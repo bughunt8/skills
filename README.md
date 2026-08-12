@@ -27,6 +27,7 @@ Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 - **[code-review](./skills/engineering/code-review/SKILL.md)** — Two-axis review of the diff since a fixed point.
 - **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)** — Work through an in-progress git merge or rebase conflict.
 - **[wizard](./skills/engineering/wizard/SKILL.md)** — Generate an interactive bash wizard for manual steps.
+- **[safe-project-organizer](./skills/engineering/safe-project-organizer/SKILL.md)** — Analyze a project and propose conservative, reviewable structure cleanup.
 
 ## Design Skills
 
