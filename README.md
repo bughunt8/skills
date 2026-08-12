@@ -41,5 +41,6 @@ Replicated from [mattpocock/skills](https://github.com/mattpocock/skills).
 
 **Model-invoked**
 
+- **[explainer-graphic](./skills/productivity/explainer-graphic/SKILL.md)** — Build a self-contained visual explanation of a complex mechanism.
 - **[grilling](./skills/productivity/grilling/SKILL.md)** — Interview the user relentlessly about a plan or idea.
 - **[writing-for-agents](./skills/productivity/writing-for-agents/SKILL.md)** — Writing documents for agents.
