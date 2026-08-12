@@ -1,8 +1,6 @@
 # skills
 Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 
-Replicated from [mattpocock/skills](https://github.com/mattpocock/skills).
-
 ## Engineering Skills
 
 **User-invoked**
