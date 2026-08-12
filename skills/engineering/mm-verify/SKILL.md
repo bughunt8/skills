@@ -29,7 +29,3 @@ Target: the most recent completed piece of work in this conversation, or whateve
    Format: the verdict is the first line; then a claims table (claim, what was observed); then frauds found, if any; then the recommended action. Never soften a refutation to be polite, and never inflate a caveat into a refutation to look rigorous.
 
 Standing rules: judging changes nothing (read and run only; fixes happen only if the user asks afterward). If the work touched nothing runnable, say plainly what a judge can and cannot check here. This is a gate, not a second implementation: minutes, not hours; if verification needs an environment you lack, hand that back rather than guessing.
-
-## suite mode: judge a skill or a model
-
-
