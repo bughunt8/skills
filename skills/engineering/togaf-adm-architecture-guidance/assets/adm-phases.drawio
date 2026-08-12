@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2025-01-24T00:00:00.000Z" agent="TOGAF Skill" version="21.7.5">
+  <diagram id="adm-phases" name="ADM Phases">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="TOGAF ADM (Architecture Development Method)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="600" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Preliminary Phase -->
+        <mxCell id="preliminary" value="Preliminary" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="540" y="80" width="120" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Phase A: Architecture Vision -->
+        <mxCell id="phaseA" value="A&#xa;Architecture&#xa;Vision" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="540" y="160" width="120" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Phase B: Business Architecture -->
+        <mxCell id="phaseB" value="B&#xa;Business&#xa;Architecture" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="700" y="220" width="120" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Phase C: Information Systems Architecture -->
+        <mxCell id="phaseC" value="C&#xa;Information Systems&#xa;Architecture" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="760" y="340" width="120" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Phase D: Technology Architecture -->
+        <mxCell id="phaseD" value="D&#xa;Technology&#xa;Architecture" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="700" y="460" width="120" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Phase E: Opportunities and Solutions -->
+        <mxCell id="phaseE" value="E&#xa;Opportunities&#xa;&amp; Solutions" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="540" y="520" width="120" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Phase F: Migration Planning -->
+        <mxCell id="phaseF" value="F&#xa;Migration&#xa;Planning" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="380" y="460" width="120" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Phase G: Implementation Governance -->
+        <mxCell id="phaseG" value="G&#xa;Implementation&#xa;Governance" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="320" y="340" width="120" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Phase H: Architecture Change Management -->
+        <mxCell id="phaseH" value="H&#xa;Architecture&#xa;Change Mgmt" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="380" y="220" width="120" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Requirements Management (Center) -->
+        <mxCell id="reqMgmt" value="Requirements&#xa;Management" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="540" y="340" width="120" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrows between phases -->
+        <mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;" edge="1" parent="1" source="preliminary" target="phaseA">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;curved=1;" edge="1" parent="1" source="phaseA" target="phaseB">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;curved=1;" edge="1" parent="1" source="phaseB" target="phaseC">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;curved=1;" edge="1" parent="1" source="phaseC" target="phaseD">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;curved=1;" edge="1" parent="1" source="phaseD" target="phaseE">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;curved=1;" edge="1" parent="1" source="phaseE" target="phaseF">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;curved=1;" edge="1" parent="1" source="phaseF" target="phaseG">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;curved=1;" edge="1" parent="1" source="phaseG" target="phaseH">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;curved=1;" edge="1" parent="1" source="phaseH" target="phaseA">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Requirements Management connections (dashed) -->
+        <mxCell id="reqArrow1" style="edgeStyle=none;rounded=0;html=1;strokeColor=#b85450;strokeWidth=1;dashed=1;" edge="1" parent="1" source="reqMgmt" target="phaseA">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="reqArrow2" style="edgeStyle=none;rounded=0;html=1;strokeColor=#b85450;strokeWidth=1;dashed=1;" edge="1" parent="1" source="reqMgmt" target="phaseB">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="reqArrow3" style="edgeStyle=none;rounded=0;html=1;strokeColor=#b85450;strokeWidth=1;dashed=1;" edge="1" parent="1" source="reqMgmt" target="phaseC">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="reqArrow4" style="edgeStyle=none;rounded=0;html=1;strokeColor=#b85450;strokeWidth=1;dashed=1;" edge="1" parent="1" source="reqMgmt" target="phaseD">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="reqArrow5" style="edgeStyle=none;rounded=0;html=1;strokeColor=#b85450;strokeWidth=1;dashed=1;" edge="1" parent="1" source="reqMgmt" target="phaseE">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="reqArrow6" style="edgeStyle=none;rounded=0;html=1;strokeColor=#b85450;strokeWidth=1;dashed=1;" edge="1" parent="1" source="reqMgmt" target="phaseF">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="reqArrow7" style="edgeStyle=none;rounded=0;html=1;strokeColor=#b85450;strokeWidth=1;dashed=1;" edge="1" parent="1" source="reqMgmt" target="phaseG">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="reqArrow8" style="edgeStyle=none;rounded=0;html=1;strokeColor=#b85450;strokeWidth=1;dashed=1;" edge="1" parent="1" source="reqMgmt" target="phaseH">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="920" y="100" width="240" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_title" value="Legend" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="110" width="80" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend1" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="940" y="140" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend1_text" value="Vision &amp; Business" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="980" y="140" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend2" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="940" y="170" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend2_text" value="Information Systems" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="980" y="170" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend3" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="940" y="200" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend3_text" value="Planning" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="980" y="200" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend4" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="940" y="230" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend4_text" value="Governance" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="980" y="230" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend5" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="940" y="260" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend5_text" value="Requirements Mgmt" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="980" y="260" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+  
+  <diagram id="content-framework" name="Content Framework">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="cf_title" value="TOGAF Architecture Content Framework" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="600" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Business Architecture -->
+        <mxCell id="cf_biz" value="Business Architecture" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="240" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_biz1" value="Business Actor / Role" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_biz">
+          <mxGeometry y="30" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_biz2" value="Business Service" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_biz">
+          <mxGeometry y="50" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_biz3" value="Business Process" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_biz">
+          <mxGeometry y="70" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_biz4" value="Business Function" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_biz">
+          <mxGeometry y="90" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_biz5" value="Business Event" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_biz">
+          <mxGeometry y="110" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_biz6" value="Product / Contract" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_biz">
+          <mxGeometry y="130" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_biz7" value="Location / Organization" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_biz">
+          <mxGeometry y="150" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_biz8" value="Goal / Objective / Driver" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_biz">
+          <mxGeometry y="170" width="240" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Data Architecture -->
+        <mxCell id="cf_data" value="Data Architecture" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="360" y="80" width="240" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_data1" value="Data Entity" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_data">
+          <mxGeometry y="30" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_data2" value="Logical Data Component" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_data">
+          <mxGeometry y="50" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_data3" value="Physical Data Component" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_data">
+          <mxGeometry y="70" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_data4" value="Data Service" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_data">
+          <mxGeometry y="90" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_data5" value="Data Quality Rules" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_data">
+          <mxGeometry y="110" width="240" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Application Architecture -->
+        <mxCell id="cf_app" value="Application Architecture" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="640" y="80" width="240" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_app1" value="Application Component" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_app">
+          <mxGeometry y="30" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_app2" value="Application Service" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_app">
+          <mxGeometry y="50" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_app3" value="Application Interface" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_app">
+          <mxGeometry y="70" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_app4" value="Application Function" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_app">
+          <mxGeometry y="90" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_app5" value="Application Interaction" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_app">
+          <mxGeometry y="110" width="240" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Technology Architecture -->
+        <mxCell id="cf_tech" value="Technology Architecture" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;fillColor=#e1d5e7;strokeColor=#9673a6;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="920" y="80" width="240" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_tech1" value="Technology Component" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_tech">
+          <mxGeometry y="30" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_tech2" value="Platform Service" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_tech">
+          <mxGeometry y="50" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_tech3" value="Node" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_tech">
+          <mxGeometry y="70" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_tech4" value="Communication Path" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_tech">
+          <mxGeometry y="90" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_tech5" value="System Software / Artifact" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_tech">
+          <mxGeometry y="110" width="240" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Cross-Cutting Entities -->
+        <mxCell id="cf_cross" value="Cross-Cutting Entities" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;fillColor=#f5f5f5;strokeColor=#666666;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="320" width="500" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_cross1" value="Capability - Business ability to achieve outcomes" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_cross">
+          <mxGeometry y="30" width="500" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_cross2" value="Principle - Fundamental guidance for architecture decisions" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_cross">
+          <mxGeometry y="50" width="500" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_cross3" value="Requirement - Need that the architecture must satisfy" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_cross">
+          <mxGeometry y="70" width="500" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_cross4" value="Constraint - Restriction on the architecture" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_cross">
+          <mxGeometry y="90" width="500" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_cross5" value="Gap - Difference between baseline and target architecture" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_cross">
+          <mxGeometry y="110" width="500" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_cross6" value="Work Package - Planned work to address gaps" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_cross">
+          <mxGeometry y="130" width="500" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_cross7" value="Standard - Approved technology or methodology" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_cross">
+          <mxGeometry y="150" width="500" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Building Blocks -->
+        <mxCell id="cf_bb" value="Building Blocks" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;fillColor=#ffe6cc;strokeColor=#d79b00;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="620" y="320" width="540" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_bb1" value="ABB (Architecture Building Block) - Logical definition, implementation-independent" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_bb">
+          <mxGeometry y="30" width="540" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="cf_bb2" value="SBB (Solution Building Block) - Specific product/technology implementation of ABB" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" vertex="1" parent="cf_bb">
+          <mxGeometry y="60" width="540" height="30" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
