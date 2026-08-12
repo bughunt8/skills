@@ -28,6 +28,7 @@ Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 - **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)** — Work through an in-progress git merge or rebase conflict.
 - **[wizard](./skills/engineering/wizard/SKILL.md)** — Generate an interactive bash wizard for manual steps.
 - **[togaf-advisor](./skills/engineering/togaf-advisor/SKILL.md)** — TOGAF 10-grounded enterprise architecture decision support. [Upstream source and attribution](./skills/engineering/togaf-advisor/ATTRIBUTION.md).
+- **[github-repository-setup](./skills/engineering/github-repository-setup/SKILL.md)** — Audit and incrementally set up GitHub repositories with governance, quality, CI, release, security, and deployment automation. [Upstream source and attribution](./skills/engineering/github-repository-setup/ATTRIBUTION.md).
 
 ## Design Skills
 
