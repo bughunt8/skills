@@ -29,6 +29,12 @@ Replicated from [mattpocock/skills](https://github.com/mattpocock/skills).
 - **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)** — Work through an in-progress git merge or rebase conflict.
 - **[wizard](./skills/engineering/wizard/SKILL.md)** — Generate an interactive bash wizard for manual steps.
 
+## Design Skills
+
+**Model-invoked**
+
+- **[ui-ux-pro-max](./skills/design/ui-ux-pro-max/SKILL.md)** — Searchable UI/UX design intelligence for building and reviewing accessible web, mobile, and desktop interfaces.
+
 ## Productivity Skills
 
 **User-invoked**
