@@ -24,6 +24,7 @@ Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 - **[tdd](./skills/engineering/tdd/SKILL.md)** — Test-driven development with a red-green-refactor loop.
 - **[domain-modeling](./skills/engineering/domain-modeling/SKILL.md)** — Build and sharpen a project's domain model.
 - **[codebase-design](./skills/engineering/codebase-design/SKILL.md)** — Shared discipline for designing deep modules.
+- **[togaf-adm-architecture-guidance](./skills/engineering/togaf-adm-architecture-guidance/SKILL.md)** — Apply TOGAF ADM for enterprise architecture planning, governance, and transition planning.
 - **[code-review](./skills/engineering/code-review/SKILL.md)** — Two-axis review of the diff since a fixed point.
 - **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)** — Work through an in-progress git merge or rebase conflict.
 - **[wizard](./skills/engineering/wizard/SKILL.md)** — Generate an interactive bash wizard for manual steps.
