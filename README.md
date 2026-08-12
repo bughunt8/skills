@@ -26,6 +26,7 @@ Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 - **[codebase-design](./skills/engineering/codebase-design/SKILL.md)** — Shared discipline for designing deep modules.
 - **[code-review](./skills/engineering/code-review/SKILL.md)** — Two-axis review of the diff since a fixed point.
 - **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)** — Work through an in-progress git merge or rebase conflict.
+- **[strict-api](./skills/engineering/strict-api/SKILL.md)** — Verify APIs against the user's installed version before writing code.
 - **[wizard](./skills/engineering/wizard/SKILL.md)** — Generate an interactive bash wizard for manual steps.
 
 ## Design Skills
