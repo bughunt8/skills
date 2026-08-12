@@ -38,9 +38,9 @@ Replicated from [mattpocock/skills](https://github.com/mattpocock/skills).
 - **[teach](./skills/productivity/teach/SKILL.md)** — Teach the user a new skill or concept over multiple sessions.
 - **[to-questionnaire](./skills/productivity/to-questionnaire/SKILL.md)** — Turn a decision into a questionnaire for someone else.
 - **[wait-what](./skills/productivity/wait-what/SKILL.md)** — Re-pitch the last message in plain English.
-- **[management-consultant](./skills/productivity/management-consultant/SKILL.md)** — Structure and solve business, strategy, operations, and transformation problems with consulting frameworks and supporting reference material. Based on [claude-skill-management-consultant-B1 by DogInfantry](https://github.com/DogInfantry/claude-skill-management-consultant-B1), licensed under Apache-2.0.
 
 **Model-invoked**
 
 - **[grilling](./skills/productivity/grilling/SKILL.md)** — Interview the user relentlessly about a plan or idea.
 - **[writing-for-agents](./skills/productivity/writing-for-agents/SKILL.md)** — Writing documents for agents.
+- **[management-consultant](./skills/productivity/management-consultant/SKILL.md)** — Structure and solve business, strategy, operations, and transformation problems with consulting frameworks and supporting reference material. Based on [claude-skill-management-consultant-B1 by DogInfantry](https://github.com/DogInfantry/claude-skill-management-consultant-B1), licensed under Apache-2.0.

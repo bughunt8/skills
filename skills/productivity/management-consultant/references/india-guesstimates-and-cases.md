@@ -1,6 +1,8 @@
 # India Guesstimates, Benchmarks & Case Drills
 
-Companion to `references/guesstimates-and-frameworks-quantified.md` and `references/case-bank-worked.md`, tuned to the **Indian market**: worked guesstimates drawn as segment trees, a benchmark-numbers cheat sheet, compact sector snapshots, and a few case drills. Every figure here is an **approximate, directional benchmark** for structuring — label anything you compute on top as `[ILLUSTRATIVE]` and sanity-check the arithmetic before presenting.
+> **Local modification:** The cross-reference below was updated to the bundled equivalent.
+
+Companion to `references/guesstimates-and-frameworks-quantified.md` and `references/case-bank-interview-classics.md`, tuned to the **Indian market**: worked guesstimates drawn as segment trees, a benchmark-numbers cheat sheet, compact sector snapshots, and a few case drills. Every figure here is an **approximate, directional benchmark** for structuring — label anything you compute on top as `[ILLUSTRATIVE]` and sanity-check the arithmetic before presenting.
 
 ---
 
