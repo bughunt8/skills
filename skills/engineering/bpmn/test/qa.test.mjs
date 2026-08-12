@@ -7,7 +7,6 @@ import { layoutModel, validateModel } from '../scripts/lib.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => readFileSync(join(here, 'fixtures', name), 'utf-8');
-const evalFile = (name) => readFileSync(join(here, '../../../evals/files', name), 'utf-8');
 
 test('generation is deterministic (same input -> identical output)', async () => {
   const a = await layoutModel(fixture('semantics-subprocess.bpmn'));
@@ -29,7 +28,7 @@ test('collaboration layout is stable on re-run', async () => {
 
 test('real exported fixtures parse and validate', async () => {
   for (const name of ['return.bpmn', 'order.bpmn', 'hiring.bpmn']) {
-    const v = await validateModel(evalFile(name));
+    const v = await validateModel(fixture(name));
     assert.equal(v.ok, true, `${name}: ${JSON.stringify(v)}`);
   }
 });
