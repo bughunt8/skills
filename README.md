@@ -15,6 +15,13 @@ Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 - **[implement](./skills/engineering/implement/SKILL.md)** — Build the work described by a spec or set of tickets.
 - **[wayfinder](./skills/engineering/wayfinder/SKILL.md)** — Plan a huge chunk of work as a shared map of decision tickets.
 - **[impeccable](./skills/engineering/impeccable/SKILL.md)** — Direct and improve frontend UX and visual design.
+- **[mm-method](./skills/engineering/mm-method/SKILL.md)** — A disciplined evidence-based problem-solving loop for multi-step tasks.
+- **[mm-loop](./skills/engineering/mm-loop/SKILL.md)** — Orchestrate planning, execution, adversarial verification, and outcome-first reporting.
+- **[mm-verify](./skills/engineering/mm-verify/SKILL.md)** — Independently verify completed work against its claims and evidence.
+- **[mm-domain](./skills/engineering/mm-domain/SKILL.md)** — Create a grounded, domain-specific adapter for the model-mesh method.
+
+The model-mesh skills are imported from [bughunt8/model-mesh](https://github.com/bughunt8/model-mesh);
+see [their local attribution and license](./skills/engineering/model-mesh-ATTRIBUTION.md).
 
 **Model-invoked**
 
