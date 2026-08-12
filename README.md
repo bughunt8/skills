@@ -3,6 +3,10 @@ Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 
 Replicated from [mattpocock/skills](https://github.com/mattpocock/skills).
 
+The [BPMN skill](./skills/engineering/bpmn/) is imported from
+[architawr/claude-bpmn-skill](https://github.com/architawr/claude-bpmn-skill)
+and retains its MIT license and attribution in its directory.
+
 ## Engineering Skills
 
 **User-invoked**
@@ -19,6 +23,7 @@ Replicated from [mattpocock/skills](https://github.com/mattpocock/skills).
 
 **Model-invoked**
 
+- **[bpmn](./skills/engineering/bpmn/SKILL.md)** — Read, explain, create, and edit BPMN 2.0 process diagrams.
 - **[prototype](./skills/engineering/prototype/SKILL.md)** — Build a throwaway prototype to answer a design question.
 - **[diagnosing-bugs](./skills/engineering/diagnosing-bugs/SKILL.md)** — Disciplined diagnosis loop for hard bugs.
 - **[research](./skills/engineering/research/SKILL.md)** — Investigate a question against primary sources.
