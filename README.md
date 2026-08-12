@@ -44,6 +44,7 @@ Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 - **[teach](./skills/productivity/teach/SKILL.md)** — Teach the user a new skill or concept over multiple sessions.
 - **[to-questionnaire](./skills/productivity/to-questionnaire/SKILL.md)** — Turn a decision into a questionnaire for someone else.
 - **[wait-what](./skills/productivity/wait-what/SKILL.md)** — Re-pitch the last message in plain English.
+- **[xero-chart-of-accounts-manager](./skills/productivity/xero-chart-of-accounts-manager/SKILL.md)** — Safely inspect and manage a Xero Chart of Accounts.
 
 **Model-invoked**
 
