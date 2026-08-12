@@ -49,3 +49,4 @@ Replicated from [mattpocock/skills](https://github.com/mattpocock/skills).
 
 - **[grilling](./skills/productivity/grilling/SKILL.md)** — Interview the user relentlessly about a plan or idea.
 - **[writing-for-agents](./skills/productivity/writing-for-agents/SKILL.md)** — Writing documents for agents.
+- **[management-consultant](./skills/productivity/management-consultant/SKILL.md)** — Structure and solve business, strategy, operations, and transformation problems with consulting frameworks and supporting reference material. Based on [claude-skill-management-consultant-B1 by DogInfantry](https://github.com/DogInfantry/claude-skill-management-consultant-B1), licensed under Apache-2.0.
