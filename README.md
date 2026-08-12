@@ -33,6 +33,19 @@ Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 **Model-invoked**
 
 - **[ui-ux-pro-max](./skills/design/ui-ux-pro-max/SKILL.md)** — Searchable UI/UX design intelligence for building and reviewing accessible web, mobile, and desktop interfaces.
+- **[taste-skill](./skills/design/taste-skill/SKILL.md)** — Anti-slop frontend design for landing pages, portfolios, and redesigns.
+- **[taste-skill-v1](./skills/design/taste-skill-v1/SKILL.md)** — Original Taste Skill behavior for projects that need backward compatibility.
+- **[gpt-tasteskill](./skills/design/gpt-tasteskill/SKILL.md)** — High-variance frontend design and GSAP motion guidance for GPT/Codex.
+- **[image-to-code-skill](./skills/design/image-to-code-skill/SKILL.md)** — Image-first workflow for creating and implementing visually important websites.
+- **[redesign-skill](./skills/design/redesign-skill/SKILL.md)** — Audit and improve existing websites and applications without breaking functionality.
+- **[soft-skill](./skills/design/soft-skill/SKILL.md)** — Guidance for calm, high-end visual design and motion.
+- **[minimalist-skill](./skills/design/minimalist-skill/SKILL.md)** — Editorial, restrained interface design guidance.
+- **[brutalist-skill](./skills/design/brutalist-skill/SKILL.md)** — Industrial brutalist interface design guidance.
+- **[stitch-skill](./skills/design/stitch-skill/SKILL.md)** — Semantic design-system guidance for Google Stitch.
+- **[imagegen-frontend-web](./skills/design/imagegen-frontend-web/SKILL.md)** — Image-generation direction for premium web design references.
+- **[imagegen-frontend-mobile](./skills/design/imagegen-frontend-mobile/SKILL.md)** — Image-generation direction for premium mobile screen concepts and flows.
+- **[brandkit](./skills/design/brandkit/SKILL.md)** — Image-generation direction for premium brand-kit and identity boards.
+- **[output-skill](./skills/design/output-skill/SKILL.md)** — Full-output enforcement for exhaustive, unabridged agent responses.
 
 ## Productivity Skills
 
