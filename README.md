@@ -16,6 +16,7 @@ Replicated from [mattpocock/skills](https://github.com/mattpocock/skills).
 - **[to-tickets](./skills/engineering/to-tickets/SKILL.md)** — Break any plan into tracer-bullet tickets.
 - **[implement](./skills/engineering/implement/SKILL.md)** — Build the work described by a spec or set of tickets.
 - **[wayfinder](./skills/engineering/wayfinder/SKILL.md)** — Plan a huge chunk of work as a shared map of decision tickets.
+- **[impeccable](./skills/engineering/impeccable/SKILL.md)** — Direct and improve frontend UX and visual design.
 
 **Model-invoked**
 
