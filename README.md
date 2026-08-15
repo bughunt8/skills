@@ -27,6 +27,7 @@ Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 - **[togaf-adm-architecture-guidance](./skills/engineering/togaf-adm-architecture-guidance/SKILL.md)** — Apply TOGAF ADM for enterprise architecture planning, governance, and transition planning.
 - **[code-review](./skills/engineering/code-review/SKILL.md)** — Two-axis review of the diff since a fixed point.
 - **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)** — Work through an in-progress git merge or rebase conflict.
+- **[strict-api](./skills/engineering/strict-api/SKILL.md)** — Verify APIs against the user's installed version before writing code.
 - **[wizard](./skills/engineering/wizard/SKILL.md)** — Generate an interactive bash wizard for manual steps.
 - **[togaf-advisor](./skills/engineering/togaf-advisor/SKILL.md)** — TOGAF 10-grounded enterprise architecture decision support. [Upstream source and attribution](./skills/engineering/togaf-advisor/ATTRIBUTION.md).
 - **[github-repository-setup](./skills/engineering/github-repository-setup/SKILL.md)** — Audit and incrementally set up GitHub repositories with governance, quality, CI, release, security, and deployment automation. [Upstream source and attribution](./skills/engineering/github-repository-setup/ATTRIBUTION.md).
