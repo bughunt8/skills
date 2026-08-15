@@ -60,6 +60,7 @@ Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 - **[teach](./skills/productivity/teach/SKILL.md)** — Teach the user a new skill or concept over multiple sessions.
 - **[to-questionnaire](./skills/productivity/to-questionnaire/SKILL.md)** — Turn a decision into a questionnaire for someone else.
 - **[wait-what](./skills/productivity/wait-what/SKILL.md)** — Re-pitch the last message in plain English.
+- **[agile-prd-creator](./skills/productivity/agile-prd-creator/SKILL.md)** — Generate comprehensive Agile PRDs. Adapted from [prd-generator by James Rochabrun](https://github.com/jamesrochabrun/skills), licensed under MIT.
 
 **Model-invoked**
 
