@@ -74,7 +74,7 @@ The following complete skill domains are imported from [Alireza Rezvani's Claude
 | Domain | Skills | Description |
 | --- | ---: | --- |
 | [business-growth](./skills/business-growth/) | 5 | Customer success, sales engineering, revenue operations, contracts, and business development. |
-| [business-operations](./skills/business-operations/) | 7 | Process, procurement, capacity, communications, knowledge, and vendor operations. |
+| [business-operations](./skills/business-operations/) | 8 | Process mapping, BPMN diagram modeling, procurement, capacity, communications, knowledge, and vendor operations. |
 | [c-level-advisor](./skills/c-level-advisor/) | 68 | C-suite advisory and leadership workflows. |
 | [commercial](./skills/commercial/) | 8 | Pricing, deal desk, partnerships, commercial policy, and forecasting. |
 | [compliance-os](./skills/compliance-os/) | 9 | Compliance controls, evidence, and audit-readiness workflows. |

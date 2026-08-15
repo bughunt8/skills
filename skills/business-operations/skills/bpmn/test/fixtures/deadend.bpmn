@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="D" targetNamespace="x">
+  <bpmn:process id="P" isExecutable="false">
+    <bpmn:startEvent id="S"/>
+    <bpmn:exclusiveGateway id="G" name="Which?"/>
+    <bpmn:task id="STUCK" name="Stuck"/>
+    <bpmn:endEvent id="E"/>
+    <bpmn:sequenceFlow id="f0" sourceRef="S" targetRef="G"/>
+    <bpmn:sequenceFlow id="f1" sourceRef="G" targetRef="E"/>
+    <bpmn:sequenceFlow id="f2" sourceRef="G" targetRef="STUCK"/>
+  </bpmn:process>
+</bpmn:definitions>

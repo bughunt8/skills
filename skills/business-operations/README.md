@@ -2,13 +2,14 @@
 
 **Internal-operations skills for BizOps leads, COO direct reports, vendor management, IT ops.**
 
-v2.8.0 — 7 skills (orchestrator + 6 sub-skills), 18 stdlib Python tools, 24 references citing 7+ authoritative sources each.
+v2.9.0 — 8 skills (orchestrator + 7 sub-skills), including BPMN 2.0 diagram reading/editing tooling and deterministic process analysis workflows.
 
 ## Skills
 
 | Skill | Job-to-be-done |
 |---|---|
 | [`business-operations-skills`](skills/business-operations-skills/) | Orchestrator — routes to the right sub-skill via `context: fork` + Matt Pocock grill discipline |
+| [`bpmn`](skills/bpmn/) | "Read, explain, create, and edit `.bpmn` workflow diagrams" — semantics-aware BPMN 2.0 tooling + auto-layout/validation/linting. [Upstream source and attribution](skills/bpmn/ATTRIBUTION.md). |
 | [`process-mapper`](skills/process-mapper/) | "Where does the work spend most of its time waiting?" — BPMN + bottleneck + cycle-time |
 | [`vendor-management`](skills/vendor-management/) | "Is this vendor delivering, and what's the risk if they fail?" — scorecard + SLA + risk |
 | [`capacity-planner`](skills/capacity-planner/) | "Are we sized to peak demand without burning the team?" — Erlang-C + utilization + hiring sequence |

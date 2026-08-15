@@ -1,6 +1,6 @@
 ---
 name: business-operations-skills
-description: Use when running, diagnosing, or designing internal business operations — process documentation, vendor SLAs, capacity planning, internal comms, SOP/runbook authoring, procurement spend. Triggers on "BizOps review", "where's the bottleneck", "vendor health", "internal SOP", "all-hands deck", "spend categorization", "capacity for Q3", "process mapping". Forks context to route to one of six BizOps sub-skills (process-mapper, vendor-management, capacity-planner, internal-comms, knowledge-ops, procurement-optimizer) and returns a digest. Distinct from business-growth (external sales motion) and c-level-advisor (strategic, not operational).
+description: Use when running, diagnosing, or designing internal business operations — process documentation, BPMN modeling, vendor SLAs, capacity planning, internal comms, SOP/runbook authoring, procurement spend. Triggers on "BizOps review", "where's the bottleneck", "vendor health", "internal SOP", "all-hands deck", "spend categorization", "capacity for Q3", "process mapping", ".bpmn". Forks context to route to one of seven BizOps sub-skills (bpmn, process-mapper, vendor-management, capacity-planner, internal-comms, knowledge-ops, procurement-optimizer) and returns a digest. Distinct from business-growth (external sales motion) and c-level-advisor (strategic, not operational).
 context: fork
 version: 2.8.0
 author: claude-code-skills
@@ -11,12 +11,13 @@ compatible_tools: [claude-code, codex-cli, cursor, antigravity, opencode, gemini
 
 # Business Operations — Domain Orchestrator
 
-The BizOps surface is **internal**: how the company actually runs. This orchestrator forks its conversation context, routes your inquiry to one of six sub-skills, then returns a tight digest to the parent thread. The heavy ingestion (vendor catalogs, process interviews, multi-doc SOP intake) stays in the forked context.
+The BizOps surface is **internal**: how the company actually runs. This orchestrator forks its conversation context, routes your inquiry to one of seven sub-skills, then returns a tight digest to the parent thread. The heavy ingestion (vendor catalogs, process interviews, multi-doc SOP intake) stays in the forked context.
 
 ## When to invoke
 
 | Symptom | Sub-skill to route to |
 |---|---|
+| "Read, explain, create, or edit a `.bpmn` process file." | `bpmn` |
 | "Where does the work spend most of its time waiting?" | `process-mapper` |
 | "Is this vendor delivering against the SLA?" | `vendor-management` |
 | "Do we have enough people to ship in Q3?" | `capacity-planner` |
@@ -32,7 +33,8 @@ The orchestrator classifies the inquiry by **signals** detected in the prompt. T
 
 | Signal class | Keywords | Sub-skill |
 |---|---|---|
-| **PROCESS** | bottleneck, cycle time, waiting, handoff, BPMN, process map, workflow | `process-mapper` |
+| **BPMN_FILE** | .bpmn, bpmn xml, camunda, zeebe, flowable, bpmn.io | `bpmn` |
+| **PROCESS** | bottleneck, cycle time, waiting, handoff, process map, workflow | `process-mapper` |
 | **VENDOR** | vendor, supplier, SLA, contract, third-party, MSA, SaaS subscription, renewal | `vendor-management` |
 | **CAPACITY** | headcount, capacity, utilization, planning, hiring sequence, FTE | `capacity-planner` |
 | **COMMS** | all-hands, internal newsletter, announcement, change management, FAQ, town hall | `internal-comms` |
@@ -133,7 +135,7 @@ Every sub-skill produces at least one artifact (markdown, CSV, or JSON) saved to
 
 ## Anti-patterns (do not)
 
-- ❌ Run all 6 sub-skills "to be thorough" — pick one based on signal, return digest, let user chain
+- ❌ Run all 7 sub-skills "to be thorough" — pick one based on signal, return digest, let user chain
 - ❌ Auto-approve a vendor or process change — surface findings; the human decides
 - ❌ Edit production process docs without asking — write to a new file, propose the diff
 - ❌ Skip the digest step — parent context needs ≤ 200-word digest, not the full sub-skill output
