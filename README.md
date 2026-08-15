@@ -36,6 +36,19 @@ Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 **Model-invoked**
 
 - **[ui-ux-pro-max](./skills/design/ui-ux-pro-max/SKILL.md)** — Searchable UI/UX design intelligence for building and reviewing accessible web, mobile, and desktop interfaces.
+- **[taste-skill](./skills/design/taste-skill/SKILL.md)** — Anti-slop frontend design for landing pages, portfolios, and redesigns.
+- **[taste-skill-v1](./skills/design/taste-skill-v1/SKILL.md)** — Original Taste Skill behavior for projects that need backward compatibility.
+- **[gpt-tasteskill](./skills/design/gpt-tasteskill/SKILL.md)** — High-variance frontend design and GSAP motion guidance for GPT/Codex.
+- **[image-to-code-skill](./skills/design/image-to-code-skill/SKILL.md)** — Image-first workflow for creating and implementing visually important websites.
+- **[redesign-skill](./skills/design/redesign-skill/SKILL.md)** — Audit and improve existing websites and applications without breaking functionality.
+- **[soft-skill](./skills/design/soft-skill/SKILL.md)** — Guidance for calm, high-end visual design and motion.
+- **[minimalist-skill](./skills/design/minimalist-skill/SKILL.md)** — Editorial, restrained interface design guidance.
+- **[brutalist-skill](./skills/design/brutalist-skill/SKILL.md)** — Industrial brutalist interface design guidance.
+- **[stitch-skill](./skills/design/stitch-skill/SKILL.md)** — Semantic design-system guidance for Google Stitch.
+- **[imagegen-frontend-web](./skills/design/imagegen-frontend-web/SKILL.md)** — Image-generation direction for premium web design references.
+- **[imagegen-frontend-mobile](./skills/design/imagegen-frontend-mobile/SKILL.md)** — Image-generation direction for premium mobile screen concepts and flows.
+- **[brandkit](./skills/design/brandkit/SKILL.md)** — Image-generation direction for premium brand-kit and identity boards.
+- **[output-skill](./skills/design/output-skill/SKILL.md)** — Full-output enforcement for exhaustive, unabridged agent responses.
 
 ## Productivity Skills
 
@@ -53,3 +66,28 @@ Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 - **[grilling](./skills/productivity/grilling/SKILL.md)** — Interview the user relentlessly about a plan or idea.
 - **[writing-for-agents](./skills/productivity/writing-for-agents/SKILL.md)** — Writing documents for agents.
 - **[management-consultant](./skills/productivity/management-consultant/SKILL.md)** — Structure and solve business, strategy, operations, and transformation problems with consulting frameworks and supporting reference material. Based on [claude-skill-management-consultant-B1 by DogInfantry](https://github.com/DogInfantry/claude-skill-management-consultant-B1), licensed under Apache-2.0.
+
+## Additional Skill Domains
+
+The following complete skill domains are imported from [Alireza Rezvani's Claude Skills collection](https://github.com/borahanmirzaii/alirezarezvani-claude-skills) at commit [`aa8d778`](https://github.com/borahanmirzaii/alirezarezvani-claude-skills/tree/aa8d778811a557a2c28ccadda4cf3d0bd028a4cc). Each domain retains its workflows, scripts, references, and nested license notices. See [the attribution record](./skills/ALIREZAREZVANI_CLAUDE_SKILLS_ATTRIBUTION.md) for provenance and exclusions made to avoid duplicating local skills.
+
+| Domain | Skills | Description |
+| --- | ---: | --- |
+| [business-growth](./skills/business-growth/) | 5 | Customer success, sales engineering, revenue operations, contracts, and business development. |
+| [business-operations](./skills/business-operations/) | 7 | Process, procurement, capacity, communications, knowledge, and vendor operations. |
+| [c-level-advisor](./skills/c-level-advisor/) | 68 | C-suite advisory and leadership workflows. |
+| [commercial](./skills/commercial/) | 8 | Pricing, deal desk, partnerships, commercial policy, and forecasting. |
+| [compliance-os](./skills/compliance-os/) | 9 | Compliance controls, evidence, and audit-readiness workflows. |
+| [engineering](./skills/engineering/) | 81 | Advanced engineering, reliability, security, infrastructure, and agent-development skills. |
+| [engineering-team](./skills/engineering-team/) | 52 | Core engineering roles across architecture, frontend, backend, QA, DevOps, security, data, and AI. |
+| [finance](./skills/finance/) | 4 | Financial analysis, SaaS metrics, and investment advisory. |
+| [loop-library](./skills/loop-library/) | 1 | Discovering, auditing, adapting, and designing bounded agent loops. |
+| [markdown-html](./skills/markdown-html/) | 5 | Markdown-to-interactive-HTML generation and review workflows. |
+| [marketing](./skills/marketing/) | 1 | Landing-page generation. |
+| [marketing-skill](./skills/marketing-skill/) | 48 | Content, SEO/AEO, CRO, growth, intelligence, and sales workflows. |
+| [product-team](./skills/product-team/) | 17 | Product management, discovery, strategy, UX research, and roadmaps. |
+| [productivity](./skills/productivity/) | 10 | Capture, email, reflection, deep work, meetings, reviews, and decision support. |
+| [project-management](./skills/project-management/) | 9 | Project, agile, Jira, Confluence, and Atlassian workflows. |
+| [ra-qm-team](./skills/ra-qm-team/) | 19 | Regulatory affairs, quality management, and risk workflows. |
+| [research](./skills/research/) | 9 | Academic and deep-research workflows. |
+| [research-ops](./skills/research-ops/) | 5 | Clinical, financial, market, and product research operations. |
