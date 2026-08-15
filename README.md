@@ -30,6 +30,7 @@ Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 - **[wizard](./skills/engineering/wizard/SKILL.md)** — Generate an interactive bash wizard for manual steps.
 - **[togaf-advisor](./skills/engineering/togaf-advisor/SKILL.md)** — TOGAF 10-grounded enterprise architecture decision support. [Upstream source and attribution](./skills/engineering/togaf-advisor/ATTRIBUTION.md).
 - **[github-repository-setup](./skills/engineering/github-repository-setup/SKILL.md)** — Audit and incrementally set up GitHub repositories with governance, quality, CI, release, security, and deployment automation. [Upstream source and attribution](./skills/engineering/github-repository-setup/ATTRIBUTION.md).
+- **[skill-creator](./skills/engineering/skill-creator/SKILL.md)** — Create, evaluate, and iteratively improve skills, including benchmark and trigger-description optimization workflows. [Upstream source and attribution](./skills/engineering/skill-creator/ATTRIBUTION.md).
 
 ## Design Skills
 
