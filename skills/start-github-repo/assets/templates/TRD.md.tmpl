@@ -1,0 +1,166 @@
+# TRD: {{PROJECT_NAME}}
+
+<!-- id: TRD-{{PROJECT_NAME}} · implements: PRD-{{PROJECT_NAME}} · status: draft · authors: TODO -->
+<!-- Do not paste formal interface or data definitions in full; link to the source of truth. -->
+<!-- Design docs should rarely contain code. -->
+<!-- If the designed system has not shipped yet, update this doc. After shipping, add amendments and ADRs. -->
+
+## 1. Abstract
+
+TODO — one paragraph a reader can use to decide whether to read on.
+
+## 2. Context and Scope
+
+<!-- Not a requirements doc. Keep it succinct. -->
+
+TODO
+
+## 3. Goals and Non-Goals
+
+**Goals**
+
+- TODO
+
+**Non-Goals**
+
+- TODO
+
+## 4. Requirements Traced
+
+<!-- THE load-bearing table. Every FR-/NFR- in the PRD must appear here.
+     scripts/validate_docs.py enforces this in both directions. -->
+
+| Req ID | Requirement (MUST) | Design section | Screen | Task(s) | Test | Issue | Status |
+|---|---|---|---|---|---|---|---|
+| FR-001 | TODO | §6.2 | SCR-001 | — | `test/TODO.spec.ts › FR-001 TODO` | — | not started |
+| NFR-001 | TODO | §7.1 | — | — | `test/TODO.spec.ts` | — | not started |
+| NFR-002 | TODO | §7.2 | — | — | `test/TODO.spec.ts` | — | not started |
+| NFR-003 | TODO | §7.3 | — | — | `test/TODO.spec.ts` | — | not started |
+
+## 5. Architecture Overview
+
+```mermaid
+flowchart LR
+  Client[Client] --> Edge[{{PROJECT_NAME}} Worker]
+  Edge --> Store[(Storage)]
+```
+
+TODO — narrate the diagram in three sentences.
+
+## 6. Detailed Design
+
+### 6.1 Runtime & Deployment Topology
+
+TODO — routes, environments, regions, cold-start characteristics.
+
+### 6.2 Public API / Contracts
+
+TODO — endpoints, request/response shape, error model, versioning policy. Link to the schema source
+of truth rather than restating it.
+
+### 6.3 Data Model & Storage
+
+TODO — entities, keys, indexes, retention, migration posture.
+
+### 6.4 Key Flows & Sequence Diagrams
+
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant W as Worker
+  C->>W: TODO
+  W-->>C: TODO
+```
+
+### 6.5 Configuration, Secrets & Bindings
+
+TODO — every binding by name and purpose. Secrets by name only, never by value. See `.env.example`
+and `.dev.vars.example`.
+
+### 6.6 Degree of Constraint
+
+TODO — where this design is deliberately rigid, and where it is deliberately open.
+
+## 7. Non-Functional Requirements
+
+<!-- ISO/IEC 25010:2023 framing. Note: Availability is under Reliability; Scalability is under
+     Flexibility. Compliance is not one of the nine characteristics — file it under constraints. -->
+
+### 7.1 Performance Efficiency
+
+Time behaviour, capacity, resource utilization. TODO
+
+### 7.2 Reliability
+
+Faultlessness, fault tolerance, availability, recoverability. TODO
+
+### 7.3 Security
+
+Confidentiality, integrity, non-repudiation, accountability, authenticity, resistance. TODO
+
+### 7.4 Flexibility
+
+Testability, adaptability, scalability, installability, replaceability. TODO
+
+### 7.5 Compliance & Data-Protection Constraints
+
+TODO
+
+### 7.6 Observability
+
+Logs, metrics, traces, alerts, and the SLIs that back section 7.2. TODO
+
+## 8. Alternatives Considered
+
+<!-- One of the most important sections. Trade-offs, not a list of names. -->
+
+| Option | Pros | Cons | Why not chosen |
+|---|---|---|---|
+| TODO | TODO | TODO | TODO |
+
+## 9. Cross-Cutting Concerns
+
+Security, privacy, observability, cost. TODO
+
+## 10. Test Strategy
+
+| Layer | Scope | Tooling | Gate |
+|---|---|---|---|
+| Static | types, lint | `tsc --noEmit`, eslint | CI blocking |
+| Unit | pure logic | Vitest | coverage threshold, perFile |
+| Integration | bindings and handlers, in-runtime | Vitest Workers plugin | CI blocking |
+| E2E | user journeys | Playwright | nightly or label-gated |
+
+Test names carry the requirement ID: `describe('FR-001 ...')`. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for the red-green-refactor rule.
+
+## 11. Rollout, Migration & Rollback
+
+TODO — staged rollout, kill switch, data migration order, rollback trigger and procedure.
+
+## 12. Open Questions & Risks
+
+- TODO. Record an unresolved point by prefixing it with the clarification marker
+  described in [docs/index.md](docs/index.md) — CI fails while any remain.
+
+## 13. Decisions
+
+| ADR | Title | Status |
+|---|---|---|
+| [ADR-0001](docs/adr/0001-record-architecture-decisions.md) | Record architecture decisions | accepted |
+
+## 14. References
+
+**Normative**
+
+- TODO
+
+**Informative**
+
+- TODO
+
+## 15. Change Log
+
+| Date | Change | Author |
+|---|---|---|
+| {{YEAR}}-MM-DD | Initial draft | TODO |

@@ -1,0 +1,57 @@
+name: Spec change
+description: Propose a change to the PRD, TRD, WIREFRAME, DESIGN, or an architecture decision.
+title: "spec: "
+labels: ["spec", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for changes to the document spine itself. Implementation issues go in the bug or
+        feature forms.
+  - type: dropdown
+    id: artifact
+    attributes:
+      label: Which artifact? *(required)*
+      multiple: true
+      options:
+        - PRD.md
+        - TRD.md
+        - WIREFRAME.md
+        - DESIGN.md
+        - docs/architecture/
+        - New ADR
+        - Supersede an existing ADR
+    validations:
+      required: true
+  - type: input
+    id: ids
+    attributes:
+      label: Affected ids
+      description: Requirement, screen or ADR ids this touches.
+      placeholder: FR-001, NFR-002, SCR-001, ADR-0003
+  - type: textarea
+    id: change
+    attributes:
+      label: Proposed change *(required)*
+      description: What should the document say instead, and why?
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact assessment *(required)*
+      description: |
+        What else moves? Consider the traceability matrix, existing tests, screens, tokens, and any
+        decision this contradicts.
+    validations:
+      required: true
+  - type: dropdown
+    id: breaking
+    attributes:
+      label: Does this invalidate shipped behaviour? *(required)*
+      options:
+        - "No"
+        - "Yes — needs a migration note in the TRD"
+        - "Not sure"
+    validations:
+      required: true

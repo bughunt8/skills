@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+# script/console — opens a console against the application.
+# Optional first argument is an environment name.
+
+env_name="${1:-}"
+
+if [ -n "$env_name" ]; then
+  exec {{PACKAGE_MANAGER}} exec wrangler dev --env "$env_name"
+fi
+
+exec {{PACKAGE_MANAGER}} exec wrangler dev
