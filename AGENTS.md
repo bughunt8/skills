@@ -5,14 +5,14 @@ anything here.
 
 ## What this repository is
 
-A library of 459 agent skills across 21 directories. There is no application, no build, no
+A library of 469 agent skills across 22 directories. There is no application, no build, no
 tests to run against behaviour. Every file is an instruction to some other agent, in a
 future session, with credentials you do not have. Write accordingly.
 
 ## The five rules
 
-1. **Do not edit anything under a vendored directory.** Currently that is
-   `skills/pstack/`. Those files are copies, and the fortnightly sync overwrites them. The
+1. **Do not edit anything under a vendored directory.** Currently `skills/pstack/` and
+   `skills/job-hunt/`. Those files are copies, and the fortnightly sync overwrites them. The
    authoritative list of vendored destinations is the `dest` field of each source in
    `skills/vendor.manifest.json`.
 2. **Do not hand-edit generated files.** They carry a banner saying so. That covers the
@@ -30,7 +30,7 @@ future session, with credentials you do not have. Write accordingly.
 ## The three checks
 
 ```bash
-python3 scripts/lint_skills.py             # SK001-SK008 on all 459 SKILL.md files
+python3 scripts/lint_skills.py             # SK001-SK008 on all 469 SKILL.md files
 python3 scripts/generate_index.py --check  # README index matches the tree
 python3 scripts/sync_vendor.py --validate-manifest
 ```
@@ -64,6 +64,7 @@ New domain: add a line to `docs/domain-descriptions.json`, then
 skills/                        one directory per domain
 skills/vendor.manifest.json    every vendored upstream: repo, author, licence, commit pin, exclusions
 skills/pstack/                 vendored, read-only, refreshed automatically
+skills/job-hunt/               vendored, read-only. skills/ plus the guides/ and templates/ they link into
 scripts/sync_vendor.py         first import and every refresh use this one code path
 scripts/lint_skills.py         SKILL.md metadata validation
 scripts/generate_index.py      regenerates the README index from the tree
@@ -88,6 +89,15 @@ docs/domain-descriptions.json  human prose for the generated index
   Do not "fix" it in place.
 - **Some vendored skills assume a Cursor-style multi-model runner** (`poteto-mode`,
   `setup-pstack`, `arena`). The discipline is portable; the model names are not.
+- **A vendored source can map several upstream subtrees, not one.** job-hunt-skills has 47
+  links from its skills into a sibling `guides/` directory. The manifest maps `skills/`,
+  `guides/` and `templates/` at the same relative distance so those links keep resolving.
+  If you add a source, check its internal links before assuming `skills/` is self-contained.
+- **`skills/job-hunt/skills/_shared/` has no SKILL.md** and is not a skill. It holds the
+  shared state-layer contract. It is exempt from the per-skill provenance rule by design.
+- **The job-hunt export toolchain is not vendored.** Upstream needs Node 22 and Typst for
+  DOCX and PDF output. Markdown workflows are unaffected. Do not vendor the scripts without
+  adding Node CI to keep them honest.
 
 ## Commit convention
 

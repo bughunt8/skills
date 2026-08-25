@@ -9,3 +9,6 @@ contact_links:
   - name: Bug in a vendored pstack skill
     url: https://github.com/backnotprop/pstack/issues
     about: skills/pstack/ is a verbatim copy. Logic bugs belong upstream so everyone gets the fix.
+  - name: Bug in a vendored job-hunt skill
+    url: https://github.com/Remotivated/job-hunt-skills/issues
+    about: skills/job-hunt/ is a verbatim copy. Logic bugs belong upstream so everyone gets the fix.

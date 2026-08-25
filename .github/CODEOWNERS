@@ -9,6 +9,7 @@
 /LICENSE                            @bughunt8
 /skills/vendor.manifest.json        @bughunt8
 /skills/pstack/                     @bughunt8
+/skills/job-hunt/                   @bughunt8
 
 # Automation and the checks that gate it.
 /.github/                           @bughunt8

@@ -172,6 +172,27 @@ Fixed:
 - [`.github/dependabot.yml`](../.github/dependabot.yml) proposes action updates weekly, which
   is the necessary counterpart to pinning actions by SHA.
 
+### S9. A coverage gap the domain list hid
+
+**Medium, and a content finding rather than a structural one.** The repository had 68
+`c-level-advisor` skills, 52 `engineering-team` skills and 48 `marketing-skill` skills, and
+nothing that helps a person get hired. For a library whose README describes its audience as
+"Agentic Entrepreneurs and OPC", that is an odd hole: the same person who needs a pricing
+strategist skill needs a resume that survives a screen.
+
+The gap was invisible because the domain table listed directory names, not capabilities. A
+reader scanning 18 domain names has no way to notice that none of them covers the job search.
+
+Addressed by vendoring [Remotivated/job-hunt-skills](https://github.com/Remotivated/job-hunt-skills)
+(MIT) into `skills/job-hunt/`: 11 skills covering source resume, honest audit, tailoring to a
+posting, cover letters, company research, LinkedIn, proof-of-value assets, interview coaching,
+stage tracking, and a final claim-check pass. It is the only import here whose value is
+directly measurable, since the outcome is an interview or not.
+
+Two limitations are recorded rather than glossed over: the skills need a `my-documents/`
+workspace in the user's own directory, and the DOCX and PDF export toolchain is not vendored.
+Both are in the collection's attribution, the README and SUPPORT.md.
+
 ## What this branch changed
 
 | Area | Before | After |
@@ -179,12 +200,15 @@ Fixed:
 | `start-github-repo` self-audit | 8 errors, 2 warnings | 0 errors, 0 warnings |
 | Repository licence | none | MIT, scoped to own content |
 | Consolidated third-party notices | none | generated, CI-enforced |
-| Vendored upstreams under automation | 0 | 1 source, 40 skills |
+| Vendored upstreams under automation | 0 | 2 sources, 51 skills |
+| Skills covering the job search | 0 | 11 |
 | Skill metadata validation | none | SK001-SK008 on every pull request |
 | README counts | hand-maintained, 3 wrong | generated, CI-enforced |
 | Community health files | 0 of 7 | 7 of 7 |
 | Workflows | 0 | 3 |
 | Third-party actions | none | 3, all pinned to full commit SHAs |
+| Total skills | 459 | 469 |
+| Unresolved relative links in vendored trees | n/a | 0 of 386 checked |
 
 ## Design decisions worth stating
 
@@ -192,6 +216,31 @@ Fixed:
 and every subsequent one. A vendored directory therefore cannot become a quietly maintained
 fork, because the next scheduled run would revert it and the reversion would be visible in a
 pull request diff.
+
+**A source maps a list of subtrees, not one directory.** The first version of the manifest
+assumed an upstream keeps everything under `skills/`, because pstack does. The second import
+broke that assumption immediately: job-hunt-skills carries 47 links from its skills into a
+sibling `guides/` directory and more into `templates/`. Copying only `skills/` would have
+produced a tree where every one of those links pointed at nothing, and nothing in the original
+design would have noticed.
+
+Rather than special-case it, the schema was generalised. A source now declares `paths`, a list
+of upstream subtrees mapped into the vendored root at the same relative distance, so the links
+resolve unchanged. Two kinds: `skill-collection` for a directory of skill directories, tracked
+per child with individual provenance, and `support` for a subtree that is only linked into,
+copied whole with one provenance file. All 386 relative links across both vendored trees now
+resolve, and the check is in `CONTRIBUTING.md` for the next import.
+
+The lesson is worth stating plainly, because it will recur: a skills collection is not
+necessarily a self-contained directory. It is a directory plus everything it links into. The
+manifest has to be able to describe the second part.
+
+**An import records what it cannot do.** job-hunt-skills ships a Node 22 plus Typst toolchain
+for ATS-safe DOCX and PDF export. It is not vendored: it is an application rather than a prompt
+library, its checked-in dependency bundle is 1.9 MB, and this repository has no Node CI to keep
+it honest. That is a real reduction in capability, so it is recorded in the source's
+`limitations` array and rendered into the collection's attribution, the README and SUPPORT.md.
+A user following the skill's own instructions will otherwise file it as a bug.
 
 **Vendored content lives in its own namespace.** `skills/pstack/` rather than distributed
 into existing domains by topic. Earlier imports were merged into domains, which is friendlier
@@ -246,10 +295,18 @@ In the order that maximises value per unit of risk.
 5. **Bring the pre-manifest imports under the manifest**: the 18 alirezarezvani domains, the
    stitch skills, the design collection. Each becomes a manifest source and gets automated
    refresh and generated attribution. Largest single reduction in ongoing maintenance
-   remaining.
+   remaining. The `paths` schema now handles collections that are not self-contained, so this
+   is unblocked.
 6. **Annotate or retire `references.md`** (S7).
-7. **Add a link checker** to CI. With 1912 Markdown files, cross-references between skills
-   will rot and nothing currently notices.
+7. **Add a link checker** to CI. With over 1900 Markdown files, cross-references between
+   skills will rot and nothing currently notices. Vendored trees are the urgent case: link
+   integrity there was verified by hand during the job-hunt import and 386 links passed, but
+   an upstream refactor could break them on any fortnightly sync and no gate would catch it.
+   Upstream job-hunt-skills runs `scripts/check-internal-links.py` for exactly this reason,
+   which is a reasonable model to copy.
+8. **Decide whether to vendor the job-hunt export toolchain.** It needs Node 22, Typst and a
+   Node CI job. Worth it only if people ask for DOCX and PDF output from this repository
+   rather than from upstream.
 
 ## How to re-derive every number here
 
@@ -259,6 +316,18 @@ python3 scripts/lint_skills.py --strict --output json      # all metadata findin
 python3 scripts/generate_index.py --check                  # index freshness and counts
 python3 scripts/sync_vendor.py --validate-manifest         # provenance completeness
 python3 scripts/sync_vendor.py --check                     # drift against upstream
+
+# every relative link inside the vendored trees resolves
+python3 - <<'EOF'
+import glob, os, re
+bad = []
+for f in glob.glob("skills/pstack/**/*.md", recursive=True) + glob.glob("skills/job-hunt/**/*.md", recursive=True):
+    base = os.path.dirname(f)
+    for m in re.finditer(r'\]\((?!https?:|mailto:|#)([^)#\s]+)', open(f).read()):
+        if not os.path.exists(os.path.normpath(os.path.join(base, m.group(1)))):
+            bad.append((f, m.group(1)))
+print(f"{len(bad)} unresolved")
+EOF
 python3 skills/start-github-repo/scripts/validate_repo.py --root . --visibility public
 git ls-files '*.md' | wc -l
 find skills -name SKILL.md | wc -l

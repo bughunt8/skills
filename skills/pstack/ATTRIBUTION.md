@@ -2,20 +2,28 @@
 
 # Attribution: pstack
 
-Every skill in this directory was copied from [pstack](https://github.com/backnotprop/pstack) at commit
+Everything in this directory was copied from [pstack](https://github.com/backnotprop/pstack) at commit
 [`18e0e908a13553b0e58d065ab26dbc9a972ec8ba`](https://github.com/backnotprop/pstack/commit/18e0e908a13553b0e58d065ab26dbc9a972ec8ba), pinned on 2026-08-25.
 
 - **Upstream project:** <https://github.com/backnotprop/pstack>
 - **Original author:** Lauren Tan (@backnotprop, "poteto")
 - **Upstream licence:** MIT, reproduced verbatim in [`LICENSE.upstream`](./LICENSE.upstream)
-- **Tracked by:** [`skills/vendor.manifest.json`](../vendor.manifest.json)
-- **Refreshed by:** [`scripts/sync_vendor.py`](../../scripts/sync_vendor.py), run every two weeks by [`.github/workflows/sync-vendored-skills.yml`](../../.github/workflows/sync-vendored-skills.yml)
-- **Upstream's own source:** https://github.com/cursor/plugins/tree/main/pstack (pstack is a mirror kept in sync for standalone use)
+- **Tracked by:** [`../vendor.manifest.json`](../vendor.manifest.json)
+- **Refreshed by:** [`../../scripts/sync_vendor.py`](../../scripts/sync_vendor.py), run every two weeks by [`../../.github/workflows/sync-vendored-skills.yml`](../../.github/workflows/sync-vendored-skills.yml)
+- **Upstream's own source:** https://github.com/cursor/plugins/tree/main/pstack
 
 No functional changes were made to the vendored content. This repository adds only a
-`PROVENANCE.md` inside each skill directory and this file.
+`PROVENANCE.md` per vendored directory and this file.
 
-## Imported skills (40)
+## Layout
+
+Upstream subtrees are mapped so that the relative links inside them keep resolving.
+
+| Upstream path | Vendored to | Kind |
+| --- | --- | --- |
+| `skills` | [`./`](.//) | skill-collection |
+
+## Imported skills from `skills` (40)
 
 | Skill | Upstream permalink |
 | --- | --- |
@@ -64,20 +72,25 @@ No functional changes were made to the vendored content. This repository adds on
 
 unslop is an always-apply writing-quality skill and is a required import for this repository. The sync script fails if a mandatory skill is missing from the upstream tree or has been excluded.
 
-- [`unslop`](./unslop/)
+- `unslop`
 
 ## Deliberate exclusions
 
-Upstream skills left out of this repository, and why. Recorded so the decision is
+Upstream content left out of this repository, and why. Recorded so the decision is
 auditable rather than looking like an incomplete import.
 
-| Upstream skill | Reason |
+| Upstream path | Reason |
 | --- | --- |
 | `bro` | Requires the external backnotprop/bro repository at runtime. Out of scope for an offline-first skills library; add it as its own manifest source if that dependency is ever accepted. |
 | `reflect` | Frontmatter name collides with the local skills/productivity/reflect/skills/reflect. |
 | `tdd` | Frontmatter name collides with the local skills/engineering/tdd. The local skill is the canonical one for this repository. |
 | `teach` | Frontmatter name collides with the local skills/productivity/teach. |
 
+## Known limitations of this import
+
+- poteto-mode, setup-pstack and arena assume a Cursor-style multi-model runner. The engineering discipline in them is portable; the model names (sol, grok, fable, opus 5) are not.
+- Upstream names the poteto-mode skill `Poteto Mode`, which fails this repository's SK004 and SK005 metadata rules. It is reported as a warning rather than corrected, because correcting it would fork the file.
+
 ## Notes
 
-Vendored verbatim under a dedicated namespace so upstream refreshes are a mechanical diff. Environment note: poteto-mode, setup-pstack and arena assume a Cursor-style multi-model runner; the engineering discipline in them is portable, the model names are not.
+Vendored verbatim under a dedicated namespace so upstream refreshes are a mechanical diff. Everything upstream keeps under skills/ is self-contained, so this source needs only one mapped path.

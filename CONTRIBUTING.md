@@ -39,6 +39,28 @@ hand.
 1. Add a source to [`skills/vendor.manifest.json`](./skills/vendor.manifest.json) with the
    upstream repository, the author, the licence, the licence file path, the destination
    directory, and an `exclude_reasons` entry for anything you leave out.
+
+   **Check the upstream links before you assume `skills/` is self-contained.** A source
+   declares a list of `paths`, not one subdirectory, because that assumption already failed
+   once: job-hunt-skills has 47 links from its skills into a sibling `guides/` directory and
+   more into `templates/`. Map every subtree the skills link into, at the same relative
+   distance, and the links keep resolving. Use `kind: "skill-collection"` for a directory of
+   skill directories and `kind: "support"` for a subtree that is only linked into.
+
+   Verify it afterwards. Every relative Markdown link inside a vendored tree should resolve:
+
+   ```bash
+   python3 - <<'EOF'
+   import glob, os, re
+   bad = []
+   for f in glob.glob("skills/<dest>/**/*.md", recursive=True):
+       base = os.path.dirname(f)
+       for m in re.finditer(r'\]\((?!https?:|mailto:|#)([^)#\s]+)', open(f).read()):
+           if not os.path.exists(os.path.normpath(os.path.join(base, m.group(1)))):
+               bad.append((f, m.group(1)))
+   print(f"{len(bad)} unresolved")
+   EOF
+   ```
 2. Run `python3 scripts/sync_vendor.py --sync`. That imports the tree, writes a
    `PROVENANCE.md` into every skill directory, copies the upstream licence verbatim to
    `LICENSE.upstream`, regenerates the collection's `ATTRIBUTION.md`, and rewrites
@@ -53,9 +75,9 @@ later.
 
 ## Never edit a vendored directory in place
 
-Anything under a `dest` listed in the manifest, currently
-[`skills/pstack/`](./skills/pstack/), is a copy. The next fortnightly sync overwrites it
-and your change disappears without a trace.
+Anything under a `dest` listed in the manifest, currently [`skills/pstack/`](./skills/pstack/)
+and [`skills/job-hunt/`](./skills/job-hunt/), is a copy. The next fortnightly sync overwrites
+it and your change disappears without a trace.
 
 If a vendored skill needs changing, in order of preference:
 
@@ -94,6 +116,17 @@ fix(scripts): ...
 and it applies to this repository's own prose, not only to what the skills generate. Before
 you submit documentation, read it and apply it. No em dashes, no "delve", no bold-label
 lists that restate the line, sentence-case headings, no decorative emoji.
+
+## Record what an import cannot do
+
+An import is rarely a clean subset. job-hunt-skills ships a Node 22 plus Typst toolchain for
+DOCX and PDF export, which is an application rather than a prompt library, so it is not
+vendored. That is a real reduction in capability and it is written down in the source's
+`limitations` array, which the generator renders into the collection's `ATTRIBUTION.md` and
+the README.
+
+If your import drops something the upstream skills tell users to run, say so there. An
+undocumented gap turns into a bug report from someone following the skill's own instructions.
 
 ## Reviewing a vendored refresh
 

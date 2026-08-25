@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        There are already 459 skills here. Search the index in the README first: the most
+        There are already 469 skills here. Search the index in the README first: the most
         common outcome of this form is discovering the skill exists under a different name.
 
         To import skills someone else wrote, use the vendored-import form instead.
