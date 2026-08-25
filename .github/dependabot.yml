@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # Third-party actions are pinned to full commit SHAs, which is correct for security
+  # and useless for staying current. Dependabot is what closes that gap: it proposes
+  # the new SHA with the release notes attached.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:00'
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'chore(actions)'
+    labels:
+      - automation
+      - dependencies
+    groups:
+      actions:
+        patterns:
+          - '*'

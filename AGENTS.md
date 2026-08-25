@@ -1,0 +1,94 @@
+# AGENTS.md
+
+Instructions for an AI agent working inside this repository. Read this before editing
+anything here.
+
+## What this repository is
+
+A library of 459 agent skills across 21 directories. There is no application, no build, no
+tests to run against behaviour. Every file is an instruction to some other agent, in a
+future session, with credentials you do not have. Write accordingly.
+
+## The five rules
+
+1. **Do not edit anything under a vendored directory.** Currently that is
+   `skills/pstack/`. Those files are copies, and the fortnightly sync overwrites them. The
+   authoritative list of vendored destinations is the `dest` field of each source in
+   `skills/vendor.manifest.json`.
+2. **Do not hand-edit generated files.** They carry a banner saying so. That covers the
+   block between the `BEGIN GENERATED` and `END GENERATED` markers in `README.md`,
+   `THIRD_PARTY_NOTICES.md`, every `PROVENANCE.md`, and every vendored `ATTRIBUTION.md`.
+   Change the script or the data it reads, then run the script.
+3. **Do not import someone else's work by copying files.** Add a source to
+   `skills/vendor.manifest.json` and run `scripts/sync_vendor.py --sync`. That is the only
+   path that produces correct licence, author and commit-pinned attribution, and CI rejects
+   an import that lacks them.
+4. **Run the three checks before you claim to be finished.** Not "should pass". Run them.
+5. **Apply `skills/pstack/unslop/SKILL.md` to every sentence you write here,** including
+   commit messages and pull request bodies. It is a mandatory import for exactly this reason.
+
+## The three checks
+
+```bash
+python3 scripts/lint_skills.py             # SK001-SK008 on all 459 SKILL.md files
+python3 scripts/generate_index.py --check  # README index matches the tree
+python3 scripts/sync_vendor.py --validate-manifest
+```
+
+All three are Python standard library only. Nothing to install. They are the same commands
+`.github/workflows/ci.yml` runs, so a green local run means a green pull request.
+
+`scripts/lint_skills.py --strict` shows the 66 findings the baseline currently accepts. Do
+not add to that number. `--write-baseline` exists, and using it to silence a violation you
+introduced is the wrong move.
+
+## Adding a skill
+
+```
+skills/<domain>/<skill-name>/SKILL.md
+```
+
+Frontmatter `name` must equal the directory name, lowercase kebab-case. The `description` is
+the only text a routing agent sees before deciding whether to load the skill, so it must say
+what the skill does, when to use it, and what to use instead. Ceiling is 1024 characters.
+
+Check the name is free first. There are already 32 duplicate-name findings in the baseline
+and each one is a live risk of the wrong skill loading.
+
+New domain: add a line to `docs/domain-descriptions.json`, then
+`python3 scripts/generate_index.py --write`.
+
+## Where things are
+
+```
+skills/                        one directory per domain
+skills/vendor.manifest.json    every vendored upstream: repo, author, licence, commit pin, exclusions
+skills/pstack/                 vendored, read-only, refreshed automatically
+scripts/sync_vendor.py         first import and every refresh use this one code path
+scripts/lint_skills.py         SKILL.md metadata validation
+scripts/generate_index.py      regenerates the README index from the tree
+scripts/skill_lint_baseline.json  accepted pre-existing violations, plus non-skill path ignores
+docs/ARCHITECTURE_REVIEW.md    the audit this structure came from, and the open backlog
+docs/domain-descriptions.json  human prose for the generated index
+.github/workflows/ci.yml       the three checks, on every push and pull request
+.github/workflows/sync-vendored-skills.yml  fortnightly upstream refresh, opens a pull request
+```
+
+## Things that will trip you up
+
+- **The fortnightly cadence is a weekly cron with an even-ISO-week gate.** GitHub cron
+  cannot express "every two weeks". Do not simplify the gate away.
+- **A pull request opened by `GITHUB_TOKEN` cannot trigger `ci`.** The sync workflow
+  therefore runs the three checks itself. If you move those steps out, the automated pull
+  requests become unverified.
+- **`--check` exits 1 when upstream moved.** That is a report, not a failure. Only
+  `--validate-manifest` belongs in a blocking gate.
+- **`poteto-mode` fails SK004 and SK005** because upstream names it `Poteto Mode`. It is
+  reported as a warning, not an error, because vendored content cannot be corrected here.
+  Do not "fix" it in place.
+- **Some vendored skills assume a Cursor-style multi-model runner** (`poteto-mode`,
+  `setup-pstack`, `arena`). The discipline is portable; the model names are not.
+
+## Commit convention
+
+Conventional Commits. `feat(skills):`, `chore(vendor):`, `docs(readme):`, `fix(scripts):`.

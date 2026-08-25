@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "$comment": "Single source of truth for every skill directory in this repository that is vendored from an upstream project. scripts/sync_vendor.py reads this file to perform both the initial import and every scheduled refresh, so an import and an update take exactly the same code path. Do not hand-edit vendored directories: change the manifest, then re-run the script.",
+  "sources": [
+    {
+      "id": "pstack",
+      "name": "pstack",
+      "repo": "https://github.com/backnotprop/pstack",
+      "homepage": "https://github.com/backnotprop/pstack",
+      "upstream_of_upstream": "https://github.com/cursor/plugins/tree/main/pstack",
+      "author": "Lauren Tan (@backnotprop, \"poteto\")",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "main",
+      "pinned_commit": "18e0e908a13553b0e58d065ab26dbc9a972ec8ba",
+      "pinned_at": "2026-08-25",
+      "source_subpath": "skills",
+      "dest": "skills/pstack",
+      "include": [
+        "*"
+      ],
+      "exclude": [
+        "tdd",
+        "teach",
+        "reflect",
+        "bro"
+      ],
+      "exclude_reasons": {
+        "tdd": "Frontmatter name collides with the local skills/engineering/tdd. The local skill is the canonical one for this repository.",
+        "teach": "Frontmatter name collides with the local skills/productivity/teach.",
+        "reflect": "Frontmatter name collides with the local skills/productivity/reflect/skills/reflect.",
+        "bro": "Requires the external backnotprop/bro repository at runtime. Out of scope for an offline-first skills library; add it as its own manifest source if that dependency is ever accepted."
+      },
+      "mandatory": [
+        "unslop"
+      ],
+      "mandatory_reason": "unslop is an always-apply writing-quality skill and is a required import for this repository. The sync script fails if a mandatory skill is missing from the upstream tree or has been excluded.",
+      "notes": "Vendored verbatim under a dedicated namespace so upstream refreshes are a mechanical diff. Environment note: poteto-mode, setup-pstack and arena assume a Cursor-style multi-model runner; the engineering discipline in them is portable, the model names are not."
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+name: sync-vendored-skills
+
+# Refresh every vendored upstream declared in skills/vendor.manifest.json and open
+# a pull request when anything moved.
+#
+# Cadence: once every two weeks. GitHub cron has no fortnightly expression, so this
+# runs weekly and the fortnight gate below exits early on odd ISO weeks. That is
+# deliberate and visible rather than hidden in a third-party scheduler.
+#
+# The Actions-created pull request does not trigger the `ci` workflow, because a
+# GITHUB_TOKEN push cannot start another workflow run. Rather than pretend it does,
+# this job runs the same three checks itself before opening the pull request, and
+# names the results in the pull request body.
+
+on:
+  schedule:
+    - cron: '17 3 * * 1' # Mondays 03:17 UTC, gated to even ISO weeks below
+  workflow_dispatch:
+    inputs:
+      source:
+        description: 'Limit to one manifest source id (blank means all)'
+        required: false
+        type: string
+      force:
+        description: 'Ignore the fortnight gate and run now'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-vendored-skills
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: refresh vendored skills
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Fortnight gate
+        id: gate
+        env:
+          FORCED: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
+        run: |
+          set -euo pipefail
+          week=$(date -u +%V)
+          if [ "${FORCED}" = "true" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Manual run, gate bypassed."
+          elif [ $((10#$week % 2)) -eq 0 ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "ISO week ${week} is even, this is a sync week."
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "ISO week ${week} is odd, skipping. Next run is in seven days."
+          fi
+
+      - name: Check out repository
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Report upstream drift
+        if: steps.gate.outputs.run == 'true'
+        id: drift
+        run: |
+          # --check exits 1 when anything moved, which is the normal case here.
+          # The report is the product; the exit code is not interesting.
+          python3 scripts/sync_vendor.py --check ${SOURCE_ARG} --output text > drift.txt 2>&1 || true
+          cat drift.txt
+        env:
+          SOURCE_ARG: ${{ inputs.source && format('--source {0}', inputs.source) || '' }}
+        continue-on-error: true
+
+      - name: Apply upstream
+        if: steps.gate.outputs.run == 'true'
+        env:
+          SOURCE_ARG: ${{ inputs.source && format('--source {0}', inputs.source) || '' }}
+        run: python3 scripts/sync_vendor.py --sync ${SOURCE_ARG}
+
+      - name: Regenerate the skill index
+        if: steps.gate.outputs.run == 'true'
+        run: python3 scripts/generate_index.py --write
+
+      # These are the same gates as the ci workflow. They run here because a
+      # token-created pull request cannot start ci, so this is the only place the
+      # result is real. A failure here stops the pull request being opened.
+      - name: Validate the result
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          python3 scripts/lint_skills.py
+          python3 scripts/generate_index.py --check
+          python3 scripts/sync_vendor.py --validate-manifest
+
+      - name: Summarise for the pull request body
+        if: steps.gate.outputs.run == 'true'
+        id: summary
+        run: |
+          set -euo pipefail
+          {
+            echo 'body<<PRBODY'
+            echo 'Automated fortnightly refresh of every upstream declared in `skills/vendor.manifest.json`.'
+            echo
+            echo '## What moved'
+            echo
+            echo '```'
+            cat drift.txt || echo 'drift report unavailable'
+            echo '```'
+            echo
+            echo '## Checks run in this job'
+            echo
+            echo 'A pull request opened by `GITHUB_TOKEN` cannot trigger the `ci` workflow, so these ran'
+            echo 'in the sync job itself and all three passed before this pull request was opened:'
+            echo
+            echo '- `scripts/lint_skills.py`'
+            echo '- `scripts/generate_index.py --check`'
+            echo '- `scripts/sync_vendor.py --validate-manifest`'
+            echo
+            echo '## What a reviewer should look at'
+            echo
+            echo '- Read the upstream diff, not just this one. Vendored skills change agent behaviour.'
+            echo '- Confirm no new upstream skill name collides with a local skill.'
+            echo '- Confirm `unslop` is still present. The sync fails closed if it is not.'
+            echo '- `PROVENANCE.md`, `ATTRIBUTION.md` and `THIRD_PARTY_NOTICES.md` are regenerated, not hand-edited.'
+            echo
+            echo 'Generated by `.github/workflows/sync-vendored-skills.yml`.'
+            echo 'PRBODY'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the pull request
+        if: steps.gate.outputs.run == 'true'
+        id: pr
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ secrets.SYNC_PAT || secrets.GITHUB_TOKEN }}
+          branch: automation/sync-vendored-skills
+          delete-branch: true
+          commit-message: 'chore(vendor): refresh vendored upstream skills'
+          title: 'chore(vendor): fortnightly refresh of vendored upstream skills'
+          body: ${{ steps.summary.outputs.body }}
+          labels: |
+            automation
+            vendored-skills
+          add-paths: |
+            skills/
+            THIRD_PARTY_NOTICES.md
+            README.md
+
+      # Auto-merge only lands the pull request once the branch's required checks
+      # pass. If the repository has no required checks configured it is refused,
+      # and the pull request waits for a human instead of merging unreviewed.
+      - name: Request auto-merge
+        if: steps.gate.outputs.run == 'true' && steps.pr.outputs.pull-request-number
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_PAT || secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.pr.outputs.pull-request-number }}
+        run: |
+          if gh pr merge "$PR" --squash --auto; then
+            echo "Auto-merge armed. It lands when required checks pass."
+          else
+            echo "::warning::Auto-merge was refused. Enable it in repository settings and set at" \
+                 "least one required status check on main, then this pull request lands on its own." \
+                 "Until then it waits for a human review, which is the safe failure."
+          fi
