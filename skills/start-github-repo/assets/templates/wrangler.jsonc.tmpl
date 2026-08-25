@@ -1,0 +1,30 @@
+{
+  // Wrangler's configuration file is the source of truth. `wrangler.jsonc` is what
+  // create-cloudflare scaffolds; wrangler.toml and wrangler.json are equally valid.
+  //
+  // TRAP: `vars` is NOT inherited by named environments. Every variable must be redefined in every
+  // environment block below. The same applies to bindings.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "{{PROJECT_NAME}}",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-01-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+
+  "vars": {
+    "ENVIRONMENT": "development"
+  },
+
+  // Declaring required secrets makes `wrangler types` generate typed bindings from this list, and
+  // makes `wrangler deploy` fail when one is missing — a deploy-time error instead of a runtime one.
+  // "secrets": { "required": ["API_SIGNING_KEY"] },
+
+  "env": {
+    "staging": {
+      "vars": { "ENVIRONMENT": "staging" }
+    },
+    "production": {
+      "vars": { "ENVIRONMENT": "production" }
+    }
+  }
+}

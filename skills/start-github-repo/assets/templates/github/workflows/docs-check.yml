@@ -1,0 +1,38 @@
+name: Docs check
+
+on:
+  pull_request:
+    paths:
+      - "PRD.md"
+      - "TRD.md"
+      - "WIREFRAME.md"
+      - "DESIGN.md"
+      - "docs/**"
+      - "scripts/check-docs"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  spine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+      - uses: actions/setup-node@v4 # SCAFFOLD-PIN-SHA
+        with:
+          node-version-file: .nvmrc
+
+      # Fails on: missing required headings, malformed ids, requirements absent from the
+      # traceability matrix, screens referenced but never specified, broken ADR links, and any
+      # remaining [NEEDS CLARIFICATION] marker.
+      - name: Validate the document spine
+        run: scripts/check-docs
+
+      # Enforces design.md section order and, critically, the WCAG AA contrast ratio on every
+      # component colour pair. A design system that fails accessibility fails the build.
+      - name: Lint the design system
+        run: npx --yes @google/design.md lint DESIGN.md

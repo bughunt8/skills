@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+# script/test — runs the test suite. Accepts an optional path to narrow the run.
+# Linting is a form of testing, so it runs first and fails fast.
+
+scripts/bootstrap
+
+{{LINT_COMMAND}}
+{{PACKAGE_MANAGER}} exec tsc --noEmit
+
+if [ "$#" -gt 0 ]; then
+  exec {{TEST_COMMAND}} -- "$@"
+fi
+
+exec {{TEST_COMMAND}}

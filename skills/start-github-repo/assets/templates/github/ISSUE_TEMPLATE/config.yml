@@ -1,0 +1,13 @@
+# This file is not optional. It appeared in every surveyed repository that has an ISSUE_TEMPLATE
+# directory. It is what keeps questions and vulnerability reports out of the issue tracker.
+blank_issues_enabled: false
+contact_links:
+  - name: Question or discussion
+    url: https://github.com/{{OWNER}}/{{PROJECT_NAME}}/discussions
+    about: Ask how something works, or propose an idea before writing it up as an issue.
+  - name: Report a security vulnerability
+    url: https://github.com/{{OWNER}}/{{PROJECT_NAME}}/security/advisories/new
+    about: Report privately through a security advisory. Never open a public issue.
+  - name: Contributing guide
+    url: https://github.com/{{OWNER}}/{{PROJECT_NAME}}/blob/{{DEFAULT_BRANCH}}/CONTRIBUTING.md
+    about: Development setup, the test-first workflow, and the pull request process.

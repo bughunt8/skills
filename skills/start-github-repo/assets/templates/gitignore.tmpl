@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+.output/
+*.tsbuildinfo
+
+# Test and coverage
+coverage/
+test-results/
+playwright-report/
+blob-report/
+
+# dotenv environment variable files
+# The negation is GitHub's own idiom: .env.example is the committed template.
+.env
+.env.*
+!.env.example
+
+# Cloudflare local secrets
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.wrangler/
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
