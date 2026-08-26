@@ -25,6 +25,12 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _fail(message: str, code: int = 2):
+    print(f"error: {message}", file=sys.stderr)
+    raise SystemExit(code)
+
 SKILLS_ROOT = REPO_ROOT / "skills"
 README = REPO_ROOT / "README.md"
 DESCRIPTIONS = REPO_ROOT / "docs" / "domain-descriptions.json"
@@ -107,11 +113,31 @@ def render() -> str:
 
 
 def splice(text: str, block: str) -> str:
-    if BEGIN in text and END in text:
-        head = text.split(BEGIN)[0]
-        tail = text.split(END, 1)[1]
-        return head + block + tail
-    return text.rstrip() + "\n\n" + block + "\n"
+    """Replace the generated block, or append it when no markers exist yet.
+
+    Marker state is validated rather than assumed. An earlier version checked only
+    `BEGIN in text and END in text`, so a file with an orphan BEGIN got a second
+    complete block appended. The next run then replaced from the first BEGIN to
+    the single END and swallowed everything in between, including hand-written
+    prose. Silent corruption of the README is worse than refusing to run.
+    """
+    begins = text.count(BEGIN)
+    ends = text.count(END)
+
+    if begins == 0 and ends == 0:
+        return text.rstrip() + "\n\n" + block + "\n"
+    if begins != 1 or ends != 1:
+        _fail(
+            f"README.md has {begins} BEGIN marker(s) and {ends} END marker(s). Exactly one of "
+            f"each is required. Repair the markers by hand before running this again; splicing "
+            f"into a malformed file would delete content."
+        )
+    if text.index(BEGIN) > text.index(END):
+        _fail("README.md has its END marker before its BEGIN marker. Repair them by hand.")
+
+    head = text.split(BEGIN)[0]
+    tail = text.split(END, 1)[1]
+    return head + block + tail
 
 
 def main(argv: list) -> int:

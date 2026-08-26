@@ -7,13 +7,14 @@ Everything in this directory was copied from [pstack](https://github.com/backnot
 
 - **Upstream project:** <https://github.com/backnotprop/pstack>
 - **Original author:** Lauren Tan (@backnotprop, "poteto")
-- **Upstream licence:** MIT, reproduced verbatim in [`LICENSE.upstream`](./LICENSE.upstream)
+- **Primary licence:** MIT, reproduced verbatim in [`LICENSE.upstream`](./LICENSE.upstream)
 - **Tracked by:** [`../vendor.manifest.json`](../vendor.manifest.json)
-- **Refreshed by:** [`../../scripts/sync_vendor.py`](../../scripts/sync_vendor.py), run every two weeks by [`../../.github/workflows/sync-vendored-skills.yml`](../../.github/workflows/sync-vendored-skills.yml)
+- **Refreshed by:** [`../../scripts/sync_vendor.py`](../../scripts/sync_vendor.py), run at least every two weeks by [`../../.github/workflows/sync-vendored-skills.yml`](../../.github/workflows/sync-vendored-skills.yml)
 - **Upstream's own source:** https://github.com/cursor/plugins/tree/main/pstack
 
 No functional changes were made to the vendored content. This repository adds only a
-`PROVENANCE.md` per vendored directory and this file.
+`PROVENANCE.md` per vendored directory, a `.vendor-owned.json` ownership record, and this
+file.
 
 ## Layout
 
@@ -21,7 +22,7 @@ Upstream subtrees are mapped so that the relative links inside them keep resolvi
 
 | Upstream path | Vendored to | Kind |
 | --- | --- | --- |
-| `skills` | [`./`](.//) | skill-collection |
+| `skills` | [`./`](./) | skill-collection |
 
 ## Imported skills from `skills` (40)
 

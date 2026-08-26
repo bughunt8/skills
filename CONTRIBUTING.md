@@ -10,13 +10,21 @@ Run the same three checks CI runs. All of them are Python standard library only,
 is nothing to install.
 
 ```bash
-python3 scripts/lint_skills.py            # SK001-SK008 on every SKILL.md
-python3 scripts/generate_index.py --check # the README index still matches the tree
-python3 scripts/sync_vendor.py --validate-manifest
+python3 scripts/lint_skills.py --self-test         # the frontmatter parser refuses what it cannot read
+python3 scripts/lint_skills.py                     # SK001-SK009 on every SKILL.md
+python3 scripts/generate_index.py --check          # the README index still matches the tree
+python3 scripts/sync_vendor.py --validate-manifest # provenance, licences, ownership records
+python3 scripts/audit_third_party.py               # every licence marker is accounted for
+python3 scripts/check_links.py                     # relative links resolve
 ```
 
-`python3 scripts/lint_skills.py --strict` shows the full backlog including findings the
-baseline currently accepts. Fixing one is always a welcome pull request.
+Install PyYAML first if you do not have it (`python3 -m pip install PyYAML`). Without it the
+linter falls back to a parser that refuses YAML it cannot read, which is safe but noisier.
+
+`python3 scripts/lint_skills.py --strict` shows the full backlog including the 68 findings the
+baseline currently accepts. Fixing one is always a welcome pull request. Two of them,
+`markdown-html/skills/design-system` and `markdown-html/skills/md-slides`, have frontmatter no
+YAML loader can parse, so they are broken rather than untidy and are the best place to start.
 
 ## Adding a skill you wrote
 
@@ -47,20 +55,18 @@ hand.
    distance, and the links keep resolving. Use `kind: "skill-collection"` for a directory of
    skill directories and `kind: "support"` for a subtree that is only linked into.
 
-   Verify it afterwards. Every relative Markdown link inside a vendored tree should resolve:
+   Verify it afterwards. Every relative Markdown link inside the vendored tree must resolve:
 
    ```bash
-   python3 - <<'EOF'
-   import glob, os, re
-   bad = []
-   for f in glob.glob("skills/<dest>/**/*.md", recursive=True):
-       base = os.path.dirname(f)
-       for m in re.finditer(r'\]\((?!https?:|mailto:|#)([^)#\s]+)', open(f).read()):
-           if not os.path.exists(os.path.normpath(os.path.join(base, m.group(1)))):
-               bad.append((f, m.group(1)))
-   print(f"{len(bad)} unresolved")
-   EOF
+   python3 scripts/check_links.py --path skills/<your-dest>
    ```
+
+   That command treats an empty run as a failure. An earlier version of this section was a
+   paste-in snippet containing a literal `<dest>`, so running it verbatim matched no files and
+   printed "0 unresolved", which reads as success. If a link genuinely cannot be fixed here,
+   because it is an upstream placeholder, exempt it by exact path with a reason in
+   `docs/link-check-exemptions.json` rather than loosening the checker.
+
 2. Run `python3 scripts/sync_vendor.py --sync`. That imports the tree, writes a
    `PROVENANCE.md` into every skill directory, copies the upstream licence verbatim to
    `LICENSE.upstream`, regenerates the collection's `ATTRIBUTION.md`, and rewrites
@@ -68,10 +74,16 @@ hand.
 3. Run `python3 scripts/generate_index.py --write`.
 4. Commit the manifest change and the generated result together.
 
-An import without a licence, a named author and a commit-pinned source link does not get
-merged. That is not a formality: this repository is public and MIT, and redistributing
-someone's work without attribution is the one mistake here that cannot be quietly fixed
-later.
+An import without a licence, a named author and a commit-pinned source link does not get merged.
+That is not a formality. This repository is public and MIT, and redistributing someone's work
+without attribution is the one mistake here that cannot be quietly fixed later.
+
+It has already happened once. Eighteen skills derived from
+[mattpocock/skills](https://github.com/mattpocock/skills) say in their own text that Matt
+Pocock's content is "preserved verbatim (MIT)", and no copy of the MIT notice existed anywhere in
+the repository until an outside review found it. Naming an author in prose is credit. MIT also
+requires the copyright and permission notice to travel with the copy. Those are different things,
+and `scripts/audit_third_party.py` now enforces the second one.
 
 ## Never edit a vendored directory in place
 

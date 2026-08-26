@@ -11,11 +11,11 @@ This directory is vendored, unmodified, from an upstream project. Do not edit it
 | Pinned commit | [`5fb238febf14`](https://github.com/Remotivated/job-hunt-skills/commit/5fb238febf14a0b41fb5a8fe7384594ad1f59335) |
 | Permalink | https://github.com/Remotivated/job-hunt-skills/tree/5fb238febf14a0b41fb5a8fe7384594ad1f59335/skills/get-started |
 | Original author | Remotivated |
-| Upstream licence | MIT |
+| Upstream licence | MIT, plus OFL-1.1 |
 | Licence copy | [`../../LICENSE.upstream`](../../LICENSE.upstream) |
 | Full attribution | [`../../ATTRIBUTION.md`](../../ATTRIBUTION.md) |
 | Content kind | skill |
-| Refresh cadence | Automated every two weeks by [`../../../../.github/workflows/sync-vendored-skills.yml`](../../../../.github/workflows/sync-vendored-skills.yml) |
+| Refresh cadence | At least every two weeks by [`../../../../.github/workflows/sync-vendored-skills.yml`](../../../../.github/workflows/sync-vendored-skills.yml) |
 
 ## Changing this
 

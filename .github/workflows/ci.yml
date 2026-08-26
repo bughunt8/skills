@@ -1,7 +1,7 @@
 name: ci
 
 # A skills library has no build and no runtime, so its correctness lives entirely
-# in metadata and provenance. That is what this workflow tests.
+# in metadata, provenance and links. That is what this workflow tests.
 
 on:
   push:
@@ -32,9 +32,22 @@ jobs:
         with:
           python-version: '3.12'
 
-      # SK001-SK008. Pre-existing violations are recorded in
-      # scripts/skill_lint_baseline.json so this gate blocks new debt without
-      # requiring the whole backlog to be fixed first.
+      # The linter falls back to a strict stdlib parser without PyYAML, and that
+      # fallback refuses constructs it cannot read rather than guessing. Installing
+      # PyYAML means real YAML gets parsed as YAML instead of raising SK009.
+      - name: Install PyYAML
+        run: python3 -m pip install --quiet 'PyYAML==6.0.2'
+
+      # Proves the frontmatter parser refuses what it cannot read. Without this,
+      # a regression to naive line-matching would silently pass malformed skills.
+      - name: Test the frontmatter parser
+        run: python3 scripts/lint_skills.py --self-test
+
+      # SK001-SK009. Pre-existing violations are recorded in
+      # scripts/skill_lint_baseline.json, keyed by rule, path and a fingerprint of
+      # the message, so the gate blocks new debt without requiring the whole
+      # backlog to be fixed first and without letting a baselined path launder an
+      # unrelated new violation.
       - name: Lint every SKILL.md
         run: python3 scripts/lint_skills.py
 
@@ -43,12 +56,23 @@ jobs:
       - name: Check the generated skill index is current
         run: python3 scripts/generate_index.py --check
 
-      # Offline: every vendored directory still has provenance, a licence copy,
-      # an attribution file, no excluded skill smuggled back in, and every
-      # mandatory import still present. No network, so upstream moving does not
-      # turn unrelated pull requests red.
+      # Offline: every vendored directory still has provenance, a licence copy, an
+      # attribution file and an ownership record, no excluded skill was smuggled
+      # back in, and every mandatory import is still present. No network, so
+      # upstream moving does not turn unrelated pull requests red.
       - name: Validate vendored provenance
         run: python3 scripts/sync_vendor.py --validate-manifest
+
+      # Every licence, notice or attribution marker in the tree must be covered by
+      # the vendor manifest or the third-party inventory. This is the check that
+      # would have caught redistributing mattpocock/skills with no MIT notice.
+      - name: Reconcile third-party attribution
+        run: python3 scripts/audit_third_party.py
+
+      # Vendored trees link into each other and into sibling support directories.
+      # An upstream refactor can break those links on any scheduled refresh.
+      - name: Check relative links resolve
+        run: python3 scripts/check_links.py
 
       - name: Show the full unbaselined backlog for information
         if: always()

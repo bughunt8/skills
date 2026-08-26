@@ -100,8 +100,11 @@ Eleven skills covering the full search: build a source resume, audit it honestly
 posting, write the cover letter, research the company, optimise LinkedIn, build a proof-of-value
 asset, run interview prep, track stages, and fact-check every claim before it goes out.
 
-It fills a real gap. This repository had 68 C-suite advisory skills and nothing that helps a person
-get hired.
+It fills a real gap. This repository had 68 C-suite advisory skills and no coherent workflow for
+a person applying for work. Adjacent pieces existed, `productivity/andreessen` for career bets,
+`research/dossier` for person research, `marketing-skill/social-content` for LinkedIn presence,
+and CHRO and interview-system skills from the employer's side. None of them writes a resume,
+tailors it to a posting, or prepares a candidate.
 
 Two things to know before using it:
 
@@ -120,6 +123,14 @@ there. Full list of limitations:
 
 `guides/` and `templates/` are vendored alongside the skills because 47 links inside them point
 that way. Copying only `skills/` would leave every one of those links broken.
+`scripts/scaffold-state.mjs` and `scripts/profile-strength.mjs` are vendored too: both import
+only `node:fs`, `node:path` and `node:url`, and `get-started` calls the scaffolder its preferred
+path, so omitting them guaranteed a file-not-found for anyone following the instruction as
+written.
+
+The Gelasio fonts under `templates/fonts/` are SIL Open Font License 1.1, not MIT. The import's
+primary licence does not cover them, and
+[`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md) says so.
 
 ## Skill index
 
@@ -127,14 +138,20 @@ that way. Copying only `skills/` would leave every one of those links broken.
 ## Repository layout
 
 ```
-skills/                     one directory per domain, one SKILL.md per skill
-skills/vendor.manifest.json declares every vendored upstream: repo, licence, commit pin, exclusions
-skills/pstack/              vendored from backnotprop/pstack, do not edit in place
-scripts/sync_vendor.py      performs both the first import and every scheduled refresh
-scripts/lint_skills.py      validates all SKILL.md frontmatter (SK001-SK008)
-scripts/generate_index.py   regenerates the index above from the tree
-docs/ARCHITECTURE_REVIEW.md the audit this structure came out of, with the open backlog
-.github/workflows/          ci.yml on every push, sync-vendored-skills.yml every two weeks
+skills/                        one directory per domain, one SKILL.md per skill
+skills/vendor.manifest.json    every vendored upstream: repo, author, licence, commit pin, exclusions
+skills/pstack/                 vendored from backnotprop/pstack, do not edit in place
+skills/job-hunt/               vendored from Remotivated/job-hunt-skills, do not edit in place
+scripts/sync_vendor.py         the first import and every scheduled refresh, one code path
+scripts/lint_skills.py         SKILL.md frontmatter validation (SK001-SK009)
+scripts/generate_index.py      regenerates the index above from the tree
+scripts/audit_third_party.py   reconciles every licence marker against the inventory
+scripts/check_links.py         relative links resolve
+scripts/sync_due.py            whether a refresh is due, measured in elapsed days
+docs/ARCHITECTURE_REVIEW.md    the audit this came out of, with the open backlog
+docs/third-party-inventory.json every pre-manifest import, with author and licence
+docs/adversarial-review-2026-08-25.md  an independent review of this work, findings and all
+.github/workflows/             ci.yml on every push, sync-vendored-skills.yml on a schedule
 ```
 
 ## Contributing
@@ -146,13 +163,27 @@ Read [CONTRIBUTING.md](./CONTRIBUTING.md) first. Three rules matter most:
 3. Every import from someone else's work needs a licence, an author, and a commit-pinned link
    before it is merged.
 
-Run the same checks CI runs:
+Run the same checks CI runs. All offline, standard library plus PyYAML, nothing else to install:
 
 ```bash
-python3 scripts/lint_skills.py
-python3 scripts/generate_index.py --check
-python3 scripts/sync_vendor.py --check
+python3 scripts/lint_skills.py --self-test        # the frontmatter parser refuses what it cannot read
+python3 scripts/lint_skills.py                    # SK001-SK009 on every SKILL.md
+python3 scripts/generate_index.py --check         # the index below matches the tree
+python3 scripts/sync_vendor.py --validate-manifest # provenance, licences, ownership records
+python3 scripts/audit_third_party.py              # every licence marker is accounted for
+python3 scripts/check_links.py                    # relative links resolve
 ```
+
+Two more that reach the network, so they run in the scheduled job rather than in CI:
+
+```bash
+python3 scripts/sync_vendor.py --check   # has an upstream moved
+python3 scripts/sync_due.py --self-test  # is a refresh due, and why the cadence is measured in days
+```
+
+Without PyYAML the linter falls back to a strict parser that refuses YAML it cannot read rather
+than guessing at it. That is deliberate. A checker that silently passes what it does not
+understand produces confidence instead of information.
 
 ## Licensing and attribution
 
