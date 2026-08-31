@@ -1,0 +1,14 @@
+# Cloudflare local development secrets. Copy to `.dev.vars` and fill in.
+# `.dev.vars` is gitignored. Values here must always be empty.
+#
+# NOTE: `.dev.vars.example` is not a Cloudflare-documented convention — it is this
+# template's extrapolation from `.env.example`. The mechanism it mirrors IS documented.
+#
+# TRAP: if a `.dev.vars.<environment>` file exists, ONLY that file is loaded and
+# `.dev.vars` is skipped entirely. Every secret must then be redefined in it.
+#
+# Non-secret configuration belongs in `[vars]` in wrangler.jsonc, not here.
+# Production secrets are set with: wrangler secret put <KEY>
+
+# Example — replace with the project's real bindings.
+API_SIGNING_KEY=

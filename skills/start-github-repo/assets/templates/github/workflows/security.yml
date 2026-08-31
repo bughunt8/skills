@@ -1,0 +1,60 @@
+name: Security
+
+on:
+  pull_request:
+  push:
+    branches: [{{DEFAULT_BRANCH}}]
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+      - uses: github/codeql-action/init@v3 # SCAFFOLD-PIN-SHA
+        with:
+          languages: javascript-typescript
+      - uses: github/codeql-action/analyze@v3 # SCAFFOLD-PIN-SHA
+
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+      - uses: actions/dependency-review-action@v4 # SCAFFOLD-PIN-SHA
+        with:
+          fail-on-severity: high
+
+  # Audits these workflows for the failure classes that .github/AGENTS.md forbids:
+  # over-broad permissions, unpinned actions, template-injection into run blocks,
+  # and dangerous privileged-trigger usage.
+  workflow-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+      - uses: zizmorcore/zizmor-action@v0 # SCAFFOLD-PIN-SHA
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+        with:
+          fetch-depth: 0 # required: the scanner diffs history
+      - name: Scan for committed secrets
+        uses: trufflesecurity/trufflehog@main # SCAFFOLD-PIN-SHA
+        with:
+          extra_args: --results=verified,unknown

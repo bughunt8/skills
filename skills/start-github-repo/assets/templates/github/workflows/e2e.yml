@@ -1,0 +1,36 @@
+name: E2E
+
+# Kept off the default pull-request path to protect review latency. Runs on a label or nightly.
+on:
+  pull_request:
+    types: [labeled, synchronize]
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  playwright:
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-e2e')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+      - uses: actions/setup-node@v4 # SCAFFOLD-PIN-SHA
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: {{PACKAGE_MANAGER}} install --frozen-lockfile
+      - run: {{PACKAGE_MANAGER}} exec playwright install --with-deps chromium
+      - run: {{PACKAGE_MANAGER}} exec playwright test
+      - uses: actions/upload-artifact@v4 # SCAFFOLD-PIN-SHA
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

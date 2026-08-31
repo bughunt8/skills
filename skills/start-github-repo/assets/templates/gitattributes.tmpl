@@ -1,0 +1,18 @@
+# Normalize line endings to LF in the index.
+# Re-apply to an existing checkout with: git add --renormalize .
+* text=auto
+
+# Generated files: excluded from language stats AND diff-collapsed by default.
+pnpm-lock.yaml             linguist-generated
+package-lock.json          linguist-generated
+yarn.lock                  linguist-generated
+worker-configuration.d.ts  linguist-generated
+
+# Keep shell scripts LF even on Windows checkouts.
+scripts/*  text eol=lf
+bin/*      text eol=lf
+
+# Excluded from `git archive` output.
+/.github/       export-ignore
+/e2e/           export-ignore
+/.editorconfig  export-ignore

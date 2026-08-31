@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+# script/bootstrap — fulfils the project's dependencies. Nothing else.
+# Safe to run repeatedly. Called by setup and update rather than duplicating their work.
+
+if ! command -v corepack >/dev/null 2>&1; then
+  echo "corepack not found. Install Node {{NODE_VERSION}} (see .nvmrc) and retry." >&2
+  exit 1
+fi
+
+corepack enable
+{{PACKAGE_MANAGER}} install --frozen-lockfile

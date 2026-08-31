@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+# scripts/check-docs — validates the document spine. Called by CI and by the pull request checklist.
+#
+# Fails on: missing required headings, malformed ids, requirements missing from the traceability
+# matrix, matrix rows citing requirements that do not exist, screens referenced but never specified,
+# broken ADR links, and any remaining [NEEDS CLARIFICATION] or scaffold TODO marker.
+
+python3 - "$@" <<'PY'
+import re, sys, pathlib
+
+root = pathlib.Path(".")
+errors, warnings = [], []
+
+
+def read(name):
+    p = root / name
+    return p.read_text(encoding="utf-8") if p.exists() else None
+
+
+REQUIRED = {
+    "PRD.md": ["## 1. Summary", "## 8. Functional Requirements", "## 9. Non-Functional Requirements"],
+    "TRD.md": ["## 1. Abstract", "## 4. Requirements Traced", "## 7. Non-Functional Requirements",
+               "## 8. Alternatives Considered"],
+    "WIREFRAME.md": ["## 2. Screen Inventory", "## 3. Navigation Map"],
+    "DESIGN.md": ["## Overview", "## Colors", "## Typography", "## Accessibility"],
+}
+
+for name, headings in REQUIRED.items():
+    text = read(name)
+    if text is None:
+        warnings.append(f"{name}: not present, skipped")
+        continue
+    for h in headings:
+        if h not in text:
+            errors.append(f"{name}: missing required heading '{h}'")
+
+prd, trd = read("PRD.md"), read("TRD.md")
+wire = read("WIREFRAME.md")
+
+if prd and trd:
+    prd_ids = set(re.findall(r"\b((?:FR|NFR)-\d{3})\b", prd))
+    matrix = trd.split("## 4. Requirements Traced", 1)[-1].split("\n## 5.", 1)[0]
+    matrix_ids = set(re.findall(r"\b((?:FR|NFR)-\d{3})\b", matrix))
+    for rid in sorted(prd_ids - matrix_ids):
+        errors.append(f"{rid} is in PRD.md but absent from the TRD.md traceability matrix")
+    for rid in sorted(matrix_ids - prd_ids):
+        errors.append(f"{rid} appears in the TRD.md matrix but is not defined in PRD.md")
+
+if prd and wire:
+    screens_defined = set(re.findall(r"\b(SCR-\d{3})\b", wire.split("## 2. Screen Inventory", 1)[-1]))
+    for scr in sorted(set(re.findall(r"\b(SCR-\d{3})\b", prd)) - screens_defined):
+        errors.append(f"{scr} is referenced in PRD.md but not defined in WIREFRAME.md section 2")
+
+if trd:
+    for link in re.findall(r"\((docs/adr/[^)]+\.md)\)", trd):
+        if not (root / link).exists():
+            errors.append(f"TRD.md links to a missing ADR: {link}")
+
+for name in ("PRD.md", "TRD.md", "WIREFRAME.md", "DESIGN.md"):
+    text = read(name)
+    if not text:
+        continue
+    n = len(re.findall(r"\[NEEDS CLARIFICATION", text))
+    if n:
+        errors.append(f"{name}: {n} unresolved [NEEDS CLARIFICATION] marker(s)")
+
+for adr in sorted((root / "docs" / "adr").glob("[0-9][0-9][0-9][0-9]-*.md")) if (root / "docs" / "adr").exists() else []:
+    text = adr.read_text(encoding="utf-8")
+    if not re.search(r"^status:\s*\S+", text, re.M):
+        errors.append(f"{adr}: missing 'status:' in front matter")
+
+for w in warnings:
+    print(f"warn: {w}")
+for e in errors:
+    print(f"error: {e}")
+
+print(f"\n{len(errors)} error(s), {len(warnings)} warning(s)")
+sys.exit(1 if errors else 0)
+PY

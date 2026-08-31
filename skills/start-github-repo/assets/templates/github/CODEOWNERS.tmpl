@@ -1,0 +1,18 @@
+# Last matching pattern wins, so order from general to specific.
+# Every owner listed must have write access, or the rule silently does nothing.
+# Gitignore-style negation is NOT supported here.
+
+*                       @{{OWNER}}
+
+# The document spine changes the contract. Route it deliberately.
+/PRD.md                 @{{OWNER}}
+/TRD.md                 @{{OWNER}}
+/DESIGN.md              @{{OWNER}}
+/WIREFRAME.md           @{{OWNER}}
+/docs/adr/              @{{OWNER}}
+/docs/architecture/     @{{OWNER}}
+
+# Anything that can change what runs in CI, or with what permissions.
+/.github/workflows/     @{{OWNER}}
+/.github/CODEOWNERS     @{{OWNER}}
+/AGENTS.md              @{{OWNER}}

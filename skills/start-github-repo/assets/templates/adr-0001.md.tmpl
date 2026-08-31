@@ -1,0 +1,57 @@
+---
+status: accepted
+date: {{YEAR}}-MM-DD
+decision-makers: TODO
+decision-scope: repository
+decision-type: process
+---
+
+# 0001. Record architecture decisions
+
+## Context and Problem Statement
+
+Design choices made during implementation are otherwise recoverable only from commit history and
+memory. New contributors and coding agents re-litigate settled questions because the reasoning was
+never written down, and a design document alone cannot carry that history: it is updated in place, so
+the record of what was rejected disappears with each edit.
+
+## Decision Drivers
+
+- The reasoning behind a decision outlives the decision itself.
+- Records must diff and review like code, in the same pull request as the change they justify.
+- The workflow here is TOGAF ADM-based, so governance artifacts need a lightweight in-repo form.
+
+## Considered Options
+
+1. Architecture Decision Records in `docs/adr/`.
+2. A single running decisions section inside the TRD.
+3. Decisions captured only in pull request descriptions.
+
+## Decision Outcome
+
+Chosen option: **Architecture Decision Records in `docs/adr/`**.
+
+We will record every architecturally significant decision as a numbered, immutable markdown file in
+`docs/adr/`, using MADR headings extended with the Open Agile Architecture fields *decision scope*
+and *decision type*. Files are named `NNNN-imperative-verb-phrase.md`. Numbers are monotonic and never
+reused. Only a record's status changes after creation; a reversal is a new record that supersedes the
+old one.
+
+Option 2 was rejected because the TRD is updated in place, which destroys the history of rejected
+alternatives. Option 3 was rejected because pull request descriptions are not discoverable from the
+codebase and do not survive repository migration.
+
+### Consequences
+
+- **Positive:** decisions are discoverable, diffable, and reviewable alongside the code they govern.
+- **Negative:** one more artifact to write; requires discipline to keep records immutable.
+- **Neutral:** ADRs covering more than this codebase will need a home elsewhere.
+
+### Confirmation
+
+`scripts/check-docs` verifies that every `docs/adr/` link cited in the TRD resolves.
+
+## More Information
+
+- [docs/adr/0000-template.md](0000-template.md) — the template to copy.
+- [TRD.md](../../TRD.md) section 13 — the decision index.

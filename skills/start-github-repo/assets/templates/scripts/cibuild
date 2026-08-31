@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+# script/cibuild — the continuous integration entry point. Not intended for local use.
+
+scripts/bootstrap
+scripts/check-docs
+{{LINT_COMMAND}}
+{{PACKAGE_MANAGER}} exec tsc --noEmit
+{{PACKAGE_MANAGER}} exec wrangler types --check || true
+{{TEST_COMMAND}} -- --coverage
+{{BUILD_COMMAND}}

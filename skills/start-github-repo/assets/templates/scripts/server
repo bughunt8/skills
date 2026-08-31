@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+# script/server — starts the application. Updates first, so a stale checkout cannot boot.
+
+scripts/update
+exec {{DEV_COMMAND}}

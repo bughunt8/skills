@@ -1,0 +1,20 @@
+SCAFFOLD MARKER: REPLACE-WITH-CANONICAL-TEXT
+
+The Apache License 2.0 must be reproduced verbatim. This template does not embed it, because a
+paraphrased or truncated licence text is legally worse than no licence file.
+
+To complete this file:
+
+  1. Download the canonical text:
+       curl -fsSL https://www.apache.org/licenses/LICENSE-2.0.txt -o LICENSE
+  2. Append the copyright line below to the end of the appendix section:
+       Copyright {{YEAR}} {{COPYRIGHT_HOLDER}}
+  3. Keep the accompanying NOTICE file. Apache-2.0 section 4(d) requires downstream redistributors to
+     include a readable copy of its attribution notices.
+  4. Add a per-file header to source files — either the full boilerplate from the licence appendix or
+     the short form:
+       // SPDX-License-Identifier: Apache-2.0
+  5. Remember that redistributors must mark modified files as changed.
+  6. Delete this marker block.
+
+`scripts/validate_repo.py` fails while this marker is still present.
