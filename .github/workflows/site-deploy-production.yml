@@ -1,7 +1,7 @@
 name: Site deploy production
 
-# main branch -> production environment (AWS S3 + CloudFront, and Hostinger)
-# serving https://skills.ronald.ng
+# main branch -> production environment, deployed to Hostinger, serving
+# https://skills.ronald.ng
 #
 # Same workflow, same steps and same secret names as staging; only the
 # environment differs. Production revalidates the exact commit it is about to

@@ -2,20 +2,22 @@ name: Site deploy
 
 # One deploy path, used unchanged by both staging and production.
 #
+# Hostinger is the only host. No S3, no CloudFront, no ACM: the site is static
+# files over FTP, TLS is Hostinger's free certificate, and caching, compression
+# and security headers come from site/.htaccess, which ships with the site so the
+# posture is reviewable in a diff rather than clicked into hPanel.
+#
+# The only AWS service involved anywhere is Route 53, which holds the DNS record,
+# and that is not touched here. As in bughunt8/www-resume, DNS is created once by
+# hand. See site/DEPLOYMENT.md.
+#
 # Staging and production are the SAME setup: same workflow, same steps, same
-# secret names, both publishing to AWS S3 + CloudFront and to Hostinger over FTP.
-# The only difference is which values those names carry, which comes from the
-# GitHub Environment named by the `environment` input. That is what makes the two
-# genuinely identical rather than merely similar: there is no second code path
-# that can drift, and a staging deploy exercises the exact mechanism production
-# will use.
+# secret names. The only difference is which values those names carry, which comes
+# from the GitHub Environment named by the `environment` input. There is no second
+# code path that can drift, so a staging deploy exercises exactly the mechanism
+# production will use.
 #
-# Deliberately mirrors the existing estate rather than inventing a new pattern:
-#   AWS steps        follow bughunt8/www-resume .github/workflows/deploy.yml
-#   Hostinger step   follows bughunt8/profitrise-website deploy-production.yml
-#
-# DNS is not managed here, exactly as in www-resume. The record for the
-# environment's hostname is created once by hand. See site/DEPLOYMENT.md.
+# The FTP step follows bughunt8/profitrise-website deploy-production.yml.
 
 on:
   workflow_call:
@@ -35,7 +37,7 @@ permissions:
 
 jobs:
   deploy:
-    name: publish to AWS and Hostinger
+    name: publish to Hostinger
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.environment }}
@@ -48,27 +50,21 @@ jobs:
       # sync with nothing to indicate it.
       - name: Confirm the environment is fully configured
         env:
-          AWS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          S3_BUCKET: ${{ secrets.S3_BUCKET }}
-          CF_DIST: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
           missing=""
-          for name in AWS_KEY AWS_SECRET AWS_REGION S3_BUCKET CF_DIST \
-                      FTP_SERVER FTP_USERNAME FTP_PASSWORD; do
+          for name in FTP_SERVER FTP_USERNAME FTP_PASSWORD; do
             [ -n "${!name}" ] || missing="$missing $name"
           done
           if [ -n "$missing" ]; then
             echo "::error::environment '${{ inputs.environment }}' is missing:$missing"
-            echo "See site/DEPLOYMENT.md. The values are the same ones already held by"
-            echo "bughunt8/www-resume (AWS) and bughunt8/profitrise-website (FTP)."
+            echo "See site/DEPLOYMENT.md. These are the same three values already held"
+            echo "by bughunt8/profitrise-website."
             exit 1
           fi
-          echo "environment '${{ inputs.environment }}' is fully configured"
+          echo "environment '${{ inputs.environment }}' is configured"
 
       - uses: actions/setup-python@v5
         with:
@@ -101,6 +97,8 @@ jobs:
           ENVIRONMENT: ${{ inputs.environment }}
         run: |
           mkdir -p _site
+          # .htaccess is intentionally NOT excluded: it carries the security
+          # headers, caching and compression that CloudFront used to provide.
           rsync -a \
             --exclude '_site' \
             --exclude 'tests' \
@@ -115,7 +113,6 @@ jobs:
             --exclude 'package-lock.json' \
             --exclude 'playwright.config.js' \
             --exclude '.htmlvalidate.json' \
-            --exclude '_headers' \
             --exclude '*.md' \
             ./ _site/
 
@@ -152,62 +149,48 @@ jobs:
           fi
           echo "asset paths are relative"
 
-      # ---------------------------------------------------------------- AWS
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      # Two passes, matching www-resume: assets get a long cache, HTML gets none,
-      # so a content change is visible immediately while assets stay cacheable.
-      #
-      # SAFETY: --delete makes the destination match the publish directory. It is
-      # therefore scoped to S3_PREFIX when one is set, so staging and production
-      # can share a bucket without either deleting the other. Point S3_BUCKET at a
-      # bucket (or prefix) that holds nothing but this site.
-      - name: Sync assets to S3, long cache
-        working-directory: site
-        env:
-          S3_BUCKET: ${{ secrets.S3_BUCKET }}
-          S3_PREFIX: ${{ vars.SITE_S3_PREFIX }}
-        run: |
-          dest="s3://${S3_BUCKET}${S3_PREFIX:+/${S3_PREFIX#/}}"
-          echo "destination: $dest"
-          aws s3 sync _site/ "$dest" \
-            --delete \
-            --exclude "*.html" \
-            --exclude "BUILD-INFO.txt" \
-            --cache-control "public, max-age=604800, must-revalidate"
-
-      - name: Sync HTML to S3, no cache
-        working-directory: site
-        env:
-          S3_BUCKET: ${{ secrets.S3_BUCKET }}
-          S3_PREFIX: ${{ vars.SITE_S3_PREFIX }}
-        run: |
-          dest="s3://${S3_BUCKET}${S3_PREFIX:+/${S3_PREFIX#/}}"
-          aws s3 sync _site/ "$dest" \
-            --exclude "*" --include "*.html" \
-            --content-type "text/html; charset=utf-8" \
-            --cache-control "public, max-age=0, must-revalidate"
-          aws s3 cp _site/BUILD-INFO.txt "$dest/BUILD-INFO.txt" \
-            --content-type "text/plain; charset=utf-8" \
-            --cache-control "no-store"
-
-      - name: Invalidate CloudFront
-        env:
-          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
-          S3_PREFIX: ${{ vars.SITE_S3_PREFIX }}
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
-            --paths "/${S3_PREFIX:+${S3_PREFIX#/}/}*"
-
       # ---------------------------------------------------------- Hostinger
-      # Same artifact, second target. dangerous-clean-slate stays false: it wipes
-      # the remote directory, and this account serves other sites.
+      # Confirm .htaccess actually made it into the publish set. Without it the
+      # site still serves, but with no security headers and no compression, and
+      # that is a silent downgrade rather than a visible failure.
+      # vendor/ and fonts/ carry the self-hosted libraries and webfonts. If they
+      # were ever excluded the page would still load, with no motion and system
+      # fonts, which is a silent downgrade rather than a visible failure.
+      - name: Confirm the self-hosted assets are being published
+        working-directory: site
+        run: |
+          missing=""
+          for f in vendor/gsap.min.js vendor/ScrollTrigger.min.js vendor/lenis.min.js \
+                   fonts/fonts.css fonts/inter-latin.woff2 fonts/space-grotesk-latin.woff2; do
+            [ -f "_site/$f" ] || missing="$missing $f"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::the publish set is missing:$missing"
+            exit 1
+          fi
+          # And nothing may be FETCHED from another origin. Scoped to elements a
+          # browser actually loads: the page links out to github.com on every card,
+          # and an <a href> is not a request.
+          if grep -oE '<(link|script|img|use|iframe|source)[^>]*>' _site/index.html \
+             | grep -E '(src|href)="https?://' \
+             | grep -v 'rel="canonical"'; then
+            echo "::error::index.html loads a resource from another origin"
+            exit 1
+          fi
+          echo "self-hosted assets present, no external resource loads"
+
+      - name: Confirm .htaccess is being published
+        working-directory: site
+        run: |
+          if [ ! -f _site/.htaccess ]; then
+            echo "::error::_site/.htaccess is missing; the site would deploy with no"
+            echo "security headers, no caching rules and no compression."
+            exit 1
+          fi
+          echo ".htaccess present ($(wc -c < _site/.htaccess) bytes)"
+
+      # dangerous-clean-slate stays false: it wipes the remote directory, and this
+      # Hostinger account serves other sites.
       - name: Deploy to Hostinger over FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:

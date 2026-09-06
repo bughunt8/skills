@@ -35,8 +35,8 @@ jobs:
           node-version: 20
 
       # Our own rule: nothing credential-shaped may enter the tree. This repo
-      # deploys to Cloudflare and reads Route 53, so it is exactly the one where
-      # a token gets pasted "just to test it".
+      # deploys over FTP, so it is exactly the repository where a password gets
+      # pasted "just to test it".
       - name: Scan the tree for credential-shaped material
         run: node scripts/check-secrets.mjs
 

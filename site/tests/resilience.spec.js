@@ -171,10 +171,103 @@ test.describe("narrow viewports", () => {
   });
 });
 
+test.describe("no third party in the request path", () => {
+  /*
+   * The motion libraries and both webfonts used to come from jsDelivr and Google
+   * Fonts. Both see every reader, both can be blocked or disappear, and jsDelivr
+   * routes through Cloudflare. They are now served from this origin, and these
+   * tests keep it that way.
+   *
+   * The font check exists because moving them in place broke them silently: CSS
+   * url() resolves against the stylesheet, not the page, so url('./fonts/x.woff2')
+   * inside fonts/fonts.css requested /fonts/fonts/x.woff2. The browser fell back
+   * to a system font and said nothing.
+   */
+
+  test("loads nothing from another origin", async ({ page }) => {
+    const external = [];
+    page.on("request", (r) => {
+      const url = r.url();
+      if (!url.startsWith("http://127.0.0.1") && !url.startsWith("data:")) {
+        external.push(`${r.resourceType()} ${url}`);
+      }
+    });
+    page.on("requestfailed", (r) => external.push(`FAILED ${r.url()}`));
+
+    await page.goto("/index.html", { waitUntil: "load" });
+    await page.waitForTimeout(2500);
+
+    expect(external, "the page must be entirely self-hosted").toEqual([]);
+  });
+
+  test("the motion libraries are served from this origin", async ({ page }) => {
+    await page.goto("/index.html");
+    await page.waitForTimeout(2500);
+
+    const srcs = await page.locator("script[src]").evaluateAll((els) =>
+      els.map((e) => e.getAttribute("src"))
+    );
+    for (const src of srcs) {
+      expect(src, `script src must be relative: ${src}`).toMatch(/^\.\//);
+    }
+    // And they must actually have loaded, not merely be referenced.
+    const globals = await page.evaluate(() => ({
+      gsap: typeof window.gsap,
+      st: typeof window.ScrollTrigger,
+      lenis: typeof window.Lenis
+    }));
+    expect(globals.gsap).not.toBe("undefined");
+    expect(globals.st).not.toBe("undefined");
+    expect(globals.lenis).not.toBe("undefined");
+  });
+
+  test("the self-hosted fonts actually load", async ({ page }) => {
+    await page.goto("/index.html");
+    await page.waitForTimeout(2500);
+    await page.evaluate(() => document.fonts.ready);
+
+    const state = await page.evaluate(() => ({
+      errored: [...document.fonts]
+        .filter((f) => f.status === "error")
+        .map((f) => `${f.family} ${f.weight}`),
+      loaded: [...document.fonts].filter((f) => f.status === "loaded").length,
+      served: performance
+        .getEntriesByType("resource")
+        .filter((r) => r.name.endsWith(".woff2"))
+        .map((r) => r.name),
+      display: getComputedStyle(document.querySelector(".hero h1")).fontFamily
+    }));
+
+    expect(state.errored, "a font face failed to load").toEqual([]);
+    expect(state.loaded, "no font face loaded at all").toBeGreaterThan(0);
+    expect(state.served.length, "no woff2 was fetched").toBeGreaterThan(0);
+    for (const url of state.served) {
+      expect(url).toContain("/fonts/");
+      expect(url, "double fonts/ path regression").not.toContain("/fonts/fonts/");
+    }
+    // The display family must be the one we ship, not a system fallback.
+    expect(state.display).toContain("Space Grotesk");
+  });
+
+  test("no stylesheet or font is requested from a CDN", async () => {
+    const fs = await import("node:fs");
+    const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+    const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+    const fonts = fs.readFileSync(new URL("../fonts/fonts.css", import.meta.url), "utf8");
+
+    for (const [name, text] of [["index.html", html], ["styles.css", css], ["fonts.css", fonts]]) {
+      for (const host of ["jsdelivr", "fonts.googleapis.com", "fonts.gstatic.com", "unpkg", "cdnjs"]) {
+        expect(text, `${name} references ${host}`).not.toContain(host);
+      }
+    }
+  });
+});
+
 test.describe("graceful failure", () => {
-  test("survives the motion CDN being unavailable", async ({ page }) => {
-    // If jsDelivr is blocked or down, the page must still be the full list.
-    await page.route("**/cdn.jsdelivr.net/**", (r) => r.abort());
+  test("survives the motion libraries failing to load", async ({ page }) => {
+    // The libraries are self-hosted now, so blocking jsDelivr would prove
+    // nothing: the request is never made. Block what is actually requested.
+    await page.route("**/vendor/*.js", (r) => r.abort());
 
     const errors = [];
     page.on("pageerror", (e) => errors.push(String(e)));

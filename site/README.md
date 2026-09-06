@@ -69,15 +69,19 @@ build.py        reads the sources, prerenders the page, verifies it in CI
 sources.json    the repositories to index. The host repo is read in place; the
                 external ones are pinned to a commit. Adding a source here is the
                 only change needed.
-_headers        Cloudflare Pages response headers, including CSP
+.htaccess       Apache/LiteSpeed config for Hostinger: security headers, CSP,
+                caching, compression, charset
+vendor/         GSAP, ScrollTrigger and Lenis, self-hosted
+fonts/          Space Grotesk and Inter as WOFF2, self-hosted
 tests/          Playwright suite: content, motion, resilience, accessibility
 scripts/        secret scanner and post-deploy smoke test
 ```
 
 ### Constraints this page holds itself to
 
-- **No runtime dependencies of our own.** Motion comes from two CDN libraries and
-  the page is fully functional without them.
+- **No third party in the request path.** The motion libraries and both webfonts
+  are served from our own origin. The page makes no external request at all, and
+  is fully functional even if the libraries fail to load.
 - **Readable without JavaScript.** With JS off it is a complete, plain list.
 - **Readable without motion.** With `prefers-reduced-motion` set, pinning and
   scrubbing are switched off entirely and the page becomes the same plain list.
@@ -121,9 +125,13 @@ Everything is driven by GitHub Actions. Nothing is built, validated or deployed 
 hand.
 
 **Staging and production are the same setup.** Both publish the same artifact to
-both AWS (S3 + CloudFront) and Hostinger (FTP), through one reusable workflow.
-There is no second code path, so staging cannot drift from production. The only
-difference is which GitHub Environment supplies the secrets.
+Hostinger over FTP through one reusable workflow. There is no second code path, so
+staging cannot drift from production. The only difference is which GitHub
+Environment supplies the secrets.
+
+Hostinger is the only host. The only AWS service involved anywhere is Route 53,
+which holds the DNS record and is never touched by CI. There is no Cloudflare
+anywhere: not in the deploy, and not in the request path.
 
 | | Branch | Environment | URL |
 | --- | --- | --- | --- |

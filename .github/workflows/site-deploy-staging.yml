@@ -1,6 +1,6 @@
 name: Site deploy staging
 
-# staging branch -> staging environment (AWS S3 + CloudFront, and Hostinger).
+# staging branch -> staging environment, deployed to Hostinger.
 #
 # Identical to production in every respect except which GitHub Environment
 # supplies the secrets. Mirrors the www-resume branch model: work lands on

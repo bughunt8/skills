@@ -19,11 +19,13 @@
       content="Scroll to travel through 22 categories of AI agent skills. Every skill carries its description, source repository and licence.">
     <meta name="twitter:card" content="summary_large_image">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap"
-      rel="stylesheet">
+    <!-- Everything this page loads is served from this origin. No CDN, no font
+         service, no third party in the request path at all: nothing that sees the
+         reader, nothing to consent to, and no dependency that can disappear or be
+         blocked. The motion libraries are in vendor/ and the fonts in fonts/. -->
+    <link rel="preload" href="./fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="./fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="./fonts/fonts.css">
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
@@ -2960,9 +2962,9 @@
     </section>
 
     <script src="./data.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js" defer></script>
+    <script src="./vendor/gsap.min.js" defer></script>
+    <script src="./vendor/ScrollTrigger.min.js" defer></script>
+    <script src="./vendor/lenis.min.js" defer></script>
     <script src="./app.js" defer></script>
   </body>
 </html>

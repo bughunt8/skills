@@ -37,25 +37,47 @@ single place a source is declared.
 
 ## Runtime libraries
 
-Loaded from a CDN at run time, not vendored into this repository. The page is
-fully functional if both fail to load.
+**Vendored into this repository and served from our own origin**, under `site/vendor/`.
+They are no longer loaded from a CDN: a CDN sees every reader, can be blocked, and
+can disappear. The page is still fully functional if they fail to load.
+
+Because these files are now redistributed rather than linked, their licences apply
+to this repository directly.
 
 ### GSAP, with ScrollTrigger
 
-- Version 3.15.0, <https://gsap.com>
+- Version 3.15.0, vendored at `site/vendor/gsap.min.js` and
+  `site/vendor/ScrollTrigger.min.js`, <https://gsap.com>
 - Licence: GSAP Standard "No Charge" licence,
   <https://gsap.com/community/standard-license/>
 - GSAP including ScrollTrigger became free for commercial use in April 2025.
 
 ### Lenis
 
-- Version 1.3.11, <https://github.com/darkroomengineering/lenis>
+- Version 1.3.11, vendored at `site/vendor/lenis.min.js`,
+  <https://github.com/darkroomengineering/lenis>
 - Licence: MIT
 
 ### Fonts
 
-- Space Grotesk and Inter, served by Google Fonts. Both are licensed under the
-  SIL Open Font License 1.1.
+**Self-hosted** under `site/fonts/`, not loaded from Google Fonts.
+
+- **Space Grotesk** by Florian Karsten — SIL Open Font License 1.1
+- **Inter** by Rasmus Andersson — SIL Open Font License 1.1
+
+Both are redistributed here as WOFF2, in the `latin` and `latin-ext` subsets only.
+Google serves both as variable fonts, so one file covers each family's whole weight
+range; the duplicate per-weight downloads were dropped after confirming the bytes
+were identical.
+
+The OFL permits redistribution and bundling, including in a commercial project,
+provided the fonts are not sold on their own and the licence travels with them.
+Neither font has been modified or renamed. Full licence text:
+<https://openfontlicense.org/open-font-license-official-text/>.
+
+CJK text in skill descriptions is not covered by either family and falls back to
+the reader's system font by design; bundling a CJK face would add megabytes for a
+handful of strings.
 
 ## Development-only dependencies
 
