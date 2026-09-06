@@ -1,13 +1,13 @@
 ---
 name: market-research-pro
 description: |
-  Production-grade market research: evidence and sizing system model, failure modes (single-source TAM, spurious precision, category mismatch, stale data), decision trade-offs (top-down vs bottom-up, breadth vs depth, speed vs rigor), quality guardrails (no fabricated market sizes; cite source+date+geo).
+  Production-grade market research: evidence and sizing system model, failure modes (single-source TAM, spurious precision, stale data), decision trade-offs (top-down vs bottom-up, breadth vs depth, speed vs rigor), quality guardrails (no fabricated market sizes; cite source+date+geo).
 
-  Use this skill when the user asks to validate market opportunity, compare competitors, estimate market size with assumptions, identify ICP segments, prioritize country/vertical expansion, or produce an executive-style market brief with citations and explicit confidence levels.
+  Use when the user asks to validate market opportunity, compare competitors, estimate market size with assumptions, identify ICP segments, prioritize expansion, or produce an executive market brief with citations and confidence levels.
 
-  Use **with** **`web-research-pro`** for official and current external sources, **`business-analysis-pro`** to convert findings into requirements/roadmaps, and **`data-analysis-pro`** when survey or tabular datasets need numeric analysis. This skill (`market-research-pro`) owns **research framing and synthesis quality**; other skills own deep implementation or analytics details.
+  Pair with `web-research-pro` for official current sources, `business-analysis-pro` to turn findings into requirements or roadmaps, and `data-analysis-pro` for numeric analysis of survey or tabular data. This skill owns research framing and synthesis quality; the others own implementation and analytics.
 
-  Triggers: "market research", "TAM", "SAM", "SOM", "competitive analysis", "market sizing", "ICP segments", "market brief", "market opportunity", "competitor landscape", "market entry", "expansion hypothesis".
+  Triggers: "market research", "TAM", "SAM", "SOM", "competitive analysis", "market sizing", "ICP segments", "market brief", "competitor landscape", "expansion".
 ---
 
 > Adapted from [truongnat/aix](https://github.com/truongnat/aix), licensed under MIT.
