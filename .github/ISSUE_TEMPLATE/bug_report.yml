@@ -1,0 +1,66 @@
+name: Skill misbehaves
+description: A skill produced the wrong behaviour, loaded when it should not have, or failed to load.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Skill behaviour varies substantially between agent runners and models. Without that
+        detail a report is not actionable, so both fields below are required.
+
+        If the skill lives under `skills/pstack/` or `skills/job-hunt/` it is a verbatim copy
+        of an upstream project. Logic bugs belong upstream, where the fix reaches everyone.
+        File here if the copy is stale, misattributed, or should be excluded.
+
+        Two non-bugs for `skills/job-hunt/`: it needs a `my-documents/` workspace, created by
+        the `get-started` skill, and its DOCX/PDF export toolchain is deliberately not
+        vendored here.
+  - type: input
+    id: skill_path
+    attributes:
+      label: Skill path
+      description: Path to the SKILL.md, for example skills/engineering/tdd/SKILL.md
+      placeholder: skills/<domain>/<skill>/SKILL.md
+    validations:
+      required: true
+  - type: input
+    id: runner
+    attributes:
+      label: Agent runner
+      placeholder: Claude Code, Cursor, Codex, Perplexity Computer, OpenClaw, other
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      placeholder: which model, and which version if you know it
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: Paste the relevant agent output. Redact any credential before pasting.
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Skill gave wrong or harmful guidance
+        - Skill loaded when it should not have (description problem)
+        - Skill did not load when it should have (description problem)
+        - Wrong skill loaded because two share a name
+        - Broken link, script or reference inside the skill
+        - Attribution or licence is wrong
+        - Other
+    validations:
+      required: true

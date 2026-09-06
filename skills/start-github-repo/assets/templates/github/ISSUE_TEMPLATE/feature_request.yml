@@ -1,0 +1,55 @@
+name: Feature request
+description: Propose new behaviour or a change in scope.
+title: "feat: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Substantial features change the PRD. If this is accepted, it becomes one or more `FR-`
+        requirements with acceptance scenarios.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve? *(required)*
+      description: Describe the problem, not the solution. Who has it, and how often?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour *(required)*
+      description: Phrase it as the system would behave. "System MUST ..." is ideal.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance scenarios
+      description: Given / When / Then. One per line.
+      value: |
+        - Given ... When ... Then ...
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Suggested priority *(required)*
+      options:
+        - P1 — cannot ship without it
+        - P2 — important, not blocking
+        - P3 — nice to have
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Including doing nothing. What makes those worse?
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and discussions
+          required: true
+        - label: I read the PRD and this is not already covered
+          required: true

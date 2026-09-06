@@ -1,0 +1,29 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # Grouping is what keeps this from producing a wall of pull requests.
+      dev-dependencies:
+        dependency-type: development
+        update-types: ["minor", "patch"]
+      production-patches:
+        dependency-type: production
+        update-types: ["patch"]
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+
+  # This is what keeps action SHA pins current. Without it, pinning becomes rot.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "chore(ci)"

@@ -1,0 +1,71 @@
+name: Bug report
+description: Something behaves differently from what the PRD or TRD says it should.
+title: "bug: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please do not use this form for security vulnerabilities —
+        see [SECURITY.md](../blob/{{DEFAULT_BRANCH}}/SECURITY.md).
+
+        Note: field validation only enforces `required` in public repositories. Please fill in
+        every field marked *(required)* regardless.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened? *(required)*
+      description: What you observed, and what you expected instead.
+      placeholder: I expected X, but Y happened.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce *(required)*
+      description: A minimal, ordered sequence. A link to a failing test or reproduction repo is ideal.
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit *(required)*
+      placeholder: 0.1.0, or a commit SHA
+    validations:
+      required: true
+  - type: input
+    id: requirement
+    attributes:
+      label: Requirement id
+      description: If you know which requirement this violates, name it (e.g. FR-001).
+      placeholder: FR-001
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Where did this occur? *(required)*
+      options:
+        - Local development
+        - Preview or staging
+        - Production
+        - CI
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or output
+      description: Paste as text, not a screenshot, so it is searchable. Redact any secrets.
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and discussions
+          required: true
+        - label: I confirmed this is not a security vulnerability
+          required: true

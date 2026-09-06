@@ -1,0 +1,138 @@
+{
+  "$comment": "Drives scripts/scaffold.py. Each entry maps a bundled template to a destination, with an optional profile/flag condition. Conditions are evaluated against the answers object.",
+  "manifest_version": 1,
+
+  "profiles": {
+    "worker-service": { "label": "Cloudflare Worker service", "cloudflare": true, "package": false, "ui": true },
+    "ts-library": { "label": "TypeScript npm library", "cloudflare": false, "package": true, "ui": false },
+    "monorepo": { "label": "pnpm workspaces monorepo", "cloudflare": true, "package": true, "ui": true, "workspaces": true },
+    "docs-site": { "label": "Documentation site", "cloudflare": true, "package": false, "ui": true, "docs_site": true },
+    "internal-tool": { "label": "Internal tool or CLI", "cloudflare": false, "package": true, "ui": false }
+  },
+
+  "answers_schema": {
+    "project_name":       { "prompt": "Project name (kebab-case)", "required": true },
+    "description":        { "prompt": "One-line description (under 120 chars)", "required": true },
+    "profile":            { "prompt": "Profile", "default": "worker-service", "enum": ["worker-service", "ts-library", "monorepo", "docs-site", "internal-tool"] },
+    "license":            { "prompt": "License (SPDX id)", "default": "MIT", "enum": ["MIT", "Apache-2.0", "BSD-3-Clause", "MPL-2.0", "AGPL-3.0", "UNLICENSED"] },
+    "visibility":         { "prompt": "Repository visibility", "default": "private", "enum": ["private", "public"] },
+    "package_manager":    { "prompt": "Package manager", "default": "pnpm", "enum": ["pnpm", "npm", "yarn", "bun"] },
+    "coc_contact":        { "prompt": "Code of conduct reporting contact", "required": true },
+    "release_tooling":    { "prompt": "Release tooling", "default": "changesets", "enum": ["changesets", "release-please", "manual"] },
+    "owner":              { "prompt": "GitHub owner (user or org)", "required": true },
+    "copyright_holder":   { "prompt": "Copyright holder", "required": true },
+    "default_branch":     { "prompt": "Default branch", "default": "main" },
+    "node_version":       { "prompt": "Node version", "default": "22" },
+    "emit_speckit":       { "prompt": "Emit spec-kit specs/ interop?", "default": false },
+    "emit_coc_inline":    { "prompt": "Inline the full Contributor Covenant instead of a pointer?", "default": false },
+    "emit_pr_dir":        { "prompt": "Emit multiple PR templates in a directory?", "default": false },
+    "emit_secret_scan":   { "prompt": "Add a secret-scanning step to CI?", "default": true },
+    "emit_docs_site":     { "prompt": "Scaffold a docs site?", "default": false }
+  },
+
+  "placeholders": [
+    "PROJECT_NAME", "DESCRIPTION", "OWNER", "REPO", "LICENSE_ID", "COPYRIGHT_HOLDER", "YEAR",
+    "COC_CONTACT", "DEFAULT_BRANCH", "NODE_VERSION", "PACKAGE_MANAGER", "PROFILE_LABEL",
+    "RELEASE_TOOLING", "TEST_COMMAND", "LINT_COMMAND", "BUILD_COMMAND", "DEV_COMMAND", "CHECK_COMMAND"
+  ],
+
+  "derived": {
+    "TEST_COMMAND":  "{PACKAGE_MANAGER} test",
+    "LINT_COMMAND":  "{PACKAGE_MANAGER} lint",
+    "BUILD_COMMAND": "{PACKAGE_MANAGER} build",
+    "DEV_COMMAND":   "{PACKAGE_MANAGER} dev",
+    "CHECK_COMMAND": "{PACKAGE_MANAGER} check",
+    "REPO":          "{OWNER}/{PROJECT_NAME}"
+  },
+
+  "groups": [
+    { "id": "docs",       "label": "Document spine",            "order": 1 },
+    { "id": "root",       "label": "Root files and hygiene",     "order": 2 },
+    { "id": "community",  "label": "Community health files",     "order": 3 },
+    { "id": "github",     "label": "Issue forms, PR, ownership", "order": 4 },
+    { "id": "workflows",  "label": "CI and security workflows",  "order": 5 },
+    { "id": "scripts",    "label": "Automation scripts",         "order": 6 },
+    { "id": "toolchain",  "label": "Test and runtime config",    "order": 7 }
+  ],
+
+  "files": [
+    { "template": "PRD.md.tmpl",                         "dest": "PRD.md",                                 "group": "docs" },
+    { "template": "TRD.md.tmpl",                         "dest": "TRD.md",                                 "group": "docs" },
+    { "template": "WIREFRAME.md.tmpl",                   "dest": "WIREFRAME.md",                           "group": "docs", "when": "profile.ui" },
+    { "template": "DESIGN.md.tmpl",                      "dest": "DESIGN.md",                              "group": "docs", "when": "profile.ui" },
+    { "template": "docs-index.md.tmpl",                  "dest": "docs/index.md",                          "group": "docs" },
+    { "template": "adr-template.md.tmpl",                "dest": "docs/adr/0000-template.md",              "group": "docs" },
+    { "template": "adr-0001.md.tmpl",                    "dest": "docs/adr/0001-record-architecture-decisions.md", "group": "docs" },
+    { "template": "architecture-principles.md.tmpl",     "dest": "docs/architecture/principles.md",        "group": "docs" },
+    { "template": "architecture-vision.md.tmpl",         "dest": "docs/architecture/vision.md",            "group": "docs" },
+    { "template": "architecture-roadmap.md.tmpl",        "dest": "docs/architecture/roadmap.md",           "group": "docs" },
+    { "template": "architecture-building-blocks.md.tmpl","dest": "docs/architecture/building-blocks.md",   "group": "docs" },
+
+    { "template": "README.md.tmpl",                      "dest": "README.md",                              "group": "root" },
+    { "template": "AGENTS.md.tmpl",                      "dest": "AGENTS.md",                              "group": "root" },
+    { "template": "CLAUDE.md.tmpl",                      "dest": "CLAUDE.md",                              "group": "root" },
+    { "template": "CHANGELOG.md.tmpl",                   "dest": "CHANGELOG.md",                           "group": "root", "when": "release_tooling != release-please" },
+    { "template": "gitignore.tmpl",                      "dest": ".gitignore",                             "group": "root" },
+    { "template": "gitattributes.tmpl",                  "dest": ".gitattributes",                         "group": "root" },
+    { "template": "editorconfig.tmpl",                   "dest": ".editorconfig",                          "group": "root" },
+    { "template": "nvmrc.tmpl",                          "dest": ".nvmrc",                                 "group": "root" },
+    { "template": "env.example.tmpl",                    "dest": ".env.example",                           "group": "root" },
+    { "template": "dev.vars.example.tmpl",               "dest": ".dev.vars.example",                      "group": "root", "when": "profile.cloudflare" },
+
+    { "template": "CONTRIBUTING.md.tmpl",                "dest": "CONTRIBUTING.md",                        "group": "community" },
+    { "template": "CODE_OF_CONDUCT.pointer.md.tmpl",     "dest": "CODE_OF_CONDUCT.md",                     "group": "community", "when": "not emit_coc_inline" },
+    { "template": "CODE_OF_CONDUCT.inline.md.tmpl",      "dest": "CODE_OF_CONDUCT.md",                     "group": "community", "when": "emit_coc_inline" },
+    { "template": "SECURITY.md.tmpl",                    "dest": "SECURITY.md",                            "group": "community" },
+    { "template": "SUPPORT.md.tmpl",                     "dest": "SUPPORT.md",                             "group": "community" },
+    { "template": "LICENSE.MIT.tmpl",                    "dest": "LICENSE",                                "group": "community", "when": "license == MIT" },
+    { "template": "LICENSE.Apache-2.0.tmpl",             "dest": "LICENSE",                                "group": "community", "when": "license == Apache-2.0" },
+    { "template": "NOTICE.tmpl",                         "dest": "NOTICE",                                 "group": "community", "when": "license == Apache-2.0" },
+
+    { "template": "github/ISSUE_TEMPLATE/bug_report.yml",      "dest": ".github/ISSUE_TEMPLATE/bug_report.yml",      "group": "github" },
+    { "template": "github/ISSUE_TEMPLATE/feature_request.yml", "dest": ".github/ISSUE_TEMPLATE/feature_request.yml", "group": "github" },
+    { "template": "github/ISSUE_TEMPLATE/spec_change.yml",     "dest": ".github/ISSUE_TEMPLATE/spec_change.yml",     "group": "github" },
+    { "template": "github/ISSUE_TEMPLATE/config.yml",          "dest": ".github/ISSUE_TEMPLATE/config.yml",          "group": "github" },
+    { "template": "github/pull_request_template.md",           "dest": ".github/pull_request_template.md",           "group": "github" },
+    { "template": "github/CODEOWNERS.tmpl",                    "dest": ".github/CODEOWNERS",                         "group": "github" },
+    { "template": "github/dependabot.yml",                     "dest": ".github/dependabot.yml",                     "group": "github" },
+    { "template": "github/AGENTS.md.tmpl",                     "dest": ".github/AGENTS.md",                          "group": "github" },
+
+    { "template": "github/workflows/ci.yml",           "dest": ".github/workflows/ci.yml",           "group": "workflows" },
+    { "template": "github/workflows/docs-check.yml",   "dest": ".github/workflows/docs-check.yml",   "group": "workflows" },
+    { "template": "github/workflows/security.yml",     "dest": ".github/workflows/security.yml",     "group": "workflows" },
+    { "template": "github/workflows/release.yml",      "dest": ".github/workflows/release.yml",      "group": "workflows", "when": "release_tooling == changesets" },
+    { "template": "github/workflows/scorecard.yml",    "dest": ".github/workflows/scorecard.yml",    "group": "workflows", "when": "visibility == public" },
+    { "template": "github/workflows/e2e.yml",          "dest": ".github/workflows/e2e.yml",          "group": "workflows", "when": "profile.ui" },
+
+    { "template": "scripts/bootstrap",   "dest": "scripts/bootstrap",   "group": "scripts", "mode": "0755" },
+    { "template": "scripts/setup",       "dest": "scripts/setup",       "group": "scripts", "mode": "0755" },
+    { "template": "scripts/update",      "dest": "scripts/update",      "group": "scripts", "mode": "0755" },
+    { "template": "scripts/server",      "dest": "scripts/server",      "group": "scripts", "mode": "0755" },
+    { "template": "scripts/test",        "dest": "scripts/test",        "group": "scripts", "mode": "0755" },
+    { "template": "scripts/cibuild",     "dest": "scripts/cibuild",     "group": "scripts", "mode": "0755" },
+    { "template": "scripts/console",     "dest": "scripts/console",     "group": "scripts", "mode": "0755" },
+    { "template": "scripts/check-docs",  "dest": "scripts/check-docs",  "group": "scripts", "mode": "0755" },
+    { "template": "scripts/README.md.tmpl", "dest": "scripts/README.md", "group": "scripts" },
+
+    { "template": "vitest.config.ts.tmpl",     "dest": "vitest.config.ts",     "group": "toolchain" },
+    { "template": "playwright.config.ts.tmpl", "dest": "playwright.config.ts", "group": "toolchain", "when": "profile.ui" },
+    { "template": "wrangler.jsonc.tmpl",       "dest": "wrangler.jsonc",       "group": "toolchain", "when": "profile.cloudflare" },
+    { "template": "changeset-config.json.tmpl","dest": ".changeset/config.json","group": "toolchain", "when": "release_tooling == changesets" }
+  ],
+
+  "required_secrets": [
+    { "name": "CLOUDFLARE_API_TOKEN",  "purpose": "wrangler deploy from CI",           "when": "profile.cloudflare", "scope": "repository secret" },
+    { "name": "CLOUDFLARE_ACCOUNT_ID", "purpose": "target account for deploys",        "when": "profile.cloudflare", "scope": "repository variable" },
+    { "name": "NPM_TOKEN",             "purpose": "publish to npm (prefer OIDC)",      "when": "profile.package",    "scope": "environment secret" }
+  ],
+
+  "manual_settings": [
+    "Create a repository ruleset on the default branch: require a PR, require status checks, require linear history, block force pushes.",
+    "Enable Dependabot alerts and security updates.",
+    "Enable secret scanning and push protection (repository-level push protection is OFF by default).",
+    "Enable private vulnerability reporting (public repositories only).",
+    "Enable CodeQL default setup.",
+    "Create the production environment with required reviewers before enabling the deploy workflow.",
+    "Resolve every action pin in versions.json to a full-length commit SHA."
+  ]
+}

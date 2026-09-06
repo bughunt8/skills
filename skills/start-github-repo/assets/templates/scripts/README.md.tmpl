@@ -1,0 +1,21 @@
+# scripts/
+
+Named after GitHub's "Scripts To Rule Them All" pattern, so the entry points are predictable across
+projects. Each script is idempotent and safe to run repeatedly.
+
+| Script | Responsibility |
+|---|---|
+| `bootstrap` | Fulfils dependencies. Nothing else. |
+| `setup` | Puts a fresh clone into a working state, or resets it back to one. Runs `bootstrap`. |
+| `update` | Brings the project up to date after a fresh pull. Runs `bootstrap`. |
+| `server` | Starts the application. Runs `update` first. |
+| `test` | Runs the suite. Lint and typecheck first, then tests. Optional path argument. |
+| `cibuild` | CI entry point. Not intended for local use. |
+| `console` | Opens a console. Optional environment-name argument. |
+| `check-docs` | Validates the document spine. Called by CI and the PR checklist. |
+
+`bin/` is deliberately separate and holds release gating only, so "which of these can I safely run
+locally?" is answerable at a glance.
+
+Every script starts with `set -euo pipefail` and is checked by `shellcheck` in CI. `package.json`
+aliases these, so `{{PACKAGE_MANAGER}} test` and `scripts/test` do the same thing.

@@ -1,0 +1,17 @@
+{
+  "name": "start-github-repo",
+  "description": "Greenfield repository scaffolder for TypeScript/Node and Cloudflare Workers projects. Emits a complete repo in one offline pass: README, AGENTS.md (+ a thin CLAUDE.md adapter and a scoped .github/AGENTS.md), LICENSE, CODE_OF_CONDUCT, CHANGELOG, YAML issue forms with config.yml, PR template, CODEOWNERS, dependabot, six hardened workflows, SECURITY.md, SUPPORT.md, env examples, Scripts-To-Rule-Them-All automation, docs/, and a PRD/TRD/TOGAF-ADM-lite/WIREFRAME/DESIGN document spine wired to a single traceability matrix and TDD coverage gates. Templates are bundled, not fetched. Four stdlib-only validators enforce the result. Complements github-repository-setup, which audits repositories that already exist.",
+  "version": "1.0.0",
+  "license": "MIT",
+  "skills": [
+    "."
+  ],
+  "commands": [
+    "./commands/start-github-repo.md"
+  ],
+  "design": {
+    "self_contained": "No network fetch at scaffold time. All 56 templates are bundled.",
+    "versions_are_data": "Every pinned version lives in assets/versions.json with a checked_at field. SKILL.md and references/ never hardcode a version.",
+    "evidence_base": "Defaults are justified by a file-by-file survey of 14 production repositories, recorded under `evidence` in assets/versions.json."
+  }
+}

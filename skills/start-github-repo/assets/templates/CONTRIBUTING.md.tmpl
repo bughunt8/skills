@@ -1,0 +1,92 @@
+# Contributing to {{PROJECT_NAME}}
+
+Thanks for helping. This document is the human workflow; `AGENTS.md` is the machine-readable
+equivalent for coding agents, and the two must not contradict each other.
+
+## Ways to contribute
+
+Bug reports, reproductions, documentation fixes and reviews are all as valuable as code. Open an
+issue using one of the [issue forms](.github/ISSUE_TEMPLATE) before starting substantial work.
+
+**Do not report a security vulnerability in a public issue.** See [SECURITY.md](SECURITY.md).
+
+## Find an issue
+
+Issues labelled `good first issue` and `help wanted` are ready to pick up. Comment on the issue to
+claim it so two people do not duplicate work.
+
+## Development environment
+
+```bash
+git clone https://github.com/{{OWNER}}/{{PROJECT_NAME}}.git
+cd {{PROJECT_NAME}}
+scripts/setup
+```
+
+`scripts/setup` installs dependencies and creates local configuration from the committed examples. If
+that command fails on a clean clone, that is a bug — please report it.
+
+Requires Node {{NODE_VERSION}} (`.nvmrc`) and {{PACKAGE_MANAGER}}.
+
+## Test-driven development
+
+This project is test-first. The loop:
+
+1. Write a test for the next piece of functionality.
+2. Write the code until the test passes.
+3. Refactor both new and old code so it is well structured.
+
+Weighting follows the testing trophy — static checks, unit, integration, end-to-end — with the bulk
+of the value in **integration** tests. Write tests, not too many, mostly integration.
+
+Name tests with the requirement id they cover, so coverage maps back to the PRD:
+
+```ts
+describe('FR-001 email validation', () => { /* ... */ });
+```
+
+Coverage thresholds are enforced per file. A well-covered file cannot mask an untested one.
+
+## Commits
+
+[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/):
+
+```
+<type>[optional scope][optional !]: <description>
+```
+
+`feat` for features, `fix` for bug fixes; also `build`, `chore`, `ci`, `docs`, `perf`, `refactor`,
+`revert`, `style`, `test`. Breaking changes use `!` before the colon or a `BREAKING CHANGE:` footer
+in uppercase.
+
+Use the requirement id as the scope where one applies: `feat(FR-001): add email validation`.
+
+## Pull request lifecycle
+
+- Open a draft pull request early if you want feedback on direction; mark it ready when it is.
+- Keep the diff narrow — one concern per pull request. Large refactors go in their own PR.
+- Fill in the [pull request template](.github/pull_request_template.md), including `Closes #NNN`.
+- Run the same gate CI runs before pushing: `{{CHECK_COMMAND}}`.
+- Expect a first review within a few working days. Ping the thread once after that; do not ping
+  repeatedly.
+- A stalled pull request may be taken over or closed for inactivity after a comment asking about it.
+
+## Pull request checklist
+
+- [ ] A failing test was written first, and it now passes
+- [ ] `{{CHECK_COMMAND}}` passes locally
+- [ ] `scripts/check-docs` passes if any document in the spine changed
+- [ ] Documentation updated: PRD, TRD matrix, WIREFRAME or DESIGN as applicable
+- [ ] An ADR added if an architecturally significant decision was made
+- [ ] A changeset added if the change is user-visible
+- [ ] No secret values, `.env` or `.dev.vars` files committed
+
+## Documentation changes
+
+The document spine is validated in CI. If you change a requirement, update the traceability matrix in
+[TRD.md](TRD.md) section 4 in the same pull request. Unresolved clarification markers (see
+[docs/index.md](docs/index.md)) fail the build.
+
+## Code of conduct
+
+Participation is governed by [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).

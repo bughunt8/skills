@@ -1,0 +1,79 @@
+name: ci
+
+# A skills library has no build and no runtime, so its correctness lives entirely
+# in metadata, provenance and links. That is what this workflow tests.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: validate skills and provenance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      # The linter falls back to a strict stdlib parser without PyYAML, and that
+      # fallback refuses constructs it cannot read rather than guessing. Installing
+      # PyYAML means real YAML gets parsed as YAML instead of raising SK009.
+      - name: Install PyYAML
+        run: python3 -m pip install --quiet 'PyYAML==6.0.2'
+
+      # Proves the frontmatter parser refuses what it cannot read. Without this,
+      # a regression to naive line-matching would silently pass malformed skills.
+      - name: Test the frontmatter parser
+        run: python3 scripts/lint_skills.py --self-test
+
+      # SK001-SK009. Pre-existing violations are recorded in
+      # scripts/skill_lint_baseline.json, keyed by rule, path and a fingerprint of
+      # the message, so the gate blocks new debt without requiring the whole
+      # backlog to be fixed first and without letting a baselined path launder an
+      # unrelated new violation.
+      - name: Lint every SKILL.md
+        run: python3 scripts/lint_skills.py
+
+      # The README used to carry hand-counted totals; three of them were wrong.
+      # The counts are generated now, and this step proves nobody bypassed it.
+      - name: Check the generated skill index is current
+        run: python3 scripts/generate_index.py --check
+
+      # Offline: every vendored directory still has provenance, a licence copy, an
+      # attribution file and an ownership record, no excluded skill was smuggled
+      # back in, and every mandatory import is still present. No network, so
+      # upstream moving does not turn unrelated pull requests red.
+      - name: Validate vendored provenance
+        run: python3 scripts/sync_vendor.py --validate-manifest
+
+      # Every licence, notice or attribution marker in the tree must be covered by
+      # the vendor manifest or the third-party inventory. This is the check that
+      # would have caught redistributing mattpocock/skills with no MIT notice.
+      - name: Reconcile third-party attribution
+        run: python3 scripts/audit_third_party.py
+
+      # Vendored trees link into each other and into sibling support directories.
+      # An upstream refactor can break those links on any scheduled refresh.
+      - name: Check relative links resolve
+        run: python3 scripts/check_links.py
+
+      - name: Show the full unbaselined backlog for information
+        if: always()
+        run: python3 scripts/lint_skills.py --strict || true

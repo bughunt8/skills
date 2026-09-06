@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [{{DEFAULT_BRANCH}}]
+
+# Least privilege by default. Narrow further per job if a job needs less.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # SCAFFOLD: replace every action ref with a full-length commit SHA before enabling this
+      # workflow. A tag can be moved; a SHA cannot. Keep the version as a trailing comment.
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+      - uses: actions/setup-node@v4 # SCAFFOLD-PIN-SHA
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: {{PACKAGE_MANAGER}} install --frozen-lockfile
+      - name: Lint
+        run: {{LINT_COMMAND}}
+      - name: Typecheck
+        run: {{PACKAGE_MANAGER}} exec tsc --noEmit
+      - name: Verify generated binding types are current
+        run: {{PACKAGE_MANAGER}} exec wrangler types --check
+      - name: Test with coverage
+        run: {{TEST_COMMAND}} -- --coverage
+      - uses: actions/upload-artifact@v4 # SCAFFOLD-PIN-SHA
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
