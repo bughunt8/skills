@@ -3,35 +3,156 @@
   "title": "Bilingual marketing platform",
   "subtitle": "Edge-cached static site with a lead-capture path and an async notification tail. Boundaries are trust boundaries, not team boundaries.",
   "orientation": "LR",
-  "legend": ["Dotted edges cross a trust boundary"],
+  "legend": [
+    "Dotted edges cross a trust boundary"
+  ],
   "groups": [
-    { "label": "Public edge", "nodes": ["visitor", "cdn", "waf"] },
-    { "label": "Application", "nodes": ["site", "api", "queue"] },
-    { "label": "Data", "nodes": ["db", "objects"] },
-    { "label": "Third party", "nodes": ["mail", "crm"] }
+    {
+      "label": "Public edge",
+      "nodes": [
+        "visitor",
+        "cdn",
+        "waf"
+      ]
+    },
+    {
+      "label": "Application",
+      "nodes": [
+        "site",
+        "api",
+        "queue"
+      ]
+    },
+    {
+      "label": "Data",
+      "nodes": [
+        "db",
+        "objects"
+      ]
+    },
+    {
+      "label": "Third party",
+      "nodes": [
+        "mail",
+        "crm"
+      ]
+    }
   ],
   "nodes": [
-    { "id": "visitor", "label": "Visitor", "shape": "actor", "note": "EN and ZH locales" },
-    { "id": "cdn", "label": "CDN", "shape": "cloud", "tech": "CloudFront" },
-    { "id": "waf", "label": "WAF", "note": "Rate limit and bot rules", "tech": "AWS WAF" },
-    { "id": "site", "label": "Static site", "note": "Prerendered, no runtime deps", "tech": "S3 + Workers", "accent": true },
-    { "id": "api", "label": "Lead capture API", "note": "Validates and de-duplicates", "tech": "Lambda" },
-    { "id": "queue", "label": "Notification queue", "shape": "queue", "tech": "SQS" },
-    { "id": "db", "label": "Lead store", "shape": "cylinder", "tech": "DynamoDB" },
-    { "id": "objects", "label": "Assets", "shape": "cylinder", "tech": "S3" },
-    { "id": "mail", "label": "Transactional mail", "tech": "SES" },
-    { "id": "crm", "label": "CRM", "note": "Sales follow-up" }
+    {
+      "id": "visitor",
+      "label": "Visitor",
+      "shape": "actor",
+      "note": "EN and ZH locales"
+    },
+    {
+      "id": "cdn",
+      "label": "CDN",
+      "shape": "cloud",
+      "tech": "CloudFront"
+    },
+    {
+      "id": "waf",
+      "label": "WAF",
+      "note": "Rate limit and bot rules",
+      "tech": "AWS WAF"
+    },
+    {
+      "id": "site",
+      "label": "Static site",
+      "note": "Prerendered, no runtime deps",
+      "tech": "S3 + Workers",
+      "accent": true
+    },
+    {
+      "id": "api",
+      "label": "Lead capture API",
+      "note": "Validates and de-duplicates",
+      "tech": "Lambda"
+    },
+    {
+      "id": "queue",
+      "label": "Notification queue",
+      "shape": "queue",
+      "tech": "SQS"
+    },
+    {
+      "id": "db",
+      "label": "Lead store",
+      "shape": "cylinder",
+      "tech": "DynamoDB"
+    },
+    {
+      "id": "objects",
+      "label": "Assets",
+      "shape": "cylinder",
+      "tech": "S3"
+    },
+    {
+      "id": "mail",
+      "label": "Transactional mail",
+      "tech": "SES"
+    },
+    {
+      "id": "crm",
+      "label": "CRM",
+      "note": "Sales follow-up"
+    }
   ],
   "edges": [
-    { "from": "visitor", "to": "cdn", "label": "HTTPS" },
-    { "from": "cdn", "to": "waf" },
-    { "from": "waf", "to": "site", "label": "cache miss" },
-    { "from": "site", "to": "objects", "label": "images" },
-    { "from": "visitor", "to": "api", "label": "form submit", "accent": true },
-    { "from": "api", "to": "db", "label": "write" },
-    { "from": "api", "to": "queue", "label": "enqueue", "style": "dashed" },
-    { "from": "queue", "to": "mail", "label": "send", "style": "dotted" },
-    { "from": "queue", "to": "crm", "label": "sync", "style": "dotted" },
-    { "from": "crm", "to": "api", "label": "status callback" }
-  ]
+    {
+      "from": "visitor",
+      "to": "cdn",
+      "label": "HTTPS"
+    },
+    {
+      "from": "cdn",
+      "to": "waf"
+    },
+    {
+      "from": "waf",
+      "to": "site",
+      "label": "cache miss"
+    },
+    {
+      "from": "site",
+      "to": "objects",
+      "label": "images"
+    },
+    {
+      "from": "visitor",
+      "to": "api",
+      "label": "form submit",
+      "accent": true
+    },
+    {
+      "from": "api",
+      "to": "db",
+      "label": "write"
+    },
+    {
+      "from": "api",
+      "to": "queue",
+      "label": "enqueue",
+      "style": "dashed"
+    },
+    {
+      "from": "queue",
+      "to": "mail",
+      "label": "send",
+      "style": "dotted"
+    },
+    {
+      "from": "queue",
+      "to": "crm",
+      "label": "sync",
+      "style": "dotted"
+    },
+    {
+      "from": "crm",
+      "to": "api",
+      "label": "status callback"
+    }
+  ],
+  "footer": "Read from infra/main.tf at commit e3778af, 6 September 2026"
 }

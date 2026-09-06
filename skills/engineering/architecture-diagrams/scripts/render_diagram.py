@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 from xml.sax.saxutils import escape, quoteattr
@@ -50,8 +51,57 @@ def die(msg, code=2):
 
 
 def e(text):
-    """Escape text for XML content."""
+    """Escape for element *text* content. Does not escape quotes, so this is not
+    safe for an attribute value: use attr() there."""
     return escape("" if text is None else str(text))
+
+
+def attr(text):
+    """Escape for an attribute value that is already wrapped in double quotes.
+
+    escape() leaves quotes alone, so using e() inside content="..." lets a
+    crafted subtitle close the attribute and add its own. quoteattr() supplies
+    its own quotes and so cannot be used where the template already has them.
+    """
+    return (
+        escape("" if text is None else str(text))
+        .replace('"', "&quot;")
+        .replace("'", "&#39;")
+    )
+
+
+# A template placeholder. Substitution is a single pass over the template, so
+# replacement text is never itself scanned for placeholders.
+TOKEN_RE = re.compile(r"__[A-Z][A-Z0-9_]*__")
+
+
+def fill(template, values):
+    """Substitute every placeholder in one pass.
+
+    This is a security boundary, not a style preference. The previous version
+    applied str.replace() once per token over the whole template, which meant
+    text inserted by an earlier token was rescanned by later ones. A node id of
+    "__A11Y_DESC__" survived attribute-escaping, was then matched by the later
+    A11Y_DESC replacement, and received a text-escaped description whose
+    unescaped quotes broke out of the attribute and installed an onfocus
+    handler. That was a working XSS in a file intended to be sent to clients.
+
+    One pass with re.sub closes the class of bug: a placeholder appearing in
+    user data is emitted literally and never expanded.
+    """
+    missing = []
+
+    def replace(match):
+        key = match.group(0)
+        if key not in values:
+            missing.append(key)
+            return key
+        return values[key]
+
+    out = TOKEN_RE.sub(replace, template)
+    if missing:
+        die(f"template has placeholders with no value: {', '.join(sorted(set(missing)))}", 1)
+    return out
 
 
 # ------------------------------------------------------------------- shapes
@@ -172,7 +222,7 @@ def sequence_markup(geo):
             "h": lane["h"],
             "shape": lane["shape"],
             "label_lines": lane["label_lines"],
-            "note_lines": [],
+            "note_lines": lane.get("note_lines") or [],
             "tech": None,
             "id": lane["id"],
             "accent": None,
@@ -252,6 +302,9 @@ def a11y_description(doc, geo):
     """SVG needs a text alternative. Describe the structure, not the picture."""
     if geo["kind"] == "sequence":
         lines = [f"Sequence diagram: {doc['title']}."]
+        for lane in geo["lanes"]:
+            if lane.get("note"):
+                lines.append(f"{lane['id']}: {lane['note']}.")
         for msg in geo["messages"]:
             label = msg.get("label") or "message"
             lines.append(f"{msg['index']}. {msg['from']} to {msg['to']}: {label}.")
@@ -269,28 +322,29 @@ def render_html(doc, geo):
     css = (TEMPLATES / "theme.css").read_text(encoding="utf-8")
 
     subtitle = doc.get("subtitle") or ""
-    replacements = {
+    # Numeric values are injected into a <script> block, so they are coerced to
+    # float rather than interpolated as whatever the document happened to hold.
+    def num(value):
+        return repr(float(value))
+
+    values = {
         "__TITLE__": e(doc["title"]),
         "__SUBTITLE__": e(subtitle),
-        "__DESCRIPTION__": e(subtitle or doc["title"]),
+        # An attribute sink, so it needs quote escaping, not text escaping.
+        "__DESCRIPTION__": attr(subtitle or doc["title"]),
         "__KIND__": e(KIND_LABELS.get(doc["kind"], doc["kind"])),
         "__CSS__": css,
         "__BODY__": build_body(geo),
         "__LEGEND__": build_legend(doc, geo),
         "__STAT__": e(stat_line(geo)),
+        "__FOOTER__": e(doc.get("footer") or ""),
         "__A11Y_DESC__": e(a11y_description(doc, geo)),
-        "__MIN_X__": str(geo["min_x"]),
-        "__MIN_Y__": str(geo["min_y"]),
-        "__WIDTH__": str(geo["width"]),
-        "__HEIGHT__": str(geo["height"]),
+        "__MIN_X__": num(geo["min_x"]),
+        "__MIN_Y__": num(geo["min_y"]),
+        "__WIDTH__": num(geo["width"]),
+        "__HEIGHT__": num(geo["height"]),
     }
-    for token, value in replacements.items():
-        template = template.replace(token, value)
-
-    leftover = [t for t in replacements if t in template]
-    if leftover:
-        die(f"template still contains unsubstituted tokens: {', '.join(leftover)}", 1)
-    return template
+    return fill(template, values)
 
 
 def render_svg(doc, geo):

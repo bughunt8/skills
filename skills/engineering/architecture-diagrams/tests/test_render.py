@@ -21,6 +21,33 @@ import render_diagram  # noqa: E402
 
 EXAMPLES = sorted((ROOT / "examples").glob("*.json"))
 
+# Every mechanism by which a standalone file could reach the network. Kept as a
+# module-level helper so a test can assert the detector itself catches each one.
+NETWORK_PATTERNS = [
+    (r"<link\b", "<link> element"),
+    (r"<script[^>]*\bsrc\s*=", "external script"),
+    (r"<img[^>]*\bsrc\s*=\s*[\"']https?:", "remote image"),
+    (r"@import", "CSS @import"),
+    (r"url\(\s*[\"']?https?:", "CSS remote url()"),
+    (r"<use[^>]*\bhref\s*=\s*[\"']https?:", "remote SVG use"),
+    (r"@font-face", "webfont"),
+    (r"\bfetch\s*\(", "fetch"),
+    (r"\bXMLHttpRequest\b", "XMLHttpRequest"),
+    (r"\bWebSocket\b", "WebSocket"),
+    (r"\bEventSource\b", "EventSource"),
+    (r"\bsendBeacon\b", "sendBeacon"),
+    (r"\bnew\s+Image\s*\(", "dynamic image"),
+    (r"\bimportScripts\b", "importScripts"),
+]
+
+
+def network_offenders(html):
+    import re
+
+    return [
+        what for pattern, what in NETWORK_PATTERNS if re.search(pattern, html, re.I)
+    ]
+
 
 def load(path):
     return json.loads(Path(path).read_text("utf-8"))
@@ -61,32 +88,47 @@ class TestOutputProperties(unittest.TestCase):
         self.html = render_diagram.render_html(self.doc, self.geo)
 
     def test_standalone_no_network(self):
-        """The artifact must not fetch anything at open time.
+        """The artifact must not fetch anything, at load or afterwards.
 
-        Checked against the patterns that actually load a resource, not against
-        the substring "http". The SVG namespace declaration
-        xmlns="http://www.w3.org/2000/svg" is an identifier that no browser ever
-        dereferences, and flagging it makes the test cry wolf on correct output.
+        Checked against the patterns that actually cause a request, not against
+        the substring "http": xmlns="http://www.w3.org/2000/svg" is an identifier
+        no browser dereferences, and flagging it makes the test cry wolf on
+        correct output.
         """
-        import re
+        self.assertEqual(
+            network_offenders(self.html), [], "artifact can reach the network"
+        )
 
-        offenders = []
-        for pattern, what in [
-            (r"<link\b", "<link> element"),
-            (r"<script[^>]*\bsrc\s*=", "external script"),
-            (r"<img[^>]*\bsrc\s*=\s*[\"']https?:", "remote image"),
-            (r"@import", "CSS @import"),
-            (r"url\(\s*[\"']?https?:", "CSS remote url()"),
-            (r"<use[^>]*\bhref\s*=\s*[\"']https?:", "remote SVG use"),
-            (r"@font-face", "webfont"),
-        ]:
-            if re.search(pattern, self.html, re.I):
-                offenders.append(what)
-        self.assertEqual(offenders, [], f"artifact loads external resources: {offenders}")
+    def test_the_network_detector_can_fail(self):
+        """Run the detector against each planted mechanism.
 
-        # Sanity-check the check itself: it must catch a planted reference.
-        planted = self.html.replace("</head>", '<link rel="stylesheet" href="x.css"></head>')
-        self.assertRegex(planted, r"<link\b")
+        The previous version planted a <link> and then asserted the string
+        contained "<link", which proved nothing about the detector. It also
+        checked only resource tags, so a planted fetch() in the inline script
+        went undetected.
+        """
+        plants = {
+            "<link> element": lambda h: h.replace(
+                "</head>", '<link rel="stylesheet" href="x.css"></head>'
+            ),
+            "external script": lambda h: h.replace(
+                "</head>", '<script src="https://cdn.example.com/x.js"></script></head>'
+            ),
+            "CSS @import": lambda h: h.replace("<style>", '<style>@import "x.css";'),
+            "webfont": lambda h: h.replace("<style>", "<style>@font-face{src:url(x.woff2)}"),
+            "fetch": lambda h: h.replace('"use strict";', '"use strict"; fetch("https://e.example/leak");'),
+            "XMLHttpRequest": lambda h: h.replace('"use strict";', '"use strict"; new XMLHttpRequest();'),
+            "WebSocket": lambda h: h.replace('"use strict";', '"use strict"; new WebSocket("wss://e.example");'),
+            "sendBeacon": lambda h: h.replace('"use strict";', '"use strict"; navigator.sendBeacon("/x");'),
+            "EventSource": lambda h: h.replace('"use strict";', '"use strict"; new EventSource("/x");'),
+            "dynamic image": lambda h: h.replace('"use strict";', '"use strict"; new Image().src="https://e.example/p.gif";'),
+        }
+        for what, plant in plants.items():
+            with self.subTest(mechanism=what):
+                found = network_offenders(plant(self.html))
+                self.assertIn(
+                    what, found, f"detector missed a planted {what}: found {found}"
+                )
 
     def test_css_and_script_are_inlined(self):
         self.assertIn("<style>", self.html)
@@ -146,6 +188,73 @@ class TestOutputProperties(unittest.TestCase):
         html = render_diagram.render_html(doc, diagram_layout.layout(doc))
         self.assertNotIn("<script>alert(1)</script>", html)
         self.assertIn("&lt;script&gt;", html)
+
+
+class TestDocumentedBehaviour(unittest.TestCase):
+    """Assertions for claims SKILL.md makes that were previously only accidentally
+    true. A browser test would cover these better, but the suite is deliberately
+    dependency-free, and these catch the mutations that matter: tabindex to -1,
+    the reduced-motion query inverted, and @media print changed to screen.
+    """
+
+    def setUp(self):
+        self.doc = load(ROOT / "examples" / "web-platform.architecture.json")
+        self.geo = diagram_layout.layout(self.doc)
+        self.html = render_diagram.render_html(self.doc, self.geo)
+        self.css = (ROOT / "templates" / "theme.css").read_text("utf-8")
+
+    def test_nodes_are_keyboard_reachable(self):
+        count = self.html.count('tabindex="0"')
+        self.assertGreaterEqual(
+            count, len(self.doc["nodes"]), "nodes are not in the tab order"
+        )
+        self.assertNotIn('tabindex="-1"', self.html)
+        self.assertIn('role="button"', self.html)
+        # Enter and Space must activate, not only the mouse.
+        self.assertIn('e.key === "Enter"', self.html)
+        self.assertIn("focus-visible", self.css)
+
+    def test_reduced_motion_is_honoured(self):
+        self.assertIn("(prefers-reduced-motion: reduce)", self.css)
+        self.assertIn('matchMedia("(prefers-reduced-motion: reduce)")', self.html)
+        self.assertNotIn("(prefers-reduced-motion: no-preference)", self.css)
+
+    def test_print_rules_exist_and_hide_the_chrome(self):
+        self.assertIn("@media print", self.css)
+        block = self.css.split("@media print", 1)[1]
+        self.assertIn("display: none", block, "print rules do not hide the chrome")
+
+    def test_both_themes_are_defined(self):
+        for theme in ('[data-theme="dark"]', '[data-theme="light"]'):
+            self.assertIn(theme, self.css)
+        self.assertIn("(prefers-color-scheme: light)", self.html)
+
+    def test_footer_is_rendered_when_declared(self):
+        """It was accepted, documented, and then silently dropped."""
+        self.assertIn(self.doc["footer"], self.html)
+        marker = "SENTINEL-FOOTER-VALUE"
+        doc = dict(self.doc, footer=marker)
+        html = render_diagram.render_html(doc, diagram_layout.layout(doc))
+        self.assertIn(marker, html)
+
+    def test_participant_notes_are_rendered(self):
+        """Also accepted, documented and silently dropped."""
+        doc = {
+            "kind": "sequence",
+            "title": "t",
+            "participants": [{"id": "a", "label": "A", "note": "SENTINEL-PARTICIPANT-NOTE"}],
+            "messages": [{"from": "a", "to": "a", "label": "x"}],
+        }
+        html = render_diagram.render_html(doc, diagram_layout.layout(doc))
+        self.assertIn("SENTINEL-PARTICIPANT-NOTE", html)
+        # and it must be findable and described, not just drawn
+        self.assertIn("SENTINEL-PARTICIPANT-NOTE", html.split("<desc")[1].split("</desc>")[0])
+
+    def test_svg_has_a_text_alternative(self):
+        self.assertIn("<desc", self.html)
+        desc = self.html.split("<desc", 1)[1].split("</desc>", 1)[0]
+        for node in self.doc["nodes"][:3]:
+            self.assertIn(node["id"], desc)
 
 
 class TestCycles(unittest.TestCase):

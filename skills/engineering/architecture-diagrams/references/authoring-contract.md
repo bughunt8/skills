@@ -1,8 +1,9 @@
 # Authoring contract
 
-Every field, and how to choose. The authoritative implementation is
-`scripts/diagram_ir.py`; `schemas/diagram.schema.json` says the same thing in
-JSON Schema, and a test fails if the two drift apart.
+Every field, and how to choose. The authoritative implementation is `scripts/diagram_ir.py`.
+`schemas/diagram.schema.json` is **generated** from it by
+`scripts/generate_schema.py`, so the two cannot disagree; do not hand-edit the
+schema, and run `generate_schema.py --write` after changing a field spec.
 
 The validator is strict by design:
 
@@ -11,8 +12,15 @@ The validator is strict by design:
   build.
 - **Unknown keys are errors.** A silently ignored key is how you end up certain
   you set something that never took effect.
-- **All problems are reported at once**, each with its JSON path, so one pass
-  fixes the document.
+- **Problems are reported together**, each with its JSON path, so one pass fixes
+  the document. One exception: an unrecognised `kind` stops validation, because
+  the kind decides which fields apply. The error says so explicitly rather than
+  leaving you to wonder what else is wrong.
+- **An exact duplicate edge is an error.** Two identical edges draw the same curve
+  in the same place with no way for a reader to tell. Parallel edges with
+  different labels are legitimate and are fanned apart automatically.
+- **Every field is type-checked, not just the required ones.** `{"legend": 7}` is
+  rejected at validation rather than crashing the renderer later.
 
 ## Top level
 
@@ -21,7 +29,7 @@ The validator is strict by design:
 | `kind` | yes | `architecture`, `workflow`, `dataflow`, `lifecycle`, `sequence` |
 | `title` | yes | Short. Names the system or the flow. |
 | `subtitle` | no | One or two sentences. State what the diagram *asserts*, so a reader can tell when it has gone stale. |
-| `footer` | no | Provenance: commit, date, source of truth. |
+| `footer` | no | Provenance: commit, date, source of truth. Rendered in the artifact's footer. |
 | `orientation` | no | `LR` (default) or `TB`. Ignored for `sequence`. |
 | `legend` | no | Extra legend strings. Loop, async and boundary entries are derived for you. |
 | `groups` | no | Boundaries. Graph kinds only. |
@@ -39,7 +47,7 @@ almost always reads better on a screen.
 | Key | Required | Notes |
 | --- | --- | --- |
 | `id` | yes | Referenced by `edges` and `groups`. Short and stable; renaming it breaks every reference. |
-| `label` | yes | What a reader calls this thing. Wrapped automatically. |
+| `label` | yes | What a reader calls this thing. Wrapped automatically, including long identifiers and scripts with no spaces, such as Chinese and Japanese. |
 | `shape` | no | Default `box`. See the table below. |
 | `note` | no | One short line. Must say something the label cannot. |
 | `tech` | no | The concrete technology, rendered small and monospaced. |
@@ -89,8 +97,14 @@ rely on it. A common and useful one: solid for synchronous, dashed for
 asynchronous, dotted for crossing a trust boundary.
 
 **Cycles are fine.** Retry loops, rollbacks and state machines are cyclic. The
-layout finds the edges that close a cycle, routes them through a strip clear of
-every node, and dashes them. Do not linearise a state machine to make it fit.
+layout finds the edges that close a cycle, routes them through a strip that no
+node occupies, and dashes them. A self-referential edge (`from` equal to `to`)
+draws as a loop above the node. Do not linearise a state machine to make it fit.
+
+**Edges are not routed around obstacles.** Between neighbouring ranks nothing can
+be in the way. A longer edge, or the leg of a back edge, can cross an unrelated
+node on a dense graph. That is a limitation of the renderer, not of your document:
+if it looks wrong, the diagram is too dense and wants splitting.
 
 ## `groups`
 

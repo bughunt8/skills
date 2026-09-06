@@ -59,22 +59,39 @@ def text_width(text, font_size=LABEL_FS):
     return len(text) * font_size * GLYPH
 
 
+def _hard_break(word, max_px, font_size):
+    """Split a token that cannot fit on one line at any width.
+
+    Necessary rather than nice to have. Refusing to split meant a long
+    identifier, a URI, or any CJK string (which has no spaces to wrap at)
+    rendered as a single line far wider than the node: a 1,000-character label
+    measured 9,153px inside a 208px box, overflowing by ~4,470px on each side and
+    being clipped at the fit and print boundaries.
+    """
+    if text_width(word, font_size) <= max_px:
+        return [word]
+    per_char = max(1, int(max_px // (font_size * GLYPH)))
+    return [word[i : i + per_char] for i in range(0, len(word), per_char)] or [word]
+
+
 def wrap(text, max_px, font_size=LABEL_FS):
-    """Greedy word wrap to a pixel budget. A single over-long word is not split;
-    breaking identifiers mid-token hurts more than a slightly wide box."""
+    """Greedy word wrap to a pixel budget, hard-breaking tokens that cannot fit."""
     words = str(text).split()
     if not words:
         return [""]
-    lines, cur = [], words[0]
-    for word in words[1:]:
-        candidate = cur + " " + word
-        if text_width(candidate, font_size) <= max_px:
-            cur = candidate
-        else:
-            lines.append(cur)
-            cur = word
-    lines.append(cur)
-    return lines
+    lines, cur = [], ""
+    for word in words:
+        for piece in _hard_break(word, max_px, font_size):
+            candidate = (cur + " " + piece) if cur else piece
+            if text_width(candidate, font_size) <= max_px:
+                cur = candidate
+            else:
+                if cur:
+                    lines.append(cur)
+                cur = piece
+    if cur:
+        lines.append(cur)
+    return lines or [""]
 
 
 ACTOR_HEAD = 34
@@ -249,14 +266,20 @@ def layout_graph(doc):
         for n in by_rank[r]:
             stacks.setdefault((band_of[n], r), []).append(n)
 
-    # Each band is as tall as its fullest rank, plus a header when it is a group.
+    # The cross-axis size of a box is its height under LR and its width under TB.
+    # Using the height in both directions made every TB rank advance by ~86px
+    # while the boxes are 208px wide, so neighbours overlapped by 122px.
+    def cross(node_id):
+        return boxes[node_id]["w"] if orientation == "TB" else boxes[node_id]["h"]
+
+    # Each band is as deep as its fullest rank, plus a header when it is a group.
     band_height = {}
     for bi in range(len(bands)):
         tallest = 0
         for r in sorted(by_rank):
             members = stacks.get((bi, r), [])
             if members:
-                extent = sum(boxes[m]["h"] for m in members) + NODE_GAP * (len(members) - 1)
+                extent = sum(cross(m) for m in members) + NODE_GAP * (len(members) - 1)
                 tallest = max(tallest, extent)
         header = GROUP_HEADER if bands[bi][0] == "group" else 0
         band_height[bi] = tallest + header + (2 * GROUP_PAD if header else 0)
@@ -271,12 +294,19 @@ def layout_graph(doc):
     for (bi, r), members in stacks.items():
         header = GROUP_HEADER + GROUP_PAD if bands[bi][0] == "group" else 0
         inner_h = band_height[bi] - header - (GROUP_PAD if bands[bi][0] == "group" else 0)
-        extent = sum(boxes[m]["h"] for m in members) + NODE_GAP * (len(members) - 1)
+        extent = sum(cross(m) for m in members) + NODE_GAP * (len(members) - 1)
         along = band_top[bi] + header + (inner_h - extent) / 2
         for m in members:
-            across = MARGIN + r * (NODE_W + RANK_GAP)
+            # Rank spacing must clear the box's own extent along the rank axis,
+            # which is the height under TB and the fixed width under LR.
+            rank_step = (
+                (max(boxes[k]["h"] for k in node_ids) + RANK_GAP)
+                if orientation == "TB"
+                else (NODE_W + RANK_GAP)
+            )
+            across = MARGIN + r * rank_step
             placed[m] = (across, along) if orientation == "LR" else (along, across)
-            along += boxes[m]["h"] + NODE_GAP
+            along += cross(m) + NODE_GAP
 
     out_nodes = []
     for n in node_ids:
@@ -331,11 +361,26 @@ def layout_graph(doc):
     back_list = [i for i in range(len(edges)) if i in back]
     strip = {idx: content_min - 40 - 24 * k for k, idx in enumerate(back_list)}
 
+    # Edges sharing a pair of endpoints would otherwise trace the same curve and
+    # stack their labels in the same place, so they are fanned apart.
+    pair_count = {}
+    for edge in edges:
+        key = (edge["from"], edge["to"])
+        pair_count[key] = pair_count.get(key, 0) + 1
+    pair_seen = {}
+
     out_edges = []
     for i, edge in enumerate(edges):
         a, b = pos[edge["from"]], pos[edge["to"]]
         is_back = i in back
-        path, lx, ly = _edge_path(a, b, orientation, is_back, strip.get(i))
+        key = (edge["from"], edge["to"])
+        k = pair_seen.get(key, 0)
+        pair_seen[key] = k + 1
+        # Centre the fan on the direct route: one edge is undeflected.
+        fan = 0.0
+        if pair_count[key] > 1:
+            fan = (k - (pair_count[key] - 1) / 2) * 34.0
+        path, lx, ly = _edge_path(a, b, orientation, is_back, strip.get(i), fan)
         out_edges.append(
             {
                 "from": edge["from"],
@@ -372,9 +417,24 @@ def layout_graph(doc):
     }
 
 
-def _edge_path(a, b, orientation, is_back, strip=None):
-    """Cubic bezier between two boxes. Back edges run through a reserved strip
-    clear of every node, so neither the curve nor its label lands on content."""
+def _edge_path(a, b, orientation, is_back, strip=None, fan=0.0):
+    """Cubic bezier between two boxes.
+
+    Back edges travel through a reserved strip that no node occupies. The legs
+    from each endpoint up to that strip are straight cubics and are NOT routed
+    around intervening boxes, so on a dense graph a back edge can still cross an
+    unrelated node. This is a known limitation, stated in SKILL.md rather than
+    papered over.
+    """
+    if a is b:
+        # A self-loop needs a visible loop, not a zero-length curve.
+        x, y = a["x"] + a["w"] / 2, a["y"]
+        return (
+            f"M {x - 24:.1f} {y:.1f} C {x - 40:.1f} {y - 56:.1f} "
+            f"{x + 40:.1f} {y - 56:.1f} {x + 24:.1f} {y:.1f}",
+            x,
+            y - 44,
+        )
     if orientation == "LR":
         sx, sy = a["x"] + a["w"], a["y"] + a["h"] / 2
         tx, ty = b["x"], b["y"] + b["h"] / 2
@@ -385,8 +445,11 @@ def _edge_path(a, b, orientation, is_back, strip=None):
             path = f"M {sx:.1f} {sy:.1f} C {sx - 60:.1f} {bow:.1f} {tx + 60:.1f} {bow:.1f} {tx:.1f} {ty:.1f}"
             return path, (sx + tx) / 2, bow - 6
         dx = max(40.0, (tx - sx) * 0.5)
-        path = f"M {sx:.1f} {sy:.1f} C {sx + dx:.1f} {sy:.1f} {tx - dx:.1f} {ty:.1f} {tx:.1f} {ty:.1f}"
-        return path, (sx + tx) / 2, (sy + ty) / 2 - 8
+        path = (
+            f"M {sx:.1f} {sy:.1f} C {sx + dx:.1f} {sy + fan:.1f} "
+            f"{tx - dx:.1f} {ty + fan:.1f} {tx:.1f} {ty:.1f}"
+        )
+        return path, (sx + tx) / 2, (sy + ty) / 2 - 8 + fan * 0.75
     sx, sy = a["x"] + a["w"] / 2, a["y"] + a["h"]
     tx, ty = b["x"] + b["w"] / 2, b["y"]
     if is_back:
@@ -396,8 +459,11 @@ def _edge_path(a, b, orientation, is_back, strip=None):
         path = f"M {sx:.1f} {sy:.1f} C {bow:.1f} {sy - 60:.1f} {bow:.1f} {ty + 60:.1f} {tx:.1f} {ty:.1f}"
         return path, bow + 4, (sy + ty) / 2
     dy = max(40.0, (ty - sy) * 0.5)
-    path = f"M {sx:.1f} {sy:.1f} C {sx:.1f} {sy + dy:.1f} {tx:.1f} {ty - dy:.1f} {tx:.1f} {ty:.1f}"
-    return path, (sx + tx) / 2 + 8, (sy + ty) / 2
+    path = (
+        f"M {sx:.1f} {sy:.1f} C {sx + fan:.1f} {sy + dy:.1f} "
+        f"{tx + fan:.1f} {ty - dy:.1f} {tx:.1f} {ty:.1f}"
+    )
+    return path, (sx + tx) / 2 + 8 + fan * 0.75, (sy + ty) / 2
 
 
 # ---------------------------------------------------------- sequence layout
@@ -412,14 +478,19 @@ def layout_sequence(doc):
     measured = []
     for part in parts:
         label_lines = wrap(part["label"], LANE_BOX_W - 24, LABEL_FS)
+        # The note is part of the documented contract, so it must be measured
+        # here or it will be rendered outside the box it belongs to.
+        note_lines = wrap(part["note"], LANE_BOX_W - 24, NOTE_FS) if part.get("note") else []
         h = 22 + len(label_lines) * LINE_H + 18
+        if note_lines:
+            h += 6 + len(note_lines) * NOTE_LINE_H
         if part.get("shape") == "actor":
             h += ACTOR_HEAD
-        measured.append((part, label_lines, max(LANE_BOX_H, h)))
-    box_h = max(h for _, _, h in measured)
+        measured.append((part, label_lines, note_lines, max(LANE_BOX_H, h)))
+    box_h = max(h for _, _, _, h in measured)
 
     lanes = []
-    for i, (part, label_lines, _) in enumerate(measured):
+    for i, (part, label_lines, note_lines, _) in enumerate(measured):
         x = MARGIN + i * LANE_W
         lanes.append(
             {
@@ -431,6 +502,7 @@ def layout_sequence(doc):
                 "h": box_h,
                 "shape": part.get("shape", "box"),
                 "note": part.get("note"),
+                "note_lines": note_lines,
             }
         )
     cx = {lane["id"]: lane["cx"] for lane in lanes}

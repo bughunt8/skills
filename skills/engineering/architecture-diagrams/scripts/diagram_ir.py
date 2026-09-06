@@ -54,38 +54,119 @@ def _is_str(v):
     return isinstance(v, str) and v.strip() != ""
 
 
-def _check_keys(obj, path, required, optional, problems):
-    """Require what must be present and reject what is not recognised.
+# Field specifications. The suffix "!" marks a required field. These are the
+# single source of truth: schemas/diagram.schema.json is generated from them by
+# scripts/generate_schema.py, so the two cannot drift.
+NODE_SPEC = {
+    "id": "str!",
+    "label": "str!",
+    "shape": "shape",
+    "note": "text",
+    "tech": "text",
+    "accent": "bool",
+}
+EDGE_SPEC = {"from": "str!", "to": "str!", "label": "text", "style": "style", "accent": "bool"}
+PARTICIPANT_SPEC = {"id": "str!", "label": "str!", "shape": "shape", "note": "text"}
+MESSAGE_SPEC = {
+    "from": "str!",
+    "to": "str!",
+    "label": "text",
+    "style": "style",
+    "note": "text",
+    "accent": "bool",
+}
+GROUP_SPEC = {"label": "str!", "nodes": "ids!"}
+TOP_COMMON = {"kind": "kind!", "title": "str!", "subtitle": "text", "footer": "text",
+              "legend": "strlist"}
+TOP_GRAPH = dict(TOP_COMMON, orientation="orientation", groups="objlist", nodes="objlist!",
+                 edges="objlist")
+TOP_SEQUENCE = dict(TOP_COMMON, participants="objlist!", messages="objlist!")
 
-    Unknown keys are errors rather than warnings. A silently ignored key is how
-    an author ends up convinced they set something that never took effect.
+ENUMS = {
+    "shape": NODE_SHAPES,
+    "style": EDGE_STYLES,
+    "orientation": ORIENTATIONS,
+    "kind": ALL_KINDS,
+}
+
+REQUIRED_TOP = ("kind", "title")
+REQUIRED_NODE = ("id", "label")
+REQUIRED_EDGE = ("from", "to")
+REQUIRED_PARTICIPANT = ("id", "label")
+REQUIRED_MESSAGE = ("from", "to")
+
+
+def _type_ok(kind, value, path, problems):
+    """Check one field's type. Returns False when the value is unusable.
+
+    Every optional field is checked, not just the required ones. Previously only
+    required fields were type-checked, so {"legend": 7} and {"tech": 7} passed
+    validation and then crashed the renderer with a TypeError. A validator that
+    lets a document through and leaves the renderer to fail is worse than no
+    validator, because the error surfaces far from its cause.
     """
+    base = kind.rstrip("!")
+    if base == "str":
+        if not _is_str(value):
+            problems.append(f"{path}: must be a non-empty string")
+            return False
+    elif base == "text":
+        if not isinstance(value, str):
+            problems.append(f"{path}: must be a string, got {type(value).__name__}")
+            return False
+    elif base == "bool":
+        if not isinstance(value, bool):
+            problems.append(f"{path}: must be true or false, got {type(value).__name__}")
+            return False
+    elif base in ENUMS:
+        if not isinstance(value, str):
+            problems.append(f"{path}: must be a string, got {type(value).__name__}")
+            return False
+        if value not in ENUMS[base]:
+            problems.append(
+                f"{path}: {value!r} is not one of {', '.join(map(repr, ENUMS[base]))}"
+            )
+            return False
+    elif base in ("strlist", "ids"):
+        if not isinstance(value, list):
+            problems.append(f"{path}: must be a list, got {type(value).__name__}")
+            return False
+        if base == "ids" and not value:
+            problems.append(f"{path}: must not be empty")
+            return False
+        for i, item in enumerate(value):
+            # Checked before the value is ever used as a dict key: an unhashable
+            # member used to crash the validator itself with a TypeError.
+            if not _is_str(item):
+                problems.append(f"{path}[{i}]: must be a non-empty string")
+                return False
+    elif base == "objlist":
+        if not isinstance(value, list):
+            problems.append(f"{path}: must be a list, got {type(value).__name__}")
+            return False
+    return True
+
+
+def _check_object(obj, path, spec, problems):
+    """Validate one object against a spec: required keys, no unknown keys, types."""
     if not isinstance(obj, dict):
         problems.append(f"{path}: expected an object, got {type(obj).__name__}")
         return False
     ok = True
-    for key in required:
-        if key not in obj:
+    for key, kind in spec.items():
+        if kind.endswith("!") and key not in obj:
             problems.append(f"{path}: missing required key '{key}'")
             ok = False
-        elif not _is_str(obj[key]) and key not in ("nodes",):
-            problems.append(f"{path}.{key}: must be a non-empty string")
-            ok = False
-    allowed = set(required) | set(optional)
     for key in obj:
-        if key not in allowed:
+        if key not in spec:
             problems.append(
-                f"{path}: unknown key '{key}' (allowed: {', '.join(sorted(allowed))})"
+                f"{path}: unknown key '{key}' (allowed: {', '.join(sorted(spec))})"
             )
             ok = False
+            continue
+        if not _type_ok(spec[key], obj[key], f"{path}.{key}", problems):
+            ok = False
     return ok
-
-
-def _check_enum(obj, path, key, allowed, problems):
-    if key in obj and obj[key] not in allowed:
-        problems.append(
-            f"{path}.{key}: {obj[key]!r} is not one of {', '.join(map(repr, allowed))}"
-        )
 
 
 def validate(doc):
@@ -95,24 +176,28 @@ def validate(doc):
     if not isinstance(doc, dict):
         raise ValidationError([f"document root: expected an object, got {type(doc).__name__}"])
 
-    for key in REQUIRED_TOP:
-        if key not in doc:
-            problems.append(f"document root: missing required key '{key}'")
-        elif not _is_str(doc[key]):
-            problems.append(f"{key}: must be a non-empty string")
-
     kind = doc.get("kind")
-    if kind is not None and kind not in ALL_KINDS:
+    if kind is None:
+        problems.append("document root: missing required key 'kind'")
+    elif kind not in ALL_KINDS:
         problems.append(
             f"kind: {kind!r} is not one of {', '.join(map(repr, ALL_KINDS))}"
         )
-        # Without a known kind the rest cannot be checked meaningfully.
+
+    # An unknown kind means the body shape is unknown, but the parts that do not
+    # depend on it are still worth reporting in the same pass.
+    if kind not in ALL_KINDS:
+        if "title" in doc and not _is_str(doc["title"]):
+            problems.append("title: must be a non-empty string")
+        elif "title" not in doc:
+            problems.append("document root: missing required key 'title'")
+        problems.append(
+            "further checks were skipped because 'kind' decides which fields apply"
+        )
         raise ValidationError(problems)
 
-    _check_enum(doc, "document root", "orientation", ORIENTATIONS, problems)
-    for key in ("subtitle", "footer"):
-        if key in doc and not isinstance(doc[key], str):
-            problems.append(f"{key}: must be a string")
+    spec = TOP_SEQUENCE if kind in SEQUENCE_KINDS else TOP_GRAPH
+    _check_object(doc, "document root", spec, problems)
 
     if kind in SEQUENCE_KINDS:
         _validate_sequence(doc, problems)
@@ -125,11 +210,6 @@ def validate(doc):
 
 
 def _validate_graph(doc, problems):
-    top_optional = ("subtitle", "footer", "orientation", "groups", "legend")
-    for key in doc:
-        if key not in set(REQUIRED_TOP) | set(top_optional) | {"nodes", "edges"}:
-            problems.append(f"document root: unknown key '{key}' for kind {doc['kind']!r}")
-
     nodes = doc.get("nodes")
     if not isinstance(nodes, list) or not nodes:
         problems.append("nodes: a graph diagram needs a non-empty list of nodes")
@@ -138,71 +218,68 @@ def _validate_graph(doc, problems):
     ids = {}
     for i, node in enumerate(nodes):
         path = f"nodes[{i}]"
-        if not _check_keys(
-            node, path, REQUIRED_NODE, ("shape", "note", "tech", "accent"), problems
-        ):
+        _check_object(node, path, NODE_SPEC, problems)
+        nid = node.get("id") if isinstance(node, dict) else None
+        if not _is_str(nid):
             continue
-        _check_enum(node, path, "shape", NODE_SHAPES, problems)
-        nid = node["id"]
         if nid in ids:
             problems.append(f"{path}.id: duplicate node id {nid!r} (also at nodes[{ids[nid]}])")
         else:
             ids[nid] = i
 
     edges = doc.get("edges", [])
-    if not isinstance(edges, list):
-        problems.append("edges: must be a list")
-        edges = []
-    for i, edge in enumerate(edges):
-        path = f"edges[{i}]"
-        if not _check_keys(
-            edge, path, REQUIRED_EDGE, ("label", "style", "accent"), problems
-        ):
-            continue
-        _check_enum(edge, path, "style", EDGE_STYLES, problems)
-        for end in ("from", "to"):
-            if edge[end] not in ids:
+    if isinstance(edges, list):
+        seen_edges = {}
+        for i, edge in enumerate(edges):
+            path = f"edges[{i}]"
+            _check_object(edge, path, EDGE_SPEC, problems)
+            if not isinstance(edge, dict) or not all(
+                _is_str(edge.get(k)) for k in ("from", "to")
+            ):
+                continue
+            for end in ("from", "to"):
+                if edge[end] not in ids:
+                    problems.append(
+                        f"{path}.{end}: {edge[end]!r} is not a declared node id. "
+                        f"An edge to a node that does not exist is the most common "
+                        f"authoring mistake, so it is an error rather than a dropped edge."
+                    )
+            # An exact duplicate draws itself twice in the same place, with no
+            # way for a reader to tell. Parallel edges with different labels are
+            # legitimate and are fanned apart by the layout instead.
+            key = (edge["from"], edge["to"], edge.get("label"), edge.get("style"))
+            if key in seen_edges:
                 problems.append(
-                    f"{path}.{end}: {edge[end]!r} is not a declared node id. "
-                    f"An edge to a node that does not exist is the most common "
-                    f"authoring mistake, so it is an error rather than a dropped edge."
-                )
-
-    groups = doc.get("groups", [])
-    if not isinstance(groups, list):
-        problems.append("groups: must be a list")
-        groups = []
-    claimed = {}
-    for i, group in enumerate(groups):
-        path = f"groups[{i}]"
-        if not isinstance(group, dict):
-            problems.append(f"{path}: expected an object")
-            continue
-        if not _is_str(group.get("label")):
-            problems.append(f"{path}.label: must be a non-empty string")
-        members = group.get("nodes")
-        if not isinstance(members, list) or not members:
-            problems.append(f"{path}.nodes: must be a non-empty list of node ids")
-            continue
-        for member in members:
-            if member not in ids:
-                problems.append(f"{path}.nodes: {member!r} is not a declared node id")
-            elif member in claimed:
-                # Overlapping groups cannot both be drawn as a clean boundary.
-                problems.append(
-                    f"{path}.nodes: node {member!r} is already in groups[{claimed[member]}]; "
-                    f"a node may belong to at most one group"
+                    f"{path}: exact duplicate of edges[{seen_edges[key]}]; it would be "
+                    f"drawn twice in the same place. Remove it, or give it a distinct label."
                 )
             else:
-                claimed[member] = i
+                seen_edges[key] = i
+
+    groups = doc.get("groups", [])
+    if isinstance(groups, list):
+        claimed = {}
+        for i, group in enumerate(groups):
+            path = f"groups[{i}]"
+            _check_object(group, path, GROUP_SPEC, problems)
+            members = group.get("nodes") if isinstance(group, dict) else None
+            if not isinstance(members, list):
+                continue
+            for member in members:
+                if not _is_str(member):
+                    continue
+                if member not in ids:
+                    problems.append(f"{path}.nodes: {member!r} is not a declared node id")
+                elif member in claimed:
+                    problems.append(
+                        f"{path}.nodes: node {member!r} is already in groups[{claimed[member]}]; "
+                        f"a node may belong to at most one group"
+                    )
+                else:
+                    claimed[member] = i
 
 
 def _validate_sequence(doc, problems):
-    top_optional = ("subtitle", "footer", "legend")
-    for key in doc:
-        if key not in set(REQUIRED_TOP) | set(top_optional) | {"participants", "messages"}:
-            problems.append(f"document root: unknown key '{key}' for kind 'sequence'")
-
     parts = doc.get("participants")
     if not isinstance(parts, list) or not parts:
         problems.append("participants: a sequence diagram needs a non-empty list")
@@ -211,10 +288,10 @@ def _validate_sequence(doc, problems):
     ids = {}
     for i, part in enumerate(parts):
         path = f"participants[{i}]"
-        if not _check_keys(part, path, REQUIRED_PARTICIPANT, ("shape", "note"), problems):
+        _check_object(part, path, PARTICIPANT_SPEC, problems)
+        pid = part.get("id") if isinstance(part, dict) else None
+        if not _is_str(pid):
             continue
-        _check_enum(part, path, "shape", NODE_SHAPES, problems)
-        pid = part["id"]
         if pid in ids:
             problems.append(f"{path}.id: duplicate participant id {pid!r}")
         else:
@@ -226,11 +303,11 @@ def _validate_sequence(doc, problems):
         return
     for i, msg in enumerate(messages):
         path = f"messages[{i}]"
-        if not _check_keys(
-            msg, path, REQUIRED_MESSAGE, ("label", "style", "note", "accent"), problems
+        _check_object(msg, path, MESSAGE_SPEC, problems)
+        if not isinstance(msg, dict) or not all(
+            _is_str(msg.get(k)) for k in ("from", "to")
         ):
             continue
-        _check_enum(msg, path, "style", EDGE_STYLES, problems)
         for end in ("from", "to"):
             if msg[end] not in ids:
                 problems.append(
