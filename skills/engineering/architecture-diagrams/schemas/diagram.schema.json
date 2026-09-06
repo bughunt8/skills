@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/bughunt8/skills/skills/engineering/architecture-diagrams/schemas/diagram.schema.json",
+  "title": "Diagram document",
+  "description": "A diagram authored as an intermediate representation. scripts/diagram_ir.py is the authoritative implementation of this contract; this file documents it for editors and general JSON Schema tools. tests/test_contract.py fails if the two disagree, so neither can drift.",
+  "type": "object",
+  "required": ["kind", "title"],
+  "properties": {
+    "kind": {
+      "description": "One diagram answers one question. The kind picks the layout and the vocabulary.",
+      "enum": ["architecture", "workflow", "dataflow", "lifecycle", "sequence"]
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "subtitle": {
+      "type": "string",
+      "description": "One or two sentences of context. A good subtitle states what the diagram asserts, so a reader can tell when it has gone stale."
+    },
+    "footer": { "type": "string" },
+    "orientation": {
+      "enum": ["LR", "TB"],
+      "default": "LR",
+      "description": "Not used by the sequence kind, which is always top to bottom."
+    },
+    "legend": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Extra legend entries. Loop, async and boundary entries are derived automatically."
+    },
+    "groups": {
+      "type": "array",
+      "description": "Boundaries. Use for trust, network or ownership boundaries, not for teams or directories. Laid out as swimlanes, so a node may belong to at most one group.",
+      "items": {
+        "type": "object",
+        "required": ["label", "nodes"],
+        "properties": {
+          "label": { "type": "string", "minLength": 1 },
+          "nodes": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Required for every kind except sequence.",
+      "items": { "$ref": "#/$defs/node" }
+    },
+    "edges": {
+      "type": "array",
+      "description": "Direction is meaning: an edge points the way a request or a record travels.",
+      "items": { "$ref": "#/$defs/edge" }
+    },
+    "participants": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Required for the sequence kind. Lifelines, left to right.",
+      "items": { "$ref": "#/$defs/participant" }
+    },
+    "messages": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Required for the sequence kind. Rendered in order, numbered.",
+      "items": { "$ref": "#/$defs/message" }
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "sequence" } }, "required": ["kind"] },
+      "then": { "required": ["participants", "messages"] },
+      "else": { "required": ["nodes"] }
+    }
+  ],
+  "$defs": {
+    "shape": {
+      "enum": ["box", "round", "cylinder", "queue", "cloud", "actor", "decision"],
+      "default": "box",
+      "description": "box service, round start or end state, cylinder datastore, queue queue or topic, cloud managed or third-party service, actor a person, decision a branch."
+    },
+    "style": {
+      "enum": ["solid", "dashed", "dotted"],
+      "default": "solid",
+      "description": "Edges that close a cycle default to dashed."
+    },
+    "node": {
+      "type": "object",
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "shape": { "$ref": "#/$defs/shape" },
+        "note": {
+          "type": "string",
+          "description": "Say something the label cannot: a constraint, a guarantee, a gotcha."
+        },
+        "tech": {
+          "type": "string",
+          "description": "The concrete technology, shown small and monospaced."
+        },
+        "accent": {
+          "type": "boolean",
+          "description": "Use once per diagram, on the thing the diagram exists to show."
+        }
+      },
+      "additionalProperties": false
+    },
+    "edge": {
+      "type": "object",
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "type": "string", "minLength": 1 },
+        "to": { "type": "string", "minLength": 1 },
+        "label": { "type": "string" },
+        "style": { "$ref": "#/$defs/style" },
+        "accent": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "participant": {
+      "type": "object",
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "shape": { "$ref": "#/$defs/shape" },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "message": {
+      "type": "object",
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "type": "string", "minLength": 1 },
+        "to": { "type": "string", "minLength": 1 },
+        "label": { "type": "string" },
+        "style": { "$ref": "#/$defs/style" },
+        "note": { "type": "string" },
+        "accent": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

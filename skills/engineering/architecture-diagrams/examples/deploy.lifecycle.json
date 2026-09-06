@@ -1,0 +1,24 @@
+{
+  "kind": "lifecycle",
+  "title": "Gated deployment lifecycle",
+  "subtitle": "Staging-first promotion with an explicit rollback path. The retry and rollback edges are cycles, which is why a state machine cannot be ranked without breaking them.",
+  "orientation": "LR",
+  "nodes": [
+    { "id": "open", "label": "PR open", "shape": "round" },
+    { "id": "validate", "label": "Validate", "note": "Secrets, build, lint, tests" },
+    { "id": "review", "label": "Review", "shape": "decision" },
+    { "id": "staging", "label": "Staging", "note": "Smoke-tested against the live URL" },
+    { "id": "prod", "label": "Production", "accent": true, "note": "Tag or manual, protected" },
+    { "id": "rollback", "label": "Rollback", "shape": "round" }
+  ],
+  "edges": [
+    { "from": "open", "to": "validate" },
+    { "from": "validate", "to": "review", "label": "green" },
+    { "from": "validate", "to": "open", "label": "failed, fix and push" },
+    { "from": "review", "to": "staging", "label": "approved" },
+    { "from": "review", "to": "open", "label": "changes requested" },
+    { "from": "staging", "to": "prod", "label": "promote" },
+    { "from": "prod", "to": "rollback", "label": "smoke test failed", "style": "dashed" },
+    { "from": "rollback", "to": "staging", "label": "redeploy previous" }
+  ]
+}
