@@ -1,23 +1,127 @@
 # Deployment
 
-Everything is driven by GitHub Actions. No step in this document is meant to be
-carried out by hand on a laptop, and no credential belongs anywhere in this
-repository.
+Everything runs in GitHub Actions. No step here is meant to be carried out by
+hand on a laptop, and no credential belongs in this repository.
 
-## Hosting layout
+This mirrors the existing estate rather than inventing a pattern: the AWS steps
+follow `bughunt8/www-resume` `.github/workflows/deploy.yml`, the Hostinger step
+follows `bughunt8/profitrise-website` `deploy-production.yml`, and the branch
+model and typed-confirmation promotion follow www-resume's
+`promote-staging-to-main.yml`.
 
-| Environment | Host | URL | Trigger |
+## Staging and production are the same setup
+
+Both publish the same artifact to **both** targets:
+
+- **AWS** — `aws s3 sync` in two passes (assets long-cached, HTML uncached), then
+  a CloudFront invalidation
+- **Hostinger** — the same directory over FTP
+
+They share one reusable workflow, `site-deploy.yml`. There is no second code
+path, so staging cannot drift from production, and a staging deploy exercises the
+exact mechanism production will use. The only difference is which **GitHub
+Environment** supplies the secrets.
+
+| | Branch | Environment | Public URL |
 | --- | --- | --- | --- |
-| Staging | GitHub Pages | `https://<owner>.github.io/<repo>/` | push to `main` |
-| Production | Cloudflare Pages | `https://skills.ronald.ng` | `v*` tag or manual run |
+| Staging | `staging` | `staging` | whatever you set `SITE_URL` to |
+| Production | `main` | `production` | `https://skills.ronald.ng` |
 
-Staging serves `robots.txt` with `Disallow: /` so it cannot compete with
-production in search results. Production serves a `sitemap.xml` and allows
-indexing.
+```
+work ──▶ staging branch ──▶ staging env  (AWS + Hostinger)
+                 │
+                 └── site-promote.yml, manual, type "promote"
+                              │
+                              ▼
+                          main branch ──▶ production env (AWS + Hostinger)
+```
 
-## An important correction about DNS
+## Workflows
 
-`ronald.ng` **is not on Cloudflare.** Its authoritative nameservers are AWS Route 53:
+| Workflow | Trigger | Does |
+| --- | --- | --- |
+| `site-validate.yml` | called | secret scan, gitleaks, build reproducibility, HTML validity, browser suite |
+| `site-ci.yml` | push/PR touching `site/**`, `skills/**` | calls validate. Exposes the required check `site gates passed` |
+| `site-deploy.yml` | called | the single deploy path: build, assemble, AWS, Hostinger, smoke-test |
+| `site-deploy-staging.yml` | push to `staging` | validate, then deploy to the `staging` environment |
+| `site-deploy-production.yml` | push to `main`, or dispatched by promote | validate, then deploy to `production` |
+| `site-promote.yml` | manual, typed confirmation | merge `staging` into `main`, then dispatch the production deploy |
+| `site-refresh-sources.yml` | 1st and 15th | re-pin the external sources, open a PR against `staging` |
+
+Validation is a reusable workflow called by every deploy path, so no deploy can
+skip the gates, and nothing polls across a workflow boundary for another run's
+result.
+
+## Secrets you need to add
+
+Set these on the repository's **Environments** (`Settings → Environments`), not as
+plain repository secrets. Environment scoping is what lets staging and production
+use identical names with different values, and it lets you require a reviewer on
+production without affecting staging.
+
+The values are the ones you already hold elsewhere:
+
+| Name | Same value as | Notes |
+| --- | --- | --- |
+| `AWS_ACCESS_KEY_ID` | `bughunt8/www-resume` | |
+| `AWS_SECRET_ACCESS_KEY` | `bughunt8/www-resume` | |
+| `AWS_REGION` | `bughunt8/www-resume` | CloudFront invalidation is global; any region works |
+| `S3_BUCKET` | **new per environment** | See the warning below |
+| `CLOUDFRONT_DISTRIBUTION_ID` | **new for production** | The distribution serving `skills.ronald.ng` |
+| `FTP_SERVER` | `bughunt8/profitrise-website` | Hostinger |
+| `FTP_USERNAME` | `bughunt8/profitrise-website` | Hostinger |
+| `FTP_PASSWORD` | `bughunt8/profitrise-website` | Hostinger |
+
+GitHub never reveals a secret's value, not even to a workflow that can use it, so
+these must be entered per environment. They cannot be copied across repositories
+programmatically.
+
+Optional **variables** (`vars`, not secrets), per environment:
+
+| Name | Default | Use |
+| --- | --- | --- |
+| `SITE_URL` | empty | Enables the post-deploy smoke test. Empty skips it rather than guessing. |
+| `SITE_S3_PREFIX` | empty, bucket root | Deploy under a prefix so two environments can share a bucket safely |
+| `SITE_FTP_REMOTE_DIR` | `./` | Hostinger directory for this environment |
+
+`site-deploy.yml` fails in its first step listing every missing secret, rather
+than skipping a target and reporting success. A deploy that publishes to one of
+two targets and looks green is how the two silently diverge.
+
+### One warning about `--delete`
+
+The asset sync uses `--delete`, matching www-resume, so the destination ends up
+matching the publish directory exactly. That means **anything else at that
+location is removed.** Either:
+
+- point `S3_BUCKET` at a bucket that holds nothing but this site, or
+- set `SITE_S3_PREFIX` so the delete is confined to that prefix
+
+Do not point staging and production at the same bucket root. They would take
+turns deleting each other, and the symptom would be an intermittently missing
+site rather than an obvious failure.
+
+The Hostinger step keeps `dangerous-clean-slate: false` for the same reason: that
+account serves other sites, and it wipes the remote directory.
+
+## What production has to exist first
+
+CI deploys; it does not provision. Create these once, as was done for
+`resume.ronald.ng`:
+
+1. **An S3 bucket** for the site, in your usual region.
+2. **A CloudFront distribution** with that bucket as origin, an alternate domain
+   name of `skills.ronald.ng`, and an ACM certificate for it **in `us-east-1`**
+   (CloudFront only reads certificates from that region, regardless of where the
+   bucket is).
+3. **A Route 53 record** for `skills.ronald.ng` pointing at the distribution, as
+   an A/AAAA alias.
+4. **A Hostinger directory** for the site, and `SITE_FTP_REMOTE_DIR` set to it.
+
+### About DNS, since it has caused confusion
+
+`ronald.ng` is authoritative on **AWS Route 53**, not Cloudflare and not
+Hostinger. Verified:
 
 ```
 $ dig +short NS ronald.ng
@@ -27,166 +131,57 @@ ns-381.awsdns-47.com.
 ns-549.awsdns-04.net.
 ```
 
-Cloudflare is used for *hosting* the Pages project, and historically for a staging
-preview of the main site, which is the likely source of the confusion. The zone
-itself stays on Route 53.
+So the `skills.ronald.ng` record is created in Route 53 even though the content is
+also pushed to Hostinger. Nothing in CI touches DNS, exactly as in www-resume.
 
-This matters because it changes what a custom domain requires. Cloudflare Pages
-can serve a custom domain whose DNS lives elsewhere, but the record has to be
-created in Route 53 and Cloudflare validates it over that CNAME. There is no need
-to migrate the zone, and migrating it would put a live business domain at risk for
-no benefit.
+`skills.ronald.ng` did not previously exist, so nothing is being taken over. These
+records are live and unrelated; do not touch them:
 
-### Records that must not be touched
+| Record | Serves |
+| --- | --- |
+| `ronald.ng`, `www.ronald.ng` | the main site, CloudFront |
+| `resume.ronald.ng` | the résumé site, CloudFront `d1srz7a0s8w38` |
+| `mcp.ronald.ng` | a live API Gateway endpoint in `ap-east-1` |
 
-These are live and unrelated to this project. `dns.yml` refuses to modify any name
-other than `skills.ronald.ng`, and prints these before it does anything.
+Both targets serve the same bytes, but only one can be authoritative for the
+hostname. The Route 53 record decides which; Hostinger is the mirror. Point the
+record at whichever you want to serve readers and the other stays a warm copy.
 
-| Record | Points at | Why it matters |
-| --- | --- | --- |
-| `ronald.ng` | CloudFront | the main site |
-| `www.ronald.ng` | CloudFront | the main site |
-| `resume.ronald.ng` | CloudFront `d1srz7a0s8w38` | the résumé site |
-| `mcp.ronald.ng` | API Gateway, ap-east-1 | a live service endpoint |
+## Protect the environments
 
-`skills.ronald.ng` did not exist before this project, so nothing is being taken
-over.
+`Settings → Environments`:
 
-## One-time setup
+- **`production`** — require a reviewer, and restrict to the `main` branch.
+- **`staging`** — no protection needed.
 
-### 1. Enable GitHub Pages
+Also require the check **`site gates passed`** on `main`. It is a single stable
+job name that depends on the others, so the required check does not change when a
+job is added or renamed.
 
-Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+## Shipping
 
-No token needed. The workflow publishes with a short-lived OIDC token that Actions
-mints for the run.
+Push to `staging`, look at the staging URL, then run **Site promote staging to
+main** and type `promote`. It shows you what is being promoted, merges, and
+dispatches the production deploy.
 
-### 2. Create the Cloudflare Pages project
+A push straight to `main` also deploys production, which is why `main` should be
+protected.
 
-Create a Pages project with **Direct Upload** (not a Git connection: the deploy is
-driven from this repository's workflow, and connecting Git as well would give you
-two competing deploy paths). Name it `skills-ronald-ng`, or set the repository
-variable `CLOUDFLARE_PROJECT_NAME` to whatever you call it.
+## What a deploy verifies
 
-Then add `skills.ronald.ng` as a custom domain on the project. Cloudflare will
-show you the CNAME target and wait for it to resolve.
+Publishing is not the same as succeeding. When `SITE_URL` is set, CI then checks
+the live origin and fails the deploy unless:
 
-### 3. Add the repository secrets
-
-Settings → Secrets and variables → Actions. These are read by reference at run
-time and never written into the tree, the artifact, or the logs.
-
-| Name | Kind | Used by | Notes |
-| --- | --- | --- | --- |
-| `CLOUDFLARE_API_TOKEN` | secret | `deploy-production.yml` | Scope it to **Cloudflare Pages: Edit** on this account only. Do not use a Global API Key. |
-| `CLOUDFLARE_ACCOUNT_ID` | secret | `deploy-production.yml` | Not strictly confidential, kept as a secret so it never appears in the tree. |
-| `AWS_ROLE_ARN` | secret | `dns.yml` | An IAM role trusted for GitHub OIDC. **No access keys.** |
-| `AWS_HOSTED_ZONE_ID` | secret | `dns.yml` | The `ronald.ng` hosted zone. |
-| `CLOUDFLARE_PROJECT_NAME` | variable | both | Optional; defaults to `skills-ronald-ng`. |
-
-`deploy-production.yml` fails in its first job if a required secret is missing,
-rather than skipping its own deploy step and reporting green.
-
-### 4. Create the AWS role for DNS, with no stored keys
-
-`dns.yml` assumes a role by OIDC, so there is no AWS access key in this repository
-or in its secrets. Trust policy, restricted to this repository:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [{
-    "Effect": "Allow",
-    "Principal": { "Federated": "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/token.actions.githubusercontent.com" },
-    "Action": "sts:AssumeRoleWithWebIdentity",
-    "Condition": {
-      "StringEquals": { "token.actions.githubusercontent.com:aud": "sts.amazonaws.com" },
-      "StringLike": { "token.actions.githubusercontent.com:sub": "repo:<OWNER>/<REPO>:*" }
-    }
-  }]
-}
-```
-
-Permission policy, scoped to the one zone and the one record:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "route53:ChangeResourceRecordSets",
-      "Resource": "arn:aws:route53:::hostedzone/<HOSTED_ZONE_ID>",
-      "Condition": {
-        "ForAllValues:StringEquals": {
-          "route53:ChangeResourceRecordSetsNormalizedRecordNames": ["skills.ronald.ng"],
-          "route53:ChangeResourceRecordSetsRecordTypes": ["CNAME"]
-        }
-      }
-    },
-    {
-      "Effect": "Allow",
-      "Action": ["route53:GetChange", "route53:ListResourceRecordSets"],
-      "Resource": "*"
-    }
-  ]
-}
-```
-
-That condition is the real safety net: even if the workflow were changed to point
-at the apex, AWS would refuse the call.
-
-### 5. Protect the environments
-
-Settings → Environments.
-
-- `production` — require a reviewer, and restrict to `main` and `v*` tags.
-- `production-dns` — require a reviewer. This one edits a live business domain.
-- `staging` — no protection needed.
-
-### 6. Point DNS at Cloudflare
-
-Run the **DNS for skills.ronald.ng** workflow with `action: plan`. It prints the
-current nameservers, the live records it will not touch, and the change it would
-make. Read that output, then run it again with `action: apply`.
-
-It waits for the change to reach `INSYNC` and then confirms the name resolves
-before reporting success.
-
-### 7. Ship
-
-```bash
-git tag v1.0.0 && git push origin v1.0.0
-```
-
-Or run **Deploy production** manually with a reason.
-
-## What a production deploy verifies
-
-The deploy is not considered successful because an upload succeeded. After
-publishing, CI checks against the live origin that:
-
-- the custom domain resolves, falling back to the `pages.dev` origin with a
-  warning if the CNAME is not in place yet
+- it returns 200 with `text/html`
 - the served HTML contains 400+ prerendered cards
-- `BUILD-INFO.txt` names the commit being deployed, so a cached previous deploy is
+- `BUILD-INFO.txt` names the commit just deployed, so a cached previous deploy is
   detected rather than mistaken for success
 - the page renders with no console or page errors at 390px and 1440px
 - there is no horizontal overflow at either width
 - it is still a complete list with JavaScript disabled
-- `Strict-Transport-Security`, `X-Content-Type-Options` and `Referrer-Policy` are
-  present on the response
-
-Any of those failing fails the deploy.
 
 ## Rollback
 
-Cloudflare Pages keeps every deployment. Roll back in the dashboard, or re-run
-**Deploy production** from an earlier tag. Because the artifact is rebuilt from
-source in CI on every run, an old tag rebuilds to what that tag actually said.
-
-## Branch protection
-
-Require the check named **`all gates passed`** on `main`. That is a single stable
-job name that depends on the other CI jobs, so the required check does not need
-changing when a job is added or renamed.
+Re-run **Site deploy production** from an earlier commit, or revert on `main` and
+let the push deploy. Because the artifact is rebuilt from source in CI on every
+run, an older commit rebuilds to what that commit actually said.

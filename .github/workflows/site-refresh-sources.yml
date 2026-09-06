@@ -9,8 +9,9 @@ name: Site refresh from upstream sources
 # whenever a year contains 53 ISO weeks. Day-of-month caps the gap at 16 days.
 #
 # Credentials: none beyond the automatic GITHUB_TOKEN, which is scoped to this
-# repository and cannot deploy anything. The PR still has to pass CI and be
-# reviewed like any other change.
+# repository and cannot deploy anything. The PR targets staging, not main, so an
+# upstream change reaches production only through the normal promotion, and it
+# still has to pass CI and be reviewed like any other change.
 
 on:
   schedule:
@@ -83,7 +84,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: automation/site-refresh-sources
-          base: main
+          base: staging
           commit-message: "chore: refresh skill index from upstream sources"
           title: "chore: refresh skill index from upstream sources"
           body-path: /tmp/pr-body.md

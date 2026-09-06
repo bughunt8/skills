@@ -1,0 +1,36 @@
+name: Site deploy staging
+
+# staging branch -> staging environment (AWS S3 + CloudFront, and Hostinger).
+#
+# Identical to production in every respect except which GitHub Environment
+# supplies the secrets. Mirrors the www-resume branch model: work lands on
+# staging, is verified on the staging URL, then is promoted to main by hand.
+
+on:
+  push:
+    branches: [staging]
+    paths: ["site/**", "skills/**", ".github/workflows/site-*.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    name: validate
+    uses: ./.github/workflows/site-validate.yml
+
+  deploy:
+    name: deploy
+    needs: gate
+    uses: ./.github/workflows/site-deploy.yml
+    with:
+      environment: staging
+      # Set the SITE_URL variable on the staging environment to enable the
+      # post-deploy smoke test. Left empty it is skipped rather than guessed.
+      url: ${{ vars.SITE_URL }}
+    secrets: inherit

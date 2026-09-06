@@ -1,0 +1,74 @@
+name: Site promote staging to main
+
+# Manual promotion of the staging branch into main, which then deploys to
+# production. Mirrors bughunt8/www-resume promote-staging-to-main.yml, including
+# the typed confirmation and the explicit dispatch.
+#
+# Flow:
+#   staging --(this workflow, manual, typed confirmation)--> main
+#   main    --(site-deploy-production.yml, dispatched below)--> skills.ronald.ng
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "promote" to merge staging into main and deploy production.'
+        required: true
+        default: ""
+
+permissions:
+  contents: write
+  actions: write # needed to dispatch the production deploy
+
+concurrency:
+  group: site-promote
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    name: merge staging into main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "promote" ]; then
+            echo "::error::confirmation failed; type 'promote' to run this workflow"
+            exit 1
+          fi
+          echo "confirmation accepted"
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Show what is being promoted
+        run: |
+          git fetch origin staging:staging
+          echo "=== commits on staging not yet on main ==="
+          git log --oneline main..staging || true
+          echo "=== files ==="
+          git diff --stat main..staging || true
+
+      - name: Merge staging into main
+        run: |
+          git merge --no-ff --no-edit staging \
+            -m "Promote staging to main (manual promotion via workflow_dispatch)"
+
+      - name: Push to main
+        run: git push origin main
+
+      # A push made with the default GITHUB_TOKEN does not trigger other
+      # workflows' on:push events, which is GitHub's anti-recursion safeguard, so
+      # the production deploy is dispatched explicitly.
+      - name: Trigger the production deploy
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run site-deploy-production.yml --ref main
+          echo "dispatched site-deploy-production.yml on main -> skills.ronald.ng"

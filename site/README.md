@@ -117,28 +117,30 @@ npm run serve          # http://localhost:8090
 
 ## CI/CD
 
-Everything is driven by GitHub Actions. Nothing is built, validated or deployed
-by hand.
+Everything is driven by GitHub Actions. Nothing is built, validated or deployed by
+hand.
 
-| Workflow | Trigger | What it does |
-| --- | --- | --- |
-| `validate.yml` | called by the two below | secret scan, gitleaks, build reproducibility, HTML validity, and the full browser suite. Defined once so production revalidates the exact commit it ships. |
-| `ci.yml` | every push and PR | calls `validate.yml`, then on `main` rebuilds and publishes staging to GitHub Pages and smoke-tests the live URL. Exposes one required check, `all gates passed`. |
-| `deploy-production.yml` | `v*` tag or manual | calls `validate.yml`, rebuilds, publishes to Cloudflare Pages, verifies DNS, smoke-tests the live site and checks security headers |
-| `dns.yml` | manual only | plans or applies the one Route 53 CNAME for `skills.ronald.ng` |
-| `refresh-sources.yml` | 1st and 15th | rebuilds from the upstream repositories and opens a PR when anything changed |
+**Staging and production are the same setup.** Both publish the same artifact to
+both AWS (S3 + CloudFront) and Hostinger (FTP), through one reusable workflow.
+There is no second code path, so staging cannot drift from production. The only
+difference is which GitHub Environment supplies the secrets.
 
-`validate.yml` uses no secrets at all, so it runs in full on fork pull requests.
-Deploy credentials are read only by the deploy jobs, from Actions secrets, by
-reference.
+| | Branch | Environment | URL |
+| --- | --- | --- | --- |
+| Staging | `staging` | `staging` | set `SITE_URL` |
+| Production | `main` | `production` | `https://skills.ronald.ng` |
 
-Both deploy paths call the same validation rather than polling for another
-workflow's result. Polling across a workflow boundary for a check that has not
-been created yet fails immediately, which is exactly what the first staging
-deploy did.
+Promotion is manual and typed, mirroring `bughunt8/www-resume`: run **Site promote
+staging to main**, type `promote`, and it merges and dispatches the production
+deploy.
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for the hosting layout, the secrets the deploy
-workflows expect, and how DNS is arranged.
+Validation is a reusable workflow called by every deploy path, so no deploy can
+skip the gates. It runs the secret scan, gitleaks, build reproducibility, HTML
+validity and the browser suite, and uses no secrets at all, so it runs in full on
+fork pull requests.
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the secrets each environment needs, what
+has to be provisioned first, and why DNS lives in Route 53.
 
 ## Licence
 
