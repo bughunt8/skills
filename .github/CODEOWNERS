@@ -1,0 +1,16 @@
+# Every change needs the maintainer. This repository's output is agent instructions,
+# so a diff that looks like documentation can change what an agent does with
+# someone's credentials.
+*                                   @bughunt8
+
+# Vendored content, provenance and licence records. A wrong attribution here is the
+# one mistake in this repository that cannot be quietly fixed later.
+/THIRD_PARTY_NOTICES.md             @bughunt8
+/LICENSE                            @bughunt8
+/skills/vendor.manifest.json        @bughunt8
+/skills/pstack/                     @bughunt8
+/skills/job-hunt/                   @bughunt8
+
+# Automation and the checks that gate it.
+/.github/                           @bughunt8
+/scripts/                           @bughunt8

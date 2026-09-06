@@ -1,0 +1,289 @@
+{
+  "schema": 1,
+  "$comment": "Complete record of third-party work redistributed by this repository that is NOT under the automated manifest at skills/vendor.manifest.json. scripts/audit_third_party.py discovers every licence, notice and attribution marker in the tree and fails CI if one is not covered by an entry here, so this file cannot silently fall behind. scripts/sync_vendor.py renders the tier 2 table of THIRD_PARTY_NOTICES.md from it. Adding a hand-copied import without an entry here is a CI failure by design.",
+  "ignore_globs": [
+    "skills/start-github-repo/assets/templates/LICENSE.*.tmpl",
+    "skills/engineering/skills/dependency-auditor/references/license_compatibility_matrix.md",
+    "skills/engineering/skills/dependency-auditor/scripts/license_checker.py",
+    "skills/start-github-repo/assets/templates/NOTICE.tmpl"
+  ],
+  "ignore_reasons": {
+    "skills/start-github-repo/assets/templates/LICENSE.*.tmpl": "Scaffolding templates emitted into a new repository, not a licence covering anything here.",
+    "skills/engineering/skills/dependency-auditor/references/license_compatibility_matrix.md": "Reference documentation about licences. Matched on filename only.",
+    "skills/engineering/skills/dependency-auditor/scripts/license_checker.py": "A licence-scanning tool. Matched on filename only.",
+    "skills/start-github-repo/assets/templates/NOTICE.tmpl": "Scaffolding template emitted into a newly created repository. It is not a notice covering anything redistributed here."
+  },
+  "legacy": [
+    {
+      "id": "alirezarezvani-claude-skills",
+      "name": "alirezarezvani-claude-skills",
+      "repo": "https://github.com/borahanmirzaii/alirezarezvani-claude-skills",
+      "author": "Alireza Rezvani and contributors",
+      "license": "MIT",
+      "upstream_commit": "aa8d778811a557a2c28ccadda4cf3d0bd028a4cc",
+      "notice": "skills/ALIREZAREZVANI_CLAUDE_SKILLS_ATTRIBUTION.md",
+      "license_file": "skills/ALIREZAREZVANI_CLAUDE_SKILLS_LICENSE",
+      "paths": [
+        "skills/business-growth",
+        "skills/business-operations",
+        "skills/c-level-advisor",
+        "skills/commercial",
+        "skills/compliance-os",
+        "skills/engineering",
+        "skills/engineering-team",
+        "skills/finance",
+        "skills/loop-library",
+        "skills/markdown-html",
+        "skills/marketing",
+        "skills/marketing-skill",
+        "skills/product-team",
+        "skills/productivity",
+        "skills/project-management",
+        "skills/ra-qm-team",
+        "skills/research",
+        "skills/research-ops",
+        "skills/engineering/strict-api"
+      ],
+      "notes": "Eighteen whole skill domains. This is the largest import in the repository and the only pre-manifest one with a commit recorded."
+    },
+    {
+      "id": "stitch-skills",
+      "name": "stitch-skills",
+      "repo": "https://github.com/google-labs-code/stitch-skills",
+      "author": "Google Labs and contributors",
+      "license": "Apache-2.0",
+      "notice": "skills/design/stitch-design-md/ATTRIBUTION.md",
+      "paths": [
+        "skills/design/stitch-code-to-design",
+        "skills/design/stitch-design-md",
+        "skills/design/stitch-enhance-prompt",
+        "skills/design/stitch-extract-design-md",
+        "skills/design/stitch-extract-static-html",
+        "skills/design/stitch-generate-design",
+        "skills/design/stitch-loop",
+        "skills/design/stitch-manage-design-system",
+        "skills/design/stitch-upload-to-stitch",
+        "skills/engineering/stitch-react-components",
+        "skills/engineering/stitch-react-native",
+        "skills/engineering/stitch-react-vite-dashboard",
+        "skills/engineering/stitch-remotion",
+        "skills/engineering/stitch-shadcn-ui"
+      ],
+      "notes": "Apache-2.0, not MIT. An earlier hand-written notices table recorded this as 'see per-skill LICENSE', which was accurate but useless. Apache-2.0 also requires that modifications be marked, which is worth checking if any of these are ever edited."
+    },
+    {
+      "id": "taste-skill",
+      "name": "taste-skill and derivatives",
+      "repo": "https://github.com/Leonxlnx/taste-skill",
+      "author": "Leonxlnx",
+      "license": "MIT",
+      "notice": "skills/design/taste-skill/ATTRIBUTION.md",
+      "paths": [
+        "skills/design/brandkit",
+        "skills/design/brutalist-skill",
+        "skills/design/gpt-tasteskill",
+        "skills/design/image-to-code-skill",
+        "skills/design/imagegen-frontend-mobile",
+        "skills/design/imagegen-frontend-web",
+        "skills/design/minimalist-skill",
+        "skills/design/output-skill",
+        "skills/design/redesign-skill",
+        "skills/design/soft-skill",
+        "skills/design/stitch-skill",
+        "skills/design/taste-skill",
+        "skills/design/taste-skill-v1"
+      ]
+    },
+    {
+      "id": "mattpocock-skills",
+      "name": "mattpocock/skills",
+      "repo": "https://github.com/mattpocock/skills",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "upstream_commit": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+      "notice": "skills/engineering/MATTPOCOCK_SKILLS_ATTRIBUTION.md",
+      "license_file": "skills/engineering/MATTPOCOCK_SKILLS_LICENSE",
+      "paths": [
+        "skills/engineering/ask-matt",
+        "skills/engineering/caveman",
+        "skills/engineering/code-review",
+        "skills/engineering/grill-with-docs",
+        "skills/engineering/implement",
+        "skills/engineering/improve-codebase-architecture",
+        "skills/engineering/setup-matt-pocock-skills",
+        "skills/engineering/to-spec",
+        "skills/engineering/to-tickets",
+        "skills/engineering/triage",
+        "skills/engineering/wayfinder",
+        "skills/engineering/write-a-skill",
+        "skills/productivity/grill-me",
+        "skills/productivity/grilling",
+        "skills/productivity/handoff",
+        "skills/productivity/to-questionnaire",
+        "skills/productivity/wait-what",
+        "skills/productivity/writing-for-agents"
+      ],
+      "notes": "Several of these state in prose that Matt Pocock's content or voice is 'preserved verbatim' under MIT, but no copy of the upstream MIT notice existed anywhere in the repository. MIT requires the copyright and permission notice to travel with copies, so the notice and licence files above were added. An independent adversarial review found this; it was the most serious licensing defect in the repository."
+    },
+    {
+      "id": "impeccable",
+      "name": "impeccable",
+      "repo": "https://github.com/pbakaus/impeccable",
+      "author": "Paul Bakaus",
+      "license": "Apache-2.0",
+      "notice": "skills/engineering/impeccable/ATTRIBUTION.md",
+      "paths": [
+        "skills/engineering/impeccable"
+      ]
+    },
+    {
+      "id": "github-repository-setup",
+      "name": "github-repository-setup",
+      "repo": "https://github.com/domelic/github-repository-setup",
+      "author": "Damir Omelic",
+      "license": "MIT",
+      "notice": "skills/engineering/github-repository-setup/ATTRIBUTION.md",
+      "paths": [
+        "skills/engineering/github-repository-setup"
+      ]
+    },
+    {
+      "id": "togaf-advisor",
+      "name": "togaf-advisor",
+      "repo": "https://github.com/bhubanmm/togaf-advisor",
+      "author": "Bhuban",
+      "license": "MIT",
+      "notice": "skills/engineering/togaf-advisor/ATTRIBUTION.md",
+      "paths": [
+        "skills/engineering/togaf-advisor"
+      ]
+    },
+    {
+      "id": "togaf-skill",
+      "name": "togaf-skill",
+      "repo": "https://github.com/deeparchi-ai/togaf-skill",
+      "author": "DeepArchi",
+      "license": "MIT",
+      "notice": "skills/engineering/togaf-adm-architecture-guidance/ATTRIBUTION.md",
+      "paths": [
+        "skills/engineering/togaf-adm-architecture-guidance"
+      ]
+    },
+    {
+      "id": "awesome-design-md",
+      "name": "awesome-design-md",
+      "repo": "https://github.com/VoltAgent/awesome-design-md",
+      "author": "VoltAgent",
+      "license": "MIT",
+      "notice": "skills/design/awesome-design-md/ATTRIBUTION.md",
+      "paths": [
+        "skills/design/awesome-design-md"
+      ]
+    },
+    {
+      "id": "ui-ux-pro-max-skill",
+      "name": "ui-ux-pro-max-skill",
+      "repo": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "author": "Next Level Builder",
+      "license": "MIT",
+      "notice": "skills/design/ui-ux-pro-max/ATTRIBUTION.md",
+      "paths": [
+        "skills/design/ui-ux-pro-max"
+      ]
+    },
+    {
+      "id": "prd-generator",
+      "name": "prd-generator",
+      "repo": "https://github.com/jamesrochabrun/skills",
+      "author": "James Rochabrun",
+      "license": "MIT",
+      "notice": "skills/productivity/agile-prd-creator/ATTRIBUTION.md",
+      "paths": [
+        "skills/productivity/agile-prd-creator"
+      ]
+    },
+    {
+      "id": "management-consultant",
+      "name": "claude-skill-management-consultant-B1",
+      "repo": "https://github.com/DogInfantry/claude-skill-management-consultant-B1",
+      "author": "DogInfantry",
+      "license": "Apache-2.0",
+      "notice": "skills/productivity/management-consultant/LICENSE",
+      "paths": [
+        "skills/productivity/management-consultant"
+      ]
+    },
+    {
+      "id": "playwright-pro",
+      "name": "playwright-pro",
+      "repo": "",
+      "author": "Reza Rezvani",
+      "license": "MIT",
+      "notice": "skills/engineering-team/playwright-pro/LICENSE",
+      "paths": [
+        "skills/engineering-team/playwright-pro"
+      ],
+      "notes": "Carries an MIT licence naming Reza Rezvani but no upstream repository link. Provenance should be established or the skill removed. Tracked as backlog."
+    },
+    {
+      "id": "self-improving-agent",
+      "name": "self-improving-agent",
+      "repo": "",
+      "author": "Reza Rezvani",
+      "license": "MIT",
+      "notice": "skills/engineering-team/self-improving-agent/LICENSE",
+      "paths": [
+        "skills/engineering-team/self-improving-agent"
+      ],
+      "notes": "MIT licence present, no upstream repository link recorded."
+    },
+    {
+      "id": "collab-proof",
+      "name": "collab-proof",
+      "repo": "",
+      "author": "dong7812",
+      "license": "MIT",
+      "notice": "skills/engineering/collab-proof/LICENSE",
+      "paths": [
+        "skills/engineering/collab-proof"
+      ],
+      "notes": "MIT licence present, no upstream repository link recorded."
+    },
+    {
+      "id": "skillopt-sleep",
+      "name": "skillopt-sleep",
+      "repo": "",
+      "author": "Microsoft Corporation",
+      "license": "MIT",
+      "notice": "skills/engineering/skillopt-sleep/LICENSE",
+      "paths": [
+        "skills/engineering/skillopt-sleep"
+      ],
+      "notes": "MIT licence naming Microsoft Corporation with no upstream link. Worth confirming the source before this repository stays public with it."
+    },
+    {
+      "id": "loop-library",
+      "name": "loop-library",
+      "repo": "",
+      "author": "Forward Future",
+      "license": "MIT",
+      "notice": "skills/loop-library/LICENSE",
+      "paths": [
+        "skills/loop-library"
+      ],
+      "notes": "MIT licence naming Forward Future, no upstream link recorded."
+    },
+    {
+      "id": "explainer-graphic",
+      "name": "explainer-graphic",
+      "repo": "",
+      "author": "Silicon Valley Academy",
+      "license": "MIT",
+      "notice": "skills/productivity/explainer-graphic/LICENSE",
+      "paths": [
+        "skills/productivity/explainer-graphic"
+      ],
+      "notes": "MIT licence naming Silicon Valley Academy, no upstream link recorded."
+    }
+  ]
+}

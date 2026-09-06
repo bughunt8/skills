@@ -1,0 +1,21 @@
+{
+  "$comment": "Written by scripts/sync_vendor.py. Lists exactly what the last sync placed in this directory, so the next sync can delete what it no longer owns without inferring ownership from whatever happens to be here. Do not edit.",
+  "source": "job-hunt",
+  "paths": [
+    "guides",
+    "scripts",
+    "skills/_shared",
+    "skills/claim-check",
+    "skills/company-research",
+    "skills/cover-letter",
+    "skills/get-started",
+    "skills/interview-coach",
+    "skills/interviewing",
+    "skills/linkedin-optimizer",
+    "skills/proof-asset-creator",
+    "skills/resume-auditor",
+    "skills/resume-builder",
+    "skills/resume-tailor",
+    "templates"
+  ]
+}
