@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+# script/update — brings the project up to date after a fresh pull.
+
+scripts/bootstrap
+{{PACKAGE_MANAGER}} exec wrangler types || true
+
+echo "Up to date. Run {{CHECK_COMMAND}} to verify."

@@ -1,0 +1,170 @@
+---
+version: alpha
+name: {{PROJECT_NAME}} Design System
+description: {{DESCRIPTION}}
+colors:
+  primary: "#2563EB"
+  secondary: "#0F172A"
+  neutral: "#64748B"
+  success: "#15803D"
+  warning: "#B45309"
+  danger: "#B91C1C"
+typography:
+  display-lg:
+    fontFamily: Inter
+    fontSize: 40px
+    fontWeight: 700
+    lineHeight: 48px
+    letterSpacing: -0.02em
+  headline-md:
+    fontFamily: Inter
+    fontSize: 24px
+    fontWeight: 600
+    lineHeight: 32px
+  body-md:
+    fontFamily: Inter
+    fontSize: 16px
+    fontWeight: 400
+    lineHeight: 24px
+  label-sm:
+    fontFamily: Inter
+    fontSize: 13px
+    fontWeight: 500
+    lineHeight: 18px
+rounded:
+  sm: 4px
+  md: 8px
+  lg: 12px
+  full: 9999px
+spacing:
+  base: 16px
+  xs: 4px
+  sm: 8px
+  md: 16px
+  lg: 32px
+  xl: 64px
+components:
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "#FFFFFF"
+    rounded: "{rounded.md}"
+    padding: 12px
+---
+
+# Design System
+
+<!-- This file follows the Google Labs design.md specification so it can be machine-checked:
+       npx @google/design.md lint DESIGN.md
+     The canonical section order below is LINTED. Sections may be omitted, but present sections must
+     keep this sequence. Extensions (Motion, Breakpoints, States, Accessibility, Token Export) come
+     AFTER the canonical sections so section-order still passes. -->
+
+## Overview
+
+Brand personality, audience, and the emotional target in three sentences. TODO
+
+## Colors
+
+| Token | Value | Intended use |
+|---|---|---|
+| `colors.primary` | `#2563EB` | primary actions, active states |
+| `colors.secondary` | `#0F172A` | headings, high-emphasis text |
+| `colors.neutral` | `#64748B` | secondary text, borders |
+| `colors.success` | `#15803D` | confirmation |
+| `colors.warning` | `#B45309` | recoverable problems |
+| `colors.danger` | `#B91C1C` | destructive actions, errors |
+
+Every foreground/background pair used in a component must pass the ratios in **Accessibility** below.
+
+## Typography
+
+Most design systems have 9–15 levels. Define each with its role, not just its size.
+
+| Level | Role |
+|---|---|
+| `display-lg` | page hero |
+| `headline-md` | section heading |
+| `body-md` | default body copy |
+| `label-sm` | form labels, metadata |
+
+## Layout
+
+Grid, margins, safe areas, and the spacing scale. Spacing uses the `spacing.*` tokens exclusively —
+no arbitrary pixel values in components. TODO
+
+## Elevation & Depth
+
+| Level | Use | Spread / blur / colour |
+|---|---|---|
+| 0 | flush surfaces | none |
+| 1 | cards | TODO |
+| 2 | menus, popovers | TODO |
+| 3 | modals | TODO |
+
+Provide a flat fallback for forced-colors mode.
+
+## Shapes
+
+`rounded.sm` for inputs and chips, `rounded.md` for buttons and cards, `rounded.lg` for sheets and
+modals, `rounded.full` for avatars and pills.
+
+## Components
+
+Inventory with the tokens each consumes. TODO
+
+| Component | Tokens |
+|---|---|
+| `button-primary` | `colors.primary`, `rounded.md`, `spacing.md` |
+
+## Do's and Don'ts
+
+- **Do** reference tokens by name. **Don't** hardcode a hex value in a component.
+- **Do** define a new token when a value repeats three times. **Don't** invent one-off values.
+- **Do** keep contrast pairs inside the ratios below. **Don't** ship a pair the linter flags.
+
+<!-- Extensions below. Not yet covered by the design.md alpha spec. -->
+
+## Motion
+
+Durations and easings, typed as DTCG `duration` and `cubicBezier` so they survive token export.
+
+| Token | Value | Use |
+|---|---|---|
+| `motion.instant` | 100ms | state feedback |
+| `motion.fast` | 180ms | hovers, small transitions |
+| `motion.base` | 240ms | panel and sheet entry |
+| `motion.ease-standard` | `[0.2, 0, 0, 1]` | default easing |
+
+Honour `prefers-reduced-motion` by reducing to opacity-only transitions.
+
+## Breakpoints
+
+| Name | Min width | Layout behaviour |
+|---|---|---|
+| sm | 480px | single column |
+| md | 768px | two column, persistent nav |
+| lg | 1200px | three column, sidebar visible |
+
+## States
+
+Every interactive component defines all eight: **default, hover, active, focus-visible, disabled,
+loading, error, empty**. `focus-visible` must remain visible — never remove the focus ring without
+supplying a replacement with at least 3:1 contrast against the adjacent surface.
+
+## Accessibility
+
+- Body text contrast at least **4.5:1**; large text (18pt, or 14pt bold) at least **3:1**.
+- Computed ratios are **not rounded** — 4.499:1 fails.
+- Non-text contrast is governed separately; keep UI component boundaries at 3:1 or better.
+- The `contrast-ratio` lint rule enforces the component pairs above; CI runs it.
+
+## Token Export
+
+```bash
+npx @google/design.md lint DESIGN.md
+npx @google/design.md export --format dtcg        > tokens.json
+npx @google/design.md export --format css-tailwind > src/styles/tokens.css
+```
+
+`tokens.json` is W3C Design Tokens Format Module output, so the tokens remain portable if this file
+is ever retired.

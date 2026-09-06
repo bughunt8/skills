@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+# script/setup — puts a fresh clone into a working state, or resets it back to one.
+
+scripts/bootstrap
+
+for example in .env.example .dev.vars.example; do
+  [ -f "$example" ] || continue
+  target="${example%.example}"
+  if [ -f "$target" ]; then
+    echo "keeping existing $target"
+  else
+    cp "$example" "$target"
+    echo "created $target from $example — fill in the values before running the app"
+  fi
+done
+
+# Generated binding types are committed, but regenerate so a fresh clone matches config.
+{{PACKAGE_MANAGER}} exec wrangler types || echo "wrangler types skipped (not a Workers project?)"
+
+echo
+echo "Setup complete. Next: {{DEV_COMMAND}}"

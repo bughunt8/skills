@@ -1,0 +1,47 @@
+# Documentation map
+
+Each artifact answers exactly one question. If two documents would say the same thing, one of them
+links to the other instead.
+
+| Question | Artifact |
+|---|---|
+| Why are we building this, and for whom? | [PRD.md](../PRD.md) |
+| How will it be built? | [TRD.md](../TRD.md) |
+| What did we decide, and why? | [adr/](adr/) |
+| What is the architecture context? | [architecture/](architecture/) |
+| What does it look like? | [WIREFRAME.md](../WIREFRAME.md) |
+| What are the visual rules? | [DESIGN.md](../DESIGN.md) |
+| How do I contribute? | [CONTRIBUTING.md](../CONTRIBUTING.md) |
+| What must an agent know? | [AGENTS.md](../AGENTS.md) |
+
+## The architecture repository
+
+`docs/architecture/` **is** this project's Architecture Repository in TOGAF terms. The ADM is used as
+a reference model, not a process model — it does not mandate phase sequence, a waterfall process, or
+any phase duration. The ten phases collapse into three verbs here:
+
+| Verb | ADM phases | What it produces in this repo |
+|---|---|---|
+| **Understand** | A–D | [vision.md](architecture/vision.md), and TRD sections 5–7 |
+| **Specify** | E–F | [roadmap.md](architecture/roadmap.md), TRD section 11 |
+| **Govern** | G–H | [adr/](adr/), CI gates, CODEOWNERS |
+
+Requirements Management runs continuously and lives in the PRD register plus the TRD traceability
+matrix. Enterprise-level deliverables — organizational model, communications plan, capability
+assessment, formal architecture contracts — are deliberately out of scope for a single code
+repository.
+
+## Traceability
+
+Five ID families, assigned once and never renumbered: `FR-`/`NFR-` (PRD), `US` (stories), `SCR-`
+(screens), `ADR-` (decisions), `T` (tasks). The single matrix lives in TRD section 4 and is validated
+in CI by `scripts/check-docs`.
+
+## Unresolved points
+
+Anywhere in the spine, tag something still undecided by prefixing the line with the clarification
+marker — the literal text `[NEEDS` `CLARIFICATION:` joined together, followed by the question and a
+closing bracket. `scripts/check-docs` counts them and fails the build while any remain, so an
+unresolved specification cannot reach `{{DEFAULT_BRANCH}}`.
+
+Use it liberally during drafting. It is a gate, not a criticism.

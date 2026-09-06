@@ -1,0 +1,103 @@
+{
+  "$comment": "Single source of truth for every pinned version and package name. SKILL.md and references/ must never hardcode a version — they point here. Re-verify anything whose checked_at is stale before relying on it.",
+  "checked_at": "2026-08-25",
+  "recheck_after_days": 90,
+
+  "specs": {
+    "contributor_covenant": {
+      "version": "3.0",
+      "released": "2025-07-28",
+      "url": "https://www.contributor-covenant.org/version/3/0/code_of_conduct/",
+      "notes": "Must fill the reporting-contact placeholder and the Addressing-and-Repairing-Harm NOTE. Four-tier ladder: Warning, Temporarily Limited Activities, Temporary Suspension, Permanent Ban."
+    },
+    "keep_a_changelog": {
+      "version": "1.1.0",
+      "latest_release": "1.1.2",
+      "released": "2024-09-27",
+      "url": "https://keepachangelog.com/en/1.1.0/"
+    },
+    "semver": { "version": "2.0.0", "url": "https://semver.org/" },
+    "conventional_commits": { "version": "1.0.0", "url": "https://www.conventionalcommits.org/en/v1.0.0/" },
+    "madr": { "version": "4.0.0", "released": "2024-09-17", "url": "https://adr.github.io/madr/" },
+    "o_aa": { "document": "C208", "published": "2020-09", "reissued": "2022-10", "url": "https://pubs.opengroup.org/architecture/o-aa-standard-single/" },
+    "togaf": { "edition": "10th Edition", "url": "https://www.opengroup.org/togaf/new-version" },
+    "iso_25010": { "revision": "2023", "characteristics": 9, "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010" },
+    "design_md": {
+      "version": "alpha",
+      "url": "https://github.com/google-labs-code/design.md",
+      "notes": "Section order is linted. Extensions (Motion, Breakpoints, States, Accessibility) must come AFTER the canonical sections."
+    },
+    "dtcg": { "version": "2025.10", "released": "2025-10-28", "url": "https://www.designtokens.org/tr/2025.10/format/" },
+    "wcag": { "version": "2.2", "text_contrast": "4.5:1", "large_text_contrast": "3:1", "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum" },
+    "spdx_license_list": { "version": "3.28.0", "released": "2026-02-20", "url": "https://spdx.org/licenses/" },
+    "reuse": { "version": "3.3", "released": "2024-11-14", "url": "https://reuse.software/spec-3.3/" },
+    "editorconfig": { "version": "0.17.2", "url": "https://spec.editorconfig.org/" },
+    "citation_file_format": { "version": "1.2.0", "url": "https://github.com/citation-file-format/citation-file-format" },
+    "dco": { "version": "1.1", "url": "https://developercertificate.org/" },
+    "cyclonedx": { "version": "1.7", "released": "2025-10-21", "url": "https://cyclonedx.org/specification/overview/" },
+    "agents_md": { "version": "living spec", "steward": "Agentic AI Foundation (Linux Foundation)", "url": "https://agents.md/" }
+  },
+
+  "packages": {
+    "cloudflare_vitest": {
+      "name": "@cloudflare/vitest-plugin",
+      "former_name": "@cloudflare/vitest-pool-workers",
+      "entrypoint": "cloudflareTest()",
+      "stale_entrypoint": "defineWorkersConfig",
+      "codemod": "npx @cloudflare/codemods vitest:pool-workers-to-vitest-plugin",
+      "notes": "RENAMED. Never generate defineWorkersConfig. Outbound mocking moved to @msw/cloudflare.",
+      "url": "https://developers.cloudflare.com/workers/testing/vitest-integration/"
+    },
+    "wrangler": { "config_file": "wrangler.jsonc", "types_command": "wrangler types --check", "types_output": "worker-configuration.d.ts" },
+    "vitest": { "min_major": 4, "config_file": "vitest.config.ts" },
+    "playwright": { "config_file": "playwright.config.ts", "test_dir": "e2e" },
+    "changesets": { "cli": "@changesets/cli", "config_file": ".changeset/config.json", "action": "changesets/action", "changelog_plugin": "@changesets/changelog-github" },
+    "release_please": { "action": "googleapis/release-please-action", "config_files": ["release-please-config.json", ".release-please-manifest.json"] },
+    "design_md_cli": { "name": "@google/design.md", "lint": "npx @google/design.md lint DESIGN.md", "exports": ["dtcg", "css-tailwind", "json-tailwind"] },
+    "t3_env": { "name": "@t3-oss/env-core", "notes": "ESM-only; needs TypeScript module resolution Bundler" },
+    "husky": { "init": "npx husky init", "hook_dir": ".husky" },
+    "lint_staged": { "config_location": "package.json" },
+    "gitleaks": { "config_file": ".gitleaks.toml", "durability_warning": "Project describes itself as feature-complete; future releases limited to security patches. Keep behind a manifest switch." },
+    "zizmor": { "purpose": "GitHub Actions security audit", "adoption_note": "2 of 14 surveyed repos" },
+    "commitlint": { "config": "commitlint.config.js", "preset": "@commitlint/config-conventional" },
+    "scorecard_action": { "name": "ossf/scorecard-action", "checks": 22 }
+  },
+
+  "action_pins": {
+    "$comment": "Resolve each to a full-length commit SHA at scaffold time. Never emit a bare tag for a third-party action. actions/* are first-party but pin them too for Scorecard.",
+    "required": [
+      "actions/checkout",
+      "actions/setup-node",
+      "actions/upload-artifact",
+      "actions/attest-build-provenance",
+      "github/codeql-action",
+      "changesets/action",
+      "ossf/scorecard-action",
+      "zizmorcore/zizmor-action"
+    ]
+  },
+
+  "evidence": {
+    "$comment": "Frequencies from a file-by-file survey of 14 production repositories. Used to justify defaults.",
+    "surveyed": 14,
+    "readme": 14,
+    "license_file": 14,
+    "pr_template_single_file": 12,
+    "pr_template_directory": 0,
+    "issue_template_dir": 12,
+    "issue_template_config_yml_given_dir": 12,
+    "contributing": 12,
+    "code_of_conduct": 9,
+    "code_of_conduct_pointer_form": "majority of the 9",
+    "any_agent_instruction_file": 11,
+    "agents_md": 6,
+    "dependabot": 6,
+    "support_md": 3,
+    "governance_md": 1,
+    "env_example": 1,
+    "renovate": 0,
+    "citation_cff": 0,
+    "taskfile_or_justfile": 0,
+    "yaml_forms_vs_markdown_issue_templates": "9 to 2"
+  }
+}

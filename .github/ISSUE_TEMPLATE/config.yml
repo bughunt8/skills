@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security or prompt-injection concern
+    url: https://github.com/bughunt8/skills/security/advisories/new
+    about: Report privately. Do not open a public issue for anything an agent could be induced to do.
+  - name: How to contribute
+    url: https://github.com/bughunt8/skills/blob/main/CONTRIBUTING.md
+    about: Adding a skill, importing someone else's skills, and the three checks CI runs.
+  - name: Bug in a vendored pstack skill
+    url: https://github.com/backnotprop/pstack/issues
+    about: skills/pstack/ is a verbatim copy. Logic bugs belong upstream so everyone gets the fix.
+  - name: Bug in a vendored job-hunt skill
+    url: https://github.com/Remotivated/job-hunt-skills/issues
+    about: skills/job-hunt/ is a verbatim copy. Logic bugs belong upstream so everyone gets the fix.

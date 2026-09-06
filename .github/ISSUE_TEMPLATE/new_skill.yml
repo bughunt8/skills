@@ -1,0 +1,71 @@
+name: Propose a new skill
+description: Suggest a skill that does not exist here yet, written from scratch.
+labels: [enhancement, new-skill]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        There are already 469 skills here. Search the index in the README first: the most
+        common outcome of this form is discovering the skill exists under a different name.
+
+        To import skills someone else wrote, use the vendored-import form instead.
+  - type: input
+    id: name
+    attributes:
+      label: Proposed name
+      description: Lowercase kebab-case. This becomes both the directory name and the /invocation.
+      placeholder: my-new-skill
+    validations:
+      required: true
+  - type: dropdown
+    id: domain
+    attributes:
+      label: Domain
+      options:
+        - business-growth
+        - business-operations
+        - c-level-advisor
+        - commercial
+        - compliance-os
+        - design
+        - engineering
+        - engineering-team
+        - finance
+        - loop-library
+        - markdown-html
+        - marketing
+        - marketing-skill
+        - product-team
+        - productivity
+        - project-management
+        - ra-qm-team
+        - research
+        - research-ops
+        - a new domain (say which below)
+    validations:
+      required: true
+  - type: textarea
+    id: trigger
+    attributes:
+      label: When should an agent load this
+      description: >
+        The description frontmatter is the only text a routing agent sees before deciding.
+        Write the trigger conditions as you would write them there.
+    validations:
+      required: true
+  - type: textarea
+    id: overlap
+    attributes:
+      label: What existing skill is closest, and why is this not that
+      description: Name at least one. If nothing is close, say what you searched for.
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmations
+      options:
+        - label: I searched the generated index in the README and this name is free
+          required: true
+        - label: This is original work, not a copy of someone else's skill
+          required: true

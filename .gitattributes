@@ -1,0 +1,25 @@
+# Normalise line endings so a Windows contributor does not produce a whole-file diff
+# in a vendored directory and make a sync look like a conflict.
+* text=auto eol=lf
+
+*.py    text eol=lf diff=python
+*.md    text eol=lf
+*.json  text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.sh    text eol=lf
+*.csv   text eol=lf
+
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.pdf   binary
+*.ico   binary
+
+# Collapse generated files in pull request diffs so review attention lands on the
+# manifest change that caused them.
+THIRD_PARTY_NOTICES.md      linguist-generated=true
+**/PROVENANCE.md            linguist-generated=true
+skills/*/ATTRIBUTION.md     linguist-generated=true

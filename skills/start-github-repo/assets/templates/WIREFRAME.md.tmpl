@@ -1,0 +1,116 @@
+# Wireframes: {{PROJECT_NAME}}
+
+<!-- implements: PRD-{{PROJECT_NAME}} · fidelity: low · last updated: {{YEAR}}-MM-DD -->
+
+## 1. Conventions
+
+- Screen ids are `SCR-NNN`, assigned once and never renumbered.
+- Every interactive element has a stable id, used as an annotation target.
+- Layouts use fenced `wireloom` blocks where available, monospace ASCII otherwise.
+- Flows use Mermaid. Two gotchas: a lowercase `end` used as a node label breaks the flowchart, and a
+  node label starting with `o` or `x` needs a leading space or a capital.
+- States and breakpoints are defined once in [DESIGN.md](DESIGN.md) and referenced here, never
+  restated.
+
+## 2. Screen Inventory
+
+| Screen ID | Name | Route | Primary story | Status |
+|---|---|---|---|---|
+| SCR-001 | TODO | `/` | US1 | draft |
+| SCR-002 | TODO | `/TODO` | US1 | draft |
+
+## 3. Navigation Map
+
+```mermaid
+flowchart LR
+  SCR001[SCR-001 TODO] --> SCR002[SCR-002 TODO]
+```
+
+## 4. Per-Screen Specification
+
+### SCR-001 — TODO
+
+- **Purpose:** TODO
+- **Entry points:** TODO
+- **Exit points:** TODO
+- **Requirements covered:** FR-001
+
+**Layout**
+
+```wireloom
+window "TODO":
+  header:
+    text "TODO"
+  panel:
+    input placeholder="TODO"
+    button "TODO" primary
+  footer:
+    text "TODO"
+```
+
+**Elements**
+
+| id | type | label | data source | validation | action |
+|---|---|---|---|---|---|
+| TODO | button | TODO | — | — | TODO |
+
+**Annotations**
+
+- TODO — targets element `TODO`.
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| default | TODO |
+| loading | TODO |
+| empty | TODO |
+| error | TODO |
+| success | TODO |
+| disabled | TODO |
+| offline | TODO |
+
+**Responsive behaviour** — see `DESIGN.md ## Breakpoints`.
+
+| Breakpoint | Layout change |
+|---|---|
+| sm | TODO |
+| md | TODO |
+| lg | TODO |
+
+**Accessibility notes**
+
+- Focus order: TODO
+- Labels and `aria-describedby` wiring: TODO
+- Contrast pairs used: TODO (must pass 4.5:1 for body text)
+
+**Copy / microcopy**
+
+| Key | String |
+|---|---|
+| TODO | TODO |
+
+## 5. Shared Patterns
+
+Global navigation, modals and sheets, toasts, forms, tables, pagination, skeletons. TODO
+
+## 6. Interaction Flows
+
+```mermaid
+sequenceDiagram
+  actor U as User
+  participant A as App
+  U->>A: TODO
+  A-->>U: TODO
+```
+
+## 7. Open Questions
+
+- TODO. Record an unresolved point by prefixing it with the clarification marker
+  described in [docs/index.md](docs/index.md) — CI fails while any remain.
+
+## 8. Change Log
+
+| Date | Change | Author |
+|---|---|---|
+| {{YEAR}}-MM-DD | Initial draft | TODO |
