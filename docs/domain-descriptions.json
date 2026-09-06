@@ -1,0 +1,23 @@
+{
+  "$comment": "Human-written one-line description per skills/ directory. scripts/generate_index.py joins these with counts taken from the tree. Add an entry when you add a domain; the generator leaves the cell blank if you forget.",
+  "business-growth": "Customer success, sales engineering, revenue operations, contracts, and business development.",
+  "business-operations": "Process, procurement, capacity, communications, knowledge, and vendor operations.",
+  "c-level-advisor": "C-suite advisory and leadership workflows.",
+  "commercial": "Pricing, deal desk, partnerships, commercial policy, and forecasting.",
+  "compliance-os": "Compliance controls, evidence, and audit-readiness workflows.",
+  "design": "Frontend taste, visual design direction, design systems, and image-generation briefs.",
+  "engineering": "Advanced engineering, reliability, security, infrastructure, and agent-development skills.",
+  "engineering-team": "Core engineering roles across architecture, frontend, backend, QA, DevOps, security, data, and AI.",
+  "finance": "Financial analysis, SaaS metrics, and investment advisory.",
+  "loop-library": "Discovering, auditing, adapting, and designing bounded agent loops.",
+  "markdown-html": "Markdown-to-interactive-HTML generation and review workflows.",
+  "marketing": "Landing-page generation.",
+  "marketing-skill": "Content, SEO/AEO, CRO, growth, intelligence, and sales workflows.",
+  "product-team": "Product management, discovery, strategy, UX research, and roadmaps.",
+  "productivity": "Capture, email, reflection, deep work, meetings, reviews, and decision support.",
+  "project-management": "Project, agile, Jira, Confluence, and Atlassian workflows.",
+  "ra-qm-team": "Regulatory affairs, quality management, and risk workflows.",
+  "research": "Academic and deep-research workflows.",
+  "research-ops": "Clinical, financial, market, and product research operations.",
+  "start-github-repo": "Greenfield repository scaffolder with a PRD/TRD/ADR document spine and a traceability matrix."
+}

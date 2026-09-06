@@ -69,27 +69,165 @@ Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
 - **[writing-for-agents](./skills/productivity/writing-for-agents/SKILL.md)** — Writing documents for agents.
 - **[management-consultant](./skills/productivity/management-consultant/SKILL.md)** — Structure and solve business, strategy, operations, and transformation problems with consulting frameworks and supporting reference material. Based on [claude-skill-management-consultant-B1 by DogInfantry](https://github.com/DogInfantry/claude-skill-management-consultant-B1), licensed under Apache-2.0.
 
-## Additional Skill Domains
+## Vendored collections
 
-The following complete skill domains are imported from [Alireza Rezvani's Claude Skills collection](https://github.com/borahanmirzaii/alirezarezvani-claude-skills) at commit [`aa8d778`](https://github.com/borahanmirzaii/alirezarezvani-claude-skills/tree/aa8d778811a557a2c28ccadda4cf3d0bd028a4cc). Each domain retains its workflows, scripts, references, and nested license notices. See [the attribution record](./skills/ALIREZAREZVANI_CLAUDE_SKILLS_ATTRIBUTION.md) for provenance and exclusions made to avoid duplicating local skills.
+Two upstream projects are imported verbatim rather than rewritten, so upstream fixes reach this
+repository automatically and the original authors stay credited. Nothing under a vendored
+directory is edited here. See [CONTRIBUTING.md](./CONTRIBUTING.md) for why, and
+[THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md) for the full licence record.
+
+### Engineering rigor: pstack
+
+[`skills/pstack/`](./skills/pstack/) comes from
+[backnotprop/pstack](https://github.com/backnotprop/pstack) (MIT, Lauren Tan). It brings the
+engineering-discipline layer this repository was missing: a mode skill with twenty-two playbooks,
+adversarial review, verification-skill authoring, and thirty-three named engineering principles.
+
+[`unslop`](./skills/pstack/unslop/SKILL.md) is a **mandatory** import. It strips AI tells from any
+writing these skills produce, and the sync fails the build if it ever goes missing. Apply it to
+every user-facing sentence, including this README.
+
+Four upstream skills are deliberately not imported: `tdd`, `teach` and `reflect` collide with
+local skills of the same name, and `bro` needs an external repository at runtime. The reasoning is
+recorded in [`skills/pstack/ATTRIBUTION.md`](./skills/pstack/ATTRIBUTION.md) rather than left to
+guesswork.
+
+### Career and job search: job-hunt-skills
+
+[`skills/job-hunt/`](./skills/job-hunt/) comes from
+[Remotivated/job-hunt-skills](https://github.com/Remotivated/job-hunt-skills) (MIT, Remotivated).
+Eleven skills covering the full search: build a source resume, audit it honestly, tailor it to a
+posting, write the cover letter, research the company, optimise LinkedIn, build a proof-of-value
+asset, run interview prep, track stages, and fact-check every claim before it goes out.
+
+It fills a real gap. This repository had 68 C-suite advisory skills and no coherent workflow for
+a person applying for work. Adjacent pieces existed, `productivity/andreessen` for career bets,
+`research/dossier` for person research, `marketing-skill/social-content` for LinkedIn presence,
+and CHRO and interview-system skills from the employer's side. None of them writes a resume,
+tailors it to a posting, or prepares a candidate.
+
+Two things to know before using it:
+
+**It expects a workspace.** The skills read and write a `my-documents/` directory in your own
+working folder, described in
+[`skills/job-hunt/skills/_shared/state-layer.md`](./skills/job-hunt/skills/_shared/state-layer.md).
+Run [`get-started`](./skills/job-hunt/skills/get-started/SKILL.md) first. That state is your data
+and is not vendored here.
+
+**DOCX and PDF export is not vendored.** Upstream ships a Node 22 plus Typst toolchain for
+ATS-safe export. That is an application, not a prompt library, and this repository has no Node CI
+to keep it honest, so it is left out. Everything the skills do in Markdown works without it. For
+export, clone [the upstream repository](https://github.com/Remotivated/job-hunt-skills) and run it
+there. Full list of limitations:
+[`skills/job-hunt/ATTRIBUTION.md`](./skills/job-hunt/ATTRIBUTION.md).
+
+`guides/` and `templates/` are vendored alongside the skills because 47 links inside them point
+that way. Copying only `skills/` would leave every one of those links broken.
+`scripts/scaffold-state.mjs` and `scripts/profile-strength.mjs` are vendored too: both import
+only `node:fs`, `node:path` and `node:url`, and `get-started` calls the scaffolder its preferred
+path, so omitting them guaranteed a file-not-found for anyone following the instruction as
+written.
+
+The Gelasio fonts under `templates/fonts/` are SIL Open Font License 1.1, not MIT. The import's
+primary licence does not cover them, and
+[`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md) says so.
+
+## Skill index
+
+<!-- BEGIN GENERATED: skill-index (scripts/generate_index.py) -->
+
+**470 skills** across 22 directories. Counts and licence pins on this page are generated by [`scripts/generate_index.py`](./scripts/generate_index.py) and verified in CI, so they cannot drift from the tree.
+
+### Skill domains
 
 | Domain | Skills | Description |
 | --- | ---: | --- |
-| [business-growth](./skills/business-growth/) | 5 | Customer success, sales engineering, revenue operations, contracts, and business development. |
-| [business-operations](./skills/business-operations/) | 7 | Process, procurement, capacity, communications, knowledge, and vendor operations. |
-| [c-level-advisor](./skills/c-level-advisor/) | 68 | C-suite advisory and leadership workflows. |
-| [commercial](./skills/commercial/) | 8 | Pricing, deal desk, partnerships, commercial policy, and forecasting. |
-| [compliance-os](./skills/compliance-os/) | 9 | Compliance controls, evidence, and audit-readiness workflows. |
-| [engineering](./skills/engineering/) | 81 | Advanced engineering, reliability, security, infrastructure, and agent-development skills. |
-| [engineering-team](./skills/engineering-team/) | 52 | Core engineering roles across architecture, frontend, backend, QA, DevOps, security, data, and AI. |
-| [finance](./skills/finance/) | 4 | Financial analysis, SaaS metrics, and investment advisory. |
-| [loop-library](./skills/loop-library/) | 1 | Discovering, auditing, adapting, and designing bounded agent loops. |
-| [markdown-html](./skills/markdown-html/) | 5 | Markdown-to-interactive-HTML generation and review workflows. |
-| [marketing](./skills/marketing/) | 1 | Landing-page generation. |
-| [marketing-skill](./skills/marketing-skill/) | 48 | Content, SEO/AEO, CRO, growth, intelligence, and sales workflows. |
-| [product-team](./skills/product-team/) | 17 | Product management, discovery, strategy, UX research, and roadmaps. |
-| [productivity](./skills/productivity/) | 10 | Capture, email, reflection, deep work, meetings, reviews, and decision support. |
-| [project-management](./skills/project-management/) | 9 | Project, agile, Jira, Confluence, and Atlassian workflows. |
-| [ra-qm-team](./skills/ra-qm-team/) | 19 | Regulatory affairs, quality management, and risk workflows. |
-| [research](./skills/research/) | 9 | Academic and deep-research workflows. |
-| [research-ops](./skills/research-ops/) | 5 | Clinical, financial, market, and product research operations. |
+| [`business-growth`](./skills/business-growth/) | 5 | Customer success, sales engineering, revenue operations, contracts, and business development. |
+| [`business-operations`](./skills/business-operations/) | 7 | Process, procurement, capacity, communications, knowledge, and vendor operations. |
+| [`c-level-advisor`](./skills/c-level-advisor/) | 68 | C-suite advisory and leadership workflows. |
+| [`commercial`](./skills/commercial/) | 8 | Pricing, deal desk, partnerships, commercial policy, and forecasting. |
+| [`compliance-os`](./skills/compliance-os/) | 9 | Compliance controls, evidence, and audit-readiness workflows. |
+| [`design`](./skills/design/) | 24 | Frontend taste, visual design direction, design systems, and image-generation briefs. |
+| [`engineering`](./skills/engineering/) | 108 | Advanced engineering, reliability, security, infrastructure, and agent-development skills. |
+| [`engineering-team`](./skills/engineering-team/) | 51 | Core engineering roles across architecture, frontend, backend, QA, DevOps, security, data, and AI. |
+| [`finance`](./skills/finance/) | 4 | Financial analysis, SaaS metrics, and investment advisory. |
+| [`loop-library`](./skills/loop-library/) | 1 | Discovering, auditing, adapting, and designing bounded agent loops. |
+| [`markdown-html`](./skills/markdown-html/) | 5 | Markdown-to-interactive-HTML generation and review workflows. |
+| [`marketing`](./skills/marketing/) | 1 | Landing-page generation. |
+| [`marketing-skill`](./skills/marketing-skill/) | 48 | Content, SEO/AEO, CRO, growth, intelligence, and sales workflows. |
+| [`product-team`](./skills/product-team/) | 17 | Product management, discovery, strategy, UX research, and roadmaps. |
+| [`productivity`](./skills/productivity/) | 20 | Capture, email, reflection, deep work, meetings, reviews, and decision support. |
+| [`project-management`](./skills/project-management/) | 9 | Project, agile, Jira, Confluence, and Atlassian workflows. |
+| [`ra-qm-team`](./skills/ra-qm-team/) | 19 | Regulatory affairs, quality management, and risk workflows. |
+| [`research`](./skills/research/) | 9 | Academic and deep-research workflows. |
+| [`research-ops`](./skills/research-ops/) | 5 | Clinical, financial, market, and product research operations. |
+| [`start-github-repo`](./skills/start-github-repo/) | 1 | Greenfield repository scaffolder with a PRD/TRD/ADR document spine and a traceability matrix. |
+
+### Vendored collections
+
+Imported verbatim from an upstream project, refreshed automatically every two weeks by [`.github/workflows/sync-vendored-skills.yml`](./.github/workflows/sync-vendored-skills.yml). Every skill directory carries a `PROVENANCE.md` naming its upstream path and commit. Full licence record: [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md).
+
+| Collection | Skills | Upstream | Licence | Pinned commit | Attribution |
+| --- | ---: | --- | --- | --- | --- |
+| [`job-hunt`](./skills/job-hunt/) | 11 | [job-hunt-skills](https://github.com/Remotivated/job-hunt-skills) | MIT | [`5fb238febf14`](https://github.com/Remotivated/job-hunt-skills/commit/5fb238febf14a0b41fb5a8fe7384594ad1f59335) | [attribution](./skills/job-hunt/ATTRIBUTION.md) |
+| [`pstack`](./skills/pstack/) | 40 | [pstack](https://github.com/backnotprop/pstack) | MIT | [`18e0e908a135`](https://github.com/backnotprop/pstack/commit/18e0e908a13553b0e58d065ab26dbc9a972ec8ba) | [attribution](./skills/pstack/ATTRIBUTION.md) |
+
+<!-- END GENERATED: skill-index -->
+
+
+## Repository layout
+
+```
+skills/                        one directory per domain, one SKILL.md per skill
+skills/vendor.manifest.json    every vendored upstream: repo, author, licence, commit pin, exclusions
+skills/pstack/                 vendored from backnotprop/pstack, do not edit in place
+skills/job-hunt/               vendored from Remotivated/job-hunt-skills, do not edit in place
+scripts/sync_vendor.py         the first import and every scheduled refresh, one code path
+scripts/lint_skills.py         SKILL.md frontmatter validation (SK001-SK009)
+scripts/generate_index.py      regenerates the index above from the tree
+scripts/audit_third_party.py   reconciles every licence marker against the inventory
+scripts/check_links.py         relative links resolve
+scripts/sync_due.py            whether a refresh is due, measured in elapsed days
+docs/ARCHITECTURE_REVIEW.md    the audit this came out of, with the open backlog
+docs/third-party-inventory.json every pre-manifest import, with author and licence
+docs/adversarial-review-2026-08-25.md  an independent review of this work, findings and all
+.github/workflows/             ci.yml on every push, sync-vendored-skills.yml on a schedule
+```
+
+## Contributing
+
+Read [CONTRIBUTING.md](./CONTRIBUTING.md) first. Three rules matter most:
+
+1. Never hand-edit anything under a vendored directory. Change the manifest and re-run the sync.
+2. Never hand-edit the generated index or `THIRD_PARTY_NOTICES.md`. Run the generator.
+3. Every import from someone else's work needs a licence, an author, and a commit-pinned link
+   before it is merged.
+
+Run the same checks CI runs. All offline, standard library plus PyYAML, nothing else to install:
+
+```bash
+python3 scripts/lint_skills.py --self-test        # the frontmatter parser refuses what it cannot read
+python3 scripts/lint_skills.py                    # SK001-SK009 on every SKILL.md
+python3 scripts/generate_index.py --check         # the index below matches the tree
+python3 scripts/sync_vendor.py --validate-manifest # provenance, licences, ownership records
+python3 scripts/audit_third_party.py              # every licence marker is accounted for
+python3 scripts/check_links.py                    # relative links resolve
+```
+
+Two more that reach the network, so they run in the scheduled job rather than in CI:
+
+```bash
+python3 scripts/sync_vendor.py --check   # has an upstream moved
+python3 scripts/sync_due.py --self-test  # is a refresh due, and why the cadence is measured in days
+```
+
+Without PyYAML the linter falls back to a strict parser that refuses YAML it cannot read rather
+than guessing at it. That is deliberate. A checker that silently passes what it does not
+understand produces confidence instead of information.
+
+## Licensing and attribution
+
+This repository's own content is MIT licensed, see [LICENSE](./LICENSE). It also redistributes work
+from several upstream projects, each under its own licence and each attributed with an author and a
+commit-pinned source link in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md). If you are an
+upstream author and an attribution is wrong, open an issue and it gets fixed.

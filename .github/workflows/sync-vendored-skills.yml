@@ -1,0 +1,217 @@
+name: sync-vendored-skills
+
+# Refresh every vendored upstream declared in skills/vendor.manifest.json and open
+# a pull request when anything moved.
+#
+# Cadence: at least once every two weeks. GitHub cron has no fortnightly
+# expression. An earlier version ran weekly and skipped odd ISO weeks, which is not
+# fortnightly: ISO years with 53 weeks break the parity and produce 21-day gaps
+# (2026-12-21 to 2027-01-11 is one). scripts/sync_due.py decides from the manifest's
+# own pinned_at dates instead, so the interval cannot drift and a missed week is
+# caught by the next run. Prove it with `scripts/sync_due.py --self-test`.
+#
+# The pull request this opens does not trigger the `ci` workflow, because a
+# GITHUB_TOKEN push cannot start another workflow run. Rather than pretend it does,
+# this job runs the same checks itself before opening the pull request and names
+# the results in the body.
+
+on:
+  schedule:
+    - cron: '17 3 * * 1' # Mondays 03:17 UTC. The due check below decides whether to act.
+  workflow_dispatch:
+    inputs:
+      source:
+        description: 'Limit to one manifest source id (blank means all)'
+        required: false
+        type: string
+      force:
+        description: 'Refresh even if the interval has not elapsed'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-vendored-skills
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: refresh vendored skills
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      # persist-credentials: false so a token is never left in .git/config. The
+      # sync copies files from an upstream repository, and a predictable
+      # credential file is exactly what a hostile upstream would aim at.
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install PyYAML for strict frontmatter validation
+        run: python3 -m pip install --quiet 'PyYAML==6.0.2'
+
+      - name: Is a refresh due
+        id: due
+        env:
+          FORCED: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
+        run: |
+          set -uo pipefail
+          if [ "${FORCED}" = "true" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Manual run, interval check bypassed."
+            exit 0
+          fi
+          if python3 scripts/sync_due.py --interval-days 14; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Not due. The next scheduled tick will check again in seven days."
+          fi
+
+      # A manual `source` input is one manifest id, not an argument vector. It is
+      # built into a Bash array and quoted, so whitespace in the value cannot turn
+      # into extra CLI options. An unknown id is rejected by sync_vendor.py itself.
+      - name: Report upstream drift
+        if: steps.due.outputs.run == 'true'
+        env:
+          SOURCE: ${{ inputs.source }}
+        run: |
+          set -uo pipefail
+          args=()
+          if [ -n "${SOURCE:-}" ]; then args+=(--source "$SOURCE"); fi
+          # --check exits 1 when anything moved, which is the normal case here.
+          # The report is the product, so the exit code is not interesting.
+          python3 scripts/sync_vendor.py --check "${args[@]}" --output text > drift.txt 2>&1 || true
+          cat drift.txt
+
+      - name: Apply upstream
+        if: steps.due.outputs.run == 'true'
+        env:
+          SOURCE: ${{ inputs.source }}
+        run: |
+          set -euo pipefail
+          args=()
+          if [ -n "${SOURCE:-}" ]; then args+=(--source "$SOURCE"); fi
+          python3 scripts/sync_vendor.py --sync "${args[@]}"
+
+      - name: Regenerate the skill index
+        if: steps.due.outputs.run == 'true'
+        run: python3 scripts/generate_index.py --write
+
+      # The same gates as the ci workflow. They run here because a token-created
+      # pull request cannot start ci, so this is the only place the result is real.
+      # A failure here stops the pull request being opened.
+      - name: Validate the result
+        if: steps.due.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          python3 scripts/lint_skills.py --self-test
+          python3 scripts/lint_skills.py
+          python3 scripts/generate_index.py --check
+          python3 scripts/sync_vendor.py --validate-manifest
+          python3 scripts/audit_third_party.py
+          python3 scripts/check_links.py
+
+      - name: Summarise for the pull request body
+        if: steps.due.outputs.run == 'true'
+        id: summary
+        run: |
+          set -euo pipefail
+          {
+            echo 'body<<PRBODY'
+            echo 'Automated refresh of every upstream declared in `skills/vendor.manifest.json`.'
+            echo
+            echo '## What moved'
+            echo
+            echo '```'
+            cat drift.txt || echo 'drift report unavailable'
+            echo '```'
+            echo
+            echo '## Checks run in this job'
+            echo
+            echo 'A pull request opened by `GITHUB_TOKEN` cannot trigger the `ci` workflow, so these'
+            echo 'ran in the sync job itself and all passed before this pull request was opened:'
+            echo
+            echo '- `scripts/lint_skills.py --self-test`'
+            echo '- `scripts/lint_skills.py`'
+            echo '- `scripts/generate_index.py --check`'
+            echo '- `scripts/sync_vendor.py --validate-manifest`'
+            echo '- `scripts/audit_third_party.py`'
+            echo '- `scripts/check_links.py`'
+            echo
+            echo '## What a reviewer should look at'
+            echo
+            echo '- Read the upstream diff, not just this one. Vendored skills change agent behaviour.'
+            echo '- Confirm no new upstream skill name collides with a local skill.'
+            echo '- Confirm `unslop` is still present. The sync fails closed if it is not.'
+            echo '- If an upstream added a file under a different licence, add it to'
+            echo '  `additional_licenses` in the manifest. The sync cannot detect that for you.'
+            echo '- `PROVENANCE.md`, `ATTRIBUTION.md`, `.vendor-owned.json` and'
+            echo '  `THIRD_PARTY_NOTICES.md` are regenerated, not hand-edited.'
+            echo
+            echo 'Generated by `.github/workflows/sync-vendored-skills.yml`.'
+            echo 'PRBODY'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the pull request
+        if: steps.due.outputs.run == 'true'
+        id: pr
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ secrets.SYNC_PAT || secrets.GITHUB_TOKEN }}
+          branch: automation/sync-vendored-skills
+          delete-branch: true
+          commit-message: 'chore(vendor): refresh vendored upstream skills'
+          title: 'chore(vendor): scheduled refresh of vendored upstream skills'
+          body: ${{ steps.summary.outputs.body }}
+          add-paths: |
+            skills/
+            docs/
+            THIRD_PARTY_NOTICES.md
+            README.md
+
+      # Labels are applied here rather than by the action so that a missing label
+      # is a warning instead of a failed run. `gh label create` is idempotent.
+      - name: Label the pull request
+        if: steps.due.outputs.run == 'true' && steps.pr.outputs.pull-request-number
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_PAT || secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.pr.outputs.pull-request-number }}
+        run: |
+          set -uo pipefail
+          gh label create automation --color ededed \
+            --description 'Opened by a scheduled workflow' --force || true
+          gh label create vendored-skills --color 0e8a16 \
+            --description 'Touches content vendored from an upstream project' --force || true
+          gh pr edit "$PR" --add-label automation --add-label vendored-skills \
+            || echo "::warning::could not apply labels to PR #$PR"
+
+      # Auto-merge only lands the pull request once the branch's required checks
+      # pass. If the repository has no required checks configured it is refused,
+      # and the pull request waits for a human instead of merging unreviewed.
+      - name: Request auto-merge
+        if: steps.due.outputs.run == 'true' && steps.pr.outputs.pull-request-number
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_PAT || secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.pr.outputs.pull-request-number }}
+        run: |
+          if gh pr merge "$PR" --squash --auto; then
+            echo "Auto-merge armed. It lands when required checks pass."
+          else
+            echo "::warning::Auto-merge was refused, so PR #$PR waits for a human. That is the" \
+                 "safe failure. To let it land on its own: enable auto-merge in repository" \
+                 "settings and require the 'ci / validate skills and provenance' check on main." \
+                 "Until both are set, CODEOWNERS is advisory and nothing is actually enforced."
+          fi
