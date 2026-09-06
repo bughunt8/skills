@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "$comment": "Relative Markdown links that scripts/check_links.py should not fail on. Every entry needs a reason. Vendored content is the usual case: a placeholder in an upstream file cannot be fixed here without forking it, so it is exempted by exact path rather than by loosening the checker.",
+  "exempt": [
+    {
+      "file": "skills/pstack/why/references/synthesizer-prompt.md",
+      "link": "url",
+      "reason": "Upstream template placeholder: a Markdown link whose target is the literal word url, inside an example line an agent is meant to fill in. Vendored verbatim from backnotprop/pstack, so it is exempted here rather than edited."
+    }
+  ]
+}
