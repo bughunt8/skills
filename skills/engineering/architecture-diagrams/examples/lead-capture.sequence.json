@@ -1,0 +1,90 @@
+{
+  "kind": "sequence",
+  "title": "Lead capture, happy path and duplicate",
+  "subtitle": "What actually happens when the form is submitted twice.",
+  "participants": [
+    {
+      "id": "visitor",
+      "label": "Visitor",
+      "shape": "actor"
+    },
+    {
+      "id": "edge",
+      "label": "Edge worker",
+      "note": "Cloudflare Workers"
+    },
+    {
+      "id": "api",
+      "label": "Lead API"
+    },
+    {
+      "id": "db",
+      "label": "Lead store",
+      "shape": "cylinder",
+      "note": "Conditional writes"
+    },
+    {
+      "id": "queue",
+      "label": "Queue",
+      "shape": "queue"
+    }
+  ],
+  "messages": [
+    {
+      "from": "visitor",
+      "to": "edge",
+      "label": "POST /lead"
+    },
+    {
+      "from": "edge",
+      "to": "edge",
+      "label": "verify turnstile token"
+    },
+    {
+      "from": "edge",
+      "to": "api",
+      "label": "forward with request id"
+    },
+    {
+      "from": "api",
+      "to": "db",
+      "label": "conditional put on email"
+    },
+    {
+      "from": "db",
+      "to": "api",
+      "label": "created",
+      "style": "dashed"
+    },
+    {
+      "from": "api",
+      "to": "queue",
+      "label": "enqueue notification"
+    },
+    {
+      "from": "api",
+      "to": "visitor",
+      "label": "201 with confirmation copy",
+      "style": "dashed"
+    },
+    {
+      "from": "visitor",
+      "to": "api",
+      "label": "POST /lead again",
+      "note": "same email, within the idempotency window"
+    },
+    {
+      "from": "api",
+      "to": "db",
+      "label": "conditional put fails"
+    },
+    {
+      "from": "api",
+      "to": "visitor",
+      "label": "200, no second notification",
+      "style": "dashed",
+      "accent": true
+    }
+  ],
+  "footer": "Traced against the staging deployment, 6 September 2026"
+}
