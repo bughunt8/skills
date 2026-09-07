@@ -1,0 +1,330 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/bughunt8/skills/skills/engineering/architecture-diagrams/schemas/diagram.schema.json",
+  "title": "Diagram document",
+  "description": "GENERATED FILE. Do not edit by hand. Produced from the field specs in scripts/diagram_ir.py by scripts/generate_schema.py, which is the only definition of this contract. Regenerate with: python3 scripts/generate_schema.py --write. A test fails if this file is stale. A graph document (architecture, workflow, dataflow, lifecycle) and a sequence document accept different keys, so the two shapes are given as a oneOf rather than merged.",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "title",
+        "nodes"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "architecture",
+            "workflow",
+            "dataflow",
+            "lifecycle",
+            "sequence"
+          ],
+          "description": "One diagram answers one question. The kind picks the layout and the vocabulary."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Short. Names the system or the flow."
+        },
+        "subtitle": {
+          "type": "string",
+          "description": "One or two sentences. State what the diagram asserts, so a reader can tell when it has gone stale."
+        },
+        "footer": {
+          "type": "string",
+          "description": "Provenance: commit, date, or source of truth. Rendered in the artifact's footer."
+        },
+        "legend": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Extra legend entries. Loop, async and boundary entries are derived automatically."
+        },
+        "orientation": {
+          "enum": [
+            "LR",
+            "TB"
+          ],
+          "default": "LR",
+          "description": "LR (default) or TB. Not accepted on a sequence document."
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/group"
+          },
+          "description": "Boundaries: trust, network or ownership, not teams or directories. Laid out as swimlanes, so a node belongs to at most one."
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node"
+          },
+          "description": "Required for every kind except sequence.",
+          "minItems": 1
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/edge"
+          },
+          "description": "Direction is meaning: an edge points the way a request or a record travels. Exact duplicates are rejected."
+        }
+      },
+      "additionalProperties": false,
+      "title": "Graph document: architecture, workflow, dataflow, lifecycle"
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "title",
+        "participants",
+        "messages"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "architecture",
+            "workflow",
+            "dataflow",
+            "lifecycle",
+            "sequence"
+          ],
+          "description": "One diagram answers one question. The kind picks the layout and the vocabulary."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Short. Names the system or the flow."
+        },
+        "subtitle": {
+          "type": "string",
+          "description": "One or two sentences. State what the diagram asserts, so a reader can tell when it has gone stale."
+        },
+        "footer": {
+          "type": "string",
+          "description": "Provenance: commit, date, or source of truth. Rendered in the artifact's footer."
+        },
+        "legend": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Extra legend entries. Loop, async and boundary entries are derived automatically."
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/participant"
+          },
+          "description": "Required for the sequence kind. Lifelines, left to right.",
+          "minItems": 1
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/message"
+          },
+          "description": "Required for the sequence kind. Rendered in order, numbered.",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false,
+      "title": "Sequence document"
+    }
+  ],
+  "$defs": {
+    "node": {
+      "type": "object",
+      "required": [
+        "id",
+        "label"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Referenced by edges and groups. Short and stable."
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What a reader calls this thing. Wrapped automatically, including tokens with no spaces."
+        },
+        "shape": {
+          "enum": [
+            "box",
+            "round",
+            "cylinder",
+            "queue",
+            "cloud",
+            "actor",
+            "decision"
+          ],
+          "default": "box",
+          "description": "box service, round start or end state, cylinder datastore, queue queue or topic, cloud managed or third-party service, actor a person, decision a branch."
+        },
+        "note": {
+          "type": "string",
+          "description": "One short line that says something the label cannot: a constraint, a guarantee, a gotcha."
+        },
+        "tech": {
+          "type": "string",
+          "description": "The concrete technology, shown small and monospaced."
+        },
+        "accent": {
+          "type": "boolean",
+          "description": "Use once per diagram, on the thing the diagram exists to show."
+        }
+      },
+      "additionalProperties": false,
+      "title": "Node"
+    },
+    "edge": {
+      "type": "object",
+      "required": [
+        "from",
+        "to"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A declared id."
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A declared id."
+        },
+        "label": {
+          "type": "string",
+          "description": "What a reader calls this thing. Wrapped automatically, including tokens with no spaces."
+        },
+        "style": {
+          "enum": [
+            "solid",
+            "dashed",
+            "dotted"
+          ],
+          "default": "solid",
+          "description": "Edges that close a cycle default to dashed."
+        },
+        "accent": {
+          "type": "boolean",
+          "description": "Use once per diagram, on the thing the diagram exists to show."
+        }
+      },
+      "additionalProperties": false,
+      "title": "Edge"
+    },
+    "group": {
+      "type": "object",
+      "required": [
+        "label",
+        "nodes"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What a reader calls this thing. Wrapped automatically, including tokens with no spaces."
+        },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Required for every kind except sequence."
+        }
+      },
+      "additionalProperties": false,
+      "title": "Group, drawn as a boundary"
+    },
+    "participant": {
+      "type": "object",
+      "required": [
+        "id",
+        "label"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Referenced by edges and groups. Short and stable."
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What a reader calls this thing. Wrapped automatically, including tokens with no spaces."
+        },
+        "shape": {
+          "enum": [
+            "box",
+            "round",
+            "cylinder",
+            "queue",
+            "cloud",
+            "actor",
+            "decision"
+          ],
+          "default": "box",
+          "description": "box service, round start or end state, cylinder datastore, queue queue or topic, cloud managed or third-party service, actor a person, decision a branch."
+        },
+        "note": {
+          "type": "string",
+          "description": "One short line that says something the label cannot: a constraint, a guarantee, a gotcha."
+        }
+      },
+      "additionalProperties": false,
+      "title": "Sequence participant"
+    },
+    "message": {
+      "type": "object",
+      "required": [
+        "from",
+        "to"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A declared id."
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A declared id."
+        },
+        "label": {
+          "type": "string",
+          "description": "What a reader calls this thing. Wrapped automatically, including tokens with no spaces."
+        },
+        "style": {
+          "enum": [
+            "solid",
+            "dashed",
+            "dotted"
+          ],
+          "default": "solid",
+          "description": "Edges that close a cycle default to dashed."
+        },
+        "note": {
+          "type": "string",
+          "description": "One short line that says something the label cannot: a constraint, a guarantee, a gotcha."
+        },
+        "accent": {
+          "type": "boolean",
+          "description": "Use once per diagram, on the thing the diagram exists to show."
+        }
+      },
+      "additionalProperties": false,
+      "title": "Sequence message"
+    }
+  }
+}
