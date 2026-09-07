@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the skill-browser page from its source repositories.
 
-Why this exists: the first version of this page built all 482 cards in
+Why this exists: the first version of this page built every card in
 JavaScript. That produced a page with 858 characters of text for a crawler and
 nothing at all with JS disabled, which is the wrong architecture for a public,
 indexable page. Every card is now prerendered into index.html at build time and
@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import collections
+import hashlib
 import html
 import json
 import os
@@ -121,6 +122,9 @@ def trim(text: str, limit: int = 170) -> str:
 
 def collect(checkouts: dict) -> list:
     rows = []
+    # Every duplicate the build removes, so a collapse is visible in the log
+    # rather than being a number that quietly does not add up.
+    collapsed = []
     for src in load_sources():
         root = checkouts[src["id"]]
         if src.get("subpath"):
@@ -137,17 +141,39 @@ def collect(checkouts: dict) -> list:
         # directories contributes it once.
         found.sort(key=lambda p: (len(p.parts), str(p)))
 
-        seen = set()
+        seen = {}
         for path in found:
             name, desc = frontmatter(path)
-            if name in seen or name in SKIP_NAMES:
+            if name in SKIP_NAMES:
                 continue
-            seen.add(name)
             parts = Path(os.path.relpath(path.parent, root)).parts
             if src.get("flat_category"):
                 category = src["flat_category"]
             else:
                 category = parts[0] if parts and parts[0] != "." else "core"
+
+            # The bundle a skill belongs to: the path between its category and
+            # itself, with the conventional "skills" segment dropped. Used to tell
+            # two same-named skills apart on the page.
+            middle = [seg for seg in parts[1:-1] if seg != "skills"]
+            bundle = "/".join(middle)
+
+            # Dedupe on the CONTENT of SKILL.md, not on its name.
+            #
+            # Name-based dedupe cannot tell a mirror from a namesake, and it got
+            # this wrong in both directions. Globally it dropped genuinely
+            # different skills that shared a name across categories. Scoped to the
+            # category it still collapsed engineering/agenthub/run with
+            # engineering/autoresearch-agent/run, which are different skills whose
+            # SKILL.md files differ, while the pairs it was designed to collapse
+            # are byte-identical. Hashing the file collapses exactly the mirrors
+            # and nothing else, which is verifiable rather than a guess.
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            if digest in seen:
+                collapsed.append((src["repo"], category, name, str(path), seen[digest]))
+                continue
+            seen[digest] = str(path)
+
             rows.append(
                 {
                     "n": name,
@@ -156,8 +182,29 @@ def collect(checkouts: dict) -> list:
                     "repo": src["repo"],
                     "lic": src["license"],
                     "url": src["url"],
+                    "bundle": bundle,
                 }
             )
+
+    # Two distinct skills can legitimately share a name, for example the `run`
+    # command of two different agent bundles. Qualify those on the page so a
+    # reader can tell them apart, and leave every unique name clean.
+    by_key = collections.Counter((r["dom"], r["n"]) for r in rows)
+    for r in rows:
+        r["qual"] = r["bundle"] if by_key[(r["dom"], r["n"])] > 1 and r["bundle"] else ""
+    qualified = sum(1 for r in rows if r["qual"])
+    if qualified:
+        print(f"qualified {qualified} skill(s) that share a name within a category:")
+        for r in rows:
+            if r["qual"]:
+                print(f"  {r['dom']}/{r['n']}  ->  shown as \"{r['n']} ({r['qual']})\"")
+
+    if collapsed:
+        print(f"collapsed {len(collapsed)} byte-identical duplicate(s):")
+        for repo, category, name, dupe, kept in collapsed:
+            print(f"  [{repo}] {category}/{name}")
+            print(f"      kept    {kept}")
+            print(f"      dropped {dupe}")
     return rows
 
 
@@ -317,7 +364,13 @@ def render(rows: list) -> "tuple[dict, str]":
                 f"{before + i + 1:03d}</span>"
                 f'<span class="card__cmd">/{esc(s["n"])}</span></div>'
             )
-            out.append(f'              <h3>{esc(s["n"])}</h3>')
+            qual = (
+                f'<span class="qual">{esc(s["qual"])}</span>' if s.get("qual") else ""
+            )
+            # The space matters. .qual is display:block so it collapses visually,
+            # but without it the heading's text content reads "runagenthub" to a
+            # screen reader and to anything else consuming textContent.
+            out.append(f'              <h3>{esc(s["n"])} {qual}</h3>')
             out.append(f"              <p>{esc(desc)}</p>")
             out.append(
                 f'              <footer><a href="{esc(s["url"])}" rel="noopener">'

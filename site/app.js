@@ -141,7 +141,7 @@
         onUpdate: function () {
           // Only the hero's own number. Writing the total into the HUD here made
           // the HUD mean "size of the library" during the hero and "skills
-          // passed so far" during the chapters, so it counted up to 431 and then
+          // passed so far" during the chapters, so it counted up to the full total and then
           // dropped back to 109. The HUD means progress, and nothing else.
           if (heroCount) heroCount.textContent = Math.round(counter.v);
         }
