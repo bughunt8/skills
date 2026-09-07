@@ -1,0 +1,24 @@
+title = "gitleaks config for bughunt8/skills"
+
+[extend]
+useDefault = true
+
+# This repository is a library of skill instructions, several of which teach
+# secret-scanning, security-review, or refactoring workflows. Those skills
+# necessarily contain example/anti-pattern credentials (fake API keys, JWTs,
+# private-key regexes) as fixtures and documentation. None of the entries
+# below are real, live credentials — they are illustrative strings that ship
+# with the skill on purpose. Paths are matched against the full findings
+# scanned across git history by gitleaks/gitleaks-action@v2.
+[allowlist]
+description = "Known example/test-fixture secrets in skill documentation and tests"
+paths = [
+  '''skills/engineering-team/skills/senior-secops/SKILL\.md''',
+  '''skills/engineering-team/skills/senior-secops/references/security_standards\.md''',
+  '''skills/engineering-team/skills/senior-security/scripts/secret_scanner\.py''',
+  '''skills/engineering-team/skills/senior-security/references/security-architecture-patterns\.md''',
+  '''skills/engineering/skills/api-design-reviewer/SKILL\.md''',
+  '''skills/engineering/skills/tech-debt-tracker/assets/sample_codebase/src/frontend\.js''',
+  '''skills/engineering/skills/tech-debt-tracker/assets/sample_codebase/src/user_service\.py''',
+  '''skills/engineering/skills/skill-tester/tests/test_security_scorer\.py''',
+]
