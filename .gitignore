@@ -141,3 +141,16 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# --- skill-browser site (site/) ---
+# Generated per build by CI, never committed.
+site/BUILD-INFO.txt
+site/robots.txt
+site/sitemap.xml
+site/playwright-report/
+site/test-results/
+site/blob-report/
+
+# Python bytecode from the skills' helper scripts
+__pycache__/
+*.pyc

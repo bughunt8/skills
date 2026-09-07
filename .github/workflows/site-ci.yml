@@ -1,0 +1,48 @@
+name: Site CI
+
+# Validates every push and pull request. Deployment lives in
+# site-deploy-staging.yml and site-deploy-production.yml, which call the same
+# reusable validate and deploy workflows, so no deploy path can skip these gates
+# and none of them poll across a workflow boundary for another run's result.
+
+# Path-filtered so it does not run on every unrelated change, and prefixed
+# site- so it cannot collide with the skills-repo workflows.
+#
+# skills/** is watched because the page is generated from it: adding a skill
+# without rebuilding would leave the published page quietly understating the
+# library. The build check fails with the command to run.
+on:
+  push:
+    branches: [main, staging]
+    paths: ["site/**", "skills/**", ".github/workflows/site-*.yml"]
+  pull_request:
+    branches: [main, staging]
+    paths: ["site/**", "skills/**", ".github/workflows/site-*.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: validate
+    uses: ./.github/workflows/site-validate.yml
+
+  # Stable single name for branch protection to require, so the required check
+  # does not need changing when a job inside validate.yml is added or renamed.
+  gate:
+    name: site gates passed
+    runs-on: ubuntu-latest
+    needs: validate
+    if: always()
+    steps:
+      - run: |
+          if [ "${{ needs.validate.result }}" != "success" ]; then
+            echo "::error::validation failed (${{ needs.validate.result }})"
+            exit 1
+          fi
+          echo "all gates passed"

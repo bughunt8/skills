@@ -1,0 +1,102 @@
+# Apache / LiteSpeed configuration for the skill-browser site on Hostinger.
+#
+# Replaces what CloudFront and a Cloudflare Pages _headers file used to do. It is
+# kept in the repository, not clicked into hPanel, so the security posture is
+# reviewable, diffable and deployed with the site rather than remembered.
+#
+# Hostinger runs LiteSpeed, which reads .htaccess with Apache syntax. Every block
+# is wrapped in <IfModule> so a missing module degrades rather than 500s the site,
+# which on shared hosting is the difference between a header not being set and the
+# whole page being unreachable.
+
+# ---------------------------------------------------------------- security
+<IfModule mod_headers.c>
+  # Only meaningful over HTTPS. Hostinger issues a free certificate once the
+  # domain is pointed and added in hPanel; do not enable this before that is
+  # working, or a browser will pin you to HTTPS you cannot yet serve.
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "DENY"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+
+  # Everything is served from this origin, so the policy is same-origin only with
+  # no third-party allowances at all. There is no inline script, so script-src
+  # needs no 'unsafe-inline'. If a future change reintroduces a CDN this header
+  # will block it, which is the intended behaviour rather than an obstacle.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"
+
+  # Never let a stale build report itself as the current one.
+  <FilesMatch "BUILD-INFO\.txt$">
+    Header always set Cache-Control "no-store"
+  </FilesMatch>
+</IfModule>
+
+# ------------------------------------------------------------------ caching
+# CloudFront used to do this via per-object Cache-Control. HTML must not be
+# cached, or a deploy is invisible until a browser decides otherwise; the assets
+# are safe to hold briefly.
+<IfModule mod_headers.c>
+  <FilesMatch "\.html$">
+    Header always set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "\.(css|js)$">
+    Header always set Cache-Control "public, max-age=3600, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "\.(svg|png|jpg|jpeg|webp|avif|ico|woff2)$">
+    Header always set Cache-Control "public, max-age=604800, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# ------------------------------------------------------------------- charset
+# The page is UTF-8 and contains CJK skill descriptions. Shared hosting defaults
+# vary, so state it rather than hoping.
+AddDefaultCharset UTF-8
+<IfModule mod_mime.c>
+  AddType "text/html; charset=UTF-8" .html
+  AddType "text/css; charset=UTF-8" .css
+  AddType "application/javascript; charset=UTF-8" .js
+  AddType "text/plain; charset=UTF-8" .txt
+</IfModule>
+
+# --------------------------------------------------------------- compression
+# The page is one large prerendered HTML file, so compression is the single
+# biggest win available. CloudFront did this automatically.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml \
+    application/javascript application/json image/svg+xml
+</IfModule>
+
+# --------------------------------------------------------------------- HTTPS
+# Hostinger terminates TLS upstream, so the scheme arrives in X-Forwarded-Proto.
+# Testing HTTPS directly would loop forever behind their proxy.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP:X-Forwarded-Proto} =http
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+</IfModule>
+
+# ------------------------------------------------------------------- hygiene
+DirectoryIndex index.html
+<IfModule mod_autoindex.c>
+  Options -Indexes
+</IfModule>
+
+# Nothing here should ever be fetchable, but shared hosting is shared.
+<FilesMatch "^(\.|.*\.(py|json|md|yml|yaml|lock))$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+# The one dotfile that must stay readable to the server itself is this file, and
+# Apache blocks .htaccess from being served by default regardless.
+
+# Deliberately no ErrorDocument pointing at index.html: this page is ~280 KB, and
+# serving it in full to every bot probing a bad path is a lot of bandwidth for no
+# benefit. A missing path gets the server's default 404.
