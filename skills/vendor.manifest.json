@@ -13,7 +13,7 @@
       "license_path": "LICENSE",
       "ref": "main",
       "pinned_commit": "18e0e908a13553b0e58d065ab26dbc9a972ec8ba",
-      "pinned_at": "2026-08-25",
+      "pinned_at": "2026-09-07",
       "dest": "skills/pstack",
       "paths": [
         {
@@ -57,7 +57,7 @@
       "license_path": "LICENSE",
       "ref": "main",
       "pinned_commit": "5fb238febf14a0b41fb5a8fe7384594ad1f59335",
-      "pinned_at": "2026-08-25",
+      "pinned_at": "2026-09-07",
       "dest": "skills/job-hunt",
       "paths": [
         {
