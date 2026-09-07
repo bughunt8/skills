@@ -1,5 +1,5 @@
 ---
-name: togaf
+name: togaf-adm-architecture-guidance
 version: 1.0.0
 description: TOGAF (The Open Group Architecture Framework) enterprise architecture methodology and best practices. Provides ADM (Architecture Development Method) guidance, architecture content framework, building blocks, viewpoints, and governance. Use this skill for enterprise architecture planning, architecture development, transition planning, or any TOGAF-based architecture work.
 author: DeepArchi
