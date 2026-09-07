@@ -14,10 +14,10 @@
       "id": "creative-writing-skills",
       "repo": "haowjy/creative-writing-skills",
       "url": "https://github.com/haowjy/creative-writing-skills",
-      "subpath": null,
+      "subpath": "cw/skills",
       "flat_category": "creative-writing",
       "license": "Apache-2.0",
-      "note": "Mirrors its skills into both cw/skills and skills; dedupe collapses them.",
+      "note": "Indexed at cw/skills, which its own .claude-plugin/marketplace.json declares as the plugin source ('source': './cw'). That tree holds the complete set of 24. A top-level skills/ tree also exists with 11 of them in a different frontmatter format; indexing the repository root picked up both, and 'shallowest path wins' then preferred the 11-file partial copy over the canonical one. Naming the canonical subtree removes the ambiguity instead of guessing at it.",
       "ref": "fd7a3ad9cd7697a0645ff6ff4bd5e809cf7673a3"
     },
     {

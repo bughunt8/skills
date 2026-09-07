@@ -369,3 +369,16 @@ a { color: inherit; text-decoration: none; }
   .rail { display: none; }
   .hud__bar { transform: scaleX(1); }
 }
+
+/* Qualifier shown only when two skills in one category share a name, for example
+   the `run` command of two different agent bundles. Without it the page shows two
+   cards that look identical and a reader cannot tell which is which. */
+.card h3 .qual {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
