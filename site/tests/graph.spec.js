@@ -50,12 +50,17 @@ test.describe("the Solution graph", () => {
     // skill with another. data-sol used to hold a single owner, so focusing the
     // second Solution to claim a shared skill lit one fewer node than its own card
     // listed: code-review is led by both idea-to-shipped-code and hard-to-find-bug.
-    const ids = await page.evaluate(() =>
-      [...document.querySelectorAll(".g-lead")].map((e) => e.getAttribute("data-id"))
+    // Identity and label are different things now, and this test needs both: the
+    // node is addressed by identity, and the panel displays a label.
+    const leads = await page.evaluate(() =>
+      [...document.querySelectorAll(".g-lead")].map((e) => ({
+        id: e.getAttribute("data-id"),
+        name: e.getAttribute("data-name")
+      }))
     );
-    expect(ids.length).toBe(data.solutions);
+    expect(leads.length).toBe(data.solutions);
 
-    for (const id of ids) {
+    for (const { id, name } of leads) {
       // dispatchEvent, not click(). locator.click() computes a box and then moves a
       // real pointer to it, and this page runs Lenis smooth scrolling, so the
       // coordinate is stale by the time the event is dispatched and the click lands
@@ -74,7 +79,7 @@ test.describe("the Solution graph", () => {
         };
       }, id);
 
-      expect(seen.panel, `panel for ${id}`).toContain(id);
+      expect(seen.panel, `panel for ${id}`).toContain(name);
       expect(seen.panelChain, `panel chain for ${id}`).toBe(seen.cardChain);
       expect(seen.lit, `lit members for ${id}`).toBe(seen.cardChain);
       expect(seen.edges, `lit edges for ${id}`).toBe(seen.cardChain);
@@ -106,7 +111,10 @@ test.describe("the Solution graph", () => {
     // "merely hovered" is exactly the distinction that broke twice and cannot be
     // asserted from the outside otherwise.
     await page.locator('.g-lead[data-name="agenthub"]').dispatchEvent("click");
-    await expect(page.locator("#top")).toHaveAttribute("data-pinned", "agenthub");
+    await expect(page.locator("#top")).toHaveAttribute(
+      "data-pinned",
+      "engineering~agenthub~agenthub"
+    );
 
     // Hovering a different Solution must not replace a committed selection. It did,
     // and worse: the pin was being cleared a tick later by the traversal's own dead
@@ -115,11 +123,17 @@ test.describe("the Solution graph", () => {
     await page.locator('.g-lead[data-name="c-level-agents"]').hover({ force: true });
     await page.waitForTimeout(400);
     await expect(page.locator("#panelname")).toHaveText(/agenthub/);
-    await expect(page.locator("#top")).toHaveAttribute("data-pinned", "agenthub");
+    await expect(page.locator("#top")).toHaveAttribute(
+      "data-pinned",
+      "engineering~agenthub~agenthub"
+    );
 
     // And it must still be holding a second later, not just immediately.
     await page.waitForTimeout(1000);
-    await expect(page.locator("#top")).toHaveAttribute("data-pinned", "agenthub");
+    await expect(page.locator("#top")).toHaveAttribute(
+      "data-pinned",
+      "engineering~agenthub~agenthub"
+    );
 
     // With nothing pinned, hover previews. The pointer has to leave the node first:
     // mouseenter does not fire again for an element the cursor is already inside, so
@@ -153,23 +167,30 @@ test.describe("the Solution graph", () => {
     // the nodes are actually big enough to hit with a pointer, and that nothing is
     // layered over the graph intercepting clicks. The panel and the intro used to
     // sit on top of it, and two Solutions were unclickable.
-    for (const id of ["commercial-skills", "c-level-agents", "agenthub"]) {
-      const pt = await page.evaluate((leadId) => {
-        const g = document.querySelector(`.g-lead[data-id="${CSS.escape(leadId)}"]`);
+    for (const name of ["commercial-skills", "c-level-agents", "agenthub"]) {
+      const pt = await page.evaluate((leadName) => {
+        const g = document.querySelector(`.g-lead[data-name="${leadName}"]`);
         const r = g.getBoundingClientRect();
         const cx = Math.round(r.left + r.width / 2);
         const cy = Math.round(r.top + r.height / 2);
         const el = document.elementFromPoint(cx, cy);
-        return { cx, cy, owner: el && el.closest ? el.closest(".g-lead")?.getAttribute("data-id") : null };
-      }, id);
+        const owner = el && el.closest ? el.closest(".g-lead") : null;
+        return {
+          cx,
+          cy,
+          name: owner && owner.getAttribute("data-name"),
+          id: g.getAttribute("data-id")
+        };
+      }, name);
 
       // Whatever is on top at the node's centre must be the node itself.
-      expect(pt.owner, `element on top at ${id}`).toBe(id);
+      expect(pt.name, `element on top at ${name}`).toBe(name);
 
       await page.mouse.move(pt.cx, pt.cy);
       await page.mouse.down();
       await page.mouse.up();
-      await expect(page.locator("#top")).toHaveAttribute("data-pinned", id);
+      // Pinned by identity, which is what the page records, not by the label.
+      await expect(page.locator("#top")).toHaveAttribute("data-pinned", pt.id);
     }
   });
 
@@ -238,15 +259,37 @@ test.describe("the Solution graph", () => {
     expect(seen.size).toBeGreaterThan(2);
   });
 
-  test("lead nodes are keyboard reachable", async ({ page }) => {
+  test("lead nodes are keyboard reachable, and work without scripting", async ({
+    page
+  }) => {
     await page.goto("/index.html");
-    const tabbable = await page.locator(".g-lead[tabindex='0']").count();
-    expect(tabbable).toBe(data.solutions);
+
+    // Every lead is a link to its own Solution. It used to be role="button" with a
+    // tabindex and a click handler, which made all 54 of them inert on a page whose
+    // whole claim is that it works with JavaScript switched off.
+    const links = await page.evaluate(() =>
+      [...document.querySelectorAll(".g-lead")].map((e) => ({
+        href: e.getAttribute("href"),
+        resolves: !!(
+          e.getAttribute("href") &&
+          document.querySelector(e.getAttribute("href"))
+        )
+      }))
+    );
+    expect(links.length).toBe(data.solutions);
+    expect(
+      links.filter((l) => !l.resolves),
+      "leads whose link goes nowhere"
+    ).toEqual([]);
 
     await page.locator('.g-lead[data-name="agenthub"]').focus();
     await page.keyboard.press("Enter");
     await page.waitForTimeout(300);
     await expect(page.locator("#panelname")).toHaveText(/agenthub/);
+
+    // Activating a lead must not scroll the graph out from under the visitor: on
+    // desktop the script shows the Solution here instead of following the link.
+    expect(await page.evaluate(() => Math.round(window.scrollY))).toBeLessThan(60);
   });
 });
 
