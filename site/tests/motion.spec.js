@@ -51,8 +51,15 @@ test.describe("scroll choreography", () => {
     await page.goto("/index.html");
     await page.waitForTimeout(2500);
 
-    const xAt = async (y) => {
-      await page.evaluate((v) => window.scrollTo(0, v), y);
+    // Scroll relative to the first chapter, not absolute offsets: the solutions
+    // section sits before the chapters, so hardcoded y values land in the wrong
+    // content and no chapter is pinned there.
+    const firstY = await page.evaluate(
+      () => document.getElementById("cat-engineering").offsetTop
+    );
+
+    const xAt = async (dy) => {
+      await page.evaluate((v) => window.scrollTo(0, v), firstY + dy);
       await page.waitForTimeout(1400);
       return page.evaluate(() => {
         const live = document.querySelector(".chapter.is-live .strip");
@@ -61,8 +68,8 @@ test.describe("scroll choreography", () => {
       });
     };
 
-    const early = await xAt(2500);
-    const later = await xAt(6000);
+    const early = await xAt(300);
+    const later = await xAt(1500);
 
     expect(early).not.toBeNull();
     expect(later).not.toBeNull();
