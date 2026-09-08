@@ -109,11 +109,10 @@ a { color: inherit; text-decoration: none; }
   position: fixed; top: 50%; right: 20px; transform: translateY(-50%);
   z-index: 60; width: var(--rail-w);
   display: flex; flex-direction: column; gap: 1px;
-  opacity: 0; transition: opacity 0.4s var(--ease);
+  opacity: 1; transition: opacity 0.4s var(--ease);
   max-height: 78vh; overflow: auto; scrollbar-width: none;
 }
 .rail::-webkit-scrollbar { display: none; }
-.rail.is-live { opacity: 1; }
 
 .rail a {
   display: flex; align-items: baseline; gap: 8px;
@@ -159,10 +158,10 @@ a { color: inherit; text-decoration: none; }
     radial-gradient(115% 85% at 50% 42%, transparent 8%, #0b0d12e6 62%, var(--bg) 88%);
 }
 
-.hero__mid {
+.hero__inner {
   position: relative; text-align: center; padding: 0 24px; max-width: 960px;
 }
-.hero__eyebrow {
+.eyebrow {
   font-family: var(--font-display); font-weight: 500;
   font-size: var(--t-caption); letter-spacing: var(--tr-caps);
   text-transform: uppercase; color: var(--accent);
@@ -185,10 +184,22 @@ a { color: inherit; text-decoration: none; }
   color: var(--accent);
   margin-bottom: 4px;
 }
-.hero__lede {
+.hero__sub {
   margin: 26px auto 0; max-width: 60ch;
   font-size: var(--t-body); color: var(--text-dim); line-height: var(--lh-body);
   text-wrap: balance;
+}
+
+.cue {
+  margin-top: 34px;
+  display: inline-flex; flex-direction: column; align-items: center; gap: 10px;
+  font-family: var(--font-display); font-weight: 500;
+  font-size: var(--t-caption); letter-spacing: var(--tr-caps);
+  text-transform: uppercase; color: var(--text-faint);
+}
+.cue span {
+  width: 1px; height: 42px;
+  background: linear-gradient(var(--accent), transparent);
 }
 
 /* ---------------- category chapter ---------------- */

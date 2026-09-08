@@ -148,8 +148,8 @@
       }, 0)
       .fromTo(
         ".hero__inner",
-        { opacity: 0, y: 26 },
-        { opacity: 1, y: 0, ease: "power2.out", duration: 0.45 },
+        { y: 26 },
+        { y: 0, ease: "power2.out", duration: 0.45 },
         0.12
       )
       .to(cue, { opacity: 0, duration: 0.2 }, 0.55);
