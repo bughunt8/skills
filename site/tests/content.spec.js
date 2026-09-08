@@ -86,23 +86,43 @@ test.describe("prerendered content", () => {
     }
     expect(running).toBe(data.total);
 
-    // Every Solution's chain must name skills that exist in the library, or the
-    // page is advertising a composition the reader cannot actually run.
-    const dangling = await page.evaluate(() => {
-      const known = new Set(
+    // Every step of every Solution must resolve to one specific skill, and to a
+    // graph node with the same identity.
+    //
+    // Checked on identity, not on the displayed name. Six names in this library
+    // belong to more than one skill, so a name-based version of this check passed
+    // while a chain pointed at a skill in an unrelated category that happened to
+    // share a word, and while two different skills were drawn as a single node.
+    const broken = await page.evaluate(() => {
+      const cards = new Set(
         [...document.querySelectorAll(".card")].map((c) => c.getAttribute("data-id"))
       );
+      // Nodes only. Each lead also has a <text> label carrying the same identity,
+      // and counting those makes every lead look like two nodes.
+      const graph = [
+        ...document.querySelectorAll(".g-lead[data-id], .g-node[data-id]")
+      ].reduce((m, el) => {
+        const id = el.getAttribute("data-id");
+        m[id] = (m[id] || 0) + 1;
+        return m;
+      }, {});
       const bad = [];
       document.querySelectorAll(".sol").forEach((sol) => {
+        const lead = sol.getAttribute("data-sol");
         sol.querySelectorAll(".sol__step").forEach((step) => {
-          if (!known.has(step.textContent.trim())) {
-            bad.push(sol.getAttribute("data-sol") + " -> " + step.textContent.trim());
+          const id = step.getAttribute("data-id");
+          if (!id) return bad.push(`${lead} -> a step with no identity`);
+          if (!cards.has(id)) bad.push(`${lead} -> ${id} has no library card`);
+          // Exactly one, not "at least one": two nodes for one identity is the
+          // fusion defect, and no count of nodes can see it.
+          if (graph[id] !== 1) {
+            bad.push(`${lead} -> ${id} has ${graph[id] || 0} graph nodes`);
           }
         });
       });
       return bad;
     });
-    expect(dangling, "Solution steps with no matching skill").toEqual([]);
+    expect(broken, "Solution steps that do not resolve to one skill").toEqual([]);
 
     // The headline is static truth now rather than an animation, so it can be read
     // straight from the live DOM.

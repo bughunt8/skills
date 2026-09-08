@@ -168,6 +168,12 @@ test.describe("the Solution graph", () => {
     // layered over the graph intercepting clicks. The panel and the intro used to
     // sit on top of it, and two Solutions were unclickable.
     for (const name of ["commercial-skills", "c-level-agents", "agenthub"]) {
+      // Bring it on screen first. elementFromPoint only sees the viewport, and on a
+      // phone the stage is an ordinary scrolling column, so a node can sit below the
+      // fold — which reads as "covered by nothing" rather than as "not visible".
+      await page.locator(`.g-lead[data-name="${name}"]`).scrollIntoViewIfNeeded();
+      await page.waitForTimeout(250);
+
       const pt = await page.evaluate((leadName) => {
         const g = document.querySelector(`.g-lead[data-name="${leadName}"]`);
         const r = g.getBoundingClientRect();
@@ -260,7 +266,8 @@ test.describe("the Solution graph", () => {
   });
 
   test("lead nodes are keyboard reachable, and work without scripting", async ({
-    page
+    page,
+    isMobile
   }) => {
     await page.goto("/index.html");
 
@@ -288,8 +295,12 @@ test.describe("the Solution graph", () => {
     await expect(page.locator("#panelname")).toHaveText(/agenthub/);
 
     // Activating a lead must not scroll the graph out from under the visitor: on
-    // desktop the script shows the Solution here instead of following the link.
-    expect(await page.evaluate(() => Math.round(window.scrollY))).toBeLessThan(60);
+    // desktop the script shows the Solution in the panel instead of following the
+    // link. On a phone there is no panel beside the graph and no pin, so following
+    // the link to the Solution's card is the correct outcome, not a regression.
+    if (!isMobile) {
+      expect(await page.evaluate(() => Math.round(window.scrollY))).toBeLessThan(60);
+    }
   });
 });
 
