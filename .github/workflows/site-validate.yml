@@ -169,6 +169,29 @@ jobs:
       - name: Validate solution steps resolve to real skills
         run: python3 scripts/check_solutions.py
 
+      # The browser tests could not see the two worst defects this engine has had.
+      # They counted lead nodes against Solution cards and matched name strings, so
+      # they passed while the graph drew one node for two different skills and
+      # terminated an edge on an unrelated skill of the same name. These assertions
+      # are about identity and topology, made against the engine, not the DOM.
+      - name: Unit-test the composition engine
+        working-directory: site
+        run: python3 tests/test_compose.py
+
+      - name: Confirm the composition tests can actually fail
+        working-directory: site
+        run: |
+          python3 scripts/plant_identity_defect.py plant
+          if python3 tests/test_compose.py > /tmp/planted.log 2>&1; then
+            echo "::error::the composition tests passed with the identity defect planted"
+            python3 scripts/plant_identity_defect.py restore
+            exit 1
+          fi
+          echo "gate confirmed: name-keying the graph fails these tests"
+          grep -E "^  FAIL" /tmp/planted.log || true
+          python3 scripts/plant_identity_defect.py restore
+          python3 tests/test_compose.py
+
   gate:
     name: all gates passed
     runs-on: ubuntu-latest

@@ -90,7 +90,7 @@ test.describe("the Solution graph", () => {
     // in put every other Solution outside the frame and made it unclickable, so
     // the graph's own navigation broke unless the reader knew to press Escape. It
     // also scaled the labels, because SVG text is measured in user units.
-    await page.locator('.g-lead[data-id="agenthub"]').dispatchEvent("click");
+    await page.locator('.g-lead[data-name="agenthub"]').dispatchEvent("click");
     await page.waitForTimeout(900);
     await page.mouse.wheel(0, 700);
     await page.waitForTimeout(900);
@@ -105,14 +105,14 @@ test.describe("the Solution graph", () => {
     // The selection model is reflected onto the stage, because "pinned" and
     // "merely hovered" is exactly the distinction that broke twice and cannot be
     // asserted from the outside otherwise.
-    await page.locator('.g-lead[data-id="agenthub"]').dispatchEvent("click");
+    await page.locator('.g-lead[data-name="agenthub"]').dispatchEvent("click");
     await expect(page.locator("#top")).toHaveAttribute("data-pinned", "agenthub");
 
     // Hovering a different Solution must not replace a committed selection. It did,
     // and worse: the pin was being cleared a tick later by the traversal's own dead
     // zone, so a click at the top of the page appeared to work and then quietly
     // stopped holding.
-    await page.locator('.g-lead[data-id="c-level-agents"]').hover({ force: true });
+    await page.locator('.g-lead[data-name="c-level-agents"]').hover({ force: true });
     await page.waitForTimeout(400);
     await expect(page.locator("#panelname")).toHaveText(/agenthub/);
     await expect(page.locator("#top")).toHaveAttribute("data-pinned", "agenthub");
@@ -127,7 +127,7 @@ test.describe("the Solution graph", () => {
     await page.keyboard.press("Escape");
     await expect(page.locator("#top")).toHaveAttribute("data-pinned", "");
     await page.locator(".stage__intro").hover();
-    await page.locator('.g-lead[data-id="c-level-agents"]').hover({ force: true });
+    await page.locator('.g-lead[data-name="c-level-agents"]').hover({ force: true });
     await expect(page.locator("#panelname")).toHaveText(/c-level-agents/);
   });
 
@@ -243,7 +243,7 @@ test.describe("the Solution graph", () => {
     const tabbable = await page.locator(".g-lead[tabindex='0']").count();
     expect(tabbable).toBe(data.solutions);
 
-    await page.locator('.g-lead[data-id="agenthub"]').focus();
+    await page.locator('.g-lead[data-name="agenthub"]').focus();
     await page.keyboard.press("Enter");
     await page.waitForTimeout(300);
     await expect(page.locator("#panelname")).toHaveText(/agenthub/);

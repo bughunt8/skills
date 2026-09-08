@@ -84,20 +84,62 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "").lower())
 
 
+# The order stages are TESTED in, which is not the order they happen in.
+#
+# These are two different questions and conflating them was a bug. Scanning in
+# lifecycle order meant `build` was tested before `verify`, so `code-review`
+# matched the token `code` and was classified as a build skill — the exact case the
+# docstring claimed to handle. Generic stages are now tested last, and `build` last
+# of all, so a specific signal always wins.
+PRECEDENCE = ["route", "govern", "operate", "measure", "verify", "ship",
+              "design", "spec", "research", "build"]
+
+
+def _tokens(s: str) -> list:
+    return [tok for tok in re.split(r"[^a-z0-9]+", _norm(s)) if tok]
+
+
+class LayoutTooTight(Exception):
+    """Raised when the frame cannot hold the Solutions without overlapping them."""
+
+
 def stage_of(name: str, desc: str) -> str:
     """Classify a skill onto one lifecycle stage.
 
-    First match wins in STAGES order, and the name is weighted over the
-    description because a skill called `code-review` is a review skill even if its
-    description talks about building. Unmatched skills get "build", the least
-    surprising default for a library that is mostly about making things.
+    Three passes, most reliable evidence first: an exact token of the name, then a
+    substring of a name token, then the description. Exact tokens matter because
+    substring matching on names is how `marketplace-builder` became a research
+    skill: `market` is a substring of `marketplace` but not a word in it.
+
+    Unmatched skills get "build", the least surprising default for a library that
+    is mostly about making things.
     """
-    n, d = _norm(name), _norm(desc)
-    for stage, keys in STAGES:
-        if any(k in n for k in keys):
+    keys_by_stage = dict(STAGES)
+    name_tokens = _tokens(name)
+    desc_text = _norm(desc)
+
+    # A trailing plural is the same word: `saas-metrics-coach` is a measure skill,
+    # and the keyword is "metric".
+    exact = set(name_tokens) | {tok[:-1] for tok in name_tokens if tok.endswith("s")}
+    for stage in PRECEDENCE:
+        if any(k in exact for k in keys_by_stage[stage]):
             return stage
-    for stage, keys in STAGES:
-        if any(k in d for k in keys):
+    # Substring matching, restricted twice.
+    #
+    # Only keywords of four characters or more, because short ones are noise inside
+    # a word: "ui" is a substring of "builder", which classified
+    # `marketplace-builder` as a design skill.
+    #
+    # And only against the last token, because these names are English compounds and
+    # English compounds are head-final: the head of `marketplace-builder` is
+    # "builder", so it is a build skill, even though "market" appears in it and
+    # market research is a real stage. Matching any token made it a research skill.
+    head = name_tokens[-1] if name_tokens else ""
+    for stage in PRECEDENCE:
+        if any(len(k) >= 4 and k in head for k in keys_by_stage[stage]):
+            return stage
+    for stage in PRECEDENCE:
+        if any(k in desc_text for k in keys_by_stage[stage]):
             return stage
     return "build"
 
@@ -141,6 +183,30 @@ def find_bundles(skills_root: Path) -> dict:
     return out
 
 
+def _declares(text: str, name: str) -> bool:
+    """Does this SKILL.md actually reference `name` as a skill?
+
+    A bare word in prose is not a declaration. The previous test was
+    `\bname\b` anywhere in the Markdown, which let ordinary English stand in as
+    evidence of orchestration: a bundle with siblings called `fix`, `run`, `report`
+    or `review` qualified because its lead used those words in sentences. The tier
+    is supposed to mean "the repository says so", so the reference has to look like
+    a reference: a code span, a path, a bold or linked name, a bullet, or a heading.
+    """
+    n = re.escape(name)
+    forms = [
+        rf"`[^`\n]*\b{n}\b[^`\n]*`",       # `run`, `skills/run`, `/run --now`
+        rf"\bskills/{n}\b",                  # skills/run
+        rf"\b{n}/SKILL\.md\b",              # run/SKILL.md
+        rf"/{n}\b",                          # /run as an invocation
+        rf"\*\*[^*\n]*\b{n}\b[^*\n]*\*\*",  # **run**
+        rf"\[[^\]\n]*\b{n}\b[^\]\n]*\]",    # [run](...)
+        rf"^\s*(?:[-*+]|\d+\.)\s+\**{n}\b",   # - run
+        rf"^#{{1,6}}\s+\**{n}\b",           # ## run
+    ]
+    return any(re.search(f, text, re.M | re.I) for f in forms)
+
+
 def declared_solutions(skills_root: Path, by_key: dict) -> list:
     """Solutions the library asserts about itself.
 
@@ -154,6 +220,13 @@ def declared_solutions(skills_root: Path, by_key: dict) -> list:
         base = root.name
         rel = root.relative_to(skills_root).parts
         dom = rel[0] if rel else "core"
+        # The bundle a member skill will carry, computed exactly as the collector
+        # does: the path between the category and the skill, with the conventional
+        # "skills" segment dropped. For a bundle that IS the category directory,
+        # such as skills/commercial, that is empty; for skills/engineering/agenthub
+        # it is "agenthub". Getting this wrong silently halved the declared tier,
+        # because every member key missed by one segment and resolved to nothing.
+        member_bundle = "/".join(seg for seg in rel[1:] if seg != "skills")
         candidates = [
             k for k in kids
             if k == base or k == base + "-skills" or k == base + "-agent"
@@ -167,48 +240,61 @@ def declared_solutions(skills_root: Path, by_key: dict) -> list:
         for cand in candidates:
             text = (root / "skills" / cand / "SKILL.md").read_text(
                 encoding="utf-8", errors="replace")
-            body = _norm(text)
-            named = [k for k in kids
-                     if k != cand and re.search(r"\b" + re.escape(k) + r"\b", body)]
+            named = [k for k in kids if k != cand and _declares(text, k)]
             if len(named) > len(best_named):
                 best, best_named = cand, named
         if not best or len(best_named) < 2:
             continue
-        # Resolve inside this bundle's own category, so `init` under playwright-pro
-        # is never confused with `init` under agenthub.
-        if (dom, best) not in by_key:
+        # Resolve by identity within this bundle. `init` under playwright-pro and
+        # `init` under agenthub are different skills, and a name cannot tell them
+        # apart.
+        lead_key = f"{dom}~{member_bundle}~{best}"
+        if lead_key not in by_key:
             continue
-        members = [m for m in best_named if (dom, m) in by_key]
-        if len(members) < 2:
+        member_keys = [f"{dom}~{member_bundle}~{m}" for m in best_named]
+        member_keys = [k for k in member_keys if k in by_key]
+        if len(member_keys) < 2:
             continue
         sols.append({
             "name": best,
-            "lead": best,
-            "members": members,
+            "lead": lead_key,
+            "lead_is_skill": True,
+            "members": member_keys,
             "tier": "declared",
             "dom": dom,
             "bundle": base,
-            "problem": by_key[(dom, best)]["d"],
-            "evidence": f"{best}/SKILL.md names {len(members)} of its siblings",
+            "problem": by_key[lead_key]["d"],
+            "evidence": (
+                f"{best}/SKILL.md references {len(member_keys)} of its siblings "
+                f"as skills"
+            ),
         })
     return sols
 
 
 def composed_solutions(rows: list, claimed: set) -> list:
-    """Candidate Solutions for categories that assert none.
+    """Candidate Solutions built from the skills no stronger tier has claimed.
 
-    Only emitted when a category has at least four unclaimed skills spanning at
-    least three lifecycle stages, so the result is a sequence of work rather than
-    a pile of neighbours. One skill per stage keeps the chain readable, and the
-    lead is elected by lead_score rather than picked by hand.
+    Not "categories that assert no lead", which is what this docstring used to say
+    and what the code never did. A 105-skill category can hold a declared Solution
+    and still contain several unrelated pieces of work; refusing to look at the
+    other 98 skills because one bundle inside it documents itself would be an
+    accident of shape, not a judgement. What the tier actually means is: these
+    skills belong to no curated or declared Solution, and this is a plausible
+    ordering of some of them.
 
-    These are the weakest tier and are labelled as candidates everywhere they
-    appear. A composed Solution is a suggestion the graph makes; a declared one is
-    a fact the repository states.
+    Only emitted when at least four unclaimed skills in a category span at least
+    three lifecycle stages, so the result is a sequence of work rather than a pile
+    of neighbours. One skill per stage keeps the chain readable, and the lead is
+    elected by lead_score rather than picked by hand.
+
+    This is the weakest tier and is labelled as a candidate everywhere it appears.
+    A composed Solution is a suggestion; a declared one is a fact the repository
+    states about itself.
     """
     by_dom = {}
     for r in rows:
-        if r["n"] in claimed:
+        if r["key"] in claimed:
             continue
         by_dom.setdefault(r["dom"], []).append(r)
 
@@ -230,66 +316,121 @@ def composed_solutions(rows: list, claimed: set) -> list:
                 break
 
             names = [r["n"] for r in pool]
-            lead = max(pool, key=lambda r: (lead_score(r["n"], r["d"], names), -len(r["n"])))
+            # Lexical tie-break on the key, so an election between two equally
+            # orchestration-shaped skills is stable across builds rather than
+            # depending on collection order.
+            lead = max(
+                pool,
+                key=lambda r: (lead_score(r["n"], r["d"], names), -len(r["n"]), r["key"]),
+            )
             chain = []
             for st in sorted(staged, key=lambda s: order[s]):
                 pick = sorted(
-                    (r for r in staged[st] if r["n"] != lead["n"]),
-                    key=lambda r: (-lead_score(r["n"], r["d"], names), r["n"]),
+                    (r for r in staged[st] if r["key"] != lead["key"]),
+                    key=lambda r: (-lead_score(r["n"], r["d"], names), r["key"]),
                 )
                 if pick:
-                    chain.append(pick[0]["n"])
+                    chain.append(pick[0]["key"])
             chain = chain[:8]
             if len(chain) < 3:
                 break
             sols.append({
                 "name": lead["n"],
-                "lead": lead["n"],
+                "lead": lead["key"],
+                "lead_is_skill": True,
                 "members": chain,
                 "tier": "composed",
                 "dom": dom,
+                "bundle": lead["bundle"],
                 "problem": lead["d"],
                 "evidence": f"{len(staged)} lifecycle stages present in {dom}",
             })
-            spent = set(chain) | {lead["n"]}
-            pool = [r for r in pool if r["n"] not in spent]
+            spent = set(chain) | {lead["key"]}
+            pool = [r for r in pool if r["key"] not in spent]
     return sols
 
 
-def curated_solutions(repo_root: Path, by_name: dict, parse_frontmatter) -> list:
-    """Hand-authored solutions/<name>.md, which outrank everything derived."""
+def curated_solutions(repo_root: Path, by_name: dict, by_key: dict,
+                      parse_frontmatter, fail) -> list:
+    """Hand-authored solutions/<name>.md, which outrank everything derived.
+
+    Two things this refuses to do quietly, both of which it used to do:
+
+    It no longer drops a step it cannot resolve. A curated file naming a skill that
+    does not exist, or naming one ambiguously, was accepted with the bad step
+    silently deleted, so the page could not show the mistake and no test could
+    catch it. That is now a build failure with the file and the step named.
+
+    And it no longer claims the Solution's own name is a skill. All three curated
+    Solutions are compositions, not skills: there is no `idea-to-shipped-code`
+    SKILL.md. Counting those three names as covered skills inflated the coverage
+    figure printed on the page by three.
+    """
     sol_dir = repo_root / "solutions"
     if not sol_dir.is_dir():
         return []
     out = []
-    for p in sorted(sol_dir.glob("*.md")):
-        fm = parse_frontmatter(p)
+    for path in sorted(sol_dir.glob("*.md")):
+        fm = parse_frontmatter(path)
         if not fm.get("name") or not fm.get("steps"):
             continue
-        members = [s["skill"] for s in fm["steps"] if s["skill"] in by_name]
-        if not members:
-            continue
+
+        member_keys = []
+        for step in fm["steps"]:
+            nm = step.get("skill", "")
+            matches = by_name.get(nm, [])
+            if not matches:
+                fail(
+                    f"solutions/{path.name} step {nm!r} is not a skill in the "
+                    f"library. Fix the name, or add the skill."
+                )
+            if len(matches) > 1:
+                where = ", ".join(sorted(r["key"] for r in matches))
+                fail(
+                    f"solutions/{path.name} step {nm!r} is ambiguous: {where}. "
+                    f"Qualify it, because a name does not identify a skill here."
+                )
+            member_keys.append(matches[0]["key"])
+
+        # Is the Solution's own name also a skill? For these three it is not.
+        own = by_name.get(fm["name"], [])
+        lead_is_skill = len(own) == 1
+        lead_key = own[0]["key"] if lead_is_skill else f"solution~~{fm['name']}"
+
         out.append({
             "name": fm["name"],
-            "lead": fm["name"],
-            "members": members,
+            "lead": lead_key,
+            "lead_is_skill": lead_is_skill,
+            "members": member_keys,
             "tier": "curated",
             "dom": "solutions",
+            "bundle": "",
             "problem": fm.get("problem", ""),
             "summary": fm.get("summary", ""),
-            "steps": fm["steps"],
-            "evidence": f"solutions/{p.name}, composed by {fm.get('composed_by', 'a human')}",
+            "evidence": (
+                f"solutions/{path.name}, composed by "
+                f"{fm.get('composed_by', 'a human')}"
+            ),
         })
     return out
 
 
-def build_solutions(repo_root: Path, rows: list, parse_frontmatter) -> tuple:
-    """Return (solutions, stats). Strongest tier wins any contested lead."""
-    by_name = {r["n"]: r for r in rows}
-    by_key = {(r["dom"], r["n"]): r for r in rows}
+def build_solutions(repo_root: Path, rows: list, parse_frontmatter, fail) -> tuple:
+    """Return (solutions, stats). Strongest tier wins any contested lead.
+
+    Everything here is keyed on identity rather than on a display name. Six names
+    in this library belong to more than one skill, and two of those pairs sit in
+    the same category, so a name-keyed model fused them: the graph drew one `run`
+    node for two different skills, and agenthub's `init` edge terminated on
+    playwright-pro's `init`.
+    """
+    by_key = {r["key"]: r for r in rows}
+    by_name: dict = {}
+    for r in rows:
+        by_name.setdefault(r["n"], []).append(r)
     skills_root = repo_root / "skills"
 
-    sols = curated_solutions(repo_root, by_name, parse_frontmatter)
+    sols = curated_solutions(repo_root, by_name, by_key, parse_frontmatter, fail)
     seen_leads = {s["lead"] for s in sols}
 
     for s in declared_solutions(skills_root, by_key):
@@ -306,29 +447,29 @@ def build_solutions(repo_root: Path, rows: list, parse_frontmatter) -> tuple:
             sols.append(s)
             seen_leads.add(s["lead"])
 
-    # A lead called `init`, `run` or `research` tells a reader nothing on its own,
-    # and several of them exist. Qualify those with the bundle they lead, and only
-    # those: a unique, descriptive name is left alone.
-    name_counts = {}
-    for r in rows:
-        name_counts[r["n"]] = name_counts.get(r["n"], 0) + 1
-    for s in sols:
-        row = by_key.get((s["dom"], s["lead"]), {})
-        # Prefer the bundle the lead actually leads; fall back to its category. A
-        # qualifier that repeats the name it is qualifying ("research (research)")
-        # is noise, so drop it in that case.
-        qual = s.get("bundle") or row.get("bundle") or s["dom"]
-        ambiguous = name_counts.get(s["lead"], 0) > 1 or s["lead"] in ENTRY_NAMES
-        s["label"] = (f"{s['lead']} ({qual})"
-                      if ambiguous and qual and qual != s["lead"] else s["lead"])
-
     rank = {"curated": 0, "declared": 1, "composed": 2}
     sols.sort(key=lambda s: (rank[s["tier"]], -len(s["members"]), s["name"]))
 
+    # A lead called `init`, `run` or `research` tells a reader nothing on its own,
+    # and several of them exist. Qualify a label only when its name is genuinely
+    # ambiguous in the library, and never with a qualifier that repeats the name.
+    for s in sols:
+        qual = s.get("bundle") or s["dom"]
+        ambiguous = len(by_name.get(s["name"], [])) > 1 or s["name"] in ENTRY_NAMES
+        s["label"] = (
+            f"{s['name']} ({qual})"
+            if ambiguous and qual and qual != s["name"]
+            else s["name"]
+        )
+
+    # Coverage counts skills, so it counts only identities that are skills. The
+    # three curated leads are compositions rather than skills and are excluded.
     reachable = set()
     for s in sols:
-        reachable.add(s["lead"])
-        reachable.update(s["members"])
+        if s["lead"] in by_key:
+            reachable.add(s["lead"])
+        reachable.update(m for m in s["members"] if m in by_key)
+
     stats = {
         "skills": len(rows),
         "solutions": len(sols),
@@ -337,6 +478,7 @@ def build_solutions(repo_root: Path, rows: list, parse_frontmatter) -> tuple:
         "in_a_solution": len(reachable),
         "unclaimed": len(rows) - len(reachable),
         "edges": sum(len(s["members"]) for s in sols),
+        "leads_that_are_skills": sum(1 for s in sols if s.get("lead_is_skill")),
     }
     return sols, stats
 
@@ -353,6 +495,19 @@ def build_solutions(repo_root: Path, rows: list, parse_frontmatter) -> tuple:
 # aspect ratio, and two Solution nodes ended up underneath the panel where they
 # could be seen but not clicked. The interface now occupies its own grid cells, so
 # there is nothing to avoid and nothing to keep in sync.
+
+
+def _fan_rings_for(n: int) -> list:
+    """Ring radii and counts for a cluster of n members. Module level so the frame
+    can be sized before the clusters are placed."""
+    if n <= 8:
+        return [(13.0 + n * 1.4, n)]
+    inner = (n + 1) // 2
+    return [(15.0, inner), (27.5, n - inner)]
+
+
+def _fan_radius_for(n: int) -> float:
+    return max(r for r, _ in _fan_rings_for(n))
 
 
 def layout(sols: list, rows: list, width: float = 1400.0, height: float = 560.0) -> dict:
@@ -378,6 +533,18 @@ def layout(sols: list, rows: list, width: float = 1400.0, height: float = 560.0)
     # taken their share of a 900px-tall screen the graph was a 1164x445 letterbox
     # with the drawing squeezed into a 636px-wide column in the middle of it and
     # half the width unused.
+    #
+    # The frame grows with the work it has to hold, keeping the aspect ratio so the
+    # rendered box still fits it. 1400x560 comfortably holds the Solutions this
+    # library currently produces; a library with three times as many would not fit,
+    # and the previous behaviour was to place the extras on top of each other
+    # without saying so. Area scales with the total room the clusters need, so the
+    # packing stays about as dense at any size.
+    need = sum((_fan_radius_for(len(s["members"])) + 11.0) ** 2 for s in sols)
+    baseline = 51 * (35.0 ** 2)
+    if need > baseline:
+        grow = math.sqrt(need / baseline)
+        width, height = width * grow, height * grow
     cx, cy = width / 2, height / 2
 
     # Members sit on a ring around their lead, and a large subset gets two rings
@@ -390,14 +557,8 @@ def layout(sols: list, rows: list, width: float = 1400.0, height: float = 560.0)
     # puts r at about 42 units including its spacing margin. A single ring for a
     # 21-member Solution needed 64, so the packer could only fit everything by
     # relaxing its spacing until 63 pairs of nodes overlapped.
-    def fan_rings(n: int) -> list:
-        if n <= 8:
-            return [(13.0 + n * 1.4, n)]
-        inner = (n + 1) // 2
-        return [(15.0, inner), (27.5, n - inner)]
-
-    def fan_radius(n: int) -> float:
-        return max(r for r, _ in fan_rings(n))
+    fan_rings = _fan_rings_for
+    fan_radius = _fan_radius_for
 
     ordered = sorted(sols, key=lambda s: -len(s["members"]))
 
@@ -408,7 +569,8 @@ def layout(sols: list, rows: list, width: float = 1400.0, height: float = 560.0)
     # every out-of-frame point without ever exhausting its budget.
     ga = math.pi * (3 - math.sqrt(5))
     candidates = []
-    for k in range(2600):
+    budget = max(2600, int(2600 * (width * height) / (1400.0 * 560.0)))
+    for k in range(budget):
         rad = 18.0 + 4.4 * math.sqrt(k)
         ang = k * ga
         x = cx + math.cos(ang) * rad * 1.95
@@ -436,21 +598,36 @@ def layout(sols: list, rows: list, width: float = 1400.0, height: float = 560.0)
             if spot:
                 break
         if spot is None:
-            spot = candidates[min(len(placed), len(candidates) - 1)]
+            # No silent fallback. This used to take candidates[len(placed)]
+            # regardless of collisions, so a library that outgrew the frame produced
+            # leads drawn on top of each other — at 150 Solutions, one exact
+            # duplicate position; at 300, eight — and nothing said so. Overlapping
+            # leads are not a cosmetic problem here: the graph is the navigation, and
+            # two leads at one point means one of them cannot be clicked.
+            #
+            # Growing the frame is the correct response to a growing library, and it
+            # is the caller's decision, so this reports rather than guesses.
+            raise LayoutTooTight(
+                f"no non-overlapping position for {s['name']!r} "
+                f"({len(s['members'])} members, needs {want:.0f} units of room) "
+                f"after placing {len(placed)} of {len(ordered)} Solutions in a "
+                f"{width:.0f}x{height:.0f} frame. Increase the frame in layout()."
+            )
         placed.append((spot[0], spot[1], want))
         s["_pos"] = (spot[0], spot[1], fr)
 
     nodes, index = [], {}
 
-    def add(name, kind, dom, r, x, y, sol=""):
-        index[name] = len(nodes)
-        nodes.append({"id": name, "kind": kind, "dom": dom, "r": r,
+    def add(key, kind, dom, r, x, y, sol="", label=""):
+        index[key] = len(nodes)
+        nodes.append({"id": key, "label": label, "kind": kind, "dom": dom, "r": r,
                       "x": round(x, 1), "y": round(y, 1), "sol": sol})
 
-    by_name = {r["n"]: r for r in rows}
+    by_key = {r["key"]: r for r in rows}
     for s in ordered:
         x, y, fr = s["_pos"]
-        add(s["lead"], "lead", s["dom"], 9.5 if s["tier"] != "composed" else 7.5, x, y)
+        add(s["lead"], "lead", s["dom"], 9.5 if s["tier"] != "composed" else 7.5,
+            x, y, label=s.get("label", s["name"]))
         n = len(s["members"])
         # Start each fan at a different angle so neighbouring clusters do not all
         # point their first member the same way, which would read as a pattern.
@@ -467,8 +644,10 @@ def layout(sols: list, rows: list, width: float = 1400.0, height: float = 560.0)
                 a = offset + math.tau * j / max(1, ring_n)
                 if m in index:
                     continue
-                add(m, "member", by_name.get(m, {}).get("dom", s["dom"]), 3.4,
-                    x + math.cos(a) * ring_r, y + math.sin(a) * ring_r, s["lead"])
+                row = by_key.get(m, {})
+                add(m, "member", row.get("dom", s["dom"]), 3.4,
+                    x + math.cos(a) * ring_r, y + math.sin(a) * ring_r, s["lead"],
+                    label=row.get("n", m))
 
     # The long tail, on a ring just outside the clusters. Two interleaved radii so
     # 165 dots read as a band with depth rather than as a hard circle.
@@ -478,7 +657,7 @@ def layout(sols: list, rows: list, width: float = 1400.0, height: float = 560.0)
     # ring far outside the cluster field, and since the frame was then fitted to
     # every node including the ring, the 54 clusters were squeezed into the middle
     # 413 pixels of a 1164-pixel-wide graph.
-    tail = [r for r in rows if r["n"] not in index]
+    tail = [r for r in rows if r["key"] not in index]
     SX, SY = 1.95, 0.80
     outer = max(
         (math.hypot((x - cx) / SX, (y - cy) / SY) + r for x, y, r in placed),
@@ -487,8 +666,9 @@ def layout(sols: list, rows: list, width: float = 1400.0, height: float = 560.0)
     for i, r in enumerate(tail):
         a = math.tau * i / max(1, len(tail)) + 0.22
         band = outer + 22.0 + (i % 3) * 9.0
-        add(r["n"], "tail", r["dom"], 2.2,
-            cx + math.cos(a) * band * SX, cy + math.sin(a) * band * SY)
+        add(r["key"], "tail", r["dom"], 2.2,
+            cx + math.cos(a) * band * SX, cy + math.sin(a) * band * SY,
+            label=r["n"])
 
     edges = []
     for s in sols:
@@ -520,4 +700,5 @@ def layout(sols: list, rows: list, width: float = 1400.0, height: float = 560.0)
         s.pop("_pos", None)
 
     return {"nodes": nodes, "edges": edges, "index": index,
-            "leads": [s["lead"] for s in sols], "lead_set": set(s["lead"] for s in sols)}
+            "leads": [s["lead"] for s in sols],
+            "lead_set": set(s["lead"] for s in sols)}

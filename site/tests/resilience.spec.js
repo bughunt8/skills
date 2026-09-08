@@ -157,7 +157,7 @@ test.describe("narrow viewports", () => {
 
     // Interaction is function, not decoration, so it survives on touch: tapping a
     // Solution fills the panel with that Solution.
-    await page.locator('.g-lead[data-id="agenthub"]').tap({ force: true });
+    await page.locator('.g-lead[data-name="agenthub"]').tap({ force: true });
     await page.waitForTimeout(400);
     await expect(page.locator("#panelname")).toHaveText(/agenthub/);
 
@@ -311,7 +311,14 @@ test.describe("the production Content-Security-Policy", () => {
     // hand-written part of index.html and was dropped on every page load in
     // production.
     const page = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-    expect(page.match(/style="[^"]*"/g) || []).toEqual([]);
+    // Matches a style attribute however it is quoted. The double-quoted-only
+    // version of this check had two bypasses, single-quoted and unquoted, and a
+    // gate with a bypass is a gate that will eventually be walked around by
+    // accident rather than on purpose.
+    expect(
+      page.match(/\sstyle\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi) || [],
+      "an inline style is blocked by the production CSP, so it silently does nothing"
+    ).toEqual([]);
     expect(page).not.toMatch(/<style[\s>]/);
   });
 
@@ -338,7 +345,7 @@ test.describe("the production Content-Security-Policy", () => {
     // Exercise the parts that manipulate style at runtime, since CSSOM writes are
     // allowed but setAttribute("style", ...) is not, and only one of those is
     // visible in the source.
-    await page.locator('.g-lead[data-id="agenthub"]').click({ force: true });
+    await page.locator('.g-lead[data-name="agenthub"]').click({ force: true });
     await page.evaluate(() => window.scrollTo(0, 1200));
     await page.waitForTimeout(900);
     await page.fill("#gsearch", "finance");

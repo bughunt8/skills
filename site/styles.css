@@ -640,7 +640,15 @@ a { color: inherit; text-decoration: none; }
   .rail a { flex: none; }
 }
 
-@media (max-width: 1000px) {
+/* Stacked and unpinned when the viewport is narrow OR short.
+   Width alone was the wrong test. The pinned stage is exactly one screen tall and
+   holds an intro, a graph with a 240px floor, a row of controls and a row of
+   chapter markers; on a wide but short window — a laptop with a browser toolbar,
+   a half-height window, a projector at 1280x600 — that does not fit, and the graph
+   overlapped its own search field while the whole stage was pinned and clipped, so
+   the controls could not be scrolled to either. Below either threshold the stage
+   becomes an ordinary column that scrolls. */
+@media (max-width: 1000px), (max-height: 720px) {
   .stage {
     grid-template-columns: minmax(0, 1fr);
     padding-top: 72px;

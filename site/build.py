@@ -185,6 +185,11 @@ def collect(checkouts: dict) -> list:
                     "lic": src["license"],
                     "url": src["url"],
                     "bundle": bundle,
+                    # Identity, not display. Carried through composition, layout,
+                    # every DOM node and every graph edge. Using the name here meant
+                    # agenthub's `init` edge terminated on playwright-pro's `init`
+                    # node, and the two distinct `run` skills were drawn as one.
+                    "key": f"{category}~{bundle}~{name}",
                 }
             )
 
@@ -200,6 +205,19 @@ def collect(checkouts: dict) -> list:
         for r in rows:
             if r["qual"]:
                 print(f"  {r['dom']}/{r['n']}  ->  shown as \"{r['n']} ({r['qual']})\"")
+
+    # The identity must actually identify. If this ever fails, composition and the
+    # graph would silently fuse two different skills, which is the defect this key
+    # exists to prevent, so it fails the build rather than degrading quietly.
+    seen_keys = {}
+    for r in rows:
+        if r["key"] in seen_keys:
+            fail(
+                f"identity collision: {r['key']!r} is used by two skills\n"
+                f"  {seen_keys[r['key']]}\n  {r['repo']}/{r['dom']}/{r['n']}\n"
+                "The (category, bundle, name) key must be unique."
+            )
+        seen_keys[r["key"]] = f"{r['repo']}/{r['dom']}/{r['n']}"
 
     if collapsed:
         print(f"collapsed {len(collapsed)} byte-identical duplicate(s):")
@@ -335,6 +353,16 @@ def collect_solutions() -> list:
     return out
 
 
+def slug(key: str) -> str:
+    """A DOM-safe id from an identity key, with collisions ruled out at build time.
+
+    Keys look like `engineering~agenthub~init`. The id has to work in a fragment
+    link and a CSS selector, and it must stay one-to-one with the key it came from,
+    or two Solutions would share an anchor.
+    """
+    return "s-" + re.sub(r"[^a-z0-9]+", "-", key.lower()).strip("-")
+
+
 def hue_class(name: str) -> str:
     """Deterministic community colour class for a category.
 
@@ -367,7 +395,6 @@ def render_graph(sols: list, rows: list, lay: dict) -> "tuple[str, list]":
     of markup that is already correct and already visible.
     """
     nodes, edges, index = lay["nodes"], lay["edges"], lay["index"]
-    by_name = {r["n"]: r for r in rows}
     # A skill can be led by more than one Solution, so ownership is a list, not a
     # value. code-review serves both idea-to-shipped-code and hard-to-find-bug;
     # when this held a single lead, focusing the second Solution lit only the
@@ -409,7 +436,8 @@ def render_graph(sols: list, rows: list, lay: dict) -> "tuple[str, list]":
             continue
         parts.append(
             f'          <circle class="g-node g-node--tail {hue_class(n["dom"])}" '
-            f'data-id="{esc(n["id"])}" data-dom="{esc(n["dom"])}" '
+            f'data-id="{esc(n["id"])}" data-name="{esc(n["label"])}" '
+            f'data-dom="{esc(n["dom"])}" '
             f'cx="{n["x"]}" cy="{n["y"]}" r="{n["r"]}"/>'
         )
     parts.append("        </g>")
@@ -420,7 +448,8 @@ def render_graph(sols: list, rows: list, lay: dict) -> "tuple[str, list]":
             continue
         parts.append(
             f'          <circle class="g-node g-node--member {hue_class(n["dom"])}" '
-            f'data-id="{esc(n["id"])}" data-dom="{esc(n["dom"])}" '
+            f'data-id="{esc(n["id"])}" data-name="{esc(n["label"])}" '
+            f'data-dom="{esc(n["dom"])}" '
             f'data-sol="{esc(" ".join(sol_of.get(n["id"], [])))}" '
             f'cx="{n["x"]}" cy="{n["y"]}" r="{n["r"]}"/>'
         )
@@ -428,7 +457,7 @@ def render_graph(sols: list, rows: list, lay: dict) -> "tuple[str, list]":
 
     # Leads carry a real accessible name each, so the graph is a list of Solutions
     # to a screen reader instead of 487 unlabelled circles.
-    label_of = {s["lead"]: s.get("label", s["lead"]) for s in sols}
+    label_of = {s["lead"]: s.get("label", s["name"]) for s in sols}
     tier_of = {s["lead"]: s["tier"] for s in sols}
     # Only the featured leads carry a label at rest. Fifty-four labels at once was
     # unreadable overlapping text, and a graph you cannot read is a texture.
@@ -440,10 +469,11 @@ def render_graph(sols: list, rows: list, lay: dict) -> "tuple[str, list]":
         label = label_of.get(n["id"], n["id"])
         named = " is-named" if n["id"] in featured_set else ""
         parts.append(
-            f'          <g class="g-lead {hue_class(n["dom"])}{named}" '
-            f'data-id="{esc(n["id"])}" '
+            f'          <a class="g-lead {hue_class(n["dom"])}{named}" '
+            f'href="#{esc(slug(n["id"]))}" '
+            f'data-id="{esc(n["id"])}" data-name="{esc(label)}" '
             f'data-tier="{esc(tier_of.get(n["id"], ""))}" data-dom="{esc(n["dom"])}" '
-            f'role="button" tabindex="0" aria-label="{esc(label)}">'
+            f'aria-label="{esc(label)}">'
         )
         # An invisible, larger hit target, because the lead circle is under 10
         # units across and asking a pointer to land on that would make the graph
@@ -461,7 +491,7 @@ def render_graph(sols: list, rows: list, lay: dict) -> "tuple[str, list]":
             f'            <circle class="g-node g-node--lead" cx="{n["x"]}" '
             f'cy="{n["y"]}" r="{n["r"]}"/>'
         )
-        parts.append("          </g>")
+        parts.append("          </a>")
     parts.append("        </g>")
 
     # Labels are a layer of their own, drawn after every node.
@@ -499,11 +529,20 @@ def render(rows: list) -> "tuple[dict, str]":
     for k in by:
         by[k].sort(key=lambda r: r["n"])
 
-    sols, stats = compose.build_solutions(REPO_ROOT, rows, _solution_frontmatter)
+    sols, stats = compose.build_solutions(REPO_ROOT, rows, _solution_frontmatter, fail)
     lay = compose.layout(sols, rows)
     graph_svg, featured = render_graph(sols, rows, lay)
     by_lead = {s["lead"]: s for s in sols}
-    name_row = {r["n"]: r for r in rows}
+    key_row = {r["key"]: r for r in rows}
+    claimed_keys = {m for x in sols for m in x["members"]} | set(by_lead)
+
+    # Anchors are derived from identity, so two Solutions cannot share one.
+    slugs = {}
+    for s in sols:
+        sl = slug(s["lead"])
+        if sl in slugs:
+            fail(f"anchor collision: {sl!r} from {s['lead']!r} and {slugs[sl]!r}")
+        slugs[sl] = s["lead"]
 
     out = []
 
@@ -522,6 +561,29 @@ def render(rows: list) -> "tuple[dict, str]":
     # is also the navigation: every Solution is a node you can reach by scrolling
     # past it, searching for it, or clicking it.
     out.append('    <header class="stage" id="top">')
+    out.append('      <div class="stage__tools">')
+    out.append('        <label class="vh" for="gsearch">Search the graph</label>')
+    out.append(
+        f'        <input class="stage__search" id="gsearch" type="search" '
+        f'placeholder="Search {total} skills" autocomplete="off" spellcheck="false">'
+    )
+    out.append('        <div class="stage__chips" id="gchips" role="group" aria-label="Filter by provenance">')
+    for tier, blurb in (
+        ("curated", "written by hand"),
+        ("declared", "the lead names its own members"),
+        ("composed", "derived candidate"),
+    ):
+        n = stats["by_tier"][tier]
+        out.append(
+            f'          <button class="chip" type="button" data-tier="{tier}" '
+            f'aria-pressed="false" title="{esc(blurb)}">{tier} <span>{n}</span></button>'
+        )
+    out.append('          <button class="chip chip--reset" type="button" id="greset">Reset</button>')
+    out.append("        </div>")
+    out.append("      </div>")
+
+    # The panel is prerendered with the first Solution, so it is never an empty
+    # box waiting for a hover that never comes on a touch screen.
     out.append('      <div class="stage__canvas">')
     out.append(
         # role="group", not role="img". An img role makes the whole subtree
@@ -558,29 +620,6 @@ def render(rows: list) -> "tuple[dict, str]":
 
     # Graphify-shaped controls: search the graph, filter by how much the library
     # actually asserts about each Solution, and get back out.
-    out.append('      <div class="stage__tools">')
-    out.append('        <label class="vh" for="gsearch">Search the graph</label>')
-    out.append(
-        f'        <input class="stage__search" id="gsearch" type="search" '
-        f'placeholder="Search {total} skills" autocomplete="off" spellcheck="false">'
-    )
-    out.append('        <div class="stage__chips" id="gchips" role="group" aria-label="Filter by provenance">')
-    for tier, blurb in (
-        ("curated", "written by hand"),
-        ("declared", "the lead names its own members"),
-        ("composed", "derived candidate"),
-    ):
-        n = stats["by_tier"][tier]
-        out.append(
-            f'          <button class="chip" type="button" data-tier="{tier}" '
-            f'aria-pressed="false" title="{esc(blurb)}">{tier} <span>{n}</span></button>'
-        )
-    out.append('          <button class="chip chip--reset" type="button" id="greset">Reset</button>')
-    out.append("        </div>")
-    out.append("      </div>")
-
-    # The panel is prerendered with the first Solution, so it is never an empty
-    # box waiting for a hover that never comes on a touch screen.
     first = sols[0]
     # tabindex="0" because the panel is a scrollable region: c-level-agents leads
     # 21 skills and the panel has a fixed height, so its content overflows and has
@@ -592,11 +631,11 @@ def render(rows: list) -> "tuple[dict, str]":
         'tabindex="0" aria-label="Selected Solution">'
     )
     out.append(f'        <p class="panel__tier" id="paneltier">{esc(first["tier"])}</p>')
-    out.append(f'        <h2 class="panel__name" id="panelname">{esc(first.get("label", first["lead"]))}</h2>')
+    out.append(f'        <h2 class="panel__name" id="panelname">{esc(first.get("label", first["name"]))}</h2>')
     out.append(f'        <p class="panel__desc" id="paneldesc">{esc(first.get("problem", ""))}</p>')
     out.append('        <ol class="panel__chain" id="panelchain">')
     for m in first["members"]:
-        out.append(f'          <li>{esc(m)}</li>')
+        out.append(f'          <li>{esc(key_row[m]["n"] if m in key_row else m)}</li>')
     out.append("        </ol>")
     out.append(f'        <p class="panel__ev" id="panelev">{esc(first.get("evidence", ""))}</p>')
     out.append("      </aside>")
@@ -608,7 +647,7 @@ def render(rows: list) -> "tuple[dict, str]":
         s = by_lead[lead]
         out.append(
             f'        <li class="beat" data-sol="{esc(lead)}">'
-            f'<a href="#sol-{esc(lead)}">{esc(s.get("label", lead))}</a></li>'
+            f'<a href="#{esc(slug(lead))}">{esc(s.get("label", s["name"]))}</a></li>'
         )
     out.append("      </ol>")
     out.append("    </header>")
@@ -627,21 +666,22 @@ def render(rows: list) -> "tuple[dict, str]":
     out.append('      <div class="sols__grid">')
     for s in sols:
         out.append(
-            f'        <article class="sol" id="sol-{esc(s["lead"])}" '
+            f'        <article class="sol" id="{esc(slug(s["lead"]))}" '
             f'data-tier="{esc(s["tier"])}" data-sol="{esc(s["lead"])}">'
         )
         out.append('          <header class="sol__head">')
-        out.append(f'            <h3>{esc(s.get("label", s["lead"]))}</h3>')
+        out.append(f'            <h3>{esc(s.get("label", s["name"]))}</h3>')
         out.append(f'            <span class="sol__tier">{esc(s["tier"])}</span>')
         out.append("          </header>")
         if s.get("problem"):
             out.append(f'          <p class="sol__problem">{esc(s["problem"])}</p>')
-        out.append(f'          <ol class="sol__chain">')
+        out.append('          <ol class="sol__chain">')
         for m in s["members"]:
-            row = name_row.get(m)
+            row = key_row.get(m)
             title = f'{row["repo"]} · {row["lic"]}' if row else ""
             out.append(
-                f'            <li><span class="sol__step" title="{esc(title)}">{esc(m)}</span></li>'
+                f'            <li><span class="sol__step" data-id="{esc(m)}" '
+                f'title="{esc(title)}">{esc(row["n"] if row else m)}</span></li>'
             )
         out.append("          </ol>")
         out.append(f'          <p class="sol__ev">{esc(s.get("evidence", ""))}</p>')
@@ -682,10 +722,10 @@ def render(rows: list) -> "tuple[dict, str]":
             n += 1
             desc = s["d"] or "No description declared in this skill's frontmatter."
             qual = f'<span class="qual">{esc(s["qual"])}</span>' if s.get("qual") else ""
-            in_sol = s["n"] in {m for x in sols for m in x["members"]} or s["n"] in by_lead
+            in_sol = s["key"] in claimed_keys
             out.append(
                 f'          <article class="card{" card--used" if in_sol else ""}" '
-                f'data-id="{esc(s["n"])}">'
+                f'data-id="{esc(s["key"])}" data-name="{esc(s["n"])}">'
             )
             out.append(
                 f'            <div class="card__top"><span class="card__no">{n:03d}</span>'
@@ -771,6 +811,28 @@ def splice(page: str, blocks: dict, total: int, cats: int, sols: int) -> str:
     return page
 
 
+def audit_svg(html: str) -> None:
+    """The graph must be well-formed XML, not merely lint-clean HTML.
+
+    html-validate does not parse SVG foreign content strictly, and accepted 54
+    elements opened as <a> and closed as </g> without a word. The graph is the
+    page's primary interface; if its markup is malformed, what a browser recovers
+    is a guess.
+    """
+    import xml.etree.ElementTree as ET
+
+    start = html.find("<svg")
+    if start < 0:
+        fail("the page contains no graph")
+    end = html.find("</svg>", start)
+    if end < 0:
+        fail("the graph's <svg> element is never closed")
+    try:
+        ET.fromstring(html[start:end + 6])
+    except ET.ParseError as e:
+        fail(f"the graph is not well-formed XML: {e}")
+
+
 def audit_claims(page: str, total: int, cats: int) -> list:
     """Find count claims in the hand-written region that the build does not own."""
     begin, end = MARKERS["main"]
@@ -821,6 +883,7 @@ def main(argv: list) -> int:
     current = INDEX.read_text(encoding="utf-8")
     updated = splice(current, blocks, len(rows), len(counts), nsols)
 
+    audit_svg(updated)
     drift = audit_claims(updated, len(rows), len(counts))
     if drift:
         print(

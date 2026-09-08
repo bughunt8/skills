@@ -26,6 +26,14 @@
   // column with its own height, so there is nothing to pin: pinning a stage taller
   // than the viewport hides its own controls for the length of the pin.
   var MOBILE = 1000;
+  // The pin also needs vertical room, and must agree exactly with the media query
+  // in styles.css that stacks the stage. If these two disagree, one of them
+  // pins a layout the other has already reflowed.
+  var SHORT = 720;
+
+  function wide() {
+    return window.innerWidth > MOBILE && window.innerHeight > SHORT;
+  }
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var DATA = window.SKILLDATA || {};
 
@@ -197,12 +205,19 @@
     l.addEventListener("focus", function () {
       focus(id, { pin: true });
     });
-    l.addEventListener("click", function () {
+    // Each lead is a real link to its Solution's card, so the graph is a table of
+    // contents when this script does not run. When it does run, the same activation
+    // means "show me this here" instead, and the jump is suppressed — following the
+    // link would scroll away from the graph the visitor is using.
+    l.addEventListener("click", function (e) {
+      if (wide()) e.preventDefault();
       focus(id, { pin: true });
     });
     l.addEventListener("keydown", function (e) {
       if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
+        // Space does not activate a link by default, and here it should: the
+        // visitor is operating a graph, not reading prose.
+        if (wide() || e.key === " ") e.preventDefault();
         focus(id, { pin: true });
       }
     });
@@ -246,23 +261,27 @@
     stage.classList.remove("is-focus");
     stage.classList.add("is-dim");
 
+    // Search reads data-name, the human label, not data-id, which is now an
+    // identity key of the form category~bundle~name. Searching the key would make
+    // "engineering" match all 105 skills in that category through their ids as
+    // well as their category, which is not what someone typing a skill name means.
     var hits = 0;
     nodes.forEach(function (n) {
-      var id = (n.getAttribute("data-id") || "").toLowerCase();
+      var name = (n.getAttribute("data-name") || "").toLowerCase();
       var dom = (n.getAttribute("data-dom") || "").toLowerCase();
-      var hit = id.indexOf(q) > -1 || dom.indexOf(q) > -1;
+      var hit = name.indexOf(q) > -1 || dom.indexOf(q) > -1;
       n.classList.toggle("is-hit", hit);
       if (hit) hits++;
     });
     leads.forEach(function (l) {
-      var raw = l.getAttribute("data-id") || "";
-      var hit = raw.toLowerCase().indexOf(q) > -1;
+      var name = (l.getAttribute("data-name") || "").toLowerCase();
+      var hit = name.indexOf(q) > -1;
       l.classList.toggle("is-hit", hit);
-      setLabel(raw, "is-hit", hit);
+      setLabel(l.getAttribute("data-id") || "", "is-hit", hit);
     });
     cards.forEach(function (c) {
-      var id = (c.getAttribute("data-id") || "").toLowerCase();
-      c.classList.toggle("is-hit", id.indexOf(q) > -1);
+      var name = (c.getAttribute("data-name") || "").toLowerCase();
+      c.classList.toggle("is-hit", name.indexOf(q) > -1);
     });
   }
 
@@ -391,7 +410,7 @@
 
   var enhanced =
     !reduced &&
-    window.innerWidth > MOBILE &&
+    wide() &&
     typeof window.gsap !== "undefined" &&
     typeof window.ScrollTrigger !== "undefined";
 
@@ -489,12 +508,12 @@
     });
   }
 
-  var wasDesktop = window.innerWidth > MOBILE;
+  var wasDesktop = wide();
   var t;
   window.addEventListener("resize", function () {
     clearTimeout(t);
     t = setTimeout(function () {
-      var isDesktop = window.innerWidth > MOBILE;
+      var isDesktop = wide();
       if (isDesktop !== wasDesktop) window.location.reload();
       else ScrollTrigger.refresh();
     }, 250);
