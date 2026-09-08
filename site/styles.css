@@ -425,3 +425,16 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid var(--accent-line); border-radius: 999px;
   padding: 4px 12px; background: var(--accent-soft);
 }
+
+/* ---------------- solution graph ---------------- */
+.graph {
+  position: relative;
+  padding: clamp(56px, 8vh, 88px) clamp(24px, 5vw, 64px);
+  max-width: 1120px; margin: 0 auto;
+}
+.graph h2 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: var(--t-lede); letter-spacing: var(--tr-snug); margin-bottom: 14px;
+}
+.graph__lede { color: var(--text-dim); max-width: 60ch; margin-bottom: 24px; }
+.graph svg { width: 100%; height: auto; }

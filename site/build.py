@@ -333,6 +333,53 @@ def collect_solutions() -> list:
     return out
 
 
+def render_graph(sols: list, rows: list) -> str:
+    """Prerender a radial solution graph as inline SVG (stdlib, deterministic)."""
+    from math import cos, sin, pi
+    name_dom = {r["n"]: r["dom"] for r in rows}
+    used = set()
+    for s in sols:
+        used.update(st["skill"] for st in s["steps"])
+    HUE = {"idea-to-shipped-code": "#00e5ff", "landing-page-that-sells": "#ff2ea6",
+           "hard-to-find-bug": "#8a63ff", "code-review": "#ffd166"}
+    hub_pos = {"hard-to-find-bug": 250, "idea-to-shipped-code": 500, "landing-page-that-sells": 750}
+    parts = []
+    for s in sols:
+        x = hub_pos.get(s["name"], 500)
+        c = HUE.get(s["name"], "#5a6684")
+        parts.append(f'<circle cx="{x}" cy="150" r="20" fill="#0a0e18" stroke="{c}" stroke-width="3"/>')
+        parts.append(f'<text x="{x}" y="186" text-anchor="middle" font-size="13" font-family="monospace" fill="#e8f0ff">{esc(s["name"])}</text>')
+        steps = [st["skill"] for st in s["steps"] if st["skill"] != "code-review"]
+        n = len(steps)
+        for j, sk in enumerate(steps):
+            a = pi * (j + 0.5) / n - pi / 2
+            sx = x + cos(a) * 130
+            sy = 150 + 130 + sin(a) * 70
+            parts.append(f'<line x1="{x}" y1="150" x2="{sx:.0f}" y2="{sy:.0f}" stroke="{c}" stroke-width="1.5" opacity="0.4"/>')
+            parts.append(f'<circle cx="{sx:.0f}" cy="{sy:.0f}" r="7" fill="#0a0e18" stroke="{c}" stroke-width="1.5"/>')
+            parts.append(f'<text x="{sx:.0f}" y="{sy + 18:.0f}" text-anchor="middle" font-size="9" font-family="monospace" fill="#8492b0">{esc(sk)}</text>')
+    parts.append('<line x1="500" y1="150" x2="500" y2="320" stroke="#ffd166" stroke-width="2" opacity="0.6"/>')
+    parts.append('<line x1="250" y1="150" x2="500" y2="320" stroke="#ffd166" stroke-width="2" opacity="0.6"/>')
+    parts.append('<circle cx="500" cy="320" r="11" fill="#0a0e18" stroke="#ffd166" stroke-width="2"/>')
+    parts.append('<text x="500" y="345" text-anchor="middle" font-size="11" font-family="monospace" fill="#ffd166">code-review</text>')
+    lt = collections.Counter(name_dom[k] for k in name_dom if k not in used)
+    total = sum(lt.values())
+    acc = 0.0
+    for dom, cnt in lt.most_common():
+        frac = cnt / total
+        a0 = -pi + acc * 2 * pi
+        a1 = a0 + frac * 2 * pi
+        acc += frac
+        n = max(1, cnt)
+        for k in range(n):
+            t = k / max(1, n - 1)
+            a = a0 + (a1 - a0) * t
+            x = 500 + cos(a) * 230
+            y = 500 + sin(a) * 230
+            parts.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="2" fill="#5a6684" opacity="0.5"/>')
+    return "\n".join(parts)
+
+
 def render(rows: list) -> "tuple[dict, str]":
     counts = collections.Counter(r["dom"] for r in rows)
     order = [c for c, _ in counts.most_common()]
@@ -406,6 +453,16 @@ def render(rows: list) -> "tuple[dict, str]":
             out.append('        </div>')
             out.append('      </article>')
         out.append('    </section>')
+
+    # the solution graph — prerendered SVG, solutions as hubs, long tail as ring
+    out.append('    <section class="graph" id="graph" aria-label="Solution graph">')
+    out.append('      <h2>How the skills relate</h2>')
+    out.append('      <p class="graph__lede">Three solutions compose twelve of the skills. '
+               'The ring is the long tail: every skill no solution uses yet.</p>')
+    out.append('      <svg viewBox="0 0 1000 760" role="img" aria-label="Solutions and the skills they compose">')
+    out.append(render_graph(sols, rows))
+    out.append('      </svg>')
+    out.append('    </section>')
 
     # chapters
     out.append('    <main id="chapters">')
