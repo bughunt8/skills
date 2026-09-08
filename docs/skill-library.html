@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Skill Library — solutions, not categories</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg:#05070d; --bg2:#0a0e18; --cyan:#00e5ff; --magenta:#ff2ea6; --violet:#8a63ff;
+    --text:#e8f0ff; --dim:#8492b0; --faint:#5a6684; --line:#1a2334;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,sans-serif; }
+  body::before { content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background: radial-gradient(60% 40% at 75% 0%, #00e5ff0d, transparent 60%),
+                radial-gradient(50% 45% at 15% 100%, #ff2ea60d, transparent 60%); }
+
+  .wrap { position:relative; z-index:1; max-width:980px; margin:0 auto; padding:0 24px; }
+
+  /* ---- fixed masthead: approach + attribution always up front ---- */
+  header {
+    position:fixed; top:0; left:0; right:0; z-index:20;
+    background:#05070df2; border-bottom:1px solid var(--line);
+    backdrop-filter: blur(8px);
+  }
+  header .wrap { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; }
+  .brand { font-family:var(--mono); font-weight:700; letter-spacing:.12em; }
+  .brand b { color:var(--cyan); }
+  .attr-top { font-size:12px; color:var(--faint); }
+
+  /* ---- hero: the approach ---- */
+  .hero { padding:150px 0 60px; }
+  .kicker { font-family:var(--mono); font-size:12px; letter-spacing:.2em; color:var(--magenta);
+    text-transform:uppercase; margin-bottom:16px; }
+  h1 { font-size:clamp(2.1rem,5.5vw,3.8rem); line-height:1.04; letter-spacing:-.02em; margin-bottom:20px; }
+  h1 .glow { color:var(--cyan); text-shadow:0 0 24px #00e5ff55; }
+  .lede { color:var(--dim); max-width:64ch; line-height:1.65; font-size:1.05rem; }
+  .flow-line { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:26px 0 0;
+    font-family:var(--mono); font-size:13px; }
+  .flow-line .node { padding:7px 14px; border:1px solid var(--line); border-radius:999px; }
+  .flow-line .node b { color:var(--cyan); }
+  .flow-line .arr { color:var(--faint); }
+  .attribution { margin-top:34px; padding:16px 20px; border:1px solid var(--line);
+    border-radius:12px; background:var(--bg2); font-size:13px; color:var(--dim); line-height:1.7; }
+  .attribution b { color:var(--text); }
+
+  /* ---- solutions, scrolled through one per section ---- */
+  .sol { margin:70px 0; padding:34px 30px; border:1px solid var(--line); border-radius:16px;
+    background:linear-gradient(135deg,var(--bg2),#070a12); }
+  .sol__num { font-family:var(--mono); font-size:12px; letter-spacing:.2em; color:var(--magenta); }
+  .sol h2 { font-size:clamp(1.4rem,3vw,2rem); margin:12px 0 6px; }
+  .sol__problem { color:var(--text); font-size:1.05rem; margin-bottom:4px; }
+  .sol__summary { color:var(--dim); margin-bottom:18px; }
+  .chain { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; }
+  .chain .s { font-family:var(--mono); font-size:13px; padding:5px 12px; border:1px solid var(--line);
+    border-radius:999px; background:#0a0e18; }
+  .chain .arr { color:var(--faint); }
+
+  .actions { display:flex; gap:10px; margin-top:20px; }
+  button { font-family:var(--mono); font-size:12px; letter-spacing:.06em; cursor:pointer;
+    padding:9px 16px; border-radius:8px; border:1px solid var(--line); background:#0a0e18; color:var(--text); }
+  button:hover { border-color:var(--cyan); color:var(--cyan); }
+  button.primary { border-color:var(--cyan); color:var(--cyan); }
+
+  .workflow { display:none; margin-top:22px; padding:20px; border:1px solid var(--line);
+    border-radius:12px; background:#05070d; }
+  .workflow.open { display:block; }
+  .workflow svg { max-width:100%; height:auto; filter:drop-shadow(0 0 10px #00e5ff22); }
+
+  .prompt { margin-top:20px; }
+  .prompt pre { font-family:var(--mono); font-size:12.5px; line-height:1.65; white-space:pre-wrap;
+    background:#05070d; border:1px solid var(--line); border-radius:12px; padding:18px 20px;
+    color:var(--dim); }
+  .prompt pre b { color:var(--cyan); }
+  .copied { color:var(--cyan); font-family:var(--mono); font-size:11px; margin-left:8px; opacity:0; transition:opacity .3s; }
+  .copied.show { opacity:1; }
+
+  footer { margin-top:80px; padding:40px 0 90px; border-top:1px solid var(--line); font-size:13px;
+    color:var(--faint); line-height:1.8; }
+  footer b { color:var(--dim); }
+  code { font-family:var(--mono); color:var(--violet); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="brand">THE <b>SKILL</b> LIBRARY</div>
+    <div class="attr-top">Skills © their authors · Solutions composed by Ronald Ng</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="kicker">The approach · problem → solution → product</div>
+    <h1>You have a <span class="glow">problem</span>.<br>Scroll the solutions. Click one to see the skills it chains.</h1>
+    <p class="lede">This is not a catalog of 435 skills. It is a set of <b>Solution Skills</b> — each a
+      curated "master skill" that solves one concrete problem by chaining the skills this library
+      already contains, in order, with the hand-off between them named.</p>
+    <div class="flow-line">
+      <span class="node"><b>PROBLEM</b></span><span class="arr">→</span>
+      <span class="node"><b>WAYS</b></span><span class="arr">→</span>
+      <span class="node"><b>SOLUTION SKILL</b></span><span class="arr">→</span>
+      <span class="node"><b>STEPS</b></span><span class="arr">→</span>
+      <span class="node"><b>PRODUCT</b></span>
+    </div>
+    <div class="attribution">
+      <b>Attribution, up front.</b> The 435 skills are <b>not authored here</b> — they are assembled from
+      public repositories, each under its own licence, and every skill keeps its author on its card.
+      A Solution Skill <b>references</b> skills; it never copies them. The only thing composed here is the
+      ordering and the judgement — so the honest credit is: <b>skills © their authors · solutions composed
+      by Ronald Ng</b>.
+    </div>
+  </section>
+
+  <!-- ============ SOLUTION 1 ============ -->
+  <section class="sol" id="sol-idea-to-shipped-code">
+    <div class="sol__num">SOLUTION 01</div>
+    <h2>idea-to-shipped-code</h2>
+    <div class="sol__problem">"I have a vague idea and need shippable code."</div>
+    <div class="sol__summary">Route a one-line idea through spec → tickets → build → review.</div>
+    <div class="chain">
+      <span class="s">ask-matt</span><span class="arr">→</span>
+      <span class="s">to-spec</span><span class="arr">→</span>
+      <span class="s">wayfinder</span><span class="arr">→</span>
+      <span class="s">to-tickets</span><span class="arr">→</span>
+      <span class="s">implement</span><span class="arr">→</span>
+      <span class="s">code-review</span>
+    </div>
+    <div class="actions">
+      <button class="primary" onclick="toggle('wf-idea-to-shipped-code')">View workflow</button>
+      <button onclick="copyPrompt(this, 'p-idea-to-shipped-code')">Copy prompt for another LLM</button>
+      <span class="copied" id="c-p-idea-to-shipped-code">copied ✓</span>
+    </div>
+    <div class="workflow" id="wf-idea-to-shipped-code">
+      <pre class="mermaid">
+flowchart LR
+  A[ask-matt] --> B[to-spec] --> C[wayfinder] --> D[to-tickets] --> E[implement] --> F[code-review]
+      </pre>
+    </div>
+    <div class="prompt">
+      <pre id="p-idea-to-shipped-code"><b>You are executing the Solution Skill "idea-to-shipped-code".</b>
+Problem: I have a vague idea and need shippable code.
+Run these skills in order, passing each output to the next:
+1. ask-matt — route the idea to the right flow
+2. to-spec — turn it into a decision-complete spec
+3. wayfinder — map the spec into decision tickets
+4. to-tickets — break it into tracer-bullet vertical slices
+5. implement — build the work the tickets describe
+6. code-review — verify the diff before it ships
+The skills are by their own authors (bughunt8/skills, MIT); this solution only composes them. Load each skill's SKILL.md when its step begins.</pre>
+    </div>
+  </section>
+
+  <!-- ============ SOLUTION 2 ============ -->
+  <section class="sol" id="sol-landing-page-that-sells">
+    <div class="sol__num">SOLUTION 02</div>
+    <h2>landing-page-that-sells</h2>
+    <div class="sol__problem">"My landing page reads as AI-slop and doesn't convert."</div>
+    <div class="sol__summary">Audit, redesign, and re-implement until it reads like a brand.</div>
+    <div class="chain">
+      <span class="s">taste-skill</span><span class="arr">→</span>
+      <span class="s">redesign-skill</span><span class="arr">→</span>
+      <span class="s">image-to-code-skill</span><span class="arr">→</span>
+      <span class="s">ui-ux-pro-max</span>
+    </div>
+    <div class="actions">
+      <button class="primary" onclick="toggle('wf-landing-page-that-sells')">View workflow</button>
+      <button onclick="copyPrompt(this, 'p-landing-page-that-sells')">Copy prompt for another LLM</button>
+      <span class="copied" id="c-p-landing-page-that-sells">copied ✓</span>
+    </div>
+    <div class="workflow" id="wf-landing-page-that-sells">
+      <pre class="mermaid">
+flowchart LR
+  A[taste-skill] --> B[redesign-skill] --> C[image-to-code-skill] --> D[ui-ux-pro-max]
+      </pre>
+    </div>
+    <div class="prompt">
+      <pre id="p-landing-page-that-sells"><b>You are executing the Solution Skill "landing-page-that-sells".</b>
+Problem: My landing page reads as AI-slop and doesn't convert.
+Run these skills in order, passing each output to the next:
+1. taste-skill — establish the anti-slop design language
+2. redesign-skill — audit and improve the page without breaking function
+3. image-to-code-skill — generate and implement the visual sections to match
+4. ui-ux-pro-max — verify contrast, hierarchy, and usability
+The skills are by their own authors (bughunt8/skills, MIT); this solution only composes them. Load each skill's SKILL.md when its step begins.</pre>
+    </div>
+  </section>
+
+  <!-- ============ SOLUTION 3 ============ -->
+  <section class="sol" id="sol-hard-to-find-bug">
+    <div class="sol__num">SOLUTION 03</div>
+    <h2>hard-to-find-bug</h2>
+    <div class="sol__problem">"Something is broken and I can't find where."</div>
+    <div class="sol__summary">Reproduce it, lock it with a failing test, fix it minimally, verify.</div>
+    <div class="chain">
+      <span class="s">diagnosing-bugs</span><span class="arr">→</span>
+      <span class="s">tdd</span><span class="arr">→</span>
+      <span class="s">code-review</span>
+    </div>
+    <div class="actions">
+      <button class="primary" onclick="toggle('wf-hard-to-find-bug')">View workflow</button>
+      <button onclick="copyPrompt(this, 'p-hard-to-find-bug')">Copy prompt for another LLM</button>
+      <span class="copied" id="c-p-hard-to-find-bug">copied ✓</span>
+    </div>
+    <div class="workflow" id="wf-hard-to-find-bug">
+      <pre class="mermaid">
+flowchart LR
+  A[diagnosing-bugs] --> B[tdd] --> C[code-review]
+      </pre>
+    </div>
+    <div class="prompt">
+      <pre id="p-hard-to-find-bug"><b>You are executing the Solution Skill "hard-to-find-bug".</b>
+Problem: Something is broken and I can't find where.
+Run these skills in order, passing each output to the next:
+1. diagnosing-bugs — form hypotheses and run a disciplined loop to the root cause
+2. tdd — lock the bug with a failing test before touching the fix
+3. code-review — verify the minimal fix against the spec and the diff
+The skills are by their own authors (bughunt8/skills, MIT); this solution only composes them. Load each skill's SKILL.md when its step begins.</pre>
+    </div>
+  </section>
+
+  <footer>
+    <b>Skills © their authors, under their own licences · Solutions composed by Ronald Ng.</b><br>
+    Spec: <code>docs/SKILL-SOLUTIONS.md</code> · Solutions source of truth: <code>solutions/*.md</code> ·
+    Validation: <code>scripts/check_solutions.py</code> (every step must resolve to a real skill, and every
+    solution must carry a hand-off prompt). This page is a prototype — Mermaid loads from CDN here; the
+    production build pre-renders the diagrams and keeps the no-third-party rule.
+  </footer>
+
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: "base",
+    themeVariables: {
+      background: "#05070d", primaryColor: "#0a0e18", primaryTextColor: "#e8f0ff",
+      primaryBorderColor: "#00e5ff", lineColor: "#2a3550", nodeBorder: "#1a2334",
+      fontFamily: "ui-monospace, Menlo, monospace", clusterBkg: "#070a12", clusterBorder: "#00e5ff40"
+    },
+    flowchart: { curve: "basis", padding: 12, nodeSpacing: 40, rankSpacing: 44, htmlLabels: true }
+  });
+
+  async function toggle(id) {
+    const el = document.getElementById(id);
+    if (!el.dataset.rendered) {
+      const pre = el.querySelector("pre.mermaid");
+      const { svg } = await mermaid.render("r-" + id, pre.textContent);
+      el.innerHTML = svg;
+      el.dataset.rendered = "1";
+    }
+    el.classList.toggle("open");
+  }
+
+  function copyPrompt(btn, id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const c = document.getElementById("c-" + id);
+      c.classList.add("show");
+      setTimeout(() => c.classList.remove("show"), 1500);
+    });
+  }
+</script>
+</body>
+</html>
