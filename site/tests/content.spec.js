@@ -42,8 +42,18 @@ test.describe("prerendered content", () => {
     await expect(page.locator(".g-lead")).toHaveCount(data.solutions);
 
     // Substantive text, not just a shell. The JS-built version scored 858.
-    const text = await page.innerText("body");
-    expect(text.length).toBeGreaterThan(20000);
+    //
+    // textContent, not innerText: the library's categories are collapsed
+    // <details>, so their text is in the document and indexable but not rendered.
+    // innerText measures what is painted, which is the wrong question for "is the
+    // content present for a crawler" and dropped this from 41,000 to 19,217.
+    const text = await page.evaluate(() => document.body.textContent.length);
+    expect(text).toBeGreaterThan(20000);
+
+    // And the page must still paint a substantial amount without JavaScript, so a
+    // page that is present but entirely collapsed does not pass.
+    const painted = (await page.innerText("body")).length;
+    expect(painted).toBeGreaterThan(8000);
 
     // Every card must carry its description, source and licence with JS off.
     const first = page.locator(".card").first();

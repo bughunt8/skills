@@ -327,9 +327,15 @@ a { color: inherit; text-decoration: none; }
   grid-column: 2;
   grid-row: 1;
   align-self: start;
-  /* c-level-agents leads 21 skills. Capped and scrollable so the largest
-     Solution in the library cannot push the panel off the screen. */
-  max-height: 46dvh;
+  /* A fixed height, not a max.
+     The panel shares its grid row with the intro, so its height sets the row's
+     height, and its content varies from 2 member chips to 21. Every hover
+     therefore resized the row and moved the whole graph vertically under the
+     reader's cursor: a node measured a moment earlier was no longer under the
+     pointer, and clicks landed on the background. This is the same fault the
+     camera had, arriving from the other direction. Fixed height, internal scroll
+     for the largest Solution. */
+  height: clamp(190px, 28dvh, 300px);
   overflow-y: auto;
   background: color-mix(in srgb, var(--bg-elev) 86%, transparent);
   border: 1px solid var(--line);

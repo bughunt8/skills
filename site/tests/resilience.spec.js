@@ -235,7 +235,7 @@ test.describe("no third party in the request path", () => {
         .getEntriesByType("resource")
         .filter((r) => r.name.endsWith(".woff2"))
         .map((r) => r.name),
-      display: getComputedStyle(document.querySelector(".hero h1")).fontFamily
+      display: getComputedStyle(document.querySelector(".stage h1")).fontFamily
     }));
 
     expect(state.errored, "a font face failed to load").toEqual([]);

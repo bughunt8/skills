@@ -443,7 +443,7 @@ def render_graph(sols: list, rows: list, lay: dict) -> "tuple[str, list]":
             f'          <g class="g-lead {hue_class(n["dom"])}{named}" '
             f'data-id="{esc(n["id"])}" '
             f'data-tier="{esc(tier_of.get(n["id"], ""))}" data-dom="{esc(n["dom"])}" '
-            f'tabindex="0" aria-label="{esc(label)}">'
+            f'role="button" tabindex="0" aria-label="{esc(label)}">'
         )
         # An invisible, larger hit target, because the lead circle is under 10
         # units across and asking a pointer to land on that would make the graph
@@ -524,9 +524,14 @@ def render(rows: list) -> "tuple[dict, str]":
     out.append('    <header class="stage" id="top">')
     out.append('      <div class="stage__canvas">')
     out.append(
+        # role="group", not role="img". An img role makes the whole subtree
+        # presentational, which is wrong here: the graph contains 54 controls. axe
+        # flagged the aria-label on every lead as a prohibited attribute for
+        # exactly this reason.
         '        <svg class="stage__svg" id="gsvg" viewBox="0 0 1400 560" '
-        'role="img" aria-label="Every Solution in the library and the skills each '
-        'one leads. The same information is listed as text under Solutions below.">'
+        'role="group" aria-label="Solution graph: every Solution in the library and '
+        'the skills each one leads. The same information is listed as text under '
+        'Solutions below.">'
     )
     out.append(graph_svg)
     out.append("        </svg>")
@@ -577,7 +582,15 @@ def render(rows: list) -> "tuple[dict, str]":
     # The panel is prerendered with the first Solution, so it is never an empty
     # box waiting for a hover that never comes on a touch screen.
     first = sols[0]
-    out.append('      <aside class="stage__panel" id="panel" aria-live="polite">')
+    # tabindex="0" because the panel is a scrollable region: c-level-agents leads
+    # 21 skills and the panel has a fixed height, so its content overflows and has
+    # to be reachable by keyboard. axe flags a scrollable region that cannot be
+    # focused, and it is right to: without this, a keyboard user cannot read the
+    # bottom of the largest Solution in the library.
+    out.append(
+        '      <aside class="stage__panel" id="panel" aria-live="polite" '
+        'tabindex="0" aria-label="Selected Solution">'
+    )
     out.append(f'        <p class="panel__tier" id="paneltier">{esc(first["tier"])}</p>')
     out.append(f'        <h2 class="panel__name" id="panelname">{esc(first.get("label", first["lead"]))}</h2>')
     out.append(f'        <p class="panel__desc" id="paneldesc">{esc(first.get("problem", ""))}</p>')

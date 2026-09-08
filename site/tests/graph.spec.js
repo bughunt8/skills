@@ -121,17 +121,33 @@ test.describe("the Solution graph", () => {
     await page.waitForTimeout(1000);
     await expect(page.locator("#top")).toHaveAttribute("data-pinned", "agenthub");
 
-    // With nothing pinned, hover previews.
+    // With nothing pinned, hover previews. The pointer has to leave the node first:
+    // mouseenter does not fire again for an element the cursor is already inside, so
+    // pressing Escape while hovering it leaves the panel where it was.
     await page.keyboard.press("Escape");
     await expect(page.locator("#top")).toHaveAttribute("data-pinned", "");
+    await page.locator(".stage__intro").hover();
     await page.locator('.g-lead[data-id="c-level-agents"]').hover({ force: true });
-    await page.waitForTimeout(300);
     await expect(page.locator("#panelname")).toHaveText(/c-level-agents/);
   });
 
   test("a real pointer click hits a node", async ({ page }) => {
     await page.goto("/index.html");
     await page.waitForTimeout(1200);
+
+    // Wait for scrolling to come to rest before measuring anything. Lenis eases the
+    // scroll position, so a coordinate measured while it is still settling is stale
+    // by the time the pointer arrives and the click lands on the SVG background.
+    await page.waitForFunction(
+      () => {
+        const y = Math.round(window.scrollY);
+        if (window.__lastY === y) return true;
+        window.__lastY = y;
+        return false;
+      },
+      null,
+      { timeout: 5000, polling: 250 }
+    );
 
     // The rest of the suite dispatches events, so this is the one test that proves
     // the nodes are actually big enough to hit with a pointer, and that nothing is
@@ -150,8 +166,9 @@ test.describe("the Solution graph", () => {
       // Whatever is on top at the node's centre must be the node itself.
       expect(pt.owner, `element on top at ${id}`).toBe(id);
 
-      await page.mouse.click(pt.cx, pt.cy);
-      await page.waitForTimeout(250);
+      await page.mouse.move(pt.cx, pt.cy);
+      await page.mouse.down();
+      await page.mouse.up();
       await expect(page.locator("#top")).toHaveAttribute("data-pinned", id);
     }
   });
