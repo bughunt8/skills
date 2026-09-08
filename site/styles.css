@@ -397,3 +397,31 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: 0.04em;
   color: var(--text-faint);
 }
+
+/* ---------------- solutions (problem-first layer) ---------------- */
+.solutions {
+  position: relative;
+  padding: clamp(56px, 8vh, 88px) clamp(24px, 5vw, 64px);
+  max-width: 1120px; margin: 0 auto;
+}
+.solutions h2 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: var(--t-lede); letter-spacing: var(--tr-snug); margin-bottom: 26px;
+}
+.solution {
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 22px 24px; margin-bottom: 18px; background: var(--bg-elev);
+}
+.solution h3 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: var(--t-h3); color: var(--accent); margin-bottom: 8px;
+}
+.solution__problem { color: var(--text); margin-bottom: 4px; }
+.solution__summary { color: var(--text-dim); font-size: var(--t-label); margin-bottom: 14px; }
+.solution__chain { display: flex; flex-wrap: wrap; gap: 8px; }
+.solution__step {
+  font-family: var(--font-display); font-weight: 500;
+  font-size: var(--t-caption); color: var(--text);
+  border: 1px solid var(--accent-line); border-radius: 999px;
+  padding: 4px 12px; background: var(--accent-soft);
+}

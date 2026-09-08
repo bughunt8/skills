@@ -149,10 +149,30 @@ jobs:
           path: site/playwright-report/
           retention-days: 14
 
+  solutions:
+    name: solution references resolve
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      # check_solutions.py needs PyYAML; it runs from the repo root, not site/.
+      - name: Install PyYAML
+        run: python3 -m pip install --quiet 'PyYAML==6.0.2'
+
+      # A Solution Skill references skills by name. A renamed or removed skill
+      # must not leave a solution pointing at nothing, and an ambiguous name must
+      # not pick the wrong skill. This gate blocks both.
+      - name: Validate solution steps resolve to real skills
+        run: python3 scripts/check_solutions.py
+
   gate:
     name: all gates passed
     runs-on: ubuntu-latest
-    needs: [secrets, build, lint, test]
+    needs: [secrets, build, lint, test, solutions]
     if: always()
     steps:
       - name: Fail if any gate failed

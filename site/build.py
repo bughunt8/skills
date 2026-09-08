@@ -286,6 +286,53 @@ def esc(s: str) -> str:
     return html.escape(s, quote=True)
 
 
+def _solution_frontmatter(path: Path) -> dict:
+    """Parse a solutions/*.md frontmatter without PyYAML (stdlib only)."""
+    text = path.read_text(encoding="utf-8")
+    if not text.startswith("---\n"):
+        return {}
+    parts = text.split("---", 2)
+    if len(parts) < 3:
+        return {}
+    out: dict = {}
+    steps: list = []
+    for line in parts[1].splitlines():
+        line = line.rstrip()
+        if not line.strip():
+            continue
+        if line[0] not in (" ", "-") and ":" in line:
+            key, _, val = line.partition(":")
+            out[key.strip()] = val.strip().strip('"').strip("'")
+            continue
+        m = re.match(r"^\s*-\s+skill:\s*(.+)$", line)
+        if m:
+            steps.append({"skill": m.group(1).strip().strip('"').strip("'")})
+            continue
+        h = re.match(r"^\s+handoff:\s*(.+)$", line)
+        if h and steps:
+            steps[-1]["handoff"] = h.group(1).strip()
+            continue
+        w = re.match(r"^\s+why:\s*(.+)$", line)
+        if w and steps:
+            steps[-1]["why"] = w.group(1).strip()
+    if steps:
+        out["steps"] = steps
+    return out
+
+
+def collect_solutions() -> list:
+    """Read solutions/*.md; each is a curated master skill chaining real skills."""
+    sol_dir = REPO_ROOT / "solutions"
+    if not sol_dir.is_dir():
+        return []
+    out = []
+    for p in sorted(sol_dir.glob("*.md")):
+        fm = _solution_frontmatter(p)
+        if fm.get("name") and fm.get("steps"):
+            out.append(fm)
+    return out
+
+
 def render(rows: list) -> "tuple[dict, str]":
     counts = collections.Counter(r["dom"] for r in rows)
     order = [c for c, _ in counts.most_common()]
@@ -333,6 +380,32 @@ def render(rows: list) -> "tuple[dict, str]":
     out.append('        <p class="cue" id="cue"><span></span>Scroll</p>')
     out.append("      </div>")
     out.append("    </header>")
+
+    # solutions — the problem-first layer, up front. Attribution resolved from
+    # the skill tree (repo + licence) so a solution never copies it by hand.
+    sols = collect_solutions()
+    if sols:
+        name_to_row = {r["n"]: r for r in rows}
+        out.append('    <section class="solutions" id="solutions" aria-label="Solutions">')
+        out.append('      <h2>Solutions</h2>')
+        for sol in sols:
+            out.append('      <article class="solution">')
+            out.append(f'        <h3>{esc(sol.get("name", ""))}</h3>')
+            if sol.get("problem"):
+                out.append(f'        <p class="solution__problem">{esc(sol["problem"])}</p>')
+            if sol.get("summary"):
+                out.append(f'        <p class="solution__summary">{esc(sol["summary"])}</p>')
+            out.append('        <div class="solution__chain">')
+            for step in sol.get("steps", []):
+                nm = step.get("skill", "")
+                row = name_to_row.get(nm)
+                if row:
+                    out.append(f'          <span class="solution__step" title="{esc(row["repo"])} · {esc(row["lic"])}">{esc(nm)}</span>')
+                else:
+                    out.append(f'          <span class="solution__step">{esc(nm)}</span>')
+            out.append('        </div>')
+            out.append('      </article>')
+        out.append('    </section>')
 
     # chapters
     out.append('    <main id="chapters">')
