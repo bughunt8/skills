@@ -74,6 +74,12 @@ jobs:
       - name: Check relative links resolve
         run: python3 scripts/check_links.py
 
+      # A Solution Skill references skills by name. A renamed or removed skill
+      # must not leave a solution pointing at nothing, and an ambiguous name must
+      # not let a solution pick the wrong skill. This gate blocks both.
+      - name: Validate solution steps resolve to real skills
+        run: python3 scripts/check_solutions.py
+
       - name: Show the full unbaselined backlog for information
         if: always()
         run: python3 scripts/lint_skills.py --strict || true

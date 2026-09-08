@@ -14,7 +14,6 @@ resolves to a real skill.
 
 Credit is precise: **skills © their authors, under their own licences · solutions composed by
 Ronald Ng**. A solution references skills by name and never copies their text.
-
 ## Browse it
 
 [**skills.ronald.ng**](https://skills.ronald.ng) — a scroll-driven browser for this

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Library — problem → solution → product</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #05070d;
+    --bg2: #0a0e18;
+    --cyan: #00e5ff;
+    --magenta: #ff2ea6;
+    --violet: #8a63ff;
+    --text: #e8f0ff;
+    --dim: #8492b0;
+    --faint: #5a6684;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+    --disp: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--disp);
+    overflow-x: hidden;
+  }
+
+  /* futuristic scanline + glow wash */
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(60% 40% at 70% 10%, #00e5ff12, transparent 60%),
+      radial-gradient(50% 40% at 20% 80%, #ff2ea612, transparent 60%),
+      repeating-linear-gradient(0deg, #ffffff03 0 1px, transparent 1px 3px);
+  }
+
+  /* ---- fixed HUD ---- */
+  .hud {
+    position: fixed; top: 22px; right: 22px; z-index: 30;
+    display: flex; align-items: center; gap: 12px;
+    pointer-events: none;
+  }
+  .hud__ring { width: 44px; height: 44px; transform: rotate(-90deg); }
+  .hud__ring circle { fill: none; stroke-width: 3; }
+  .hud__ring .track { stroke: #1a2334; }
+  .hud__ring .fill { stroke: var(--cyan); stroke-linecap: round;
+    filter: drop-shadow(0 0 6px var(--cyan)); }
+  .hud__label {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--cyan);
+    max-width: 180px; text-align: right; line-height: 1.4;
+  }
+
+  .stage { position: relative; z-index: 1; padding: 14vh 6vw 10vh; min-height: 100vh; }
+  .stage__num {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em;
+    color: var(--magenta); text-transform: uppercase; margin-bottom: 14px;
+  }
+  .stage h2 {
+    font-size: clamp(1.8rem, 4.5vw, 3.4rem); line-height: 1.05; letter-spacing: -0.02em;
+    font-weight: 700; margin-bottom: 18px;
+  }
+  .stage h2 .glow { color: var(--cyan); text-shadow: 0 0 18px #00e5ff66; }
+  .stage .lede { color: var(--dim); max-width: 62ch; font-size: 1.05rem; line-height: 1.6; }
+
+  .mermaid { margin: 28px 0; }
+  .mermaid svg { max-width: 100%; height: auto; filter: drop-shadow(0 0 10px #00e5ff22); }
+
+  /* ---- solution chain detail (the composed skill) ---- */
+  .chain { display: flex; flex-direction: column; gap: 12px; margin-top: 26px; }
+  .step {
+    display: grid; grid-template-columns: 56px 1fr auto; gap: 16px; align-items: center;
+    border: 1px solid #1a2334; border-radius: 12px; padding: 16px 18px;
+    background: linear-gradient(120deg, #0a0e18, #070a12);
+    position: relative; overflow: hidden;
+  }
+  .step::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: linear-gradient(var(--cyan), var(--magenta));
+  }
+  .step__idx {
+    font-family: var(--mono); font-size: 22px; font-weight: 700;
+    color: var(--cyan); text-align: center;
+  }
+  .step__name { font-family: var(--mono); font-size: 15px; color: var(--text); }
+  .step__why { color: var(--dim); font-size: 13px; margin-top: 4px; }
+  .step__attrib { text-align: right; font-size: 11px; color: var(--faint); line-height: 1.5; }
+  .step__attrib a { color: var(--violet); text-decoration: none; }
+  .handoff {
+    align-self: center; font-family: var(--mono); font-size: 11px; color: var(--faint);
+    letter-spacing: 0.1em; padding: 2px 10px; border: 1px dashed #1a2334; border-radius: 999px;
+  }
+  .handoff::before { content: "▼ hand-off: "; color: var(--magenta); }
+
+  .footer {
+    position: relative; z-index: 1; padding: 40px 6vw 80px;
+    border-top: 1px solid #1a2334; color: var(--faint); font-size: 13px;
+  }
+  .footer b { color: var(--dim); font-weight: 600; }
+</style>
+</head>
+<body>
+
+  <div class="hud">
+    <div class="hud__label" id="hudlabel">Problem</div>
+    <svg class="hud__ring" viewBox="0 0 44 44" aria-hidden="true">
+      <circle class="track" cx="22" cy="22" r="19"/>
+      <circle class="fill" id="ringfill" cx="22" cy="22" r="19"
+              stroke-dasharray="119.4" stroke-dashoffset="119.4"/>
+    </svg>
+  </div>
+
+  <!-- ============================ HERO / roadmap ============================ -->
+  <section class="stage" id="s0">
+    <div class="stage__num">00 · the paradigm</div>
+    <h2>You have a <span class="glow">problem</span>.<br>Here is the machine that solves it.</h2>
+    <p class="lede">Scroll through problems, not categories. Each problem proposes ways to
+      solve it, and each way resolves into a <b>Solution Skill</b> — an ordered chain of the
+      skills this library already contains, with the hand-off between them made explicit and
+      every skill attributed to its own author.</p>
+    <div class="mermaid">
+flowchart TB
+  P["PROBLEM<br/><i>what the visitor actually has</i>"]
+  W["WAYS TO SOLVE IT<br/><i>2–3 routes · each with a trade-off</i>"]
+  S["SOLUTION SKILL<br/><i>composed by Ronald Ng</i>"]
+  T["STEPS<br/><i>the composed skills, in order, each attributed</i>"]
+  R["PRODUCT<br/><i>the outcome that ships</i>"]
+  P --> W --> S --> T --> R
+    </div>
+  </section>
+
+  <!-- ============================ PROBLEM ============================ -->
+  <section class="stage" id="s1">
+    <div class="stage__num">01 · problem</div>
+    <h2>"I have a vague idea and need <span class="glow">shippable code</span>."</h2>
+    <p class="lede">The most common arrival state: a founder or lead with a one-line idea and
+      no spec, no tickets, no build. Getting this wrong means weeks of work on the wrong thing.</p>
+    <div class="mermaid">
+flowchart LR
+  A["vague idea"] --> B["no spec"] --> C["no tickets"] --> D["no build"]
+  classDef p fill:#05070d,stroke:#00e5ff,color:#e8f0ff;
+  class A,B,C,D p;
+    </div>
+  </section>
+
+  <!-- ============================ WAYS ============================ -->
+  <section class="stage" id="s2">
+    <div class="stage__num">02 · ways to solve it</div>
+    <h2>Three routes. One <span class="glow">trade-off</span> each.</h2>
+    <p class="lede">Not one prescriptive answer — a choice. The reader sees the cost of each
+      route before committing.</p>
+    <div class="mermaid">
+flowchart TB
+  W["WAYS"]
+  A["Route A · disciplined<br/>spec → tickets → build → review<br/><i>slow, repeatable, safe</i>"]
+  B["Route B · prototype-first<br/>throwaway build → then spec from what worked<br/><i>fast, throwaway</i>"]
+  C["Route C · smallest honest thing<br/>one slice only<br/><i>fastest, least complete</i>"]
+  W --> A; W --> B; W --> C
+    </div>
+  </section>
+
+  <!-- ============================ SOLUTION SKILL ============================ -->
+  <section class="stage" id="s3">
+    <div class="stage__num">03 · solution skill</div>
+    <h2><span class="glow">idea-to-shipped-code</span> — Route A</h2>
+    <p class="lede">A Solution Skill is a reference to existing skills, not a copy of them.
+      It claims only the ordering and the judgement. Each step names its author.</p>
+
+    <div class="chain">
+      <div class="step">
+        <div class="step__idx">1</div>
+        <div><div class="step__name">ask-matt</div>
+          <div class="step__why">Route the idea to the right flow before any work starts.</div></div>
+        <div class="step__attrib">© author · <a href="https://github.com/bughunt8/skills">bughunt8/skills</a> · MIT</div>
+      </div>
+      <div class="handoff">the routed flow</div>
+      <div class="step">
+        <div class="step__idx">2</div>
+        <div><div class="step__name">to-spec</div>
+          <div class="step__why">Turn the idea into a decision-complete spec.</div></div>
+        <div class="step__attrib">© author · <a href="https://github.com/bughunt8/skills">bughunt8/skills</a> · MIT</div>
+      </div>
+      <div class="handoff">the spec</div>
+      <div class="step">
+        <div class="step__idx">3</div>
+        <div><div class="step__name">wayfinder</div>
+          <div class="step__why">Map the spec into decision tickets.</div></div>
+        <div class="step__attrib">© author · <a href="https://github.com/bughunt8/skills">bughunt8/skills</a> · MIT</div>
+      </div>
+      <div class="handoff">decision tickets</div>
+      <div class="step">
+        <div class="step__idx">4</div>
+        <div><div class="step__name">to-tickets</div>
+          <div class="step__why">Break into tracer-bullet vertical slices.</div></div>
+        <div class="step__attrib">© author · <a href="https://github.com/bughunt8/skills">bughunt8/skills</a> · MIT</div>
+      </div>
+      <div class="handoff">slice tickets</div>
+      <div class="step">
+        <div class="step__idx">5</div>
+        <div><div class="step__name">implement</div>
+          <div class="step__why">Build the work the tickets describe.</div></div>
+        <div class="step__attrib">© author · <a href="https://github.com/bughunt8/skills">bughunt8/skills</a> · MIT</div>
+      </div>
+      <div class="handoff">the diff</div>
+      <div class="step">
+        <div class="step__idx">6</div>
+        <div><div class="step__name">code-review</div>
+          <div class="step__why">Verify the diff before it ships.</div></div>
+        <div class="step__attrib">© author · <a href="https://github.com/bughunt8/skills">bughunt8/skills</a> · MIT</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ PRODUCT ============================ -->
+  <section class="stage" id="s4">
+    <div class="stage__num">04 · product</div>
+    <h2>Out: <span class="glow">reviewed, shippable code</span>.</h2>
+    <p class="lede">The product of the solution — not a promise, a concrete artifact a team can
+      inspect, deploy, and iterate on.</p>
+    <div class="mermaid">
+flowchart LR
+  S["solution skill"] --> P["reviewed, shippable code"]
+  P --> R["deployed"] --> I["iterate on the next problem"]
+    </div>
+  </section>
+
+  <div class="footer">
+    <b>Skills © their authors, under their own licences · Solutions composed by Ronald Ng.</b>
+    This is a mockup of the proposed paradigm — see
+    <code>docs/SKILL-SOLUTIONS.md</code> for the spec. Mermaid renders the workflow; the
+    production build keeps the no-third-party rule.
+  </div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: "base",
+    themeVariables: {
+      background: "#05070d",
+      primaryColor: "#05070d",
+      primaryTextColor: "#e8f0ff",
+      primaryBorderColor: "#00e5ff",
+      secondaryColor: "#0a0e18",
+      tertiaryColor: "#070a12",
+      lineColor: "#2a3550",
+      fontFamily: "ui-monospace, Menlo, monospace",
+      edgeLabelBackground: "#05070d",
+      clusterBkg: "#070a12",
+      clusterBorder: "#00e5ff40",
+      nodeBorder: "#1a2334"
+    },
+    flowchart: { curve: "basis", padding: 18, nodeSpacing: 44, rankSpacing: 52, htmlLabels: true }
+  });
+
+  async function draw() {
+    await mermaid.run({ querySelector: ".mermaid" });
+    bindScroll();
+  }
+
+  // Progress ring + current-stage label from scroll position.
+  function bindScroll() {
+    const C = 119.4;
+    const fill = document.getElementById("ringfill");
+    const label = document.getElementById("hudlabel");
+    const stages = ["Problem", "Ways", "Solution Skill", "Product"];
+    const ids = ["s0", "s1", "s2", "s3", "s4"];
+    const names = ["Paradigm", "Problem", "Ways", "Solution Skill", "Product"];
+    const tops = ids.map((id) => document.getElementById(id).offsetTop);
+
+    function onScroll() {
+      const max = document.body.scrollHeight - window.innerHeight;
+      const p = Math.min(1, Math.max(0, window.scrollY / max));
+      fill.style.strokeDashoffset = String(C * (1 - p));
+
+      let cur = 0;
+      for (let i = 0; i < tops.length; i++) {
+        if (window.scrollY >= tops[i] - window.innerHeight * 0.4) cur = i;
+      }
+      label.textContent = names[cur];
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+
+  draw();
+</script>
+</body>
+</html>

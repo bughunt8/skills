@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Library — a problem → solution → product flight</title>
+<style>
+  :root {
+    --bg: #05070d; --cyan: #00e5ff; --magenta: #ff2ea6; --violet: #8a63ff;
+    --text: #e8f0ff; --dim: #8492b0; --faint: #5a6684; --line: #1a2334;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; }
+  body::before { content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background: radial-gradient(60% 40% at 70% 0%, #00e5ff0f, transparent 60%),
+                radial-gradient(50% 40% at 15% 100%, #ff2ea60f, transparent 60%); }
+
+  /* fixed flight-path "world" pinned behind the content */
+  #world { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  #world .path { fill: none; stroke: #1a2334; stroke-width: 2; }
+  #world .path.__draw { stroke: url(#grad); stroke-width: 2.5;
+    filter: drop-shadow(0 0 6px #00e5ff66); }
+  #world .node circle { fill: #0a0e18; stroke: #1a2334; stroke-width: 2; }
+  #world .node.__on circle { stroke: var(--cyan); filter: drop-shadow(0 0 8px #00e5ff88); }
+  #world .node text { fill: var(--faint); font: 11px ui-monospace, Menlo, monospace; letter-spacing: .18em; }
+  #world .node.__on text { fill: var(--text); }
+  #world #dot { fill: #fff; filter: drop-shadow(0 0 10px var(--cyan)); }
+
+  section { position: relative; z-index: 1; min-height: 100vh; padding: 14vh 8vw 12vh;
+    max-width: 880px; margin-left: 8vw; }
+  .kicker { font: 12px ui-monospace, monospace; letter-spacing: .2em; color: var(--magenta);
+    text-transform: uppercase; margin-bottom: 14px; }
+  h1 { font-size: clamp(2rem, 5vw, 3.6rem); line-height: 1.04; letter-spacing: -0.02em; margin-bottom: 18px; }
+  h1 .glow { color: var(--cyan); text-shadow: 0 0 20px #00e5ff55; }
+  h2 { font-size: clamp(1.5rem, 3.5vw, 2.4rem); margin-bottom: 14px; }
+  .lede { color: var(--dim); max-width: 60ch; line-height: 1.65; }
+
+  .sol { border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; margin: 18px 0;
+    background: linear-gradient(130deg, #0a0e18, #070a12); }
+  .sol__name { font: 600 15px ui-monospace, Menlo, monospace; color: var(--cyan); }
+  .sol__problem { color: var(--text); margin: 8px 0 2px; }
+  .sol__why { color: var(--dim); font-size: 13px; margin-bottom: 14px; }
+  .sol__chain { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+  .stepchip { font: 13px ui-monospace, Menlo, monospace; color: var(--text);
+    border: 1px solid #1a2334; border-radius: 999px; padding: 4px 12px; background: #0a0e18; }
+  .stepchip.__link { border-color: var(--violet); color: var(--violet); }
+  .arrow { color: var(--faint); }
+  .attr { margin-top: 14px; font-size: 12px; color: var(--faint); }
+  .attr a { color: var(--violet); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<svg id="world" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2ea6"/>
+    </linearGradient>
+  </defs>
+  <path class="path" d="M50,6 C62,20 38,26 50,40 C62,54 38,60 50,74 C60,86 44,90 50,94"/>
+  <path class="path __draw" id="draw" d="M50,6 C62,20 38,26 50,40 C62,54 38,60 50,74 C60,86 44,90 50,94"/>
+  <g class="node" id="n0"><circle cx="50" cy="6" r="3.4"/><text x="58" y="9.5">PROBLEM</text></g>
+  <g class="node" id="n1"><circle cx="50" cy="40" r="3.4"/><text x="58" y="43.5">WAYS</text></g>
+  <g class="node" id="n2"><circle cx="50" cy="74" r="3.4"/><text x="58" y="77.5">SOLUTION</text></g>
+  <g class="node" id="n3"><circle cx="50" cy="90" r="3.4"/><text x="58" y="93.5">PRODUCT</text></g>
+  <circle id="dot" r="2.2" cx="50" cy="6"/>
+</svg>
+
+<section id="s0">
+  <div class="kicker">The Skill Library · new paradigm</div>
+  <h1>You have a <span class="glow">problem</span>.<br>Here is the machine that solves it.</h1>
+  <p class="lede">Scroll and the camera flies through the workflow on the left: problem → ways
+    to solve it → a <b>Solution Skill</b> → the product. Each Solution Skill is a chain of the
+    skills this library already contains — ordered, with the hand-off between them named, and
+    every skill credited to its own author.</p>
+</section>
+
+<section id="s1">
+  <div class="kicker">01 · problem</div>
+  <h2>Problems, not categories.</h2>
+  <p class="lede">People arrive with a job to do, not a taxonomy to browse. The front of the
+    library is a list of concrete problems. Here are the first three, each with a composed
+    solution drawn from the real skill tree.</p>
+</section>
+
+<section id="s2">
+  <div class="kicker">02 · ways to solve it</div>
+  <h2>Every problem has routes. Each route has a trade-off.</h2>
+  <p class="lede">Disciplined vs. prototype-first vs. smallest honest thing. The reader sees the
+    cost before choosing — one prescriptive answer would be a lie.</p>
+</section>
+
+<section id="s3">
+  <div class="kicker">03 · solution skills</div>
+  <h2>Three composed solutions, drawn from the real tree.</h2>
+
+  <div class="sol">
+    <div class="sol__name">idea-to-shipped-code</div>
+    <div class="sol__problem">"I have a vague idea and need shippable code."</div>
+    <div class="sol__why">Route a one-line idea through spec → tickets → build → review.</div>
+    <div class="sol__chain">
+      <span class="stepchip">ask-matt</span><span class="arrow">→</span>
+      <span class="stepchip">to-spec</span><span class="arrow">→</span>
+      <span class="stepchip">wayfinder</span><span class="arrow">→</span>
+      <span class="stepchip">to-tickets</span><span class="arrow">→</span>
+      <span class="stepchip">implement</span><span class="arrow">→</span>
+      <span class="stepchip">code-review</span>
+    </div>
+    <div class="attr">Composed by Ronald Ng · steps are skills by their own authors,
+      <a href="https://github.com/bughunt8/skills">bughunt8/skills</a> · MIT</div>
+  </div>
+
+  <div class="sol">
+    <div class="sol__name">landing-page-that-sells</div>
+    <div class="sol__problem">"My landing page reads as AI-slop and doesn't convert."</div>
+    <div class="sol__why">Audit, redesign, and re-implement until it reads like a brand.</div>
+    <div class="sol__chain">
+      <span class="stepchip">taste-skill</span><span class="arrow">→</span>
+      <span class="stepchip">redesign-skill</span><span class="arrow">→</span>
+      <span class="stepchip">image-to-code-skill</span><span class="arrow">→</span>
+      <span class="stepchip">ui-ux-pro-max</span>
+    </div>
+    <div class="attr">Composed by Ronald Ng · steps © their authors · MIT</div>
+  </div>
+
+  <div class="sol">
+    <div class="sol__name">hard-to-find-bug</div>
+    <div class="sol__problem">"Something is broken and I can't find where."</div>
+    <div class="sol__why">Reproduce it, lock it with a failing test, fix it minimally, verify.</div>
+    <div class="sol__chain">
+      <span class="stepchip">diagnosing-bugs</span><span class="arrow">→</span>
+      <span class="stepchip">tdd</span><span class="arrow">→</span>
+      <span class="stepchip">code-review</span>
+    </div>
+    <div class="attr">Composed by Ronald Ng · steps © their authors · MIT</div>
+  </div>
+</section>
+
+<section id="s4">
+  <div class="kicker">04 · product</div>
+  <h2>Out: an outcome that ships.</h2>
+  <p class="lede">Reviewed code, a page that converts, a bug that stays dead. Not a promise — a
+    concrete artifact, with the skills that produced it named and attributed in the flow.</p>
+  <p class="attr" style="margin-top:40px"><b>Skills © their authors, under their own licences ·
+    Solutions composed by Ronald Ng.</b> Spec: <code>docs/SKILL-SOLUTIONS.md</code>.
+    Validation: <code>scripts/check_solutions.py</code> (every step must resolve to a real skill).</p>
+</section>
+
+<script>
+  // Scroll-scrub engine — requestAnimationFrame reading getBoundingClientRect,
+  // never a scroll-event listener (the scroll-world / scroll-attached technique).
+  const draw = document.getElementById("draw");
+  const dot = document.getElementById("dot");
+  const nodes = [0, 1, 2, 3].map((i) => document.getElementById("n" + i));
+  const sections = [0, 1, 2, 3, 4].map((i) => document.getElementById("s" + i));
+  const L = draw.getTotalLength();
+  draw.style.strokeDasharray = L;
+  draw.style.strokeDashoffset = L;
+
+  function tick() {
+    const max = document.body.scrollHeight - window.innerHeight;
+    const p = Math.min(1, Math.max(0, window.scrollY / max));
+
+    // draw the flight path and move the camera dot along it
+    draw.style.strokeDashoffset = String(L * (1 - p));
+    const pt = draw.getPointAtLength(p * L);
+    dot.setAttribute("cx", pt.x.toFixed(2));
+    dot.setAttribute("cy", pt.y.toFixed(2));
+
+    // light the node whose section is in view
+    let active = 0;
+    for (let i = 0; i < sections.length; i++) {
+      const r = sections[i].getBoundingClientRect();
+      if (r.top <= window.innerHeight * 0.5) active = Math.max(0, i - 1);
+    }
+    nodes.forEach((n, i) => n.classList.toggle("__on", i === active));
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+</script>
+</body>
+</html>
