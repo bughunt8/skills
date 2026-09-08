@@ -1,1 +1,1 @@
-window.SKILLDATA={"total":490,"categories":24};
+window.SKILLDATA={"total":490,"categories":24,"solutions":54,"featured":["idea-to-shipped-code","landing-page-that-sells","hard-to-find-bug","c-level-agents","agenthub","commercial-skills","business-operations-skills","autoresearch-agent"],"tiers":{"curated":3,"declared":13,"composed":38},"covered":325,"unclaimed":165};

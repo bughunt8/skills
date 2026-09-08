@@ -34,6 +34,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import compose
+
 ROOT = Path(__file__).resolve().parent
 # The repository that contains this site. Its own skills are read from here.
 REPO_ROOT = ROOT.parent
@@ -333,51 +335,157 @@ def collect_solutions() -> list:
     return out
 
 
-def render_graph(sols: list, rows: list) -> str:
-    """Prerender a radial solution graph as inline SVG (stdlib, deterministic)."""
-    from math import cos, sin, pi
-    name_dom = {r["n"]: r["dom"] for r in rows}
-    used = set()
+def hue_class(name: str) -> str:
+    """Deterministic community colour class for a category.
+
+    The colours live in styles.css as .h0 to .h11, not in a style attribute,
+    because the production Content-Security-Policy is style-src 'self': an inline
+    style attribute is refused by the browser, and a <style> block would be too.
+    Hashing the category name means a new category picks up a colour without
+    anyone editing CSS, and the same category keeps its colour between builds.
+    """
+    h = 0
+    for ch in name:
+        h = (h * 131 + ord(ch)) & 0xFFFFFFFF
+    return f"h{h % 12}"
+
+
+# How many Solutions the pinned opening travels through. The graph holds every
+# Solution and all of them are reachable by search or click, but scroll-stepping
+# through 54 of them would be exactly the endless scrolling this page is trying to
+# stop being. Eight is enough to teach the interaction and show the range.
+FEATURED = 8
+
+
+def render_graph(sols: list, rows: list, lay: dict) -> "tuple[str, list]":
+    """Prerender the whole graph as inline SVG from the precomputed layout.
+
+    Prerendered rather than drawn by JavaScript on load, for the same reason the
+    cards are prerendered: the graph is the opening image of the page, and a page
+    whose opening image only exists once a script has run is a page that is blank
+    for anyone the script fails for. app.js adds traversal, focus and search on top
+    of markup that is already correct and already visible.
+    """
+    nodes, edges, index = lay["nodes"], lay["edges"], lay["index"]
+    by_name = {r["n"]: r for r in rows}
+    # A skill can be led by more than one Solution, so ownership is a list, not a
+    # value. code-review serves both idea-to-shipped-code and hard-to-find-bug;
+    # when this held a single lead, focusing the second Solution lit only the
+    # members no other Solution had already claimed.
+    sol_of = {}
     for s in sols:
-        used.update(st["skill"] for st in s["steps"])
-    HUE = {"idea-to-shipped-code": "#00e5ff", "landing-page-that-sells": "#ff2ea6",
-           "hard-to-find-bug": "#8a63ff", "code-review": "#ffd166"}
-    hub_pos = {"hard-to-find-bug": 250, "idea-to-shipped-code": 500, "landing-page-that-sells": 750}
+        for m in s["members"]:
+            sol_of.setdefault(m, []).append(s["lead"])
+
     parts = []
-    for s in sols:
-        x = hub_pos.get(s["name"], 500)
-        c = HUE.get(s["name"], "#5a6684")
-        parts.append(f'<circle cx="{x}" cy="150" r="20" fill="#0a0e18" stroke="{c}" stroke-width="3"/>')
-        parts.append(f'<text x="{x}" y="186" text-anchor="middle" font-size="13" font-family="monospace" fill="#e8f0ff">{esc(s["name"])}</text>')
-        steps = [st["skill"] for st in s["steps"] if st["skill"] != "code-review"]
-        n = len(steps)
-        for j, sk in enumerate(steps):
-            a = pi * (j + 0.5) / n - pi / 2
-            sx = x + cos(a) * 130
-            sy = 150 + 130 + sin(a) * 70
-            parts.append(f'<line x1="{x}" y1="150" x2="{sx:.0f}" y2="{sy:.0f}" stroke="{c}" stroke-width="1.5" opacity="0.4"/>')
-            parts.append(f'<circle cx="{sx:.0f}" cy="{sy:.0f}" r="7" fill="#0a0e18" stroke="{c}" stroke-width="1.5"/>')
-            parts.append(f'<text x="{sx:.0f}" y="{sy + 18:.0f}" text-anchor="middle" font-size="9" font-family="monospace" fill="#8492b0">{esc(sk)}</text>')
-    parts.append('<line x1="500" y1="150" x2="500" y2="320" stroke="#ffd166" stroke-width="2" opacity="0.6"/>')
-    parts.append('<line x1="250" y1="150" x2="500" y2="320" stroke="#ffd166" stroke-width="2" opacity="0.6"/>')
-    parts.append('<circle cx="500" cy="320" r="11" fill="#0a0e18" stroke="#ffd166" stroke-width="2"/>')
-    parts.append('<text x="500" y="345" text-anchor="middle" font-size="11" font-family="monospace" fill="#ffd166">code-review</text>')
-    lt = collections.Counter(name_dom[k] for k in name_dom if k not in used)
-    total = sum(lt.values())
-    acc = 0.0
-    for dom, cnt in lt.most_common():
-        frac = cnt / total
-        a0 = -pi + acc * 2 * pi
-        a1 = a0 + frac * 2 * pi
-        acc += frac
-        n = max(1, cnt)
-        for k in range(n):
-            t = k / max(1, n - 1)
-            a = a0 + (a1 - a0) * t
-            x = 500 + cos(a) * 230
-            y = 500 + sin(a) * 230
-            parts.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="2" fill="#5a6684" opacity="0.5"/>')
-    return "\n".join(parts)
+
+    # Edges first so nodes always sit on top of them.
+    parts.append('        <g class="g-edges" aria-hidden="true">')
+    for a, b in edges:
+        na, nb = nodes[a], nodes[b]
+        lead_node = na if na["kind"] == "lead" else nb
+        lead = lead_node["id"]
+        # A skill can serve more than one Solution: code-review is used by both
+        # idea-to-shipped-code and hard-to-find-bug, and agenthub shares run and
+        # status with autoresearch-agent. The skill is drawn once, so those edges
+        # cross the frame. Dashed, so a long line reads as a shared skill rather
+        # than as a rendering fault.
+        span = ((na["x"] - nb["x"]) ** 2 + (na["y"] - nb["y"]) ** 2) ** 0.5
+        cross = " g-edge--cross" if span > 90 else ""
+        parts.append(
+            f'          <line class="g-edge{cross} {hue_class(lead_node["dom"])}" '
+            f'data-sol="{esc(lead)}" '
+            f'x1="{na["x"]}" y1="{na["y"]}" x2="{nb["x"]}" y2="{nb["y"]}"/>'
+        )
+    parts.append("        </g>")
+
+    # The long tail: every skill no Solution claims. Drawn as a quiet outer band
+    # rather than hidden, because "165 skills that no Solution uses" is a fact
+    # about the library worth showing, and it is where the next Solution comes
+    # from.
+    parts.append('        <g class="g-tail" aria-hidden="true">')
+    for n in nodes:
+        if n["kind"] != "tail":
+            continue
+        parts.append(
+            f'          <circle class="g-node g-node--tail {hue_class(n["dom"])}" '
+            f'data-id="{esc(n["id"])}" data-dom="{esc(n["dom"])}" '
+            f'cx="{n["x"]}" cy="{n["y"]}" r="{n["r"]}"/>'
+        )
+    parts.append("        </g>")
+
+    parts.append('        <g class="g-members" aria-hidden="true">')
+    for n in nodes:
+        if n["kind"] != "member":
+            continue
+        parts.append(
+            f'          <circle class="g-node g-node--member {hue_class(n["dom"])}" '
+            f'data-id="{esc(n["id"])}" data-dom="{esc(n["dom"])}" '
+            f'data-sol="{esc(" ".join(sol_of.get(n["id"], [])))}" '
+            f'cx="{n["x"]}" cy="{n["y"]}" r="{n["r"]}"/>'
+        )
+    parts.append("        </g>")
+
+    # Leads carry a real accessible name each, so the graph is a list of Solutions
+    # to a screen reader instead of 487 unlabelled circles.
+    label_of = {s["lead"]: s.get("label", s["lead"]) for s in sols}
+    tier_of = {s["lead"]: s["tier"] for s in sols}
+    # Only the featured leads carry a label at rest. Fifty-four labels at once was
+    # unreadable overlapping text, and a graph you cannot read is a texture.
+    featured_set = {s["lead"] for s in sols[:FEATURED]}
+    parts.append('        <g class="g-leads">')
+    for n in nodes:
+        if n["kind"] != "lead":
+            continue
+        label = label_of.get(n["id"], n["id"])
+        named = " is-named" if n["id"] in featured_set else ""
+        parts.append(
+            f'          <g class="g-lead {hue_class(n["dom"])}{named}" '
+            f'data-id="{esc(n["id"])}" '
+            f'data-tier="{esc(tier_of.get(n["id"], ""))}" data-dom="{esc(n["dom"])}" '
+            f'tabindex="0" aria-label="{esc(label)}">'
+        )
+        # An invisible, larger hit target, because the lead circle is under 10
+        # units across and asking a pointer to land on that would make the graph
+        # decorative rather than usable.
+        #
+        # Sized at r+7, not r+11. The closest two leads sit 41 units apart, so an
+        # r+11 target spanned 41 units and overlapped its neighbour's: clicking
+        # agenthub lit agenthub but the pointer then entered self-improving-agent's
+        # target, and the panel described a different Solution to the one shown.
+        parts.append(
+            f'            <circle class="g-hit" cx="{n["x"]}" cy="{n["y"]}" '
+            f'r="{round(n["r"] + 7, 1)}"/>'
+        )
+        parts.append(
+            f'            <circle class="g-node g-node--lead" cx="{n["x"]}" '
+            f'cy="{n["y"]}" r="{n["r"]}"/>'
+        )
+        parts.append("          </g>")
+    parts.append("        </g>")
+
+    # Labels are a layer of their own, drawn after every node.
+    #
+    # They used to live inside each lead's group, which meant a lead placed later
+    # in the document painted its circle over an earlier lead's label: the
+    # `landing-page-that-sells` label was sliced in half by a neighbouring node.
+    # SVG has no z-index, so the only way to guarantee text sits above all geometry
+    # is to emit it last.
+    parts.append('        <g class="g-labels" aria-hidden="true">')
+    for n in nodes:
+        if n["kind"] != "lead":
+            continue
+        label = label_of.get(n["id"], n["id"])
+        named = " is-named" if n["id"] in featured_set else ""
+        parts.append(
+            f'          <text class="g-label{named}" data-id="{esc(n["id"])}" '
+            f'x="{n["x"]}" y="{round(n["y"] + n["r"] + 12, 1)}" '
+            f'text-anchor="middle">{esc(label)}</text>'
+        )
+    parts.append("        </g>")
+
+    featured = [s["lead"] for s in sols[:FEATURED]]
+    return "\n".join(parts), featured
 
 
 def render(rows: list) -> "tuple[dict, str]":
@@ -391,9 +499,15 @@ def render(rows: list) -> "tuple[dict, str]":
     for k in by:
         by[k].sort(key=lambda r: r["n"])
 
+    sols, stats = compose.build_solutions(REPO_ROOT, rows, _solution_frontmatter)
+    lay = compose.layout(sols, rows)
+    graph_svg, featured = render_graph(sols, rows, lay)
+    by_lead = {s["lead"]: s for s in sols}
+    name_row = {r["n"]: r for r in rows}
+
     out = []
 
-    # category rail
+    # ------------------------------------------------------------------- rail
     out.append('    <nav class="rail" id="rail" aria-label="Categories">')
     for cat in order:
         out.append(
@@ -402,115 +516,180 @@ def render(rows: list) -> "tuple[dict, str]":
         )
     out.append("    </nav>")
 
-    # hero. One mosaic tile per skill, first tile of each category accented, so
-    # the opening image is the shape of the actual library.
-    tiles = []
-    for cat in order:
-        for i, _ in enumerate(by[cat]):
-            tiles.append('<i class="on"></i>' if i == 0 else "<i></i>")
-    out.append('    <header class="hero" id="top">')
-    out.append('      <div class="mosaic" id="mosaic" aria-hidden="true">')
-    out.append("        " + "".join(tiles))
-    out.append("      </div>")
-    out.append('      <div class="hero__veil" aria-hidden="true"></div>')
-    out.append('      <div class="hero__inner">')
-    out.append('        <p class="eyebrow">Agent skill library</p>')
+    # ------------------------------------------------------- the opening stage
+    #
+    # The graph is the first thing on the page, not a diagram buried under it. It
+    # is also the navigation: every Solution is a node you can reach by scrolling
+    # past it, searching for it, or clicking it.
+    out.append('    <header class="stage" id="top">')
+    out.append('      <div class="stage__canvas">')
     out.append(
-        f'        <h1><span class="hero__num" id="herocount">{total}</span>'
-        f"skills, {len(order)} categories</h1>"
+        '        <svg class="stage__svg" id="gsvg" viewBox="0 0 1400 560" '
+        'role="img" aria-label="Every Solution in the library and the skills each '
+        'one leads. The same information is listed as text under Solutions below.">'
+    )
+    out.append(graph_svg)
+    out.append("        </svg>")
+    out.append("      </div>")
+
+    out.append('      <div class="stage__intro">')
+    out.append('        <p class="eyebrow">Agent skill library</p>')
+    # The number is the truth from the tree, rendered at full value. It does not
+    # animate up from zero: the resting state of a headline should not be a false
+    # statement, and "0 skills" was the first thing every visitor read.
+    # Short enough to hold one line at the width the intro actually gets. The
+    # longer phrasing wrapped to two lines, and every line the text takes is a line
+    # the graph loses: the stage is exactly one screen tall.
+    out.append(
+        f'        <h1><b>{len(sols)}</b> Solutions from <b>{total}</b> skills</h1>'
     )
     out.append(
-        '        <p class="hero__sub">Keep scrolling. You travel through one category at a '
-        "time, and every skill in it arrives with what it does, where it came from, and how it "
-        "is licensed.</p>"
+        '        <p class="stage__sub">A Solution is one lead skill that drives a named '
+        "subset of the rest. Scroll to travel between them, search, or click any "
+        "node.</p>"
     )
     out.append('        <p class="cue" id="cue"><span></span>Scroll</p>')
     out.append("      </div>")
+
+    # Graphify-shaped controls: search the graph, filter by how much the library
+    # actually asserts about each Solution, and get back out.
+    out.append('      <div class="stage__tools">')
+    out.append('        <label class="vh" for="gsearch">Search the graph</label>')
+    out.append(
+        f'        <input class="stage__search" id="gsearch" type="search" '
+        f'placeholder="Search {total} skills" autocomplete="off" spellcheck="false">'
+    )
+    out.append('        <div class="stage__chips" id="gchips" role="group" aria-label="Filter by provenance">')
+    for tier, blurb in (
+        ("curated", "written by hand"),
+        ("declared", "the lead names its own members"),
+        ("composed", "derived candidate"),
+    ):
+        n = stats["by_tier"][tier]
+        out.append(
+            f'          <button class="chip" type="button" data-tier="{tier}" '
+            f'aria-pressed="false" title="{esc(blurb)}">{tier} <span>{n}</span></button>'
+        )
+    out.append('          <button class="chip chip--reset" type="button" id="greset">Reset</button>')
+    out.append("        </div>")
+    out.append("      </div>")
+
+    # The panel is prerendered with the first Solution, so it is never an empty
+    # box waiting for a hover that never comes on a touch screen.
+    first = sols[0]
+    out.append('      <aside class="stage__panel" id="panel" aria-live="polite">')
+    out.append(f'        <p class="panel__tier" id="paneltier">{esc(first["tier"])}</p>')
+    out.append(f'        <h2 class="panel__name" id="panelname">{esc(first.get("label", first["lead"]))}</h2>')
+    out.append(f'        <p class="panel__desc" id="paneldesc">{esc(first.get("problem", ""))}</p>')
+    out.append('        <ol class="panel__chain" id="panelchain">')
+    for m in first["members"]:
+        out.append(f'          <li>{esc(m)}</li>')
+    out.append("        </ol>")
+    out.append(f'        <p class="panel__ev" id="panelev">{esc(first.get("evidence", ""))}</p>')
+    out.append("      </aside>")
+
+    # One scroll beat per featured Solution. app.js turns these into the traversal;
+    # without JavaScript they are a plain list of links into the Solutions section.
+    out.append('      <ol class="stage__beats" id="beats">')
+    for lead in featured:
+        s = by_lead[lead]
+        out.append(
+            f'        <li class="beat" data-sol="{esc(lead)}">'
+            f'<a href="#sol-{esc(lead)}">{esc(s.get("label", lead))}</a></li>'
+        )
+    out.append("      </ol>")
     out.append("    </header>")
 
-    # solutions — the problem-first layer, up front. Attribution resolved from
-    # the skill tree (repo + licence) so a solution never copies it by hand.
-    sols = collect_solutions()
-    if sols:
-        name_to_row = {r["n"]: r for r in rows}
-        out.append('    <section class="solutions" id="solutions" aria-label="Solutions">')
-        out.append('      <h2>Solutions</h2>')
-        for sol in sols:
-            out.append('      <article class="solution">')
-            out.append(f'        <h3>{esc(sol.get("name", ""))}</h3>')
-            if sol.get("problem"):
-                out.append(f'        <p class="solution__problem">{esc(sol["problem"])}</p>')
-            if sol.get("summary"):
-                out.append(f'        <p class="solution__summary">{esc(sol["summary"])}</p>')
-            out.append('        <div class="solution__chain">')
-            for step in sol.get("steps", []):
-                nm = step.get("skill", "")
-                row = name_to_row.get(nm)
-                if row:
-                    out.append(f'          <span class="solution__step" title="{esc(row["repo"])} · {esc(row["lic"])}">{esc(nm)}</span>')
-                else:
-                    out.append(f'          <span class="solution__step">{esc(nm)}</span>')
-            out.append('        </div>')
-            out.append('      </article>')
-        out.append('    </section>')
-
-    # the solution graph — prerendered SVG, solutions as hubs, long tail as ring
-    out.append('    <section class="graph" id="graph" aria-label="Solution graph">')
-    out.append('      <h2>How the skills relate</h2>')
-    out.append('      <p class="graph__lede">Three solutions compose twelve of the skills. '
-               'The ring is the long tail: every skill no solution uses yet.</p>')
-    out.append('      <svg viewBox="0 0 1000 760" role="img" aria-label="Solutions and the skills they compose">')
-    out.append(render_graph(sols, rows))
-    out.append('      </svg>')
-    out.append('    </section>')
-
-    # chapters
-    out.append('    <main id="chapters">')
-    before = 0
-    for di, cat in enumerate(order):
-        label = LABELS.get(cat, cat)
-        n = counts[cat]
+    # --------------------------------------------------------------- solutions
+    out.append('    <section class="sols" id="solutions" aria-labelledby="solh">')
+    out.append('      <h2 id="solh">Every Solution the library can form</h2>')
+    out.append(
+        f'      <p class="sols__lede">{len(sols)} Solutions cover '
+        f'{stats["in_a_solution"]} of the {total} skills. '
+        f'{stats["by_tier"]["curated"]} are written by hand, '
+        f'{stats["by_tier"]["declared"]} are asserted by the lead skill itself, and '
+        f'{stats["by_tier"]["composed"]} are candidates derived from the tree. '
+        f'{stats["unclaimed"]} skills belong to no Solution yet.</p>'
+    )
+    out.append('      <div class="sols__grid">')
+    for s in sols:
         out.append(
-            f'      <section class="chapter" id="cat-{esc(cat)}" '
-            f'aria-labelledby="h-{esc(cat)}" data-before="{before}" data-count="{n}" '
-            f'data-label="{esc(label)}">'
+            f'        <article class="sol" id="sol-{esc(s["lead"])}" '
+            f'data-tier="{esc(s["tier"])}" data-sol="{esc(s["lead"])}">'
         )
-        out.append('        <div class="chapter__stage">')
-        out.append(f'          <div class="chapter__ghost" aria-hidden="true">{esc(label)}</div>')
-        out.append('          <div class="chapter__head">')
-        out.append(f'            <p class="chapter__idx">{di + 1:02d} / {len(order):02d}</p>')
-        out.append(f'            <h2 class="chapter__name" id="h-{esc(cat)}">{esc(label)}</h2>')
-        out.append(
-            f'            <p class="chapter__tally"><b>{n}</b> '
-            f'{"skill" if n == 1 else "skills"}</p>'
-        )
-        out.append("          </div>")
-        out.append('          <div class="strip__mask"><div class="strip">')
-        for i, s in enumerate(by[cat]):
-            desc = s["d"] or "No description declared in this skill's frontmatter."
-            out.append('            <article class="card">')
+        out.append('          <header class="sol__head">')
+        out.append(f'            <h3>{esc(s.get("label", s["lead"]))}</h3>')
+        out.append(f'            <span class="sol__tier">{esc(s["tier"])}</span>')
+        out.append("          </header>")
+        if s.get("problem"):
+            out.append(f'          <p class="sol__problem">{esc(s["problem"])}</p>')
+        out.append(f'          <ol class="sol__chain">')
+        for m in s["members"]:
+            row = name_row.get(m)
+            title = f'{row["repo"]} · {row["lic"]}' if row else ""
             out.append(
-                f'              <div class="card__top"><span class="card__no">'
-                f"{before + i + 1:03d}</span>"
+                f'            <li><span class="sol__step" title="{esc(title)}">{esc(m)}</span></li>'
+            )
+        out.append("          </ol>")
+        out.append(f'          <p class="sol__ev">{esc(s.get("evidence", ""))}</p>')
+        out.append("        </article>")
+    out.append("      </div>")
+    out.append("    </section>")
+
+    # ----------------------------------------------------------------- library
+    #
+    # Every skill, in one compact pass. This replaced 24 pinned chapters that
+    # scrubbed a filmstrip sideways: the effect was good once and then it was
+    # 71,000 pixels of scrolling between a reader and the skill they wanted.
+    out.append('    <main class="lib" id="library">')
+    out.append('      <h2>The library</h2>')
+    out.append(
+        f'      <p class="lib__lede">All {total} skills, grouped by category. '
+        "Each keeps the licence it was published under and names the repository "
+        "it came from.</p>"
+    )
+    n = 0
+    for cat in order:
+        label = LABELS.get(cat, cat)
+        # Every category starts closed. Leaving the largest one open added 5,000
+        # pixels to the page before the reader had asked for anything, and on a
+        # phone it was 13,000. Each row states its own count, so the section reads
+        # as a browser rather than as an empty list, and app.js opens whichever
+        # category a search or a rail link lands in.
+        out.append(
+            f'      <details class="lib__cat" id="cat-{esc(cat)}" '
+            f'data-count="{counts[cat]}">'
+        )
+        out.append(
+            f'        <summary class="lib__catname {hue_class(cat)}">'
+            f'{esc(label)}<span>{counts[cat]}</span></summary>'
+        )
+        out.append('        <div class="lib__grid">')
+        for s in by[cat]:
+            n += 1
+            desc = s["d"] or "No description declared in this skill's frontmatter."
+            qual = f'<span class="qual">{esc(s["qual"])}</span>' if s.get("qual") else ""
+            in_sol = s["n"] in {m for x in sols for m in x["members"]} or s["n"] in by_lead
+            out.append(
+                f'          <article class="card{" card--used" if in_sol else ""}" '
+                f'data-id="{esc(s["n"])}">'
+            )
+            out.append(
+                f'            <div class="card__top"><span class="card__no">{n:03d}</span>'
                 f'<span class="card__cmd">/{esc(s["n"])}</span></div>'
             )
-            qual = (
-                f'<span class="qual">{esc(s["qual"])}</span>' if s.get("qual") else ""
-            )
-            # The space matters. .qual is display:block so it collapses visually,
-            # but without it the heading's text content reads "runagenthub" to a
-            # screen reader and to anything else consuming textContent.
-            out.append(f'              <h3>{esc(s["n"])} {qual}</h3>')
-            out.append(f"              <p>{esc(desc)}</p>")
+            # The space before the qualifier matters: .qual is display:block so it
+            # collapses visually, but without it the heading reads "runagenthub" to
+            # a screen reader and to anything else consuming textContent.
+            out.append(f'            <h4>{esc(s["n"])} {qual}</h4>')
+            out.append(f"            <p>{esc(desc)}</p>")
             out.append(
-                f'              <footer><a href="{esc(s["url"])}" rel="noopener">'
+                f'            <footer><a href="{esc(s["url"])}" rel="noopener">'
                 f'{esc(s["repo"])}</a><span class="lic">{esc(s["lic"])}</span></footer>'
             )
-            out.append("            </article>")
-        out.append("          </div></div>")
+            out.append("          </article>")
         out.append("        </div>")
-        out.append("      </section>")
-        before += n
+        out.append("      </details>")
     out.append("    </main>")
 
     # credits, generated so the per-repo counts cannot drift from the tree
@@ -518,20 +697,31 @@ def render(rows: list) -> "tuple[dict, str]":
     lic_of = {r["repo"]: r["lic"] for r in rows}
     url_of = {r["repo"]: r["url"] for r in rows}
     cred = ['      <div class="credits" id="credits">']
-    for repo, n in per_repo.most_common():
+    for repo, cnt in per_repo.most_common():
         cred.append(
             f'        <div><strong><a href="{esc(url_of[repo])}" rel="noopener">{esc(repo)}</a>'
             f'</strong><span class="lic">{esc(lic_of[repo])}</span>'
-            f'<span class="n">{n} skills</span></div>'
+            f'<span class="n">{cnt} skills</span></div>'
         )
     cred.append("      </div>")
 
     data = (
         "window.SKILLDATA="
-        + json.dumps({"total": total, "categories": len(order)}, separators=(",", ":"))
+        + json.dumps(
+            {
+                "total": total,
+                "categories": len(order),
+                "solutions": len(sols),
+                "featured": featured,
+                "tiers": stats["by_tier"],
+                "covered": stats["in_a_solution"],
+                "unclaimed": stats["unclaimed"],
+            },
+            separators=(",", ":"),
+        )
         + ";\n"
     )
-    return {"main": "\n".join(out), "credits": "\n".join(cred)}, data
+    return {"main": "\n".join(out), "credits": "\n".join(cred)}, data, len(sols)
 
 
 # Every phrasing in the hand-written part of the page that states a count. Each
@@ -541,7 +731,10 @@ CLAIMS = [
     (re.compile(r"\b(\d+) agent skills across (\d+) categories"), "{t} agent skills across {c} categories"),
     (re.compile(r"\b(\d+) AI agent skills across (\d+) categories"), "{t} AI agent skills across {c} categories"),
     (re.compile(r"\btravel through (\d+) categories"), "travel through {c} categories"),
-    (re.compile(r'(<div class="hud__count" id="hudcount">)0*\d+ / (\d+)'), None),
+    # Keeps the opening tag via the backreference, so the template only owns the
+    # claim itself and not the markup around it.
+    (re.compile(r'(<div class="hud__count" id="hudcount">)[^<]*'),
+     r"\g<1>{t} skills / {s} Solutions"),
 ]
 
 # Any surviving number attached to these nouns outside the generated region is a
@@ -549,7 +742,7 @@ CLAIMS = [
 AUDIT = re.compile(r"\b(\d+)\s+(?:AI\s+)?(?:agent\s+)?(?:skills|categories)\b")
 
 
-def splice(page: str, blocks: dict, total: int, cats: int) -> str:
+def splice(page: str, blocks: dict, total: int, cats: int, sols: int) -> str:
     for key, (begin, end) in MARKERS.items():
         if page.count(begin) != 1 or page.count(end) != 1:
             fail(
@@ -561,10 +754,7 @@ def splice(page: str, blocks: dict, total: int, cats: int) -> str:
         page = head + begin + "\n" + blocks[key] + "\n    " + end + tail
 
     for pattern, template in CLAIMS:
-        if template is None:
-            page = pattern.sub(rf"\g<1>000 / {total}", page)
-        else:
-            page = pattern.sub(template.format(t=total, c=cats), page)
+        page = pattern.sub(template.format(t=total, c=cats, s=sols), page)
     return page
 
 
@@ -612,11 +802,11 @@ def main(argv: list) -> int:
     rows = collect(fetch())
     if not rows:
         fail("no skills collected; check sources.json", 1)
-    blocks, data = render(rows)
+    blocks, data, nsols = render(rows)
     counts = collections.Counter(r["dom"] for r in rows)
 
     current = INDEX.read_text(encoding="utf-8")
-    updated = splice(current, blocks, len(rows), len(counts))
+    updated = splice(current, blocks, len(rows), len(counts), nsols)
 
     drift = audit_claims(updated, len(rows), len(counts))
     if drift:

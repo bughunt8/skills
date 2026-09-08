@@ -103,10 +103,30 @@ use since April 2025 under its [standard licence](https://gsap.com/community/sta
 Lenis is driven from GSAP's ticker rather than its own `requestAnimationFrame`
 loop, so there is exactly one animation loop on the page.
 
-Card reveals are positioned on the same scrubbed timeline that moves the
-filmstrip. They cannot be separate ScrollTriggers: the cards are being translated
-by GSAP, so their position relative to the viewport is not something an ordinary
-trigger can observe.
+The opening pins the graph and steps the highlight through the featured Solutions
+as you scroll. The camera does not move: an earlier version eased the SVG viewBox
+to frame each Solution, which scaled every label with it, let a node slide under a
+stationary cursor and hijack the selection, and put every other Solution outside
+the frame where it could not be clicked. Highlighting keeps all 54 reachable.
+
+Graph interaction is not part of the motion layer. Hover, click, search and the
+provenance filters run under `prefers-reduced-motion`, on touch, and with GSAP
+absent, because they are how the page is used rather than how it is decorated.
+
+## Structure
+
+Three sections, in this order:
+
+| Section | What it is |
+| --- | --- |
+| The stage | The graph, one screen tall. Every Solution is a node; the ring around them is the skills no Solution claims yet. Search, provenance filters and the traversal beats live here. |
+| Solutions | Every Solution the library can form: a lead skill, the subset it leads, and the evidence for saying so. |
+| The library | All 490 skills, one collapsed disclosure per category. Searching opens the categories that hold a hit. |
+
+This replaced 24 pinned chapters that scrubbed a filmstrip of cards sideways, one
+category at a time. The effect was good once and then it was 76,000 pixels of
+scrolling between a reader and the skill they came for. The page is now about
+12,000.
 
 ## Development
 

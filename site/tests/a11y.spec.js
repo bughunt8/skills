@@ -13,10 +13,10 @@ test.describe("accessibility", () => {
 
     const { violations } = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-      // The ghost wordmark and mosaic are aria-hidden decoration; their contrast
+      // The graph is aria-hidden decoration with a text equivalent below it; its
       // is deliberately far below AA and they carry no information.
-      .exclude(".chapter__ghost")
-      .exclude(".mosaic")
+      .exclude(".g-tail")
+      .exclude(".g-labels")
       .analyze();
 
     const summary = violations.map((v) => ({
@@ -39,8 +39,8 @@ test.describe("accessibility", () => {
 
     const { violations } = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-      .exclude(".chapter__ghost")
-      .exclude(".mosaic")
+      .exclude(".g-tail")
+      .exclude(".g-labels")
       .analyze();
 
     expect(
@@ -63,6 +63,13 @@ test.describe("accessibility", () => {
     expect(first.cls).toContain("skip");
     await expect(page.locator(first.href)).toHaveCount(1);
 
+    // Lead nodes are the graph's navigation, so they must be focusable and named,
+    // not decorative circles.
+    const leads = await page.locator(".g-lead").evaluateAll((gs) =>
+      gs.every((g) => g.tabIndex === 0 && g.getAttribute("aria-label"))
+    );
+    expect(leads, "every lead node focusable and named").toBe(true);
+
     // Rail links are real anchors, so they are reachable and focusable.
     const focusable = await page.locator("#rail a").evaluateAll((as) =>
       as.every((a) => a.tabIndex >= 0 && a.getAttribute("href"))
@@ -78,14 +85,20 @@ test.describe("accessibility", () => {
     await expect(page.locator("nav[aria-label]")).toHaveCount(1);
     expect(await page.getAttribute("html", "lang")).toBe("en");
 
-    // Each chapter is a labelled region, so a screen reader can navigate them.
-    const labelled = await page.locator(".chapter").evaluateAll((els) =>
+    // Each category is a disclosure with a real summary, so a screen reader can
+    // find and open them without needing the graph.
+    const named = await page.locator(".lib__cat").evaluateAll((els) =>
       els.every((e) => {
-        const id = e.getAttribute("aria-labelledby");
-        return id && e.ownerDocument.getElementById(id);
+        const s = e.querySelector("summary");
+        return s && s.textContent.trim().length > 0;
       })
     );
-    expect(labelled).toBe(true);
+    expect(named).toBe(true);
+
+    // The graph carries a text alternative rather than being an unlabelled
+    // decoration, since it is the page's opening image.
+    const label = await page.getAttribute("#gsvg", "aria-label");
+    expect(label && label.length).toBeGreaterThan(20);
   });
 
   test("focusing a rail target does not leave the reader stranded", async ({ page }) => {
@@ -103,8 +116,10 @@ test.describe("accessibility", () => {
     await page.locator(`#rail a[href="${href}"]`).click();
     await page.waitForTimeout(1500);
 
-    // The chapter heading must be on screen after navigating to it.
-    const visible = await page.locator(`${href} .chapter__name`).isVisible();
+    // The category must be open and its heading on screen after navigating to it,
+    // not collapsed out of sight.
+    await expect(page.locator(href)).toHaveAttribute("open", "");
+    const visible = await page.locator(`${href} .lib__catname`).isVisible();
     expect(visible).toBe(true);
   });
 });

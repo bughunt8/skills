@@ -72,14 +72,38 @@ try {
 
   html = await res.text();
 
-  const cards = (html.match(/<article class="card">/g) || []).length;
+  const cards = (html.match(/<article class="card[^"]*"/g) || []).length;
   if (cards < 400) {
     fail(`only ${cards} prerendered cards in the served HTML; expected 400+`);
   } else {
     ok(`${cards} prerendered cards served as HTML`);
   }
 
-  if (!/<main id="chapters">/.test(html)) fail("served HTML has no chapters region");
+  if (!/<main class="lib" id="library">/.test(html)) {
+    fail("served HTML has no library region");
+  } else {
+    ok("library region present");
+  }
+
+  // The Solutions and the graph are the page's subject, so a deploy that served
+  // the library without them would be a deploy of a different page.
+  const leads = (html.match(/class="g-lead\b/g) || []).length;
+  const sols = (html.match(/<article class="sol"/g) || []).length;
+  if (leads < 10 || sols < 10) {
+    fail(`served HTML has ${sols} Solutions and ${leads} graph nodes; expected both`);
+  } else if (leads !== sols) {
+    fail(`${leads} lead nodes but ${sols} Solution cards; they must agree`);
+  } else {
+    ok(`${sols} Solutions, each with a graph node`);
+  }
+
+  // The regression that shipped: a headline whose resting state read "0 skills".
+  const h1 = (html.match(/<h1>([\s\S]*?)<\/h1>/) || [])[1] || "";
+  if (/>\s*0\s*</.test(h1) || /\b0\s*(skills|Solutions)/i.test(h1)) {
+    fail(`the headline states zero: ${h1.replace(/<[^>]+>/g, " ").trim()}`);
+  } else {
+    ok("headline states a real count");
+  }
   if (/BEGIN GENERATED[\s\S]{0,80}END GENERATED/.test(html)) {
     fail("the generated region is empty in the served page");
   }
