@@ -216,7 +216,13 @@ test.describe("the Solution graph", () => {
     expect(await page.locator(".is-hit, .is-on").count()).toBe(0);
   });
 
-  test("scrolling travels between Solutions", async ({ page }) => {
+  test("scrolling travels between Solutions", async ({ page, isMobile }) => {
+    // Desktop only, deliberately. Below the stacking breakpoint the stage is a
+    // single column with its own height and there is no pin, because pinning a
+    // stage taller than the viewport hides its own controls for the length of the
+    // pin. Touch behaviour is covered by "the graph stays usable by touch".
+    test.skip(!!isMobile, "no traversal without a pin");
+
     await page.goto("/index.html");
     await page.waitForTimeout(700);
 
