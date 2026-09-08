@@ -39,6 +39,19 @@ YAML loader can parse, so they are broken rather than untidy and are the best pl
 5. Add the domain to `docs/domain-descriptions.json` if it is new, then run
    `python3 scripts/generate_index.py --write`.
 
+## Adding a solution
+
+A Solution Skill chains existing skills in order to solve one concrete problem. It lives in
+`solutions/<name>.md` with frontmatter `name`, `problem`, `summary`, `composed_by`, `steps`
+(an ordered list of `{skill, handoff, why}`), and `prompt` — the drop-in hand-off message
+another LLM executes.
+
+1. Every `skill` in `steps` must be a real frontmatter `name` in `skills/`, and it must be
+   unambiguous. `python3 scripts/check_solutions.py` fails on a dangling or ambiguous name.
+2. A solution references skills by name and never copies their text. Write the `prompt` fresh.
+3. The credit is `composed_by` — "composed by", never "built by". The skills stay their authors'.
+4. Run `python3 scripts/check_solutions.py`, then commit the solution.
+
 ## Adding a skill someone else wrote
 
 This is the part that is easy to get wrong, so it is mechanised. Do not copy files in by

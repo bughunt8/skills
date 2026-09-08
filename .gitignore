@@ -1,3 +1,6 @@
+# Planning artifacts (Prometheus .omo plans/drafts)
+.omo/
+
 # Logs
 logs
 *.log

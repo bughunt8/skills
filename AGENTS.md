@@ -37,6 +37,7 @@ python3 scripts/generate_index.py --check          # README index matches the tr
 python3 scripts/sync_vendor.py --validate-manifest # provenance, licences, ownership records
 python3 scripts/audit_third_party.py               # every licence marker is accounted for
 python3 scripts/check_links.py                     # relative links resolve
+python3 scripts/check_solutions.py                 # every solution step resolves to one real skill
 ```
 
 All offline. Standard library plus PyYAML, which CI installs. These are exactly the steps in
@@ -63,6 +64,35 @@ and each one is a live risk of the wrong skill loading.
 New domain: add a line to `docs/domain-descriptions.json`, then
 `python3 scripts/generate_index.py --write`.
 
+## Adding a solution
+
+```
+solutions/<name>.md
+```
+
+A Solution Skill chains existing skills in order to solve one concrete problem. Frontmatter:
+
+```yaml
+name: idea-to-shipped-code          # lowercase kebab-case, unique
+problem: "..."
+summary: "..."
+composed_by: Ronald Ng
+input: a one-line idea
+output: reviewed, shippable code
+steps:
+  - skill: to-spec                  # a real frontmatter name from skills/
+    handoff: the spec               # the artifact passed to the next step
+    why: turn the idea into a spec
+prompt: |                            # the hand-off prompt another LLM executes
+  ...
+```
+
+Rules: every `skill` must resolve to exactly one real skill — dangling references fail and
+ambiguous names (a name matching more than one skill) fail. A solution references skills by
+name and never copies their text; the `prompt` is written fresh. The credit is `composed_by`,
+never "built by" — the skills stay their authors'. Validate with
+`python3 scripts/check_solutions.py`.
+
 ## Where things are
 
 ```
@@ -76,9 +106,13 @@ scripts/generate_index.py      regenerates the README index from the tree
 scripts/audit_third_party.py   reconciles licence markers against docs/third-party-inventory.json
 scripts/check_links.py         relative links resolve, used by CI
 scripts/sync_due.py            whether a refresh is due
+scripts/check_solutions.py     validates every solution step resolves to one real skill
 scripts/skill_lint_baseline.json  accepted pre-existing violations, plus non-skill path ignores
+solutions/                     curated Solution Skills, one problem and ordered chain each
 docs/ARCHITECTURE_REVIEW.md    the audit this structure came from, and the open backlog
 docs/domain-descriptions.json  human prose for the generated index
+docs/SKILL-SOLUTIONS.md        the problem-first paradigm spec
+docs/skill-library.html        static prototype rendering the solutions
 .github/workflows/ci.yml       the three checks, on every push and pull request
 .github/workflows/sync-vendored-skills.yml  fortnightly upstream refresh, opens a pull request
 ```

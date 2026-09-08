@@ -1,5 +1,19 @@
 # skills
-Skills for Agentic Entrepreneurs and OPC. Straight from my .agents directory.
+
+A library of agent skills, assembled from public repositories under their own licences, plus a
+growing set of **Solution Skills** that chain those skills into repeatable workflows for concrete
+problems. The skills are by their own authors; the solutions are composed here.
+
+## Solutions
+
+The problem-first layer. Each [solution](solutions/) is a curated "master skill" that solves one
+problem by chaining existing skills in order — see [`docs/SKILL-SOLUTIONS.md`](docs/SKILL-SOLUTIONS.md)
+for the paradigm, [`docs/skill-library.html`](docs/skill-library.html) for a rendering, and
+[`scripts/check_solutions.py`](scripts/check_solutions.py) for the validator that proves every step
+resolves to a real skill.
+
+Credit is precise: **skills © their authors, under their own licences · solutions composed by
+Ronald Ng**. A solution references skills by name and never copies their text.
 
 ## Engineering Skills
 
