@@ -1,0 +1,43 @@
+{
+  "$comment": "Pre-existing SKILL.md violations accepted so CI blocks new ones while the backlog is worked down. Entries are RULE::path::sha256(message)[:12]; the message fingerprint stops a baselined entry from laundering an unrelated new violation of the same rule at the same path. Remove an entry once the skill is fixed. scripts/lint_skills.py --strict shows everything.",
+  "ignore_globs": [
+    "skills/engineering/skills/skill-tester/assets/sample-skill/SKILL.md"
+  ],
+  "accepted": [
+    "SK006::skills/research/litreview/skills/litreview/SKILL.md::c30646a92f90",
+    "SK007::skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/SKILL.md::bfda5eb49fa8",
+    "SK007::skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/SKILL.md::208b73810878",
+    "SK007::skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/SKILL.md::ff821f8bc391",
+    "SK007::skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/SKILL.md::104d357f6350",
+    "SK007::skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/SKILL.md::fe015d5b1888",
+    "SK007::skills/c-level-advisor/skills/arquiteto-de-empresa/SKILL.md::cb0d85c635fb",
+    "SK007::skills/c-level-advisor/skills/chief-ai-officer-advisor/SKILL.md::0ba827bd1827",
+    "SK007::skills/c-level-advisor/skills/chief-customer-officer-advisor/SKILL.md::351685254175",
+    "SK007::skills/c-level-advisor/skills/chief-data-officer-advisor/SKILL.md::dcf957544568",
+    "SK007::skills/c-level-advisor/skills/general-counsel-advisor/SKILL.md::d67aa0f72cf5",
+    "SK007::skills/c-level-advisor/skills/vpe-advisor/SKILL.md::6ecfdf3cd4a2",
+    "SK007::skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/SKILL.md::8d17e016dbef",
+    "SK007::skills/engineering-team/playwright-pro/skills/init/SKILL.md::538a82ae384d",
+    "SK007::skills/engineering/agenthub/skills/init/SKILL.md::39823b971b91",
+    "SK007::skills/engineering/agenthub/skills/run/SKILL.md::db7a2bffe367",
+    "SK007::skills/engineering/agenthub/skills/status/SKILL.md::360b933fa3d0",
+    "SK007::skills/engineering/autoresearch-agent/skills/run/SKILL.md::775bddb6eae9",
+    "SK007::skills/engineering/autoresearch-agent/skills/status/SKILL.md::686613da4e2c",
+    "SK007::skills/engineering/chaos-engineering/skills/chaos-engineering/SKILL.md::36b5d82d543c",
+    "SK007::skills/engineering/feature-flags-architect/skills/feature-flags-architect/SKILL.md::9f7f0a2ee112",
+    "SK007::skills/engineering/kubernetes-operator/skills/kubernetes-operator/SKILL.md::d1b4fc7bcf70",
+    "SK007::skills/engineering/research/SKILL.md::7bd8b924b19a",
+    "SK007::skills/engineering/skills/chaos-engineering/SKILL.md::9449b37fcf00",
+    "SK007::skills/engineering/skills/feature-flags-architect/SKILL.md::9d3c9b7c2316",
+    "SK007::skills/engineering/skills/kubernetes-operator/SKILL.md::35916242d3f5",
+    "SK007::skills/engineering/skills/slo-architect/SKILL.md::6af4f760f445",
+    "SK007::skills/engineering/slo-architect/skills/slo-architect/SKILL.md::2ab386eade35",
+    "SK007::skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/SKILL.md::7693f7bd6f48",
+    "SK007::skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/SKILL.md::d96a7b3ce4b2",
+    "SK007::skills/ra-qm-team/skills/eu-ai-act-specialist/SKILL.md::6dc9ff9a8267",
+    "SK007::skills/ra-qm-team/skills/iso42001-specialist/SKILL.md::18b560710638",
+    "SK007::skills/research/research/skills/research/SKILL.md::e9e54852b3ed",
+    "SK009::skills/markdown-html/skills/design-system/SKILL.md::367a37c67047",
+    "SK009::skills/markdown-html/skills/md-slides/SKILL.md::367a37c67047"
+  ]
+}

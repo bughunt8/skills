@@ -1,0 +1,71 @@
+name: Propose importing someone else's skills
+description: Suggest vendoring a skill or collection from another repository.
+labels: [enhancement, vendored-skills]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Imports go through `skills/vendor.manifest.json` and `scripts/sync_vendor.py`. Nothing
+        is copied in by hand, because the script is what produces the licence copy, the
+        per-skill `PROVENANCE.md`, the attribution file and the commit pin. CI rejects an
+        import that lacks them.
+
+        An import with no licence or no identifiable author cannot be accepted. This
+        repository is public and MIT, and redistributing unattributed work is the one mistake
+        here that cannot be quietly fixed later.
+  - type: input
+    id: repo
+    attributes:
+      label: Upstream repository URL
+      placeholder: https://github.com/owner/name
+    validations:
+      required: true
+  - type: input
+    id: license
+    attributes:
+      label: Upstream licence
+      description: SPDX identifier, and the path to the licence file in that repository.
+      placeholder: MIT, /LICENSE
+    validations:
+      required: true
+  - type: input
+    id: author
+    attributes:
+      label: Original author, as they should be credited
+    validations:
+      required: true
+  - type: input
+    id: subpath
+    attributes:
+      label: Which path in that repository holds the skills
+      placeholder: skills
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: What this adds that is not already here
+      description: Be specific. Overlap with the existing 459 skills is the usual reason to decline.
+    validations:
+      required: true
+  - type: textarea
+    id: collisions
+    attributes:
+      label: Name collisions with existing skills
+      description: >
+        List any upstream skill name that already exists here, and say which should win.
+        Collisions are the main cause of the wrong skill loading. Colliding skills are
+        normally excluded with a recorded reason.
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmations
+      options:
+        - label: The upstream licence permits redistribution
+          required: true
+        - label: I checked that the upstream repository is not itself an unattributed copy
+          required: true
+        - label: I understand the import will be refreshed automatically every two weeks and must not be edited in place
+          required: true

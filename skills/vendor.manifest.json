@@ -1,0 +1,118 @@
+{
+  "schema": 2,
+  "$comment": "Single source of truth for every directory in this repository that is vendored from an upstream project. scripts/sync_vendor.py reads this file to perform both the initial import and every scheduled refresh, so an import and an update take exactly the same code path. Do not hand-edit vendored directories: change the manifest, then re-run the script. A source maps a list of upstream subtrees into its own vendored root, preserving the relative distance between them so links inside the vendored content keep resolving. kind=skill-collection tracks each child directory individually; kind=support copies a linked-into subtree whole.",
+  "sources": [
+    {
+      "id": "pstack",
+      "name": "pstack",
+      "repo": "https://github.com/backnotprop/pstack",
+      "homepage": "https://github.com/backnotprop/pstack",
+      "upstream_of_upstream": "https://github.com/cursor/plugins/tree/main/pstack",
+      "author": "Lauren Tan (@backnotprop, \"poteto\")",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "main",
+      "pinned_commit": "18e0e908a13553b0e58d065ab26dbc9a972ec8ba",
+      "pinned_at": "2026-08-25",
+      "dest": "skills/pstack",
+      "paths": [
+        {
+          "from": "skills",
+          "to": "",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [
+            "tdd",
+            "teach",
+            "reflect",
+            "bro"
+          ],
+          "exclude_reasons": {
+            "tdd": "Frontmatter name collides with the local skills/engineering/tdd. The local skill is the canonical one for this repository.",
+            "teach": "Frontmatter name collides with the local skills/productivity/teach.",
+            "reflect": "Frontmatter name collides with the local skills/productivity/reflect/skills/reflect.",
+            "bro": "Requires the external backnotprop/bro repository at runtime. Out of scope for an offline-first skills library; add it as its own manifest source if that dependency is ever accepted."
+          }
+        }
+      ],
+      "mandatory": [
+        "unslop"
+      ],
+      "mandatory_reason": "unslop is an always-apply writing-quality skill and is a required import for this repository. The sync script fails if a mandatory skill is missing from the upstream tree or has been excluded.",
+      "limitations": [
+        "poteto-mode, setup-pstack and arena assume a Cursor-style multi-model runner. The engineering discipline in them is portable; the model names (sol, grok, fable, opus 5) are not.",
+        "Upstream names the poteto-mode skill `Poteto Mode`, which fails this repository's SK004 and SK005 metadata rules. It is reported as a warning rather than corrected, because correcting it would fork the file."
+      ],
+      "notes": "Vendored verbatim under a dedicated namespace so upstream refreshes are a mechanical diff. Everything upstream keeps under skills/ is self-contained, so this source needs only one mapped path."
+    },
+    {
+      "id": "job-hunt",
+      "name": "job-hunt-skills",
+      "repo": "https://github.com/Remotivated/job-hunt-skills",
+      "homepage": "https://github.com/Remotivated/job-hunt-skills#readme",
+      "author": "Remotivated",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "main",
+      "pinned_commit": "5fb238febf14a0b41fb5a8fe7384594ad1f59335",
+      "pinned_at": "2026-08-25",
+      "dest": "skills/job-hunt",
+      "paths": [
+        {
+          "from": "skills",
+          "to": "skills",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "guides",
+          "to": "guides",
+          "kind": "support",
+          "exclude_reasons": {}
+        },
+        {
+          "from": "templates",
+          "to": "templates",
+          "kind": "support",
+          "exclude_reasons": {}
+        },
+        {
+          "from": "scripts",
+          "to": "scripts",
+          "kind": "support",
+          "file_include": [
+            "scaffold-state.mjs",
+            "profile-strength.mjs"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        }
+      ],
+      "mandatory": [],
+      "limitations": [
+        "DOCX and PDF export is not vendored. `scripts/export-documents.mjs` needs a checked-in 1.9 MB Node dependency bundle plus a pinned Typst binary, and this repository has no Node CI to keep either honest. Everything the skills do in Markdown works without it. For ATS-safe DOCX and PDF output, clone the upstream repository and run it there.",
+        "`scripts/scaffold-state.mjs` and `scripts/profile-strength.mjs` ARE vendored. Both import only `node:fs`, `node:path` and `node:url`, so they run on any Node 18+ with nothing installed. They are vendored because `get-started` calls the scaffolder its \"Preferred\" path and `_shared/state-layer.md` says the skills run it; omitting them guaranteed a file-not-found for anyone following the primary instruction.",
+        "The skills expect a `my-documents/` state layer in the user's own working directory, described in `skills/_shared/state-layer.md`. That is the user's data and is deliberately not vendored. Run the `get-started` skill to create it.",
+        "`skills/_shared/` holds a shared instruction contract rather than a skill, so it carries no SKILL.md and is exempt from the per-skill provenance rule. It is imported and provenance-stamped as a shared support directory.",
+        "Upstream's own contributor checks (`check-internal-links.py`, `test_skill_contracts.py`, the export tests) are not vendored. Link integrity of the vendored subset is instead enforced here by `scripts/check_links.py` in CI."
+      ],
+      "notes": "The upstream skills carry 47 links to ../_shared/state-layer.md and further links to ../../guides/ and templates/. Copying only skills/ would leave every one of those links pointing at nothing, so guides/, templates/ and the two dependency-free helper scripts are mapped alongside at the same relative distance and the links resolve unchanged. This is why a manifest source declares a list of paths rather than one subdirectory.",
+      "additional_licenses": [
+        {
+          "path": "templates/fonts/*.ttf",
+          "license": "OFL-1.1",
+          "copyright": "Copyright 2022 The Gelasio Project Authors (https://github.com/SorkinType/Gelasio)",
+          "license_file": "LICENSE.fonts-OFL-1.1.txt",
+          "upstream_license_file": "templates/fonts/OFL.txt",
+          "note": "Four Gelasio TrueType fonts under the SIL Open Font License 1.1. The import's primary MIT licence does not cover them."
+        }
+      ]
+    }
+  ]
+}

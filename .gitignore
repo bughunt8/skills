@@ -154,3 +154,8 @@ site/blob-report/
 # Python bytecode from the skills' helper scripts
 __pycache__/
 *.pyc
+# Python
+*.py[cod]
+*$py.class
+.venv/
+venv/

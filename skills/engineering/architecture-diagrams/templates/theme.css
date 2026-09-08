@@ -1,0 +1,421 @@
+/* Diagram viewer theme.
+ *
+ * Inlined into every generated artifact, so the HTML file is standalone: no
+ * network, no CDN, no build step. It opens from a file:// path years from now.
+ *
+ * Both themes are defined with custom properties on [data-theme]. The default
+ * follows prefers-color-scheme, and the toggle sets an explicit value.
+ */
+
+:root {
+  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --radius: 10px;
+  --radius-lg: 14px;
+  --stroke: 1.5px;
+}
+
+/* Dark is the default because these diagrams are read in editors and terminals. */
+[data-theme="dark"] {
+  --bg: #0d1017;
+  --bg-panel: #151a23;
+  --bg-node: #1a2029;
+  --bg-group: #ffffff07;
+  --line: #2a323f;
+  --line-strong: #3b4553;
+  --text: #e8ecf2;
+  --text-dim: #9aa5b5;
+  --text-faint: #7d8798;
+  --accent: #5c8cff;
+  --accent-dim: #5c8cff33;
+  --edge: #55617340;
+  --edge-strong: #8b97a8;
+  --shadow: 0 1px 2px #00000060, 0 8px 24px #00000040;
+}
+
+[data-theme="light"] {
+  --bg: #f7f8fa;
+  --bg-panel: #ffffff;
+  --bg-node: #ffffff;
+  --bg-group: #0b0d1206;
+  --line: #d8dde5;
+  --line-strong: #b8c0cc;
+  --text: #171b22;
+  --text-dim: #4f5a6a;
+  --text-faint: #6b7686;
+  --accent: #2f5fe0;
+  --accent-dim: #2f5fe024;
+  --edge: #8b97a870;
+  --edge-strong: #4f5a6a;
+  --shadow: 0 1px 2px #0b0d1214, 0 8px 24px #0b0d120f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------ chrome */
+
+header {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 16px 22px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-panel);
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.sub {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.8125rem;
+  max-width: 70ch;
+}
+
+.kind {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  background: var(--accent-dim);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.tools {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+button,
+input[type="search"] {
+  font: inherit;
+  font-size: 0.8125rem;
+  color: var(--text);
+  background: var(--bg-node);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 6px 11px;
+  cursor: pointer;
+}
+
+input[type="search"] {
+  cursor: text;
+  min-width: 190px;
+}
+
+button:hover,
+input[type="search"]:hover {
+  border-color: var(--line-strong);
+}
+
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+kbd {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-faint);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+
+/* ------------------------------------------------------------------ canvas */
+
+.stage {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+  min-height: 0;
+}
+
+.stage.dragging {
+  cursor: grabbing;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+#viewport {
+  transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stage.dragging #viewport,
+.no-motion #viewport {
+  transition: none;
+}
+
+/* nodes */
+
+.node rect,
+.node path.shape,
+.node ellipse {
+  fill: var(--bg-node);
+  stroke: var(--line-strong);
+  stroke-width: var(--stroke);
+}
+
+.node .label {
+  fill: var(--text);
+  font-size: 14px;
+  font-weight: 550;
+}
+
+.node .note {
+  fill: var(--text-dim);
+  font-size: 12px;
+}
+
+.node .tech {
+  fill: var(--text-faint);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+.node {
+  cursor: pointer;
+}
+
+.node:hover rect,
+.node:hover path.shape,
+.node:hover ellipse {
+  stroke: var(--accent);
+}
+
+.node.accent rect,
+.node.accent path.shape,
+.node.accent ellipse {
+  stroke: var(--accent);
+  fill: var(--accent-dim);
+}
+
+/* groups */
+
+.group rect {
+  fill: var(--bg-group);
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  rx: 14;
+}
+
+.group .glabel {
+  fill: var(--text-faint);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+/* edges */
+
+.edge path {
+  fill: none;
+  stroke: var(--edge-strong);
+  stroke-width: var(--stroke);
+  opacity: 0.75;
+}
+
+.edge.dashed path {
+  stroke-dasharray: 7 5;
+}
+
+.edge.dotted path {
+  stroke-dasharray: 2 4;
+}
+
+.edge.accent path {
+  stroke: var(--accent);
+  opacity: 1;
+}
+
+.edge text {
+  fill: var(--text-dim);
+  font-size: 11.5px;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+/* sequence */
+
+.lifeline {
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+}
+
+.msg path,
+.msg line {
+  fill: none;
+  stroke: var(--edge-strong);
+  stroke-width: var(--stroke);
+}
+
+.msg.dashed path,
+.msg.dashed line {
+  stroke-dasharray: 7 5;
+}
+
+.msg text {
+  fill: var(--text);
+  font-size: 12.5px;
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.msg .num {
+  fill: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.msg .msgnote {
+  fill: var(--text-dim);
+  font-size: 11.5px;
+}
+
+/* focus mode: clicking a node dims everything not connected to it */
+
+.focused .node,
+.focused .edge,
+.focused .msg {
+  opacity: 0.16;
+  transition: opacity 140ms ease;
+}
+
+.no-motion .focused .node,
+.no-motion .focused .edge,
+.no-motion .focused .msg {
+  transition: none;
+}
+
+.focused .node.on,
+.focused .edge.on,
+.focused .msg.on {
+  opacity: 1;
+}
+
+.focused .node.on rect,
+.focused .node.on path.shape,
+.focused .node.on ellipse {
+  stroke: var(--accent);
+}
+
+/* search dimming is independent of focus mode */
+
+.node.hidden {
+  opacity: 0.12;
+}
+
+/* ------------------------------------------------------------------ footer */
+
+footer {
+  flex: none;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 10px 22px;
+  border-top: 1px solid var(--line);
+  background: var(--bg-panel);
+  color: var(--text-faint);
+  font-size: 0.75rem;
+}
+
+footer .spacer {
+  margin-left: auto;
+}
+
+.legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend i {
+  width: 22px;
+  height: 0;
+  border-top: 2px solid var(--edge-strong);
+  display: inline-block;
+}
+
+.legend i.dashed {
+  border-top-style: dashed;
+}
+
+/* Print: one page, light, no chrome. */
+@media print {
+  header .tools,
+  footer {
+    display: none;
+  }
+  body {
+    overflow: visible;
+    height: auto;
+  }
+  .stage {
+    overflow: visible;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #viewport,
+  .focused .node,
+  .focused .edge,
+  .focused .msg {
+    transition: none !important;
+  }
+}
