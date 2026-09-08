@@ -1,82 +1,421 @@
 /*
- * Motion layer for the skill library.
+ * Behaviour layer for the skill library.
  *
- * This script attaches motion to markup that build.py has already prerendered.
- * It never creates a card, a chapter or a rail link. That matters: the page must
- * be complete for a crawler and readable with JavaScript disabled, so the DOM is
- * the source of truth and this file is a progressive enhancement over it.
+ * This script attaches to markup build.py has already prerendered. It never
+ * creates a node, a card or a rail link: the page must be complete for a crawler
+ * and usable with JavaScript disabled, so the DOM is the source of truth and this
+ * file is an enhancement over it.
  *
- * Per-chapter geometry is read from data attributes on each .chapter
- * (data-before, data-count, data-label) rather than from a parallel JS dataset,
- * so the numbers on screen cannot drift from the markup.
+ * Two distinct layers, deliberately separated:
  *
- * Bails out cleanly, leaving the plain prerendered page, when:
- *   - GSAP or ScrollTrigger failed to load from the CDN
- *   - the viewport is at or below the mobile breakpoint (native scroll-snap
- *     swipe is used there instead of pinning)
- *   - the reader has prefers-reduced-motion set
+ *   Graph interaction — hover, focus, search, provenance filters. This is
+ *   FUNCTION, not decoration, so it runs everywhere: on mobile, under
+ *   prefers-reduced-motion, and with GSAP missing. Withholding search from
+ *   someone because they asked for less animation would be absurd.
+ *
+ *   Scroll traversal — pinning the stage and stepping the highlight from one
+ *   Solution to the next. This is motion, so it is the part that bails out.
+ *
+ * Nothing here counts a number up from zero. The headline states the size of the
+ * library, and a headline's resting state should not be a false statement.
  */
 (function () {
   "use strict";
 
-  var MOBILE = 860;
-  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var total = (window.SKILLDATA && window.SKILLDATA.total) || 0;
+  // Matches the stylesheet's stacking breakpoint. Below it the stage is a single
+  // column with its own height, so there is nothing to pin: pinning a stage taller
+  // than the viewport hides its own controls for the length of the pin.
+  var MOBILE = 1000;
+  // The pin also needs vertical room, and must agree exactly with the media query
+  // in styles.css that stacks the stage. If these two disagree, one of them
+  // pins a layout the other has already reflowed.
+  var SHORT = 720;
 
-  var hudCount = document.getElementById("hudcount");
+  function wide() {
+    return window.innerWidth > MOBILE && window.innerHeight > SHORT;
+  }
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var DATA = window.SKILLDATA || {};
+
+  var stage = document.getElementById("top");
+  var svg = document.getElementById("gsvg");
+  var panel = {
+    tier: document.getElementById("paneltier"),
+    name: document.getElementById("panelname"),
+    desc: document.getElementById("paneldesc"),
+    chain: document.getElementById("panelchain"),
+    ev: document.getElementById("panelev")
+  };
+  var search = document.getElementById("gsearch");
+  var chips = document.getElementById("gchips");
+  var resetBtn = document.getElementById("greset");
+  var beats = document.getElementById("beats");
   var bar = document.getElementById("bar");
   var rail = document.getElementById("rail");
-  var mosaic = document.getElementById("mosaic");
-  var heroCount = document.getElementById("herocount");
-  var hero = document.getElementById("top");
   var cue = document.getElementById("cue");
 
-  function pad(n, w) {
-    n = String(Math.max(0, Math.round(n)));
-    while (n.length < w) n = "0" + n;
-    return n;
+  if (!stage || !svg) return;
+
+  var leads = Array.prototype.slice.call(svg.querySelectorAll(".g-lead"));
+  // Labels are a separate layer so they paint above every node, so they are
+  // keyed by lead and toggled alongside it.
+  var labelBy = {};
+  Array.prototype.slice.call(svg.querySelectorAll(".g-label")).forEach(function (el) {
+    labelBy[el.getAttribute("data-id")] = el;
+  });
+  function setLabel(id, cls, on) {
+    var el = labelBy[id];
+    if (el) el.classList.toggle(cls, on);
+  }
+  var nodes = Array.prototype.slice.call(svg.querySelectorAll(".g-node"));
+  var edges = Array.prototype.slice.call(svg.querySelectorAll(".g-edge"));
+  var cards = Array.prototype.slice.call(document.querySelectorAll(".card"));
+  var sols = Array.prototype.slice.call(document.querySelectorAll(".sol"));
+  // data-sol holds every Solution that leads this skill, space separated, so
+  // membership is a token test rather than an equality test.
+  function owns(el, id) {
+    var v = el.getAttribute("data-sol") || "";
+    return (" " + v + " ").indexOf(" " + id + " ") > -1;
   }
 
-  function setHud(seen, label) {
-    if (!hudCount) return;
-    hudCount.textContent = "";
-    var b = document.createElement("b");
-    b.textContent = pad(seen, 3);
-    hudCount.appendChild(b);
-    hudCount.appendChild(
-      document.createTextNode(" / " + total + (label ? "   " + label : ""))
-    );
+  var beatItems = beats
+    ? Array.prototype.slice.call(beats.querySelectorAll(".beat"))
+    : [];
+
+  // Index the Solutions section by lead, so the panel reads its text from the
+  // rendered page instead of from a duplicate copy in JavaScript. One source of
+  // truth means the panel cannot disagree with the card it describes.
+  var solByLead = {};
+  sols.forEach(function (el) {
+    var id = el.getAttribute("data-sol");
+    if (!id) return;
+    solByLead[id] = {
+      el: el,
+      tier: el.getAttribute("data-tier") || "",
+      label: (el.querySelector("h3") || {}).textContent || id,
+      problem: (el.querySelector(".sol__problem") || {}).textContent || "",
+      evidence: (el.querySelector(".sol__ev") || {}).textContent || "",
+      members: Array.prototype.slice
+        .call(el.querySelectorAll(".sol__step"))
+        .map(function (s) {
+          return s.textContent;
+        })
+    };
+  });
+
+  /* ------------------------------------------------------------------ panel */
+
+  function fillPanel(id) {
+    var s = solByLead[id];
+    if (!s) return;
+    if (panel.tier) panel.tier.textContent = s.tier;
+    if (panel.name) panel.name.textContent = s.label;
+    if (panel.desc) panel.desc.textContent = s.problem;
+    if (panel.ev) panel.ev.textContent = s.evidence;
+    if (panel.chain) {
+      // Rebuilt rather than innerHTML-assigned: these strings come from skill
+      // frontmatter, and textContent cannot be talked into becoming markup.
+      while (panel.chain.firstChild) panel.chain.removeChild(panel.chain.firstChild);
+      s.members.forEach(function (m) {
+        var li = document.createElement("li");
+        li.textContent = m;
+        panel.chain.appendChild(li);
+      });
+    }
   }
 
-  // Read chapter geometry straight off the prerendered markup.
-  var chapters = Array.prototype.slice
-    .call(document.querySelectorAll(".chapter"))
-    .map(function (section) {
-      return {
-        section: section,
-        stage: section.querySelector(".chapter__stage"),
-        mask: section.querySelector(".strip__mask"),
-        strip: section.querySelector(".strip"),
-        ghost: section.querySelector(".chapter__ghost"),
-        head: section.querySelector(".chapter__head"),
-        cards: Array.prototype.slice.call(section.querySelectorAll(".card")),
-        before: parseInt(section.getAttribute("data-before"), 10) || 0,
-        count: parseInt(section.getAttribute("data-count"), 10) || 0,
-        label: section.getAttribute("data-label") || ""
-      };
+  /* ------------------------------------------------------------------ focus */
+
+  var focused = null;
+  // An explicit choice is sticky: hover previews, clicking commits. Without this,
+  // moving the pointer off a clicked node onto any neighbour silently replaced the
+  // selection, so the panel described a Solution the reader had not chosen.
+  var pinned = null;
+
+  // Reflected onto the stage so the selection model is inspectable rather than
+  // trapped in a closure: "is this Solution pinned or merely hovered" is exactly
+  // the distinction that broke twice, and a test cannot assert it otherwise.
+  function mark() {
+    stage.setAttribute("data-pinned", pinned || "");
+    stage.setAttribute("data-focused", focused || "");
+  }
+
+  function focus(id, opts) {
+    opts = opts || {};
+    if (opts.pin) pinned = id;
+    focused = id;
+    mark();
+    stage.classList.add("is-focus");
+    stage.classList.remove("is-dim");
+
+    leads.forEach(function (l) {
+      var lid = l.getAttribute("data-id");
+      l.classList.toggle("is-on", lid === id);
+      setLabel(lid, "is-on", lid === id);
     });
+    nodes.forEach(function (n) {
+      if (n.classList.contains("g-node--member")) {
+        n.classList.toggle("is-on", owns(n, id));
+      }
+    });
+    edges.forEach(function (e) {
+      e.classList.toggle("is-on", owns(e, id));
+    });
+    beatItems.forEach(function (b) {
+      b.classList.toggle("is-on", b.getAttribute("data-sol") === id);
+    });
+    sols.forEach(function (s) {
+      s.classList.toggle("is-on", s.getAttribute("data-sol") === id);
+    });
+
+    fillPanel(id);
+  }
+
+  function clearFocus() {
+    focused = null;
+    pinned = null;
+    mark();
+    stage.classList.remove("is-focus", "is-dim");
+    leads.concat(nodes, edges).forEach(function (el) {
+      el.classList.remove("is-on", "is-hit");
+    });
+    Object.keys(labelBy).forEach(function (id) {
+      labelBy[id].classList.remove("is-on", "is-hit");
+    });
+    beatItems.forEach(function (b) {
+      b.classList.remove("is-on");
+    });
+    sols.forEach(function (s) {
+      s.classList.remove("is-on");
+    });
+    cards.forEach(function (c) {
+      c.classList.remove("is-hit");
+    });
+  }
+
+  leads.forEach(function (l) {
+    var id = l.getAttribute("data-id");
+    // Hover focuses rather than only previewing. When hover merely filled the
+    // panel, the panel could describe one Solution while the graph highlighted
+    // another, which is worse than either behaviour on its own.
+    l.addEventListener("mouseenter", function () {
+      if (pinned) return;
+      focus(id);
+    });
+    l.addEventListener("focus", function () {
+      focus(id, { pin: true });
+    });
+    // Each lead is a real link to its Solution's card, so the graph is a table of
+    // contents when this script does not run. When it does run, the same activation
+    // means "show me this here" instead, and the jump is suppressed — following the
+    // link would scroll away from the graph the visitor is using.
+    l.addEventListener("click", function (e) {
+      if (wide()) e.preventDefault();
+      focus(id, { pin: true });
+    });
+    l.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        // Space does not activate a link by default, and here it should: the
+        // visitor is operating a graph, not reading prose.
+        if (wide() || e.key === " ") e.preventDefault();
+        focus(id, { pin: true });
+      }
+    });
+  });
+
+  // Hovering a Solution card lights its cluster in the graph, so the two halves
+  // of the page are visibly the same information.
+  sols.forEach(function (s) {
+    var id = s.getAttribute("data-sol");
+    s.addEventListener("mouseenter", function () {
+      if (pinned) return;
+      focus(id);
+    });
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      if (search) search.value = "";
+      clearFocus();
+    }
+  });
+
+  /* ----------------------------------------------------------------- search */
+
+  function runSearch(q) {
+    q = (q || "").trim().toLowerCase();
+    if (!q) {
+      stage.classList.remove("is-dim");
+      nodes.forEach(function (n) {
+        n.classList.remove("is-hit");
+      });
+      leads.forEach(function (l) {
+        l.classList.remove("is-hit");
+        setLabel(l.getAttribute("data-id"), "is-hit", false);
+      });
+      cards.forEach(function (c) {
+        c.classList.remove("is-hit");
+      });
+      return;
+    }
+    stage.classList.remove("is-focus");
+    stage.classList.add("is-dim");
+
+    // Search reads data-name, the human label, not data-id, which is now an
+    // identity key of the form category~bundle~name. Searching the key would make
+    // "engineering" match all 105 skills in that category through their ids as
+    // well as their category, which is not what someone typing a skill name means.
+    var hits = 0;
+    nodes.forEach(function (n) {
+      var name = (n.getAttribute("data-name") || "").toLowerCase();
+      var dom = (n.getAttribute("data-dom") || "").toLowerCase();
+      var hit = name.indexOf(q) > -1 || dom.indexOf(q) > -1;
+      n.classList.toggle("is-hit", hit);
+      if (hit) hits++;
+    });
+    leads.forEach(function (l) {
+      var name = (l.getAttribute("data-name") || "").toLowerCase();
+      var hit = name.indexOf(q) > -1;
+      l.classList.toggle("is-hit", hit);
+      setLabel(l.getAttribute("data-id") || "", "is-hit", hit);
+    });
+    cards.forEach(function (c) {
+      var name = (c.getAttribute("data-name") || "").toLowerCase();
+      c.classList.toggle("is-hit", name.indexOf(q) > -1);
+    });
+  }
+
+  // A hit inside a closed category is a hit nobody can see, so searching opens
+  // the categories it found something in, and closes them again when cleared.
+  function revealHits(anyQuery) {
+    Array.prototype.slice
+      .call(document.querySelectorAll(".lib__cat"))
+      .forEach(function (d) {
+        if (!anyQuery) {
+          d.removeAttribute("open");
+        } else if (d.querySelector(".card.is-hit")) {
+          d.setAttribute("open", "");
+        } else {
+          d.removeAttribute("open");
+        }
+      });
+  }
+
+  if (search) {
+    search.addEventListener("input", function () {
+      runSearch(search.value);
+      revealHits(!!search.value.trim());
+    });
+  }
+
+  // Following a rail link into a closed category should open it, otherwise the
+  // link lands on a heading and appears to do nothing.
+  function openTarget(hash) {
+    if (!hash || hash.charAt(0) !== "#") return;
+    var el = document.getElementById(hash.slice(1));
+    if (el && el.tagName === "DETAILS") el.setAttribute("open", "");
+  }
+  if (rail) {
+    rail.addEventListener("click", function (e) {
+      var a = e.target.closest("a");
+      if (a) openTarget(a.getAttribute("href"));
+    });
+  }
+  window.addEventListener("hashchange", function () {
+    openTarget(window.location.hash);
+  });
+  openTarget(window.location.hash);
+
+  /* ------------------------------------------------------ provenance filters */
+
+  if (chips) {
+    chips.addEventListener("click", function (e) {
+      var btn = e.target.closest("button");
+      if (!btn) return;
+      if (btn === resetBtn) {
+        if (search) search.value = "";
+        chips.querySelectorAll(".chip[data-tier]").forEach(function (c) {
+          c.setAttribute("aria-pressed", "false");
+        });
+        clearFocus();
+        return;
+      }
+      var tier = btn.getAttribute("data-tier");
+      if (!tier) return;
+      var on = btn.getAttribute("aria-pressed") !== "true";
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+
+      var active = Array.prototype.slice
+        .call(chips.querySelectorAll('.chip[aria-pressed="true"]'))
+        .map(function (c) {
+          return c.getAttribute("data-tier");
+        });
+
+      if (!active.length) {
+        clearFocus();
+        return;
+      }
+      stage.classList.remove("is-focus");
+      stage.classList.add("is-dim");
+      leads.forEach(function (l) {
+        var hit = active.indexOf(l.getAttribute("data-tier")) > -1;
+        l.classList.toggle("is-hit", hit);
+        setLabel(l.getAttribute("data-id"), "is-hit", hit);
+      });
+      nodes.forEach(function (n) {
+        if (!n.classList.contains("g-node--member")) return;
+        var hit = (n.getAttribute("data-sol") || "").split(" ").some(function (o) {
+          var s = solByLead[o];
+          return !!s && active.indexOf(s.tier) > -1;
+        });
+        n.classList.toggle("is-hit", hit);
+      });
+      sols.forEach(function (s) {
+        s.classList.toggle(
+          "is-on",
+          active.indexOf(s.getAttribute("data-tier")) > -1
+        );
+      });
+    });
+  }
+
+  /* ------------------------------------------------------------------ camera
+   * There isn't one, and that is deliberate.
+   *
+   * The first version eased the SVG viewBox to frame the focused Solution. It
+   * looked good for one beat and then caused three separate faults: SVG text is
+   * measured in user units so every label scaled with the zoom and the labels
+   * collided; a node sliding under a stationary cursor fired mouseenter and hover
+   * replaced the selection the reader had just clicked; and worst, once zoomed in,
+   * every Solution outside the frame became unclickable, so the graph's own
+   * navigation broke unless the reader knew to press Escape.
+   *
+   * Highlighting instead of moving keeps all 54 Solutions reachable at all times,
+   * keeps labels at the size they were designed at, and makes the focused cluster
+   * clearer than a zoom did, because the contrast is against the rest of the
+   * library rather than against empty space.
+   */
+
+  /* ------------------------------------------------ the page opens on a Solution
+   * The panel and the graph should be showing something the moment the page is
+   * readable, rather than waiting for a hover that never arrives on a touch
+   * screen.
+   */
+  var featured = (DATA.featured || []).filter(function (id) {
+    return !!solByLead[id];
+  });
+  if (featured.length) fillPanel(featured[0]);
+
+  /* -------------------------------------------------------------- traversal */
 
   var enhanced =
     !reduced &&
-    window.innerWidth > MOBILE &&
+    wide() &&
     typeof window.gsap !== "undefined" &&
-    typeof window.ScrollTrigger !== "undefined" &&
-    chapters.length > 0;
+    typeof window.ScrollTrigger !== "undefined";
 
   if (!enhanced) {
-    // Plain prerendered page. Keep the HUD truthful rather than stuck at zero.
-    setHud(total, "");
-    if (bar) bar.style.transform = "scaleX(1)";
+    if (bar) bar.classList.add("is-full");
     document.documentElement.classList.add("is-static");
     return;
   }
@@ -84,11 +423,6 @@
   gsap.registerPlugin(ScrollTrigger);
   document.documentElement.classList.add("is-enhanced");
 
-  // Progress starts at nothing: no category has been travelled yet.
-  setHud(0, "");
-
-  // Smooth scrolling, driven from GSAP's ticker so there is exactly one rAF
-  // loop on the page rather than Lenis and GSAP each running their own.
   var lenis = null;
   if (typeof window.Lenis !== "undefined") {
     lenis = new Lenis({ duration: 0.9, smoothWheel: true });
@@ -106,166 +440,80 @@
       var target = document.querySelector(a.getAttribute("href"));
       if (!target) return;
       e.preventDefault();
-      if (lenis) lenis.scrollTo(target, { offset: 1 });
+      if (lenis) lenis.scrollTo(target, { offset: -70 });
       else target.scrollIntoView({ behavior: "smooth" });
     });
   }
 
-  /* ---------------------------------------------------------------- hero
-   * Pull back from a mosaic of one tile per skill to the headline, counting the
-   * total up as it goes. The opening image is the shape of the real library.
-   */
-  if (mosaic && hero) {
-    var counter = { v: 0 };
-    gsap
-      .timeline({
-        scrollTrigger: {
-          trigger: hero,
-          start: "top top",
-          end: "+=140%",
-          scrub: 0.6,
-          pin: true,
-          anticipatePin: 1
-        }
-      })
-      .fromTo(
-        mosaic,
-        { scale: 7, opacity: 0.25 },
-        { scale: 1, opacity: 1, ease: "none" },
-        0
-      )
-      .to(counter, {
-        v: total,
-        ease: "none",
-        duration: 1,
-        onUpdate: function () {
-          // Only the hero's own number. Writing the total into the HUD here made
-          // the HUD mean "size of the library" during the hero and "skills
-          // passed so far" during the chapters, so it counted up to the full total and then
-          // dropped back to 109. The HUD means progress, and nothing else.
-          if (heroCount) heroCount.textContent = Math.round(counter.v);
-        }
-      }, 0)
-      .fromTo(
-        ".hero__inner",
-        { y: 26 },
-        { y: 0, ease: "power2.out", duration: 0.45 },
-        0.12
-      )
-      .to(cue, { opacity: 0, duration: 0.2 }, 0.55);
-  }
-
-  /* ------------------------------------------------------------ chapters
-   * One pinned chapter per category. Scroll scrubs the filmstrip of cards
-   * horizontally through the frame, so browsing a category is the scroll itself
-   * rather than a list you skim past.
-   */
-  chapters.forEach(function (ch) {
-    if (!ch.strip || !ch.mask || ch.cards.length === 0) return;
-
-    function travel() {
-      // How far the strip must move for the last card to reach the frame edge.
-      return Math.max(0, ch.strip.scrollWidth - ch.mask.clientWidth);
-    }
-
-    // Pin length is proportional to the number of cards, floored so a
-    // one-skill category still gets a beat and capped so a 100-skill category
-    // does not become an endurance test.
-    var pinLength = Math.min(5200, Math.max(700, ch.count * 118));
-
-    // Cards start dimmed but readable. Anything near 0.3 read as empty space
-    // against this background rather than as a card waiting its turn.
-    gsap.set(ch.cards, { opacity: 0.72, y: 14 });
-
-    var tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: ch.section,
-        start: "top top",
-        end: "+=" + pinLength,
-        scrub: 0.7,
-        pin: ch.stage,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        onToggle: function (self) {
-          ch.section.classList.toggle("is-live", self.isActive);
-          if (!self.isActive || !rail) return;
-          var here = rail.querySelector("a.is-here");
-          if (here) here.classList.remove("is-here");
-          var link = rail.querySelector('a[href="#' + ch.section.id + '"]');
-          if (link) link.classList.add("is-here");
-        },
-        onUpdate: function (self) {
-          setHud(ch.before + self.progress * ch.count, ch.label);
-          if (bar) {
-            gsap.set(bar, {
-              scaleX: (ch.before + self.progress * ch.count) / total
-            });
-          }
-        }
-      }
-    });
-
-    tl.to(
-      ch.strip,
-      {
-        // Negative: the strip travels LEFT so card 1 leads and card N arrives last.
-        x: function () {
-          return -travel();
-        },
-        ease: "none",
-        duration: 1
-      },
-      0
-    );
-
-    // Card reveals sit on this same scrubbed timeline. A separate ScrollTrigger
-    // per card cannot work here: the cards are being translated by GSAP, so
-    // their position relative to the viewport is not something a normal trigger
-    // can observe.
-    ch.cards.forEach(function (card, i) {
-      var at = ch.cards.length > 1 ? (i / ch.cards.length) * 0.94 : 0;
-      tl.to(
-        card,
-        { opacity: 1, y: 0, ease: "power1.out", duration: 0.08 },
-        at
-      );
-    });
-
-    // Ghost wordmark drifts against the strip to give the pinned frame depth.
-    if (ch.ghost) {
-      tl.fromTo(
-        ch.ghost,
-        { xPercent: 6 },
-        { xPercent: -6, ease: "none", duration: 1 },
-        0
-      );
-    }
-    if (ch.head) {
-      tl.fromTo(
-        ch.head,
-        { opacity: 0, y: 22 },
-        { opacity: 1, y: 0, ease: "power2.out", duration: 0.12 },
-        0
-      );
+  // Page-wide progress. It means "how far down the page you are" and nothing
+  // else; the previous bar meant two different things in two different sections.
+  ScrollTrigger.create({
+    start: 0,
+    end: "max",
+    onUpdate: function (self) {
+      if (bar) gsap.set(bar, { scaleX: Math.max(0.02, self.progress) });
     }
   });
 
-  // Recompute geometry once webfonts land, since card widths and therefore
-  // strip travel depend on the rendered font.
+  /* The opening: pin the stage and step the highlight through the featured
+   * Solutions. The budget is deliberately small. The previous page pinned 24
+   * chapters and ran to 76,000 pixels; scrolling was the whole interface, and
+   * getting to a named skill meant travelling past hundreds of others. Eight
+   * beats teach the interaction, and everything else is reachable by search or
+   * by clicking a node.
+   */
+  if (featured.length) {
+    var PER_BEAT = 260;
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: stage,
+        start: "top top",
+        end: "+=" + featured.length * PER_BEAT,
+        scrub: 0.5,
+        pin: true,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: function (self) {
+          // A dead zone at the very start, so the page's opening image is the whole
+          // library rather than one cluster already singled out.
+          //
+          // It must not clear a selection the reader made. This trigger updates on
+          // every tick, so while sitting at the top of the page it was calling
+          // clearFocus() immediately after any click, which released the pin and let
+          // the next hover take over: clicking a Solution appeared to work and then
+          // silently stopped holding.
+          if (self.progress < 0.06) {
+            if (focused && !pinned) clearFocus();
+            return;
+          }
+          var i = Math.min(
+            featured.length - 1,
+            Math.floor(((self.progress - 0.06) / 0.94) * featured.length)
+          );
+          if (featured[i] !== focused) {
+            pinned = null;
+            focus(featured[i]);
+          }
+        },
+        onLeaveBack: function () {
+          clearFocus();
+        }
+      }
+    }).to(cue, { opacity: 0, duration: 0.3 }, 0);
+  }
+
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(function () {
       ScrollTrigger.refresh();
     });
   }
 
-  // Crossing the mobile breakpoint changes the whole strategy (pinning vs
-  // native swipe), so reload rather than trying to tear GSAP down in place.
-  var wasDesktop = window.innerWidth > MOBILE;
+  var wasDesktop = wide();
   var t;
   window.addEventListener("resize", function () {
     clearTimeout(t);
     t = setTimeout(function () {
-      var isDesktop = window.innerWidth > MOBILE;
+      var isDesktop = wide();
       if (isDesktop !== wasDesktop) window.location.reload();
       else ScrollTrigger.refresh();
     }, 250);
