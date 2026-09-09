@@ -380,12 +380,23 @@ test.describe("the production Content-Security-Policy", () => {
     const framed = await page.evaluate(() => {
       const vp = document.getElementById("vp");
       return {
+        wide: window.innerWidth > 1000 && window.innerHeight > 720,
         k: Number(getComputedStyle(vp).getPropertyValue("--k")),
-        transform: vp.style.transform
+        transform: vp.style.transform,
+        named: document.getElementById("panelname").textContent,
+        lit: document.querySelectorAll(".g-node.is-on").length
       };
     });
-    expect(framed.k, "the camera must zoom under the real policy").toBeGreaterThan(1.05);
-    expect(framed.transform).toContain("scale(");
+    // The selection has to take effect at every width; the camera move is desktop-only,
+    // because framing a cluster is no help where nothing in it can be tapped. Asserting the
+    // zoom unconditionally is what failed here on the phone profile - the test was demanding
+    // the opposite of what the page intends at that width.
+    expect(framed.named.trim().length, "a community is named").toBeGreaterThan(2);
+    expect(framed.lit, "its members are lit").toBeGreaterThan(2);
+    if (framed.wide) {
+      expect(framed.k, "the camera must zoom under the real policy").toBeGreaterThan(1.05);
+      expect(framed.transform).toContain("scale(");
+    }
 
     await page.locator(".g-node").nth(200).click({ force: true });
     await page.waitForTimeout(600);
