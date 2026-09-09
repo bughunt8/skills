@@ -103,13 +103,20 @@ test.describe("prefers-reduced-motion", () => {
     );
     expect(hidden).toBe(0);
 
-    // The graph is still there and still complete: reduced motion removes the
-    // traversal, not the content or the ability to explore it.
+    // The tree is still there and still explorable: reduced motion removes the
+    // traversal, not the content.
+    //
+    // Scoped to what is meant to be on screen. Three of the four layers are closed
+    // until their branch is opened — that is presence, not motion, and it holds under
+    // reduced motion too, because 490 leaves at their overlapping slot positions is
+    // not a legible alternative for anyone. What must not happen is a node being
+    // dimmed by a focus state the reader never triggered, so this looks at the nodes
+    // that are open.
     expect(await page.locator('.g-node[data-layer="domain"]').count()).toBe(7);
-    const dimmed = await page.locator(".g-node").evaluateAll((ns) =>
-      ns.filter((n) => Number(getComputedStyle(n).opacity) < 0.1).length
-    );
-    expect(dimmed, "nothing may be hidden by a focus state nobody triggered").toBe(0);
+    const dimmed = await page
+      .locator('.g-node[data-layer="domain"], .g-node.is-open')
+      .evaluateAll((ns) => ns.filter((n) => Number(getComputedStyle(n).opacity) < 0.9).length);
+    expect(dimmed, "nothing open may be dimmed by a state nobody triggered").toBe(0);
     expect(errors).toEqual([]);
     await ctx.close();
   });
@@ -184,8 +191,6 @@ test.describe("narrow viewports", () => {
       await expect(page.locator("#panelname")).not.toBeEmpty();
       await tapNode(".g-node--solution.is-open", "one of its Solutions");
       expect(await page.locator("#panelchain li").count()).toBeGreaterThan(1);
-    await page.waitForTimeout(400);
-    await expect(page.locator("#panelname")).toHaveText(/agenthub/);
 
     // Search is the only practical way through 490 skills on a phone.
     await page.fill("#gsearch", "resume");

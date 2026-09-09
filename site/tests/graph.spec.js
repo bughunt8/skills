@@ -332,6 +332,12 @@ test.describe("the four-layer tree", () => {
       ".g-node--practice.is-open",
       ".g-node--solution.is-open"
     ]) {
+      // Bring it on screen first. elementFromPoint only sees the viewport, and on a
+      // phone the stage is an ordinary scrolling column, so a node can sit below the
+      // fold — which reads as "covered by nothing" rather than "not visible".
+      await page.locator(sel).first().scrollIntoViewIfNeeded();
+      await page.waitForTimeout(250);
+
       const pt = await page.evaluate((selector) => {
         const el = document.querySelector(selector);
         const r = el.querySelector(".g-hit").getBoundingClientRect();
