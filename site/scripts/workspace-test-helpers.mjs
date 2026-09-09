@@ -11,7 +11,7 @@ export async function openWorkspace(page) {
   }
   const defect = process.env.WORKSPACE_PLANTED_DEFECT;
   if (defect === "hover-steals-search") {
-    await page.route("**/app.js", async (route) => {
+    await page.route(/\/app\.js(?:\?.*)?$/, async (route) => {
       const response = await route.fetch();
       const original = await response.text();
       const marker = "  function selectNode(key) {";
@@ -26,13 +26,13 @@ export async function openWorkspace(page) {
       await route.fulfill({ response, body: original.replace(marker, defectCode + marker) });
     });
   } else if (defect === "unreadable-font") {
-    await page.route("**/styles.css", async (route) => {
+    await page.route(/\/styles\.css(?:\?.*)?$/, async (route) => {
       const response = await route.fetch();
       await route.fulfill({ response, body: await response.text() +
         "\n/* Isolated acceptance defect: do not ship. */\n#graph-labels text { font-size: 8px !important; }\n" });
     });
   } else if (defect === "label-over-node") {
-    await page.route("**/app.js", async (route) => {
+    await page.route(/\/app\.js(?:\?.*)?$/, async (route) => {
       const response = await route.fetch();
       const original = await response.text();
       const marker = "\n  }\n\n  function contextTitle() {";
