@@ -38,7 +38,15 @@ The initial view fits the largest detected community, not the entire graph.
 Selecting a node expands a local neighborhood. Overview is a deliberate action.
 Pan, zoom, resize, pointer passage and keyboard focus do not change context.
 Only clicks, Enter/Space activation, form submission and deliberate input changes
-may do so. There are no hover handlers.
+may do so. There are no hover handlers: pointer passage over a dot may give
+purely presentational CSS feedback, and still never changes context.
+
+Interaction motion is specified in `MOTION.md`. State commits synchronously on
+the interaction; only pixels interpolate afterwards, so every dataset, status
+field, list, panel and label is already final before the first animation frame.
+Browser checks that read painted pixels wait for `#top[data-motion]="idle"`
+rather than sleeping; at idle the label layer is fully revealed. Reduced motion
+schedules no animation frames at all and leaves `data-motion` at `idle`.
 
 Search indexes complete skill names and frontmatter descriptions, independent
 of the initial community focus. Explicit dropdown filters constrain results.
@@ -76,6 +84,14 @@ library still works. Actual skill-file links retain source and licence credit.
 - `#gsvg`, `#vp`, `.g-node[data-key]`, `.g-edge[data-i]`: graph geometry.
   `#vp` has an SVG `transform` plus `data-x`, `data-y`, `data-scale`.
   Nodes expose `data-visible` and `data-in-context`.
+- Motion state: `#top[data-motion]` is `running` or `idle`,
+  `#top[data-motion-beat]` names the beat (`first-paint`, `context`, `camera`,
+  `search`, `path`, `selection`), and `#top[data-motion-flight]` is present only
+  while dots travel. `#top[data-pulse]` marks a search pulse.
+  `#graph-labels[data-revealed]` is `false` only while the scene is in flight.
+  `.g-node` carries `data-entering`, `data-leaving` or `data-ambient` for the
+  duration of its role; `.g-edge[data-draw]` marks a drawing path hop, and
+  `.g-halo` is the single ambient element on the selected dot.
 - `#graph-labels .g-nlabel[data-key]` and `.g-clabel[data-comm]`: screen-space
   labels. Check computed font size multiplied by screen CTM scale.
 - `#selected-label-leader` and `#top[data-selected-offscreen]`: selected label

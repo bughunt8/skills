@@ -1,6 +1,8 @@
 /* Static graph workspace. Context changes only through deliberate user actions.
  * The build owns identity, evidence, communities and the complete text library.
- * Geometry and screen-space labels have independent transforms. No motion layer.
+ * Geometry and screen-space labels have independent transforms.
+ * The motion layer interpolates pixels only: state commits synchronously before
+ * the first animation frame runs. See MOTION.md for the binding contract.
  */
 (() => {
   "use strict";
@@ -369,9 +371,11 @@
     return "All communities";
   }
 
+  const cameraTransform = (v) => `translate(${v.x} ${v.y}) scale(${v.k})`;
+
   function applyViewport(layoutPass = 0) {
     const {x, y, k} = state.viewport;
-    vp.setAttribute("transform", `translate(${x} ${y}) scale(${k})`);
+    vp.setAttribute("transform", cameraTransform(state.viewport));
     Object.assign(vp.dataset, {x: String(x), y: String(y), scale: String(k)});
     let visible = 0;
     nodes.forEach((node, key) => {
@@ -386,6 +390,7 @@
       node.hit.setAttribute("r", 22 / k);
     });
     drawLabels();
+    placeHalo();
     root.dataset.visibleCount = String(visible);
     root.dataset.renderedCount = String(sceneKeys.length);
     text("status-counts", `${visible} visible / ${sceneKeys.length} in view · ${listKeys.length} matching`);
@@ -412,6 +417,303 @@
       size = {w: rect.width, h: rect.height};
       applyViewport(layoutPass + 1);
     }
+  }
+
+  // -------------------------------------------------------------- motion layer
+  // Nothing below writes state, selection, query, mode, counts or label text.
+  // Only transform, opacity and stroke-dashoffset move. One rAF loop, self-stopping.
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const MOTION = {quick: 160, standard: 260, slow: 460, ceiling: 600,
+    wave: 220, step: 48, buckets: 10, pulse: 640, hop: 120, draw: 380, roles: 60};
+  function bezier(x1, y1, x2, y2) {
+    const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+    const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+    return (p) => {
+      if (p <= 0) return 0;
+      if (p >= 1) return 1;
+      let t = p;
+      for (let i = 0; i < 8; i++) {
+        const error = ((ax * t + bx) * t + cx) * t - p;
+        if (Math.abs(error) < 1e-5) break;
+        const slope = (3 * ax * t + 2 * bx) * t + cx;
+        if (Math.abs(slope) < 1e-6) break;
+        t -= error / slope;
+      }
+      t = Math.max(0, Math.min(1, t));
+      return ((ay * t + by) * t + cy) * t;
+    };
+  }
+  const EASE = {standard: bezier(.2, 0, 0, 1), enter: bezier(.05, .7, .1, 1), exit: bezier(.3, 0, 1, 1)};
+  const halo = document.createElementNS(ns, "circle");
+  halo.setAttribute("class", "g-halo");
+  let flight = null, raf = 0, settleTimer = 0, revealTimer = 0, idleTimer = 0, drawTimer = 0;
+  const roleNodes = [];
+
+  // The one ambient element: a halo on the selected dot, never under reduced motion.
+  function placeHalo() {
+    const key = state.selected, node = key ? nodes.get(key) : null;
+    const point = node ? scene.get(key) : null;
+    nodes.forEach((other) => {
+      if (other.el.dataset.ambient && other.key !== key) delete other.el.dataset.ambient;
+    });
+    if (reducedMotion.matches || !node || !point) {
+      if (halo.parentNode) halo.parentNode.removeChild(halo);
+      if (node) delete node.el.dataset.ambient;
+      return;
+    }
+    halo.setAttribute("cx", point.x);
+    halo.setAttribute("cy", point.y);
+    halo.setAttribute("r", 18 / state.viewport.k);
+    // Re-inserting restarts the scale-in, so only move it when the target changes.
+    if (halo.parentNode !== node.el) node.el.insertBefore(halo, node.dot);
+    node.el.dataset.ambient = "true";
+  }
+
+  function revealLabels(on) { $("graph-labels").dataset.revealed = String(on); }
+
+  // Capture what the eye currently sees, including a tween in flight, so an
+  // interruption continues from the visible position instead of snapping.
+  function liveScene() {
+    const points = new Map();
+    nodes.forEach((node, key) => {
+      if (node.el.dataset.inContext !== "true") return;
+      const x = Number(node.el.dataset.renderX), y = Number(node.el.dataset.renderY);
+      if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+      const offset = flight ? flight.offsets.get(key) : null;
+      points.set(key, {x: x + (offset ? offset.dx : 0), y: y + (offset ? offset.dy : 0)});
+    });
+    return {points, viewport: flight ? {...flight.live} : {...state.viewport}};
+  }
+
+  function clearTimers() {
+    if (settleTimer) { clearTimeout(settleTimer); settleTimer = 0; }
+    if (revealTimer) { clearTimeout(revealTimer); revealTimer = 0; }
+    if (idleTimer) { clearTimeout(idleTimer); idleTimer = 0; }
+    if (drawTimer) { clearTimeout(drawTimer); drawTimer = 0; }
+  }
+
+  function clearDraw() {
+    edgeElements.forEach((el) => {
+      if (!el.dataset.draw) return;
+      delete el.dataset.draw;
+      el.style.removeProperty("stroke-dasharray");
+      el.style.removeProperty("stroke-dashoffset");
+      el.style.removeProperty("transition");
+    });
+  }
+
+  // Pixels return to the committed geometry exactly: the tween only ever added
+  // a group transform, so removing it leaves an instant render.
+  function clearFlight() {
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    if (flight) {
+      flight.travel.forEach((item) => item.node.el.removeAttribute("transform"));
+      flight = null;
+    }
+    vp.setAttribute("transform", cameraTransform(state.viewport));
+    delete root.dataset.motionFlight;
+  }
+
+  // Only the nodes that were actually given a role are touched: sweeping all 490
+  // on every render cost more frame budget than the roles themselves.
+  function clearRoles() {
+    roleNodes.forEach((el) => {
+      if (el.dataset.entering) delete el.dataset.entering;
+      if (el.dataset.leaving) delete el.dataset.leaving;
+      el.style.removeProperty("--enter-delay");
+    });
+    roleNodes.length = 0;
+    delete root.dataset.pulse;
+  }
+
+  function cancelMotion() {
+    clearTimers();
+    clearDraw();
+    clearFlight();
+    clearRoles();
+    revealLabels(true);
+    root.dataset.motion = "idle";
+  }
+
+  // One transform write per moving group per frame, and nothing else.
+  function paint(f, progress) {
+    const eased = f.ease(progress);
+    if (f.camera) {
+      const k = f.from.k * Math.pow(f.to.k / f.from.k, eased);
+      const x = f.from.x + (f.to.x - f.from.x) * eased;
+      const y = f.from.y + (f.to.y - f.from.y) * eased;
+      f.live = {x, y, k};
+      vp.setAttribute("transform", cameraTransform(f.live));
+    }
+    for (const item of f.travel) {
+      const dx = item.dx * (1 - eased), dy = item.dy * (1 - eased);
+      const offset = f.offsets.get(item.node.key);
+      offset.dx = dx; offset.dy = dy;
+      item.node.el.setAttribute("transform", `translate(${dx} ${dy})`);
+    }
+  }
+
+  function step(now) {
+    const f = flight;
+    if (!f) { raf = 0; return; }
+    const progress = Math.min(1, (now - f.start) / f.duration);
+    paint(f, progress);
+    if (progress >= 1) { raf = 0; clearFlight(); return; }
+    raf = requestAnimationFrame(step);
+  }
+
+  // The path hops draw in sequence. Edge geometry is already final; only the
+  // dash offset moves, so no path is ever rebuilt while it animates.
+  function startDraw(budget) {
+    const hops = state.path.length - 1;
+    if (hops < 1) return 0;
+    const per = Math.max(40, Math.min(MOTION.hop, Math.floor(budget / hops)));
+    let drawn = 0;
+    state.path.slice(1).forEach((key, i) => {
+      const previous = state.path[i];
+      const edge = activeEdges.find((item) =>
+        (item.a === previous && item.b === key) || (item.a === key && item.b === previous));
+      if (!edge) return;
+      const el = edgeElements[edge.index];
+      let length = 0;
+      try { length = el.getTotalLength(); } catch (_) { length = 0; }
+      if (!length) return;
+      el.dataset.draw = "true";
+      el.style.transition = "none";
+      el.style.strokeDasharray = String(length);
+      el.style.strokeDashoffset = String(length);
+      void el.getBoundingClientRect();
+      el.style.transition = `stroke-dashoffset ${per}ms cubic-bezier(0.2, 0, 0, 1) ${i * per}ms`;
+      el.style.strokeDashoffset = "0";
+      drawn = Math.max(drawn, (i + 1) * per);
+    });
+    if (drawn) drawTimer = setTimeout(() => { drawTimer = 0; clearDraw(); }, drawn + 60);
+    return drawn;
+  }
+
+  function waveDelays(entering) {
+    const anchorKey = state.selected && scene.has(state.selected) ? state.selected :
+      ranked(sceneKeys)[0];
+    const anchor = anchorKey ? scene.get(anchorKey) : {x: 0, y: 0};
+    const order = entering.slice().sort((a, b) => {
+      const pa = scene.get(a.key), pb = scene.get(b.key);
+      return Math.hypot(pa.x - anchor.x, pa.y - anchor.y) - Math.hypot(pb.x - anchor.x, pb.y - anchor.y);
+    });
+    const perBucket = Math.max(1, Math.ceil(order.length / MOTION.buckets));
+    let longest = 0;
+    order.forEach((node, i) => {
+      const delay = Math.min(MOTION.buckets - 1, Math.floor(i / perBucket)) * MOTION.step;
+      node.el.style.setProperty("--enter-delay", `${delay}ms`);
+      longest = Math.max(longest, delay);
+    });
+    return longest;
+  }
+
+  function beginMotion(previous, beat) {
+    clearTimers();
+    clearDraw();
+    const entering = [], leaving = [], travel = [];
+    sceneKeys.forEach((key) => {
+      const node = nodes.get(key), to = scene.get(key), from = previous.points.get(key);
+      if (!from) { entering.push(node); return; }
+      if (Math.abs(from.x - to.x) > .01 || Math.abs(from.y - to.y) > .01) {
+        travel.push({node, dx: from.x - to.x, dy: from.y - to.y});
+      }
+    });
+    previous.points.forEach((_point, key) => {
+      if (!scene.has(key) && nodes.has(key)) leaving.push(nodes.get(key));
+    });
+    const from = previous.viewport, to = state.viewport;
+    const span = Math.hypot(from.x - to.x, from.y - to.y);
+    const zoomSpan = Math.abs(Math.log((to.k || 1) / (from.k || 1)));
+    const wave = beat === "first-paint";
+    // A first paint has nothing to travel from; it reveals outward instead.
+    const camera = !wave && (span > .5 || zoomSpan > .001);
+    if (beat === "context" && !camera && !travel.length && !entering.length && !leaving.length) {
+      beat = "selection";
+    }
+    root.dataset.motionBeat = beat;
+    clearFlight();
+    clearRoles();
+    if (reducedMotion.matches) {
+      revealLabels(true);
+      root.dataset.motion = "idle";
+      return;
+    }
+    let duration = beat === "camera" || beat === "selection" ? MOTION.standard : MOTION.slow;
+    if (beat !== "camera" && beat !== "selection" && camera) {
+      // Distance stretches a context change, never past the 600ms ceiling.
+      const reach = Math.min(1, span / Math.max(1, Math.max(size.w, size.h)) + zoomSpan / 3);
+      duration = Math.min(MOTION.ceiling, Math.round(MOTION.slow * (1 + reach * .31)));
+    }
+    // Roles are capped: a node-to-overview change enters hundreds of dots at once,
+    // and one CSS animation per dot costs more frame budget than the beat is worth.
+    const entered = entering.slice(0, MOTION.roles);
+    entered.forEach((node) => { node.el.dataset.entering = "true"; roleNodes.push(node.el); });
+    // A leaving dot's visibility is already committed by render(), so it is gone.
+    // The role is exposed for the flight window, but nothing is re-shown: painting
+    // dots the label layer never planned for breaks label clearance, and re-showing
+    // 466 of them on an overview-to-node change blew the 120ms frame budget.
+    leaving.slice(0, MOTION.roles).forEach((node) => {
+      node.el.dataset.leaving = "true";
+      roleNodes.push(node.el);
+    });
+    const waveLongest = wave && entered.length ? waveDelays(entered) : 0;
+    const moving = camera || travel.length > 0;
+    let settleAt = wave ? waveLongest + MOTION.wave : moving || entering.length || leaving.length ?
+      duration : beat === "selection" ? MOTION.standard : 0;
+    if (beat === "search") settleAt = Math.max(settleAt, MOTION.standard);
+    if (!settleAt && beat !== "search") {
+      revealLabels(true);
+      root.dataset.motion = "idle";
+      return;
+    }
+    root.dataset.motion = "running";
+    if (beat === "search") {
+      // Restart the matched-dot pulse even when the attribute was already present.
+      delete root.dataset.pulse;
+      void root.getBoundingClientRect();
+      root.dataset.pulse = "1";
+    }
+    // Labels are already placed for the final layout, so their computed size is
+    // correct from the commit frame; only the paint waits for the world to settle.
+    // A camera-only glide keeps them: they are already placed for the settled camera.
+    const hidesLabels = wave || travel.length > 0 || entering.length > 0 || leaving.length > 0;
+    // The reveal is the secondary layer: it starts once the dots are nearly home
+    // and completes exactly as the beat goes idle, so `idle` means fully painted.
+    const revealAt = hidesLabels ? Math.max(0, settleAt - MOTION.standard) : 0;
+    if (hidesLabels) {
+      revealLabels(false);
+      revealTimer = setTimeout(() => { revealTimer = 0; revealLabels(true); }, revealAt);
+    } else {
+      revealLabels(true);
+    }
+    if (moving) {
+      // Edges are only unsafe while dots travel; a pure camera glide keeps them.
+      if (travel.length) root.dataset.motionFlight = "true";
+      flight = {start: performance.now(), duration, ease: EASE.standard, camera,
+        from: {...from}, to: {...to}, live: {...from}, travel, offsets: new Map()};
+      travel.forEach((item) => flight.offsets.set(item.node.key, {dx: item.dx, dy: item.dy}));
+      paint(flight, 0);
+      raf = requestAnimationFrame(step);
+    }
+    let total = Math.max(settleAt, revealAt + (hidesLabels ? MOTION.standard : 0));
+    if (beat === "search") total = Math.max(total, MOTION.pulse);
+    const drawBudget = beat === "path" ? Math.max(0, Math.min(MOTION.draw, 880 - settleAt)) : 0;
+    settleTimer = setTimeout(() => {
+      settleTimer = 0;
+      clearFlight();
+      clearRoles();
+      revealLabels(true);
+      if (drawBudget) {
+        const drawn = startDraw(drawBudget);
+        if (drawn) {
+          if (idleTimer) clearTimeout(idleTimer);
+          idleTimer = setTimeout(() => { idleTimer = 0; root.dataset.motion = "idle"; }, drawn);
+        }
+      }
+    }, settleAt);
+    idleTimer = setTimeout(() => { idleTimer = 0; root.dataset.motion = "idle"; }, total);
   }
 
   function renderList() {
@@ -518,7 +820,13 @@
     if (state.selected) $("panelsource").href = nodes.get(state.selected).source;
   }
 
-  function render({frame = true} = {}) {
+  function render({frame = true, beat = "context"} = {}) {
+    // The previous rendered pixels, captured before any recompute overwrites them.
+    const previous = liveScene();
+    clearTimers();
+    clearDraw();
+    clearFlight();
+    clearRoles();
     search.value = state.query;
     $("gcommunity").value = state.filters.community || (state.mode === "community" ? state.community : "");
     $("gcategory").value = state.filters.category;
@@ -542,6 +850,8 @@
     renderPanel();
     if (frame) fit();
     applyViewport();
+    // Every truthful write above is committed. Only pixels move from here.
+    beginMotion(previous, beat);
   }
 
   function selectNode(key) {
@@ -558,7 +868,7 @@
     } else {
       state.mode = "node";
     }
-    render();
+    render({beat: state.mode === "path" && state.path.length > 1 ? "path" : "context"});
     $("panel").scrollTop = 0;
   }
 
@@ -583,7 +893,7 @@
       state.mode = baseMode();
     }
     state.listKind = "search";
-    render();
+    render({beat: "search"});
   }
   search.addEventListener("input", changeSearch);
   $("gform").addEventListener("submit", (event) => {
@@ -616,7 +926,7 @@
   $("gstated").addEventListener("click", () => {
     save(); state.filters.stated = !state.filters.stated;
     if (state.pathStart && state.pathEnd) state.path = shortestPath(state.pathStart, state.pathEnd);
-    render();
+    render({beat: state.path.length > 1 ? "path" : "context"});
   });
   function resetWorkspace() {
     save(); state = initial(); render();
@@ -656,24 +966,35 @@
     if (suppressClick) { suppressClick = false; return; }
     if (node) selectNode(node.dataset.key);
   });
-  function zoom(factor) {
-    const old = state.viewport.k, next = Math.max(.08, Math.min(30, old * factor));
-    state.viewport.x = size.w / 2 - (size.w / 2 - state.viewport.x) * next / old;
-    state.viewport.y = size.h / 2 - (size.h / 2 - state.viewport.y) * next / old;
-    state.viewport.k = next;
+  // A camera-only beat: the world is unchanged, so only #vp interpolates and the
+  // labels are re-placed for the settled camera before the tween starts.
+  function cameraBeat(change) {
+    const previous = liveScene();
+    change();
     applyViewport();
+    beginMotion(previous, "camera");
+  }
+  function zoom(factor) {
+    cameraBeat(() => {
+      const old = state.viewport.k, next = Math.max(.08, Math.min(30, old * factor));
+      state.viewport.x = size.w / 2 - (size.w / 2 - state.viewport.x) * next / old;
+      state.viewport.y = size.h / 2 - (size.h / 2 - state.viewport.y) * next / old;
+      state.viewport.k = next;
+    });
   }
   $("gzoom-in").addEventListener("click", () => zoom(1.3));
   $("gzoom-out").addEventListener("click", () => zoom(1 / 1.3));
-  $("gfit").addEventListener("click", () => { fit(); applyViewport(); });
+  $("gfit").addEventListener("click", () => cameraBeat(fit));
   svg.addEventListener("keydown", (event) => {
     const moves = {ArrowLeft: [48, 0], ArrowRight: [-48, 0], ArrowUp: [0, 48], ArrowDown: [0, -48]};
     if (moves[event.key]) {
-      event.preventDefault(); state.viewport.x += moves[event.key][0]; state.viewport.y += moves[event.key][1]; applyViewport();
+      // A held arrow key is a direct manipulation: it tracks the key, never lags.
+      event.preventDefault(); cancelMotion();
+      state.viewport.x += moves[event.key][0]; state.viewport.y += moves[event.key][1]; applyViewport();
     } else if (["+", "=", "-"].includes(event.key)) {
       event.preventDefault(); zoom(event.key === "-" ? 1 / 1.3 : 1.3);
     } else if (event.key === "Home") {
-      event.preventDefault(); fit(); applyViewport();
+      event.preventDefault(); cameraBeat(fit);
     }
   });
   let drag = null;
@@ -688,6 +1009,8 @@
     const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
     if (!drag.moved && Math.hypot(dx, dy) < 5) return;
     drag.moved = true;
+    // A drag is direct manipulation: cancel any tween and follow the pointer.
+    if (flight || raf) cancelMotion();
     svg.setPointerCapture(event.pointerId);
     svg.classList.add("is-dragging");
     state.viewport.x = drag.startX + dx; state.viewport.y = drag.startY + dy;
@@ -738,9 +1061,11 @@
       // Preserve zoom and the world point at viewport center, not just the title.
       state.viewport.x += (size.w - old.w) / 2;
       state.viewport.y += (size.h - old.h) / 2;
+      // A genuine resize invalidates a tween's target; an observer echo does not.
+      if (Math.abs(size.w - old.w) > .01 || Math.abs(size.h - old.h) > .01) cancelMotion();
       applyViewport();
     } else {
-      render();
+      render({beat: "first-paint"});
       root.dataset.ready = "true";
     }
   }
