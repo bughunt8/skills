@@ -1,279 +1,139 @@
 # The Skill Library
 
-A scroll-driven browser for a library of AI agent skills. You travel through one
-category at a time, and every skill arrives with what it does, where it came
-from, and how it is licensed.
+A static graph workspace for finding agent skills, reading their evidence and
+following their connections. Search is at the top. The initial view opens the
+largest detected community. There is no scroll animation or pinning.
 
-- **Production:** <https://skills.ronald.ng>
-- **Staging:** GitHub Pages, published from `main` after CI passes
+- Production: <https://skills.ronald.ng>
+- Staging: the `staging` branch deploys to Hostinger through GitHub Actions.
+  The staging GitHub Environment supplies its `SITE_URL`.
 
-This page lives in `site/` inside the repository it indexes. Run every command
-below from `site/`.
+## Use the workspace
 
-## What this is
+Search skill names and complete frontmatter descriptions. A short query such as
+`NDA` matches word starts and the phrase `non-disclosure`, not incidental letters
+inside `standards`. Explicit community, category and Solution filters combine.
+The initial community focus does not constrain global search.
 
-The library indexes three public repositories, one of which is its own host. Nothing here is original work:
-every skill keeps the licence it was published under, and every card on the page
-names its source repository so a reader can go and check it.
+Select a member or result to expand its neighborhood and open its description,
+source-file link, licence and connection evidence in the docked inspector.
+The result list and query remain available. Hover, focus passage, background
+clicks, scrolling, pan and resize never select a different skill. Back restores
+the previous context and camera. Clear restores the search's originating view,
+or preserves newly chosen dropdown filters; Reset returns to the
+largest community with no filters. Escape is the explicit Reset shortcut.
 
-| Source | Licence |
+Drag the graph to pan. Use the zoom buttons and Fit view, or focus the graph and
+use the arrow keys, +, − and Home. Every member is also a native list button,
+so selecting a node never requires hitting a tiny dot. On phones, filters open
+from a disclosure in the header; graph and compact details/results stack.
+
+Trace path uses the selected skill as the start, or lets you choose two results.
+It computes exact unweighted breadth-first search over the active evidence
+graph. Stated-only excludes inferred edges and recomputes an existing path.
+Every path edge includes its supplied evidence. A missing path is reported as
+missing, never replaced by an approximate route.
+
+The bottom bar reports current context, matching results, nodes actually visible,
+nodes in the current graph view, selection, zoom and displayed evidence counts.
+Full Solutions and the text library are behind explicit disclosures below the
+workspace. They remain real `.sol` and `.card` HTML with JavaScript disabled.
+
+The behavior and stable browser selectors are specified in [UI_NAVIGATION.md](UI_NAVIGATION.md).
+
+## Build and validate
+
+Run from `site/`:
+
+```bash
+python3 build.py --write
+python3 build.py --check
+npm ci
+npm run lint:html
+npm run lint:secrets
+npm test
+npm run serve
+```
+
+`index.html` and `data.js` are generated. Change `build.py`, then regenerate.
+Do not hand-edit either generated region in `index.html`.
+`python3 build.py --refresh --write` deliberately updates upstream pins;
+ordinary builds never move them.
+
+The builder uses the Python standard library. It reads the host repository
+from the working tree and external repositories at the exact `sources.json`
+commit pins. Counts are generated, not maintained in prose. Identity uses
+category, bundle and name; byte-identical files are deduplicated. Distinct skills
+with the same name keep separate identities and visible qualifiers.
+
+| File | Responsibility |
 | --- | --- |
-| [bughunt8/skills](https://github.com/bughunt8/skills) — the host repository, read from the working tree | MIT, with vendored imports keeping their upstream licences |
+| `build.py` | Collect source metadata and prerender the graph shell, skill cards and Solutions |
+| `network.py` | Evidence graph, deterministic communities, layout and agreement metrics |
+| `compose.py` | Solution membership and evidence |
+| `app.js` | Explicit workspace state, search, filtering, BFS and viewport controls |
+| `styles.css` | Responsive layout, 16px body/labels, system light/dark themes |
+| `data.js` | Generated identity keys, edges, evidence and community metadata |
+| `fonts/` | Existing self-hosted Inter and Space Grotesk WOFF2 files |
+| `tests/` | Browser and Python behavior/geometry checks |
+| `scripts/smoke.mjs` | Post-deploy verification against the actual host |
+
+## Graph evidence and readability
+
+Solid edges are stated in source material: Solution relationships, Solution steps
+and packaged siblings. Dashed edges are inferred from shared subjects in names.
+Inferred does not mean repository-declared. Communities come from deterministic
+Louvain clustering of the evidence graph, not the declared categories.
+The stated-only filter changes visible edges and paths, not community assignments.
+
+The data engine and its agreement measures remain unchanged. Purity assigns a
+majority category to each detected community; the generated data also reports
+purity without isolated singletons and normalized mutual information.
+
+Only geometry belongs inside `#vp`. Labels sit in `#graph-labels`, outside that
+transform, in a viewport-sized SVG. Their CSS-pixel scale is independent of camera
+zoom. Label placement uses measured local font widths and rejects both label and
+visible node-dot collisions. It has no fixed count cap; offset names use leaders.
+The selected skill's full name remains anchored to its dot, wrapping at hyphens
+or spaces instead of truncating. A clamped callout and status instruction identify
+offscreen selections. The root SVG has no runtime viewBox, so header resizing
+cannot temporarily scale the label layer.
+The member list carries names that do not fit in the graph.
+
+Browser checks must measure `font-size × getScreenCTM()` and actual label bounds,
+not only CSS declarations. They also measure graph/inspector non-overlap and
+test delayed pointer travel after selecting a search result. Screenshots alone
+are not proof of interaction correctness.
+
+## Sources and licences
+
+| Indexed repository | Licence |
+| --- | --- |
+| [bughunt8/skills](https://github.com/bughunt8/skills) | MIT, with vendored imports retaining upstream licences |
 | [haowjy/creative-writing-skills](https://github.com/haowjy/creative-writing-skills) | Apache-2.0 |
 | [eternityspring/shuohao-skills](https://github.com/eternityspring/shuohao-skills) | Apache-2.0 |
 
-The exact skill counts are not written down anywhere by hand. `build.py` reads
-them out of the source trees, and CI fails if the committed page disagrees with
-what the sources actually contain.
-
-Because the host repository is read from the working tree rather than cloned at a
-pin, **adding a skill under `../skills/` changes this page in the same commit**.
-CI watches `skills/**` for exactly that reason and will tell you to run
-`python3 build.py --write` if you forget.
-
-## How it is built
-
-`index.html` is **generated**, not hand-edited. Do not edit anything between the
-`BEGIN GENERATED` and `END GENERATED` markers.
-
-```bash
-python3 build.py --check     # verify the page matches the sources (this is what CI runs)
-python3 build.py --write     # regenerate index.html and data.js
-python3 build.py --refresh --write   # re-clone the upstreams first, then regenerate
-```
-
-`build.py` uses the standard library only, so CI needs nothing installed to run it.
-
-Each source in `sources.json` is **pinned to a commit**, and the build always
-clones at that pin. Without pinning the build is not reproducible: a runner
-clones upstream `HEAD` while a laptop reuses whatever a local checkout was left
-at, and the same repository commit produces two different pages. `--refresh` is
-the only thing that moves a pin, which is what the fortnightly workflow does.
-
-### Why the page is prerendered
-
-The first version of this page built all of its cards in JavaScript. That served
-858 characters of text to a crawler and rendered nothing at all with JavaScript
-disabled. Every card is now real HTML in the shipped file, and `app.js` only
-attaches motion to markup that is already there. `app.js` never creates content,
-and a test enforces that.
-
-## Architecture
-
-```
-index.html      generated page: hero, one section per category, a card per skill
-styles.css      design tokens and layout; one dark theme, one accent
-app.js          motion layer only, a progressive enhancement over the HTML
-data.js         generated totals, used by the counter
-build.py        reads the sources, prerenders the page, verifies it in CI
-sources.json    the repositories to index. The host repo is read in place; the
-                external ones are pinned to a commit. Adding a source here is the
-                only change needed.
-.htaccess       Apache/LiteSpeed config for Hostinger: security headers, CSP,
-                caching, compression, charset
-vendor/         GSAP, ScrollTrigger and Lenis, self-hosted
-fonts/          Space Grotesk and Inter as WOFF2, self-hosted
-tests/          Playwright suite: content, motion, resilience, accessibility
-scripts/        secret scanner and post-deploy smoke test
-```
-
-### Constraints this page holds itself to
-
-- **No third party in the request path.** The motion libraries and both webfonts
-  are served from our own origin. The page makes no external request at all, and
-  is fully functional even if the libraries fail to load.
-- **Readable without JavaScript.** With JS off it is a complete, plain list.
-- **Readable without motion.** With `prefers-reduced-motion` set, pinning and
-  scrubbing are switched off entirely and the page becomes the same plain list.
-- **No horizontal overflow** at any width, in either motion mode. Tested at eight
-  widths.
-- **No `scroll` event listeners.** Motion is driven by ScrollTrigger, and the one
-  `resize` listener is debounced.
-- **WCAG 2.1 AA.** Enforced by axe in CI, in both motion modes, and a build fails
-  on any violation.
-- **No credentials in the tree.** Enforced by a scanner and by gitleaks over the
-  full history.
-
-## Motion
-
-[GSAP](https://gsap.com) with ScrollTrigger, plus [Lenis](https://github.com/darkroomengineering/lenis)
-for smooth scrolling. GSAP including ScrollTrigger has been free for commercial
-use since April 2025 under its [standard licence](https://gsap.com/community/standard-license/).
-
-Lenis is driven from GSAP's ticker rather than its own `requestAnimationFrame`
-loop, so there is exactly one animation loop on the page.
-
-The opening pins the graph and steps the highlight through the largest communities as you
-scroll, without moving the camera. Selecting a community deliberately does move it; see
-"The camera, and the keyboard" below for what that broke the first time and how each fault
-is handled now.
-
-Graph interaction is not part of the motion layer. Hover, click, search, path tracing and
-the evidence filter all run under `prefers-reduced-motion`, on touch, and with GSAP absent,
-because they are how the page is used rather than how it is decorated.
-
-## Structure
-
-Three sections, in this order:
-
-| Section | What it is |
-| --- | --- |
-| The stage | The library as a graph, one screen tall: every skill a node, relationships as edges, communities detected rather than declared. Search, an evidence filter, path tracing and the community chips live here. |
-| Solutions | Every Solution the library can form: a lead skill, the subset it leads, and the evidence for saying so. |
-| The library | Every skill, one collapsed disclosure per category. Searching opens the categories that hold a hit. |
-
-This replaced 24 pinned chapters that scrubbed a filmstrip of cards sideways, one
-category at a time. The effect was good once and then it was 76,000 pixels of
-scrolling between a reader and the skill they came for. The page is now about
-12,000.
-
-### The graph
-
-The page draws something nobody decided in advance, which is the whole reason it exists.
-Three earlier openings drew things that had already been written down: a spiral of every
-skill at once (an even speckle), a filmstrip of the categories, and a four-column
-dendrogram of `domains.json` — tidy, inert, and a picture of the filing system rather than
-a finding.
-
-Exact counts are deliberately not written here. Every number the page states is generated
-by `build.py` and audited by it, and a count repeated in prose is a count that goes stale:
-this section claimed "all 54 Solutions" for a build in which there were 50. Read the
-current figures off the page, or out of `data.js`.
-
-**Edges are evidence, and the page says which kind.** *Stated* edges come from the
-repository: a Solution's lead joined to a skill it leads, the steps of a Solution joined to
-each other, or two skills packaged in the same bundle. *Inferred* edges come from names
-sharing a subject, drawn dashed and faint because it is a weaker claim, and the
-`stated only` control throws them all away so a reader can see what is left.
-
-An inferred edge is not simply "these two names share a word". That was the first version,
-and it joined `creative-research` to `clinical-research`, and `customer-success-manager` to
-`env-secrets-manager`. One word in common is not evidence, so an edge now needs either two
-shared subject words, or one word specific enough to mean something (used by at most
-`NARROW_TOKEN` skills), or a shared family prefix — the `principle-*` and `stitch-*` skills
-are deliberately named as sets, and that convention is worth trusting. Seniority, role and
-artefact-shape words (`senior`, `advisor`, `manager`, `builder`, `prep`, `toolkit`) are in
-`STOP`, because they describe the wrapper and not the subject.
-
-**Colours are communities, not categories.** They come from modularity maximisation
-(two-phase Louvain, deterministic: sorted visit order, ties broken on the lower id) over
-those edges. Each community's name is generated from the tokens its own members share, so
-the name and the shape agree by construction — no hand-written list and no model.
-
-**How much the detected structure agrees with the declared one is reported honestly.**
-`agreement()` computes majority-label purity, and says so: a detected community has no
-domain label of its own, so the measure assigns it whichever domain its members are most
-often filed under and can only flatter the clustering. It reports the value with and
-without single-member communities — every isolated skill is its own community and scores a
-free point — and alongside normalised mutual information, which is symmetric, needs no
-majority assignment, and is 0 when two labellings are independent. NMI is the number worth
-reading. `domains.json` is still here, but as the thing the detected structure is measured
-against rather than as the structure itself.
-
-**Size is degree**, by area rather than radius, so a hub reads as bigger than a leaf
-without being eleven times the width. **Paths are breadth-first** — "how many steps from
-here to there", where a strong edge is not a shorter one — and the panel reports how many
-of those steps the repository actually states, and the evidence for each one.
-
-The skills that no Solution leads and that share a subject with nothing sit on a ring
-outside everything else. Drawn faintly rather than dropped: the frontier of a library is a
-fact about it. That styling is keyed on having no edges, which is what it claims —
-an earlier version keyed it on Solution membership and drew 158 skills as the frontier
-while 129 of them had edges.
-
-### The camera, and the keyboard
-
-Selecting a community frames it: the whole library in one screen is an overview, and an
-overview you cannot go into is a picture. Labels divide their font size *and their halo* by the zoom
-factor, so a name is the same size on screen at every level — without that, they grow until
-they collide, and at 2.7x the community names vanished behind their own outline. Hover is
-ignored while the camera moves, because a node sliding under a stationary cursor otherwise
-replaces the selection the reader just clicked. The page opens unzoomed, so every node is
-clickable before the reader does anything, and Escape, Reset and a click on the background
-all pull back out.
-
-Every node is a real link to that skill's entry, which is what makes the graph a table of
-contents with JavaScript off. With JavaScript on, that same fact put hundreds of sequential
-stops in the tab order, so the links are taken out of the sequential order and the graph is
-entered once and then walked with the arrow keys, in community order. Below the narrow
-breakpoint the graph stops taking pointer and keyboard input altogether: its click target
-is expressed in the graph's own coordinate system, so it scales with the viewport and is
-under three pixels on a phone. There, the search box, the community chips and the text list
-below are the interface, and they carry the same information.
-
-### Why the geometry is tested
-
-`network.py` holds the graph, the communities, the layout and the label placement;
-`compose.py` holds what a Solution is and which skills it leads. Both are tested directly,
-in `tests/test_network.py` and `tests/test_compose.py`, because the browser suite passed on
-four successive openings of this page that were each wrong on screen. What it could not
-see:
-
-- 9,462 pairs of nodes closer together than a node is wide, from a layout that sized
-  community discs by `sqrt(n)` and left the big ones four times denser than the small
-  ones;
-- nine names drawn on top of each other in the densest community, from labels placed at a
-  fixed offset with no collision test;
-- 29 skills positioned in a band the browser clips away, because the layout used a
-  1400x620 frame while the `<svg>` declared a viewBox of 1400x560 and nothing compared
-  the two;
-- six skills that were drawn, coloured, labelled and impossible to click, because SVG has
-  no z-index and a community label's text box covered their centres;
-- and community names that changed between builds — `principle · discipline · first` or
-  `principle · discipline · redesign` depending on `PYTHONHASHSEED`, because a tie in
-  `Counter.most_common` breaks in insertion order. In a repository whose CI asserts the
-  page is reproducible from source.
-
-Every one of those is now an assertion, and `scripts/plant_network_defect.py` puts three
-of them back so CI can prove the assertions still fail. A test suite that has never failed
-is a suite nobody has checked.
-
-## Development
-
-```bash
-npm ci
-npm run build          # regenerate the page
-npm run lint:html      # HTML validity
-npm run lint:secrets   # credential scan
-npm test               # Playwright suite
-npm run serve          # http://localhost:8090
-```
+Source links open the actual `SKILL.md` file. External source links use the
+configured commit pin; the locally indexed repository uses its main branch.
+No CDN, font service, API or third-party request is needed to use the page.
+The application adds no cloud service or backend.
 
 ## CI/CD
 
-Everything is driven by GitHub Actions. Nothing is built, validated or deployed by
-hand.
+Validation and deployment remain in GitHub Actions. Staging and production
+publish the same static artifact to Hostinger through the existing reusable
+workflow. The GitHub Environment supplies the deployment secrets. Route 53
+continues to hold DNS; CI does not change it.
 
-**Staging and production are the same setup.** Both publish the same artifact to
-Hostinger over FTP through one reusable workflow. There is no second code path, so
-staging cannot drift from production. The only difference is which GitHub
-Environment supplies the secrets.
+| Branch | GitHub Environment | Destination |
+| --- | --- | --- |
+| `staging` | `staging` | Hostinger staging, from `SITE_URL` |
+| `main` | `production` | <https://skills.ronald.ng> |
 
-Hostinger is the only host. The only AWS service involved anywhere is Route 53,
-which holds the DNS record and is never touched by CI. There is no Cloudflare
-anywhere: not in the deploy, and not in the request path.
+Promotion remains the manual **Site promote staging to main** workflow with
+typed confirmation. See [DEPLOYMENT.md](DEPLOYMENT.md).
+There is no GitHub Pages or preview-hosting deployment path.
 
-| | Branch | Environment | URL |
-| --- | --- | --- | --- |
-| Staging | `staging` | `staging` | set `SITE_URL` |
-| Production | `main` | `production` | `https://skills.ronald.ng` |
-
-Promotion is manual and typed, mirroring `bughunt8/www-resume`: run **Site promote
-staging to main**, type `promote`, and it merges and dispatches the production
-deploy.
-
-Validation is a reusable workflow called by every deploy path, so no deploy can
-skip the gates. It runs the secret scan, gitleaks, build reproducibility, HTML
-validity and the browser suite, and uses no secrets at all, so it runs in full on
-fork pull requests.
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for the secrets each environment needs, what
-has to be provisioned first, and why DNS lives in Route 53.
-
-## Licence
-
-The page itself, the build script and the tests are MIT, see [LICENSE](LICENSE).
-The indexed skills belong to their authors under their own licences, recorded in
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and shown on every card.
-
+The page, builder and tests are MIT. Indexed skills retain their own licences
+and attribution in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 Built by [Ronald Ng](https://ronald.ng).

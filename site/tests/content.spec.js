@@ -22,11 +22,12 @@ test.describe("prerendered content", () => {
   test("every card is in the shipped HTML, not created by script", () => {
     const cards = html.match(/<article class="card[^"]*"/g) || [];
     expect(cards.length).toBe(data.total);
-    expect(cards.length).toBeGreaterThan(400);
+    expect(cards.length).toBe(490);
+    expect(data.solutions).toBe(50);
 
-    // app.js must never create content; it only attaches motion.
+    // Workspace chrome can be dynamic; library cards must remain prerendered.
     const app = readFileSync(new URL("../app.js", import.meta.url), "utf8");
-    expect(app).not.toMatch(/createElement\(\s*["'](?:article|section|h2|h3)["']/);
+    expect(app).not.toMatch(/createElement\(\s*["']article["']/);
   });
 
   test("renders fully with JavaScript disabled", async ({ browser }) => {
@@ -57,16 +58,19 @@ test.describe("prerendered content", () => {
     const text = await page.evaluate(() => document.body.textContent.length);
     expect(text).toBeGreaterThan(20000);
 
-    // And the page must still paint a substantial amount without JavaScript, so a
-    // page that is present but entirely collapsed does not pass.
-    const painted = (await page.innerText("body")).length;
-    expect(painted).toBeGreaterThan(8000);
+    // A native disclosure is an intentional reachable fallback, not hidden
+    // content. Actually open it with input instead of counting invisible text.
+    await page.locator("#library > summary").click();
+    await page.locator(".lib__cat").first().locator("summary").click();
 
     // Every card must carry its description, source and licence with JS off.
     const first = page.locator(".card").first();
-    await expect(first.locator("h4")).not.toBeEmpty();
+    await expect(first).toBeVisible();
+    await expect(first.getByRole("heading", { level: 3 })).not.toBeEmpty();
     await expect(first.locator("p")).not.toBeEmpty();
     await expect(first.locator("footer a")).not.toBeEmpty();
+    await page.locator("#solutions > summary").click();
+    await expect(page.locator(".sol").first()).toBeVisible();
     await ctx.close();
   });
 
@@ -74,7 +78,8 @@ test.describe("prerendered content", () => {
     await page.goto("/index.html");
 
     await expect(page.locator(".lib__cat")).toHaveCount(data.categories);
-    await expect(page.locator("#rail a")).toHaveCount(data.categories);
+    await expect(page.locator("#gcategory option[value]:not([value=''])")).toHaveCount(data.categories);
+    await expect(page.locator("#gsolution option[value]:not([value=''])")).toHaveCount(data.solutions);
 
     // Each category's declared count must equal the cards it actually holds.
     const rows = await page.locator(".lib__cat").evaluateAll((sections) =>
@@ -131,32 +136,26 @@ test.describe("prerendered content", () => {
     });
     expect(broken, "Solution steps that do not resolve to one skill").toEqual([]);
 
-    // The headline is static truth now rather than an animation, so it can be read
-    // straight from the live DOM.
-    const h1 = await page.locator("h1").innerText();
-    expect(h1).toContain(String(data.total));
-    expect(h1).toContain(String(data.solutions));
-
-    const lede = await page.locator(".sols__lede").innerText();
+    // The h1 now names the user's current context, not a huge static billboard.
+    await expect(page.locator("h1")).not.toBeEmpty();
+    const lede = await page.locator(".sols__lede").textContent();
     expect(lede).toContain(String(data.covered));
     expect(lede).toContain(String(data.unclaimed));
   });
 
-  test("every rail link resolves to a real category", async ({ page }) => {
+  test("every category filter resolves to a real category and fallback disclosure", async ({ page }) => {
     await page.goto("/index.html");
-    const hrefs = await page.locator("#rail a").evaluateAll((as) =>
-      as.map((a) => a.getAttribute("href"))
+    const values = await page.locator("#gcategory option").evaluateAll((options) =>
+      options.map((o) => o.value).filter(Boolean)
     );
-    for (const href of hrefs) {
-      expect(href).toMatch(/^#cat-/);
-      await expect(page.locator(href), `target for ${href}`).toHaveCount(1);
+    expect(values).toHaveLength(data.categories);
+    for (const value of values) {
+      await expect(page.locator(`[id="cat-${value}"]`), `category ${value}`).toHaveCount(1);
     }
-
-    // Following one must open it. Categories start closed, so a link that only
-    // jumped to a collapsed heading would appear to do nothing.
-    await page.click('#rail a[href="#cat-finance"]');
-    await page.waitForTimeout(400);
+    await page.locator("#library > summary").click();
+    await page.locator("#cat-finance > summary").click();
     await expect(page.locator("#cat-finance")).toHaveAttribute("open", "");
+    await expect(page.locator("#cat-finance .card").first()).toBeVisible();
   });
 
   test("attribution is present and licence-bearing", async ({ page }) => {
@@ -174,7 +173,7 @@ test.describe("prerendered content", () => {
     const missing = await page.locator(".card").evaluateAll((cards) =>
       cards
         .filter((c) => !(c.querySelector("footer .lic")?.textContent ?? "").trim())
-        .map((c) => c.querySelector("h4")?.textContent)
+        .map((c) => c.querySelector("h3")?.textContent)
     );
     expect(missing, "cards with no licence").toEqual([]);
   });

@@ -6,6 +6,9 @@ const PORT = 8123;
 
 export default defineConfig({
   testDir: "./tests",
+  outputDir: process.env.WORKSPACE_EVIDENCE_DIR
+    ? `${process.env.WORKSPACE_EVIDENCE_DIR}/playwright-artifacts`
+    : "./test-results",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -15,6 +18,11 @@ export default defineConfig({
     : [["list"]],
   use: {
     baseURL: `http://127.0.0.1:${PORT}`,
+    // Sandbox Chromium can be supplied explicitly. CI still uses the Playwright
+    // browser installed for the locked Node package; no machine path is baked in.
+    launchOptions: {
+      executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined
+    },
     trace: "on-first-retry",
     screenshot: "only-on-failure"
   },
@@ -26,6 +34,6 @@ export default defineConfig({
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },
-    { name: "mobile", use: { ...devices["Pixel 7"] } }
+    { name: "mobile", use: { ...devices["Pixel 7"], viewport: { width: 390, height: 844 } } }
   ]
 });
