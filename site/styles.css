@@ -179,16 +179,34 @@ input::placeholder { color: var(--muted); opacity: 1; }
 }
 .g-node:hover .g-dot { transform: scale(1.2); stroke: var(--text); stroke-width: 2.5px; }
 .g-node.is-selected:hover .g-dot { stroke-width: 3.5px; }
-/* Edge geometry is never rebuilt mid-flight: it fades out, stays hidden while
- * the dots travel, and fades back in at settle. */
+/* Curved edge geometry is never rebuilt mid-flight. It hands over to one straight
+ * ghost path that follows the travelling dots, then crossfades back at settle, so
+ * the network re-forms in view and no frame ever shows an empty canvas. */
 .g-edges { transition: opacity var(--motion-standard) var(--ease-standard); }
 #top[data-motion-flight] .g-edges { opacity: 0; }
+/* The opening has no ghost to hand over to: the network is simply not drawn yet,
+ * so it is hidden without a fade-down and arrives once the dots have. */
+#top[data-motion-beat="first-paint"][data-motion-flight] .g-edges { transition: none; }
+.g-flight-edges {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1px;
+  opacity: 0;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+  transition: opacity var(--motion-quick) var(--ease-standard);
+}
+#top[data-motion-flight] .g-flight-edges { opacity: .45; }
 /* Labels are placed for the final layout immediately, so their computed size is
- * always measurable; only their paint waits for the dots to arrive. */
+ * always measurable, and they stay on screen and travel with their own dot. Only
+ * the opening reveals from nothing, because nothing is on screen yet to keep. */
 #graph-labels[data-revealed="true"] { transition: opacity var(--motion-standard) var(--ease-standard); }
-/* The hide is instant: a half-faded label sitting at its settled position while
- * its dot is still travelling reads as a detached ghost, which is the defect. */
 #graph-labels[data-revealed="false"] { opacity: 0; }
+/* A label carried past the canvas edge would paint outside the graph frame. */
+.g-nlabel[data-flown="out"], .g-clabel[data-flown="out"] { opacity: 0; }
+.g-nlabel[data-entering], .g-clabel[data-entering] {
+  animation: label-in var(--motion-quick) var(--ease-enter) both;
+}
 .g-node[data-entering] .g-dot {
   animation: dot-enter var(--motion-wave) var(--ease-enter) var(--enter-delay, 0ms) both;
 }
@@ -210,7 +228,8 @@ input::placeholder { color: var(--muted); opacity: 1; }
     halo-breath var(--motion-breath) var(--ease-standard) var(--motion-standard) infinite;
 }
 @keyframes dot-enter { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
-@keyframes dot-leave { from { opacity: .85; transform: scale(1); } to { opacity: 0; transform: scale(.94); } }
+@keyframes dot-leave { from { opacity: .85; transform: scale(1); } to { opacity: 0; transform: scale(.6); } }
+@keyframes label-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes dot-pulse {
   0% { transform: scale(1); }
   45% { transform: scale(1.18); opacity: .78; }

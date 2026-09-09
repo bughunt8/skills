@@ -305,6 +305,11 @@
         label.appendChild(span);
       });
       reserved.push(box);
+      // The scene-space anchor and the placed box let the motion layer carry this
+      // label with its own dot in flight without ever rescaling the text.
+      const anchorScene = {x: (px - state.viewport.x) / k, y: (py - state.viewport.y) / k};
+      Object.assign(label.dataset, {sceneX: String(anchorScene.x), sceneY: String(anchorScene.y),
+        boxX: String(box.x), boxY: String(box.y), boxW: String(width), boxH: String(height)});
       if (!community) {
         const offscreen = px < 0 || px > size.w || py < 0 || py > size.h;
         Object.assign(label.dataset, {anchorX: String(px), anchorY: String(py), offscreen: String(offscreen)});
@@ -323,6 +328,10 @@
         leader.setAttribute("d", `M ${sx} ${sy} L ${tx} ${ty}`);
         leader.style.display = "";
         leader.dataset.offscreen = String(offscreen);
+        // The leader travels with the same delta as its label and its dot, so the
+        // three stay rigidly attached for every frame of the flight.
+        Object.assign(leader.dataset, {sceneX: String(anchorScene.x), sceneY: String(anchorScene.y),
+          key: label.dataset.key || ""});
       }
       return true;
     }
@@ -424,7 +433,10 @@
   // Only transform, opacity and stroke-dashoffset move. One rAF loop, self-stopping.
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const MOTION = {quick: 160, standard: 260, slow: 460, ceiling: 600,
-    wave: 220, step: 48, buckets: 10, pulse: 640, hop: 120, draw: 380, roles: 60};
+    wave: 200, step: 40, buckets: 10, pulse: 640, hop: 120, draw: 380, roles: 60, labels: 80,
+    // Bounds. Ghost segments and exits are pure decoration, so they are capped by
+    // count and never allowed to turn one frame into a long task.
+    ghost: 200, exits: 40};
   function bezier(x1, y1, x2, y2) {
     const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
     const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
@@ -447,7 +459,17 @@
   const halo = document.createElementNS(ns, "circle");
   halo.setAttribute("class", "g-halo");
   let flight = null, raf = 0, settleTimer = 0, revealTimer = 0, idleTimer = 0, drawTimer = 0;
-  const roleNodes = [];
+  let edgesTimer = 0, opening = false;
+  const roleNodes = [], exitNodes = [];
+  // One path carries every in-flight relationship as a straight segment, so the
+  // network re-forms in view instead of blacking out. One string, one write, per
+  // frame - rebuilding 1,140 curved paths per frame is what the blackout avoided.
+  const ghostEdges = document.createElementNS(ns, "path");
+  ghostEdges.setAttribute("id", "flight-edges");
+  ghostEdges.setAttribute("class", "g-flight-edges");
+  ghostEdges.setAttribute("aria-hidden", "true");
+  ghostEdges.style.display = "none";
+  (svg.querySelector(".g-edges") || vp).after(ghostEdges);
 
   // The one ambient element: a halo on the selected dot, never under reduced motion.
   function placeHalo() {
@@ -471,6 +493,42 @@
 
   function revealLabels(on) { $("graph-labels").dataset.revealed = String(on); }
 
+  // Every label and leader currently on screen, with the scene anchor and placed
+  // box it was given for the final layout. Read once per beat, never per frame.
+  function liveLabels(previous, morphing) {
+    const layer = $("graph-labels"), items = [];
+    // Only a label whose dot was already on screen can travel: an entering label has
+    // no previous position, so it stays where it was placed and fades in instead.
+    const carried = (key) => key ? previous.points.has(key) : !morphing;
+    layer.querySelectorAll(".g-nlabel, .g-clabel, .g-label-leader").forEach((el) => {
+      if (items.length >= MOTION.labels) return;
+      if (el.style.display === "none") return;
+      const sx = Number(el.dataset.sceneX), sy = Number(el.dataset.sceneY);
+      if (!Number.isFinite(sx) || !Number.isFinite(sy)) return;
+      const key = el.dataset.key || "";
+      if (!carried(key)) return;
+      items.push({el, sx, sy, key: key && scene.has(key) ? key : "",
+        box: el.classList.contains("g-label-leader") ? null : {
+          x: Number(el.dataset.boxX), y: Number(el.dataset.boxY),
+          w: Number(el.dataset.boxW), h: Number(el.dataset.boxH)}});
+    });
+    if (selectedLeader.style.display !== "none" && carried(state.selected) &&
+        Number.isFinite(Number(selectedLeader.dataset.sceneX))) {
+      items.push({el: selectedLeader, sx: Number(selectedLeader.dataset.sceneX),
+        sy: Number(selectedLeader.dataset.sceneY),
+        key: scene.has(state.selected) ? state.selected : "", box: null});
+    }
+    return items;
+  }
+
+  function clearLabelFlight(items) {
+    items.forEach((item) => {
+      item.el.removeAttribute("transform");
+      if (item.el.dataset.flown) delete item.el.dataset.flown;
+      item.el.style.removeProperty("visibility");
+    });
+  }
+
   // Capture what the eye currently sees, including a tween in flight, so an
   // interruption continues from the visible position instead of snapping.
   function liveScene() {
@@ -486,6 +544,7 @@
   }
 
   function clearTimers() {
+    if (edgesTimer) { clearTimeout(edgesTimer); edgesTimer = 0; }
     if (settleTimer) { clearTimeout(settleTimer); settleTimer = 0; }
     if (revealTimer) { clearTimeout(revealTimer); revealTimer = 0; }
     if (idleTimer) { clearTimeout(idleTimer); idleTimer = 0; }
@@ -508,15 +567,29 @@
     if (raf) { cancelAnimationFrame(raf); raf = 0; }
     if (flight) {
       flight.travel.forEach((item) => item.node.el.removeAttribute("transform"));
+      clearLabelFlight(flight.labels);
       flight = null;
     }
+    ghostEdges.style.display = "none";
+    ghostEdges.removeAttribute("d");
     vp.setAttribute("transform", cameraTransform(state.viewport));
     delete root.dataset.motionFlight;
   }
 
   // Only the nodes that were actually given a role are touched: sweeping all 490
   // on every render cost more frame budget than the roles themselves.
+  // Exits are the only place motion re-shows a dot render() had hidden. It is
+  // presentational: they carry no label, no hit target and no context.
+  function clearExits() {
+    exitNodes.forEach((el) => {
+      if (!scene.has(el.dataset.key)) el.style.display = "none";
+      el.removeAttribute("transform");
+    });
+    exitNodes.length = 0;
+  }
+
   function clearRoles() {
+    clearExits();
     roleNodes.forEach((el) => {
       if (el.dataset.entering) delete el.dataset.entering;
       if (el.dataset.leaving) delete el.dataset.leaving;
@@ -550,6 +623,40 @@
       const offset = f.offsets.get(item.node.key);
       offset.dx = dx; offset.dy = dy;
       item.node.el.setAttribute("transform", `translate(${dx} ${dy})`);
+    }
+    // The relationships stay drawn while the dots travel, as straight segments.
+    if (f.ghost.length) {
+      let d = "";
+      for (const pair of f.ghost) {
+        const oa = f.offsets.get(pair.a), ob = f.offsets.get(pair.b);
+        d += `M${(pair.ax + (oa ? oa.dx : 0)).toFixed(1)},${(pair.ay + (oa ? oa.dy : 0)).toFixed(1)}` +
+          `L${(pair.bx + (ob ? ob.dx : 0)).toFixed(1)},${(pair.by + (ob ? ob.dy : 0)).toFixed(1)}`;
+      }
+      ghostEdges.setAttribute("d", d);
+    }
+    // Labels ride their own dot: the same interpolated delta, expressed in the
+    // screen-space label layer. A translate never touches the text size, so the
+    // 16 CSS px floor is untouched by definition.
+    if (!f.labels.length) return;
+    const live = f.camera ? f.live : f.to;
+    for (const item of f.labels) {
+      const offset = item.key ? f.offsets.get(item.key) : null;
+      const ox = offset ? offset.dx : 0, oy = offset ? offset.dy : 0;
+      const dx = (item.sx + ox) * live.k + live.x - (item.sx * f.to.k + f.to.x);
+      const dy = (item.sy + oy) * live.k + live.y - (item.sy * f.to.k + f.to.y);
+      item.el.setAttribute("transform", `translate(${dx} ${dy})`);
+      // A label carried past the canvas edge would paint outside the graph frame,
+      // so it steps aside for those frames only and returns as its dot arrives.
+      if (!item.box) continue;
+      // The 6px allowance is the label's own halo stroke, which paints outside the
+      // measured text box.
+      const inside = item.box.x + dx >= 6 && item.box.y + dy >= 6 &&
+        item.box.x + item.box.w + dx <= size.w - 6 && item.box.y + item.box.h + dy <= size.h - 6;
+      if (inside === (item.el.dataset.flown !== "out")) continue;
+      // visibility, not opacity: an entering label's own fade-in animation would
+      // otherwise override an opacity rule and paint it outside the frame anyway.
+      if (inside) { delete item.el.dataset.flown; item.el.style.removeProperty("visibility"); }
+      else { item.el.dataset.flown = "out"; item.el.style.visibility = "hidden"; }
     }
   }
 
@@ -650,11 +757,26 @@
     // and one CSS animation per dot costs more frame budget than the beat is worth.
     const entered = entering.slice(0, MOTION.roles);
     entered.forEach((node) => { node.el.dataset.entering = "true"; roleNodes.push(node.el); });
-    // A leaving dot's visibility is already committed by render(), so it is gone.
-    // The role is exposed for the flight window, but nothing is re-shown: painting
-    // dots the label layer never planned for breaks label clearance, and re-showing
-    // 466 of them on an overview-to-node change blew the 120ms frame budget.
+    // Leaving dots recede instead of blinking out. render() already committed them
+    // hidden, so motion re-shows only the ones that were actually on screen, capped
+    // at MOTION.exits: re-showing all 466 of them on an overview-to-node change is
+    // what blew the frame budget, and each one still carries no label and no target.
+    const exiting = [];
+    for (const node of leaving) {
+      if (exiting.length >= MOTION.exits) break;
+      const point = previous.points.get(node.key);
+      const sx = point.x * from.k + from.x, sy = point.y * from.k + from.y;
+      if (sx < 0 || sx > size.w || sy < 0 || sy > size.h) continue;
+      exiting.push(node);
+    }
+    exiting.forEach((node) => {
+      node.el.style.display = "";
+      node.el.dataset.leaving = "true";
+      roleNodes.push(node.el);
+      exitNodes.push(node.el);
+    });
     leaving.slice(0, MOTION.roles).forEach((node) => {
+      if (node.el.dataset.leaving) return;
       node.el.dataset.leaving = "true";
       roleNodes.push(node.el);
     });
@@ -669,6 +791,7 @@
       return;
     }
     root.dataset.motion = "running";
+    opening = wave;
     if (beat === "search") {
       // Restart the matched-dot pulse even when the attribute was already present.
       delete root.dataset.pulse;
@@ -676,28 +799,58 @@
       root.dataset.pulse = "1";
     }
     // Labels are already placed for the final layout, so their computed size is
-    // correct from the commit frame; only the paint waits for the world to settle.
-    // A camera-only glide keeps them: they are already placed for the settled camera.
-    const hidesLabels = wave || travel.length > 0 || entering.length > 0 || leaving.length > 0;
-    // The reveal is the secondary layer: it starts once the dots are nearly home
-    // and completes exactly as the beat goes idle, so `idle` means fully painted.
-    const revealAt = hidesLabels ? Math.max(0, settleAt - MOTION.standard) : 0;
-    if (hidesLabels) {
+    // correct from the commit frame. They stay visible and ride their own dot: a
+    // click must never cost half a second of unlabelled graph. Only the opening
+    // reveals from nothing, because there is nothing on screen yet to keep.
+    const revealAt = wave ? Math.round(settleAt * .72) : 0;
+    if (wave) {
       revealLabels(false);
       revealTimer = setTimeout(() => { revealTimer = 0; revealLabels(true); }, revealAt);
     } else {
       revealLabels(true);
     }
-    if (moving) {
-      // Edges are only unsafe while dots travel; a pure camera glide keeps them.
-      if (travel.length) root.dataset.motionFlight = "true";
+    // Entering labels have no previous position to travel from, so they fade in.
+    // The selected name is the one label a reader is looking for, so it never
+    // fades: it is readable from the commit frame.
+    if (!wave) entered.forEach((node) => {
+      const label = node.key === state.selected ? null : labels.get(node.key);
+      if (label) { label.dataset.entering = "true"; roleNodes.push(label); }
+    });
+    if (moving || wave) {
+      // The real curved edges cannot follow travelling dots without a per-frame
+      // rebuild of every path, so they hand over to one ghost path and fade back in
+      // at settle. On the opening they simply arrive after the dots.
+      const ghost = [];
+      if (travel.length || (!wave && entering.length)) {
+        root.dataset.motionFlight = "true";
+        const deg = (key) => Number(nodes.get(key).el.dataset.deg) || 0;
+        activeEdges.slice()
+          .sort((a, b) => (deg(b.a) + deg(b.b)) - (deg(a.a) + deg(a.b)))
+          .slice(0, MOTION.ghost)
+          .forEach((edge) => {
+            const a = scene.get(edge.a), b = scene.get(edge.b);
+            if (a && b) ghost.push({a: edge.a, b: edge.b, ax: a.x, ay: a.y, bx: b.x, by: b.y});
+          });
+        if (ghost.length) ghostEdges.style.display = "";
+      } else if (wave) {
+        root.dataset.motionFlight = "true";
+      }
+      // The network is drawn again before the dots have finished arriving, so the
+      // ghost and the real curves crossfade instead of leaving an empty canvas.
+      const edgesBackAt = Math.max(0, settleAt - Math.round(settleAt * (wave ? .45 : .35)));
+      edgesTimer = setTimeout(() => {
+        edgesTimer = 0;
+        delete root.dataset.motionFlight;
+      }, edgesBackAt);
       flight = {start: performance.now(), duration, ease: EASE.standard, camera,
-        from: {...from}, to: {...to}, live: {...from}, travel, offsets: new Map()};
+        from: {...from}, to: {...to}, live: {...from}, travel, ghost,
+        labels: moving ? liveLabels(previous, !!(entering.length || leaving.length)) : [],
+        offsets: new Map()};
       travel.forEach((item) => flight.offsets.set(item.node.key, {dx: item.dx, dy: item.dy}));
       paint(flight, 0);
-      raf = requestAnimationFrame(step);
+      if (moving) raf = requestAnimationFrame(step);
     }
-    let total = Math.max(settleAt, revealAt + (hidesLabels ? MOTION.standard : 0));
+    let total = Math.max(settleAt, revealAt + (wave ? MOTION.standard : 0));
     if (beat === "search") total = Math.max(total, MOTION.pulse);
     const drawBudget = beat === "path" ? Math.max(0, Math.min(MOTION.draw, 880 - settleAt)) : 0;
     settleTimer = setTimeout(() => {
@@ -713,7 +866,9 @@
         }
       }
     }, settleAt);
-    idleTimer = setTimeout(() => { idleTimer = 0; root.dataset.motion = "idle"; }, total);
+    idleTimer = setTimeout(() => {
+      idleTimer = 0; opening = false; root.dataset.motion = "idle";
+    }, total);
   }
 
   function renderList() {
@@ -1062,8 +1217,13 @@
       state.viewport.x += (size.w - old.w) / 2;
       state.viewport.y += (size.h - old.h) / 2;
       // A genuine resize invalidates a tween's target; an observer echo does not.
-      if (Math.abs(size.w - old.w) > .01 || Math.abs(size.h - old.h) > .01) cancelMotion();
+      const resized = Math.abs(size.w - old.w) > .01 || Math.abs(size.h - old.h) > .01;
+      if (resized) cancelMotion();
       applyViewport();
+      // A layout echo right after load used to cancel the opening wave, which is why
+      // it was never observable. The geometry it was cancelled for is now committed,
+      // so the opening simply starts again against it.
+      if (resized && opening) beginMotion({points: new Map(), viewport: {...state.viewport}}, "first-paint");
     } else {
       render({beat: "first-paint"});
       root.dataset.ready = "true";
