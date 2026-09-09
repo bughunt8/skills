@@ -219,6 +219,7 @@ jobs:
             **/.git*
             **/.git*/**
             **/node_modules/**
+            **/*.py
             **/__pycache__
             **/__pycache__/**
             **/.cache
