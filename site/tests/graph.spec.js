@@ -72,6 +72,18 @@ async function settle(page) {
 }
 
 test.describe("the graph", () => {
+  // Desktop behaviour: hover, path tracing, the camera and the keyboard walk. Below the
+  // narrow breakpoint the graph deliberately takes neither pointer nor keyboard input, so
+  // running these against a phone profile asserts the opposite of what the page intends -
+  // which is what the mobile project was doing, failing eight of them.
+  //
+  // "the graph on a narrow screen" below covers that width, and it is where the claim that
+  // the graph is inert there is actually asserted.
+  test.skip(
+    ({ viewport }) => !viewport || viewport.width <= 1000 || viewport.height <= 720,
+    "the graph is a picture, not a control, below the narrow breakpoint"
+  );
+
   test.beforeEach(async ({ page }) => {
     await page.goto("/index.html", { waitUntil: "load" });
     await settle(page);

@@ -75,8 +75,16 @@ test.describe("accessibility", () => {
     );
     expect(named, "every node carries its own name").toBe(true);
 
+    // One way in on desktop; none below the narrow breakpoint, where the click targets are
+    // under three and a half pixels and the search box and text list are the interface.
+    const wide = await page.evaluate(
+      () => window.innerWidth > 1000 && window.innerHeight > 720
+    );
     const stops = await page.locator('.g-node[tabindex="0"]').count();
-    expect(stops, "exactly one tab stop for the whole graph").toBe(1);
+    expect(stops, "one tab stop for the graph on desktop, none on a phone").toBe(
+      wide ? 1 : 0
+    );
+    if (!wide) return;
 
     await page.locator('.g-node[tabindex="0"]').focus();
     const before = await page.evaluate(() =>

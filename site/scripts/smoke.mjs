@@ -85,16 +85,19 @@ try {
     ok("library region present");
   }
 
-  // The Solutions and the graph are the page's subject, so a deploy that served
-  // the library without them would be a deploy of a different page.
-  const leads = (html.match(/data-layer="solution"/g) || []).length;
+  // The Solutions and the graph are the page's subject, so a deploy that served the library
+  // without them would be a deploy of a different page. The graph draws skills, not
+  // Solutions, so the two counts no longer have to match - what matters is that the graph
+  // has its nodes and its relationships, and that every Solution card is there.
+  const nodes = (html.match(/class="g-node /g) || []).length;
+  const edges = (html.match(/class="g-edge /g) || []).length;
   const sols = (html.match(/<article class="sol"/g) || []).length;
-  if (leads < 10 || sols < 10) {
-    fail(`served HTML has ${sols} Solutions and ${leads} graph nodes; expected both`);
-  } else if (leads !== sols) {
-    fail(`${leads} lead nodes but ${sols} Solution cards; they must agree`);
+  if (sols < 10) {
+    fail(`served HTML has ${sols} Solution cards; expected the full set`);
+  } else if (nodes < 400 || edges < 400) {
+    fail(`served graph has ${nodes} nodes and ${edges} relationships; expected both`);
   } else {
-    ok(`${sols} Solutions, each with a graph node`);
+    ok(`${sols} Solutions, and a graph of ${nodes} skills and ${edges} relationships`);
   }
 
   // The regression that shipped: a headline whose resting state read "0 skills".

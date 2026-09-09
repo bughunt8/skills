@@ -367,10 +367,28 @@ test.describe("the production Content-Security-Policy", () => {
     await page.goto("/index.html");
     await page.waitForTimeout(1800);
 
-    // Exercise the parts that manipulate style at runtime, since CSSOM writes are
-    // allowed but setAttribute("style", ...) is not, and only one of those is
-    // visible in the source.
-      await page.locator(".g-node--solution.is-open").first().click({ force: true });
+    // Exercise the parts that manipulate style at runtime, since CSSOM writes are allowed
+    // but setAttribute("style", ...) is not, and only one of those is visible in the source.
+    //
+    // The camera is the important one: it writes a transform and a custom property on the
+    // viewport group on every selection. If the policy dropped those, communities would
+    // highlight without moving and the labels would be the wrong size, which is a page that
+    // looks merely disappointing rather than broken — exactly the failure mode that left the
+    // hero counter reading zero on the live site for a build.
+    await page.locator(".beat a").nth(1).click();
+    await page.waitForTimeout(1000);
+    const framed = await page.evaluate(() => {
+      const vp = document.getElementById("vp");
+      return {
+        k: Number(getComputedStyle(vp).getPropertyValue("--k")),
+        transform: vp.style.transform
+      };
+    });
+    expect(framed.k, "the camera must zoom under the real policy").toBeGreaterThan(1.05);
+    expect(framed.transform).toContain("scale(");
+
+    await page.locator(".g-node").nth(200).click({ force: true });
+    await page.waitForTimeout(600);
     await page.evaluate(() => window.scrollTo(0, 1200));
     await page.waitForTimeout(900);
     await page.fill("#gsearch", "finance");
