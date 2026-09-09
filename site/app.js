@@ -260,12 +260,22 @@
     var skillCount = +node.getAttribute("data-skills") || 0;
     var solCount = +node.getAttribute("data-sols") || 0;
     if (panel.ev) {
+      // Counted from the node, not from its children.
+      //
+      // A group's children are not all Solutions: a skill no Solution leads hangs
+      // directly off its group, which is how 158 unclaimed skills stay reachable. So
+      // printing the number of children as the number of Solutions overstated 19 of
+      // the 24 groups — Engineering claimed 44 Solutions and has 10 — because the
+      // unclaimed skills were being counted as compositions.
       panel.ev.textContent =
-        kids.length +
-        (layer === "domain" ? " groups, " : " Solutions, ") +
-        (layer === "domain" ? solCount + " Solutions, " : "") +
-        skillCount +
-        " skills";
+        layer === "domain"
+          ? kids.length +
+            " groups, " +
+            solCount +
+            " Solutions, " +
+            skillCount +
+            " skills"
+          : solCount + " Solutions, " + skillCount + " skills";
     }
   }
 
@@ -392,11 +402,27 @@
     });
   });
 
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") {
-      if (search) search.value = "";
-      clearFocus();
+  // One reset, so Escape and the Reset button cannot disagree.
+  //
+  // Escape used to clear the input and the focus and leave the tier chips reading
+  // aria-pressed="true" with the library disclosures standing open on results that had
+  // just been cleared — a state no sequence of deliberate clicks can produce.
+  function resetAll() {
+    if (search) search.value = "";
+    runSearch("");
+    revealHits(false);
+    if (chips) {
+      Array.prototype.slice
+        .call(chips.querySelectorAll(".chip[data-tier]"))
+        .forEach(function (c) {
+          c.setAttribute("aria-pressed", "false");
+        });
     }
+    clearFocus();
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") resetAll();
   });
 
   /* ----------------------------------------------------------------- search */
@@ -446,22 +472,31 @@
 
     var domainKeys = Object.keys(hitDomains);
     if (domainKeys.length) {
-      // One domain can be open at a time, so the first match wins and the rest stay
-      // visible as dimmed hits at their own layer.
+      // One branch is open at a time, and each branch is laid out as though it had
+      // the drawing to itself, so two branches' positions overlap by design.
       if (domainKeys.indexOf(openDomain) < 0) showDomain(domainKeys[0]);
       var branchKeys = Object.keys(hitBranches).filter(function (b) {
         var n = nodeById[b];
         return n && n.getAttribute("data-dom") === openDomain;
       });
       showBranch(branchKeys.length ? branchKeys[0] : null);
-      // Re-mark, because opening a branch does not know about the query.
-      nodes.forEach(function (n) {
-        var name = (n.getAttribute("data-name") || "").toLowerCase();
-        var hit = name.indexOf(q) > -1;
-        n.classList.toggle("is-hit", hit);
-        setLabel(n.getAttribute("data-id"), "is-hit", hit);
-      });
     }
+
+    // Only what is actually on screen may light up in the drawing.
+    //
+    // Marking every match everywhere made a broad query draw nodes from branches that
+    // are not open, at positions belonging to the branch that is: searching "review"
+    // put 31 pairs of labels on top of each other. Those matches are still findable —
+    // every one appears in the library below, which the search opens — they are just
+    // not drawn in a place that means something else.
+    nodes.forEach(function (n) {
+      var name = (n.getAttribute("data-name") || "").toLowerCase();
+      var visible =
+        n.getAttribute("data-layer") === "domain" || n.classList.contains("is-open");
+      var hit = visible && name.indexOf(q) > -1;
+      n.classList.toggle("is-hit", hit);
+      setLabel(n.getAttribute("data-id"), "is-hit", hit);
+    });
     mark();
   }
 
@@ -513,11 +548,7 @@
       var btn = e.target.closest("button");
       if (!btn) return;
       if (btn === resetBtn) {
-        if (search) search.value = "";
-        chips.querySelectorAll(".chip[data-tier]").forEach(function (c) {
-          c.setAttribute("aria-pressed", "false");
-        });
-        clearFocus();
+        resetAll();
         return;
       }
       var tier = btn.getAttribute("data-tier");

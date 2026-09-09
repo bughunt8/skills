@@ -426,6 +426,104 @@ test.describe("the four-layer tree", () => {
     expect(seen.size, "scrolling moves through more than one domain").toBeGreaterThan(2);
   });
 
+  test("every panel's counts are the counts of its own subtree", async ({ page }) => {
+    await page.goto("/index.html");
+    await page.waitForTimeout(900);
+
+    // A group's children are not all Solutions: a skill no Solution leads hangs
+    // directly off its group. The panel printed the number of children as the number
+    // of Solutions, so 19 of the 24 groups overstated it — Engineering claimed 44
+    // Solutions and has 10.
+    const wrong = await page.evaluate(() => {
+      const out = [];
+      const click = (el) => el.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      document.querySelectorAll('.g-node[data-layer="domain"]').forEach((d) => {
+        click(d);
+        const ev = document.getElementById("panelev").textContent.trim();
+        const want =
+          d.querySelectorAll === undefined
+            ? ""
+            : [...document.querySelectorAll(".g-node--practice.is-open")].length +
+              " groups, " +
+              d.getAttribute("data-sols") +
+              " Solutions, " +
+              d.getAttribute("data-skills") +
+              " skills";
+        if (ev !== want) out.push(`${d.getAttribute("data-id")}: "${ev}" != "${want}"`);
+
+        document.querySelectorAll(".g-node--practice.is-open").forEach((p) => {
+          click(p);
+          const pev = document.getElementById("panelev").textContent.trim();
+          const pwant =
+            p.getAttribute("data-sols") +
+            " Solutions, " +
+            p.getAttribute("data-skills") +
+            " skills";
+          if (pev !== pwant) {
+            out.push(`${p.getAttribute("data-id")}: "${pev}" != "${pwant}"`);
+          }
+        });
+      });
+      return out;
+    });
+    expect(wrong, "panels whose counts disagree with the tree").toEqual([]);
+  });
+
+  test("Escape returns every control to its resting state", async ({ page }) => {
+    await page.goto("/index.html");
+    await page.waitForTimeout(900);
+
+    // Escape used to clear the input and the focus and leave the tier chips pressed
+    // with the library disclosures standing open on results that had just been
+    // cleared — a state no sequence of deliberate clicks can produce. Escape and the
+    // Reset button now run the same reset, so this asserts the whole state vector.
+    await page.click('.chip[data-tier="curated"]');
+    await page.fill("#gsearch", "review");
+    await page.waitForTimeout(500);
+
+    const busy = await page.evaluate(() => ({
+      pressed: document.querySelectorAll('.chip[aria-pressed="true"]').length,
+      openCats: document.querySelectorAll(".lib__cat[open]").length
+    }));
+    expect(busy.pressed, "a filter is on").toBeGreaterThan(0);
+    expect(busy.openCats, "the search opened a category").toBeGreaterThan(0);
+
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(400);
+    const rest = await page.evaluate(() => ({
+      search: document.getElementById("gsearch").value,
+      pressed: document.querySelectorAll('.chip[aria-pressed="true"]').length,
+      openCats: document.querySelectorAll(".lib__cat[open]").length,
+      hits: document.querySelectorAll(".is-hit").length,
+      pinned: document.getElementById("top").getAttribute("data-pinned"),
+      dim: document.getElementById("top").classList.contains("is-dim"),
+      focus: document.getElementById("top").classList.contains("is-focus")
+    }));
+    expect(rest).toEqual({
+      search: "",
+      pressed: 0,
+      openCats: 0,
+      hits: 0,
+      pinned: "",
+      dim: false,
+      focus: false
+    });
+
+    // And the Reset button must land in the same place, since they share one function.
+    await page.click('.chip[data-tier="declared"]');
+    await page.fill("#gsearch", "review");
+    await page.waitForTimeout(400);
+    await page.click("#greset");
+    await page.waitForTimeout(400);
+    expect(
+      await page.evaluate(() => ({
+        search: document.getElementById("gsearch").value,
+        pressed: document.querySelectorAll('.chip[aria-pressed="true"]').length,
+        openCats: document.querySelectorAll(".lib__cat[open]").length
+      }))
+    ).toEqual({ search: "", pressed: 0, openCats: 0 });
+  });
+
   test("no two visible labels are drawn across each other", async ({ page }) => {
     await page.goto("/index.html");
     await page.waitForTimeout(1200);
@@ -433,7 +531,10 @@ test.describe("the four-layer tree", () => {
     const overlapping = () =>
       page.evaluate(() => {
         const vis = [...document.querySelectorAll(".g-label")]
-          .filter((e) => +getComputedStyle(e).opacity > 0.4)
+          .filter((e) => {
+            const s = getComputedStyle(e);
+            return +s.opacity > 0.4 && s.visibility !== "hidden";
+          })
           .map((e) => ({ n: e.textContent.trim(), b: e.getBoundingClientRect() }));
         const pairs = [];
         for (let i = 0; i < vis.length; i++) {
@@ -463,6 +564,17 @@ test.describe("the four-layer tree", () => {
     expect(await overlapping(), "labels overlapping with the largest branch open").toEqual(
       []
     );
+
+    // And under a broad query, which is the case that broke it. Each branch is laid
+    // out as though it had the drawing to itself, so marking matches in branches that
+    // are not open drew them at positions belonging to the branch that is: "review"
+    // matches across several domains and produced 31 overlapping pairs.
+    for (const q of ["review", "e", "a", "skills", "agent"]) {
+      await page.fill("#gsearch", q);
+      await page.waitForTimeout(450);
+      expect(await overlapping(), `labels overlapping while searching "${q}"`).toEqual([]);
+    }
+    await page.fill("#gsearch", "");
   });
 
   test("every node is a link that resolves, so the tree works without scripting", async ({

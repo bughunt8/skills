@@ -271,8 +271,29 @@ a { color: inherit; text-decoration: none; }
 .g-label--solution,
 .g-label--skill {
   opacity: 0;
+  /* visibility, not just opacity.
+     A transparent SVG link is still a focusable one, so with scripting disabled — when
+     no branch can ever be opened — the drawing put 564 invisible tab stops between the
+     top of the page and everything after it. visibility:hidden takes an element out of
+     the tab order as well as out of view, and unlike display:none it can be
+     transitioned, so the fade still works.
+     The delay is what makes it fade out rather than vanish: visibility flips at the end
+     of the opacity transition on the way out, and immediately on the way in. */
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.24s var(--ease);
+  transition: opacity 0.24s var(--ease), visibility 0s linear 0.24s;
+}
+.g-node--practice.is-open,
+.g-node--solution.is-open,
+.g-node--skill.is-open,
+.g-edge--branch.is-open,
+.g-edge--sol.is-open,
+.g-edge--leaf.is-open,
+.g-label--practice.is-open,
+.g-label--solution.is-open,
+.g-label--skill.is-open {
+  visibility: visible;
+  transition: opacity 0.24s var(--ease), visibility 0s linear 0s;
 }
 .g-node--practice.is-open,
 .g-label--practice.is-open { opacity: 1; pointer-events: auto; }
@@ -307,6 +328,10 @@ a { color: inherit; text-decoration: none; }
   pointer-events: none;
 }
 .g-label--domain { font-size: 14px; fill: var(--text); letter-spacing: var(--tr-tight); }
+/* Labels are text and are held to the contrast text is held to. The dim state used to
+   be --text-dim at 0.3 opacity, which computes to 2.44:1 against this background —
+   below AA, and invisible to the accessibility gate because the label layer was
+   excluded from it. Nodes and edges recede instead; the words stay readable. */
 .g-label--practice { font-size: 11.5px; }
 .g-label--solution { font-size: 11px; }
 .g-label--skill { font-size: 10px; }
@@ -324,7 +349,7 @@ a { color: inherit; text-decoration: none; }
 .stage.is-focus .g-edge--sol:not(.is-open),
 .stage.is-focus .g-edge--leaf:not(.is-open) { opacity: 0; }
 .stage.is-focus .g-node.is-on { opacity: 1; }
-.stage.is-focus .g-label:not(.is-on) { opacity: 0.3; }
+.stage.is-focus .g-label:not(.is-on) { fill: var(--text-dim); }
 .stage.is-focus .g-label--practice:not(.is-open),
 .stage.is-focus .g-label--solution:not(.is-open),
 .stage.is-focus .g-label--skill:not(.is-open) { opacity: 0; }
@@ -337,7 +362,7 @@ a { color: inherit; text-decoration: none; }
 .stage.is-dim .g-edge--leaf:not(.is-open) { opacity: 0; }
 .stage.is-dim .g-node.is-hit { opacity: 1; }
 .stage.is-dim .g-edge { opacity: 0.06; }
-.stage.is-dim .g-label:not(.is-hit) { opacity: 0.12; }
+.stage.is-dim .g-label:not(.is-hit) { fill: var(--text-dim); }
 .g-label.is-hit { fill: var(--text); opacity: 1; }
 
 
