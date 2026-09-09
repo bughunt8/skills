@@ -327,10 +327,16 @@ test.describe("the four-layer tree", () => {
     // The rest of the suite dispatches events, so this is the one test that proves the
     // nodes are big enough to hit with a pointer and that nothing is layered over the
     // tree intercepting clicks. The panel and the intro used to sit on top of it.
+    // A Solution has to be open before its skills exist on screen, so the skill layer
+    // is reached the way a reader reaches it.
+    await page.locator(".g-node--solution.is-open").first().dispatchEvent("click");
+    await page.waitForTimeout(400);
+
     for (const sel of [
       '.g-node[data-layer="domain"]',
       ".g-node--practice.is-open",
-      ".g-node--solution.is-open"
+      ".g-node--solution.is-open",
+      ".g-node--skill.is-open"
     ]) {
       // Bring it on screen first. elementFromPoint only sees the viewport, and on a
       // phone the stage is an ordinary scrolling column, so a node can sit below the
@@ -613,6 +619,59 @@ test.describe("the four-layer tree", () => {
     await page.locator(".g-node--solution.is-open").first().dispatchEvent("click");
     await page.waitForTimeout(300);
     expect(await page.evaluate(() => Math.round(window.scrollY))).toBeLessThan(60);
+  });
+});
+
+test.describe("with scripting disabled", () => {
+  // The suite never actually loaded the page without JavaScript, so the claim that
+  // the tree is a table of contents before any script runs was never tested. It is
+  // the state in which the drawing contributed 564 invisible tab stops.
+  test("the tree is a working table of contents", async ({ browser }) => {
+    const ctx = await browser.newContext({
+      viewport: { width: 1440, height: 900 },
+      javaScriptEnabled: false
+    });
+    const page = await ctx.newPage();
+    await page.goto("/index.html", { waitUntil: "load" });
+
+    // The domain spine is on screen and every one of its links resolves.
+    const spine = await page.evaluate(() =>
+      [...document.querySelectorAll('.g-node[data-layer="domain"]')].map((n) => ({
+        name: n.getAttribute("data-name"),
+        href: n.getAttribute("href"),
+        resolves: !!document.querySelector(n.getAttribute("href")),
+        visible: getComputedStyle(n).visibility !== "hidden"
+      }))
+    );
+    expect(spine.length).toBe(7);
+    expect(spine.filter((s) => !s.resolves), "domain links that go nowhere").toEqual([]);
+    expect(spine.filter((s) => !s.visible), "domains hidden without scripting").toEqual(
+      []
+    );
+
+    // Nothing invisible may be focusable, or the drawing is 564 dead tab stops in
+    // front of everything else on the page.
+    const ghosts = await page.evaluate(() => {
+      const out = [];
+      document.querySelectorAll("a[href], button, input, [tabindex]").forEach((el) => {
+        const s = getComputedStyle(el);
+        const hidden =
+          s.visibility === "hidden" || s.display === "none" || +s.opacity < 0.05;
+        if (!hidden) return;
+        el.focus();
+        if (document.activeElement === el) out.push(el.getAttribute("data-id") || el.tagName);
+      });
+      return out;
+    });
+    expect(ghosts.slice(0, 8), `${ghosts.length} focusable but invisible`).toEqual([]);
+
+    // And the content itself is all present as text, since the drawing cannot be
+    // opened here.
+    const text = await page.evaluate(() => document.body.textContent || "");
+    expect(text.length, "substantive text without scripting").toBeGreaterThan(100000);
+    await expect(page.locator(".sol")).toHaveCount(50);
+    await expect(page.locator(".card")).toHaveCount(490);
+    await ctx.close();
   });
 });
 
