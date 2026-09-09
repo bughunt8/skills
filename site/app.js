@@ -778,6 +778,9 @@
     }
     if (pathBtn) pathBtn.setAttribute("aria-pressed", on ? "true" : "false");
     if (stage) stage.classList.toggle("is-picking", on);
+    // Also on the document element: the category rail sits outside the stage, so a
+    // stage-scoped rule cannot reach it.
+    document.documentElement.classList.toggle("is-picking", on);
     if (on && panel.tier) {
       panel.tier.textContent = "trace";
       if (panel.name) panel.name.textContent = "Pick two skills";
@@ -925,6 +928,7 @@
     pathMode = false;
     if (pathBtn) pathBtn.setAttribute("aria-pressed", "false");
     if (stage) stage.classList.remove("is-picking");
+    document.documentElement.classList.remove("is-picking");
   }
 
   if (pathBtn) {
@@ -948,9 +952,12 @@
 
   beatItems.forEach(function (b) {
     b.addEventListener("click", function (e) {
-      if (!wide()) return;
       e.preventDefault();
-      showCommunity(+b.getAttribute("data-comm"));
+      // Works at every width. On a phone the graph takes no pointer input — the targets are
+      // three pixels wide — so these chips ARE the way into it, and they used to fall through
+      // to a plain jump down the page. The camera stays put there: framing a cluster is no
+      // help when nothing in it can be tapped, but naming it and lighting it up is.
+      showCommunity(+b.getAttribute("data-comm"), { frame: wide() });
     });
   });
 
@@ -1053,6 +1060,7 @@
     setPathModeOff();
     if (statedBtn) statedBtn.setAttribute("aria-pressed", "false");
     stage.classList.remove("is-extracted-only", "is-picking");
+    document.documentElement.classList.remove("is-picking");
     openComm = null;
     clearFocus();
     resetCam();

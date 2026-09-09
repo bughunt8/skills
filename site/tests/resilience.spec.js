@@ -11,6 +11,12 @@ import { readFileSync } from "node:fs";
  *      unreadable, so opacity is asserted, not assumed.
  */
 
+const data = JSON.parse(
+  readFileSync(new URL("../data.js", import.meta.url), "utf8")
+    .replace("window.SKILLDATA=", "")
+    .replace(/;\s*$/, "")
+);
+
 const WIDTHS = [320, 375, 390, 768, 1024, 1280, 1440, 1920];
 
 test.describe("no horizontal overflow at any width", () => {
@@ -103,20 +109,20 @@ test.describe("prefers-reduced-motion", () => {
     );
     expect(hidden).toBe(0);
 
-    // The tree is still there and still explorable: reduced motion removes the
-    // traversal, not the content.
+    // The graph is still there and still complete: reduced motion removes the traversal,
+    // not the content. Every skill is drawn, at full strength, and nothing is dimmed by a
+    // focus state the reader never triggered.
     //
-    // Scoped to what is meant to be on screen. Three of the four layers are closed
-    // until their branch is opened — that is presence, not motion, and it holds under
-    // reduced motion too, because 490 leaves at their overlapping slot positions is
-    // not a legible alternative for anyone. What must not happen is a node being
-    // dimmed by a focus state the reader never triggered, so this looks at the nodes
-    // that are open.
-    expect(await page.locator('.g-node[data-layer="domain"]').count()).toBe(7);
-    const dimmed = await page
-      .locator('.g-node[data-layer="domain"], .g-node.is-open')
-      .evaluateAll((ns) => ns.filter((n) => Number(getComputedStyle(n).opacity) < 0.9).length);
-    expect(dimmed, "nothing open may be dimmed by a state nobody triggered").toBe(0);
+    // Under reduced motion the dimming rules are switched off entirely, so this is a
+    // stronger check than the old one, which only looked at whichever branch of the tree
+    // happened to be open.
+    expect(await page.locator(".g-node").count()).toBe(data.total);
+    const faint = await page
+      .locator(".g-dot")
+      .evaluateAll(
+        (ns) => ns.filter((n) => Number(getComputedStyle(n).fillOpacity) < 0.4).length
+      );
+    expect(faint, "nothing may be dimmed by a state nobody triggered").toBe(0);
     expect(errors).toEqual([]);
     await ctx.close();
   });
@@ -162,37 +168,25 @@ test.describe("narrow viewports", () => {
     expect(box.width).toBeGreaterThan(280);
     expect(box.height).toBeGreaterThan(300);
 
-    // Interaction is function, not decoration, so it survives on touch: tapping a
-    // Solution fills the panel with that Solution.
-      // Tapped without force, and only after checking that the point belongs to the
-      // node. force:true skips exactly the checks this test claims to make: it passes
-      // when the target is covered or off-screen, which are the failures it exists
-      // for, so it proved only that a dispatched event reaches a listener.
-      async function tapNode(selector, label) {
-        const node = page.locator(selector).first();
-        await node.scrollIntoViewIfNeeded();
-        await page.waitForTimeout(250);
-        const hit = node.locator(".g-hit");
-        const box = await hit.boundingBox();
-        expect(box, label + " has no tappable box").not.toBeNull();
-        const owner = await page.evaluate(([x, y]) => {
-          const el = document.elementFromPoint(x, y);
-          const a = el && el.closest ? el.closest(".g-node") : null;
-          return a ? a.getAttribute("data-id") : null;
-        }, [box.x + box.width / 2, box.y + box.height / 2]);
-        expect(owner, "the centre of " + label + " is covered").toBe(
-          await node.getAttribute("data-id")
-        );
-        await hit.tap();
-        await page.waitForTimeout(350);
-      }
+      // On a phone the graph deliberately takes no pointer input at all: a node's click
+      // target is expressed in the graph's own 1,400-unit coordinate system, so it scales
+      // with the viewport and is under three and a half CSS pixels wide here. Offering a
+      // target that small is worse than not offering it, so what must work on a phone is
+      // the community chips, the search box and the text list.
+      const inert = await page
+        .locator(".g-node")
+        .first()
+        .evaluate((n) => getComputedStyle(n).pointerEvents);
+      expect(inert, "graph nodes must not be tap targets on a phone").toBe("none");
 
-      await tapNode('.g-node[data-layer="domain"]', "the first domain");
+      const chip = page.locator(".beat a").first();
+      await chip.scrollIntoViewIfNeeded();
+      await chip.tap();
+      await page.waitForTimeout(400);
       await expect(page.locator("#panelname")).not.toBeEmpty();
-      await tapNode(".g-node--solution.is-open", "one of its Solutions");
       expect(await page.locator("#panelchain li").count()).toBeGreaterThan(1);
 
-    // Search is the only practical way through 490 skills on a phone.
+    // Search is the only practical way through the whole library on a phone.
     await page.fill("#gsearch", "resume");
     await page.waitForTimeout(400);
     expect(await page.locator(".card.is-hit").count()).toBeGreaterThan(0);

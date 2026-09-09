@@ -806,6 +806,9 @@ a { color: inherit; text-decoration: none; }
    quarter of the library cannot be picked, which is how the first version of this
    behaved. */
 .stage.is-picking .stage__panel,
-.stage.is-picking .stage__beats,
-.stage.is-picking .rail { pointer-events: none; }
+.stage.is-picking .stage__beats { pointer-events: none; }
+/* The category rail is a sibling of the stage, not a descendant, so a .stage-scoped rule
+   never matched it and it went on swallowing clicks meant for nodes underneath. The flag is
+   set on the document element as well for exactly this. */
+.is-picking .rail { pointer-events: none; }
 .stage.is-picking .stage__panel { opacity: 0.92; }

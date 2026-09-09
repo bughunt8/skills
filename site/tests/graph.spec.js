@@ -32,7 +32,14 @@ const data = JSON.parse(
 // with getBBox in the SVG's own coordinate system rather than by estimating character
 // widths: an estimate was two units short vertically, which is exactly how much the
 // collisions that survived the first placer overlapped by.
-const LABEL_OVERLAPS = `() => {
+// Wrapped in an immediately-invoked expression on purpose.
+//
+// page.evaluate() given a STRING evaluates it as an expression. `() => {...}` is an
+// expression whose value is a function, and a function is not serialisable, so Playwright
+// returned undefined and every assertion below read properties of it. The test threw instead
+// of measuring anything, and it did so only in CI: the Python binding this was prototyped
+// against does auto-invoke a function expression, so it passed locally for the wrong reason.
+const LABEL_OVERLAPS = `(() => {
   const vb = document.getElementById("gsvg").viewBox.baseVal;
   const els = [...document.querySelectorAll(".g-nlabel, .g-clabel")].filter(
     (e) => getComputedStyle(e).opacity !== "0" && getComputedStyle(e).visibility !== "hidden"
@@ -57,7 +64,7 @@ const LABEL_OVERLAPS = `() => {
     .filter((b) => b.x0 < -1 || b.x1 > vb.width + 1 || b.y0 < -1 || b.y1 > vb.height + 1)
     .map((b) => b.t);
   return { visible: els.length, overlaps: bad, clipped: clipped };
-}`;
+})()`;
 
 async function settle(page) {
   // The camera eases over 620ms and the labels are placed against its final scale.
