@@ -265,6 +265,48 @@ test.describe("the Solution graph", () => {
     expect(seen.size).toBeGreaterThan(2);
   });
 
+  test("no two visible labels are drawn across each other", async ({ page }) => {
+    await page.goto("/index.html");
+    await page.waitForTimeout(1200);
+
+    // Every label used to sit a fixed distance below its own node, which is fine
+    // until two neighbouring Solutions both want that space: on the live page
+    // `commercial-skills` and `idea-to-shipped-code` were printed across each other.
+    // Labels are placed now — below, above, or to either side, first clear position
+    // wins — so this asserts the outcome that placement exists to produce.
+    const overlapping = async () =>
+      page.evaluate(() => {
+        const vis = [...document.querySelectorAll(".g-label")]
+          .filter((e) => +getComputedStyle(e).opacity > 0.05)
+          .map((e) => ({ n: e.textContent.trim(), b: e.getBoundingClientRect() }));
+        const pairs = [];
+        for (let i = 0; i < vis.length; i++) {
+          for (let j = i + 1; j < vis.length; j++) {
+            const a = vis[i].b;
+            const b = vis[j].b;
+            if (a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom) {
+              pairs.push(`${vis[i].n} / ${vis[j].n}`);
+            }
+          }
+        }
+        return pairs;
+      });
+
+    expect(await overlapping(), "labels overlapping at rest").toEqual([]);
+
+    // And while a node is being inspected, which reveals one more label next to the
+    // permanent ones.
+    const names = await page.evaluate(() =>
+      [...document.querySelectorAll(".g-lead")].map((e) => e.getAttribute("data-name"))
+    );
+    for (const name of names) {
+      await page.locator(`.g-lead[data-name="${name}"]`).dispatchEvent("mouseenter");
+      expect(await overlapping(), `labels overlapping while showing ${name}`).toEqual(
+        []
+      );
+    }
+  });
+
   test("lead nodes are keyboard reachable, and work without scripting", async ({
     page,
     isMobile

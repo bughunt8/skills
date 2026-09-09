@@ -462,6 +462,8 @@ def render_graph(sols: list, rows: list, lay: dict) -> "tuple[str, list]":
     # Only the featured leads carry a label at rest. Fifty-four labels at once was
     # unreadable overlapping text, and a graph you cannot read is a texture.
     featured_set = {s["lead"] for s in sols[:FEATURED]}
+    # Order matters for label placement: the first Solution gets first choice.
+    featured_set_order = [s["lead"] for s in sols[:FEATURED]]
     parts.append('        <g class="g-leads">')
     for n in nodes:
         if n["kind"] != "lead":
@@ -502,15 +504,76 @@ def render_graph(sols: list, rows: list, lay: dict) -> "tuple[str, list]":
     # SVG has no z-index, so the only way to guarantee text sits above all geometry
     # is to emit it last.
     parts.append('        <g class="g-labels" aria-hidden="true">')
+
+    # Where a label goes is a decision, not a constant offset.
+    #
+    # Every label was placed 12 units below its node, which is right until two
+    # neighbouring Solutions both want that space: `commercial-skills` and
+    # `idea-to-shipped-code` were drawn across each other on the live page. Only the
+    # featured labels are visible without interaction, so those are the ones that
+    # have to be de-conflicted, and they are placed first and in priority order.
+    #
+    # Each label tries below its node, then above, then to each side, and takes the
+    # first position that clears the labels already placed. Deterministic, so the
+    # reproducibility gate still compares like with like.
+    placed_boxes = []
+
+    def box_at(label, x, y, anchor):
+        # 13px in a 1400-unit frame rendered at about 1164px, so a unit is a little
+        # under a pixel. 6.1 units per character is measured from the widest label
+        # this library produces rather than guessed at from the font size.
+        w = len(label) * 6.1
+        h = 13.0
+        left = x - w / 2 if anchor == "middle" else (x if anchor == "start" else x - w)
+        return (left, y - h * 0.8, left + w, y + h * 0.2)
+
+    def clear(box):
+        return all(
+            box[2] < o[0] or o[2] < box[0] or box[3] < o[1] or o[3] < box[1]
+            for o in placed_boxes
+        )
+
+    def place(n, label):
+        r = n["r"]
+        for dx, dy, anchor in (
+            (0, r + 12, "middle"),      # below, the default and the calmest
+            (0, -(r + 7), "middle"),    # above
+            (r + 8, 4, "start"),        # right
+            (-(r + 8), 4, "end"),       # left
+            (0, r + 24, "middle"),      # below, one line further out
+        ):
+            x, y = round(n["x"] + dx, 1), round(n["y"] + dy, 1)
+            box = box_at(label, x, y, anchor)
+            if clear(box):
+                placed_boxes.append(box)
+                return x, y, anchor
+        # Nothing clear: keep the default rather than drop the label, since a hidden
+        # label on a hovered node would be worse than a crowded one.
+        x, y = round(n["x"], 1), round(n["y"] + r + 12, 1)
+        return x, y, "middle"
+
+    leads_by_id = {n["id"]: n for n in nodes if n["kind"] == "lead"}
+    # Featured first, in the order the page presents them, then the rest.
+    ordered_ids = [i for i in featured_set_order if i in leads_by_id]
+    ordered_ids += [n["id"] for n in nodes
+                    if n["kind"] == "lead" and n["id"] not in featured_set]
+
+    positions = {}
+    for lead_id in ordered_ids:
+        n = leads_by_id[lead_id]
+        positions[lead_id] = place(n, label_of.get(lead_id, lead_id))
+
+    # Emitted in node order, so the document stays stable regardless of priority.
     for n in nodes:
         if n["kind"] != "lead":
             continue
         label = label_of.get(n["id"], n["id"])
         named = " is-named" if n["id"] in featured_set else ""
+        x, y, anchor = positions[n["id"]]
         parts.append(
             f'          <text class="g-label{named}" data-id="{esc(n["id"])}" '
-            f'x="{n["x"]}" y="{round(n["y"] + n["r"] + 12, 1)}" '
-            f'text-anchor="middle">{esc(label)}</text>'
+            f'x="{x}" y="{y}" '
+            f'text-anchor="{anchor}">{esc(label)}</text>'
         )
     parts.append("        </g>")
 
