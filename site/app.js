@@ -332,8 +332,15 @@
     if (panel.desc) {
       panel.desc.textContent =
         meta.size +
-        " skills held together by what they reference, not by where they are filed. " +
-        "Everything here runs through " +
+        " skills grouped by what their names and their Solutions say they have in " +
+        "common, not by where they are filed. " +
+        // "Most connected", which is what degree measures. This said "everything here runs
+        // through X", which claims betweenness or an articulation point and was not
+        // computed: in the largest community the top node has six in-community neighbours
+        // and removing it leaves the rest in one piece. The prerendered copy of this
+        // sentence in build.py was corrected and this one was missed, so the live page said
+        // both things depending on whether you had clicked anything.
+        "Its most connected member is " +
         meta.hub +
         ".";
     }
@@ -356,7 +363,7 @@
       var spread = Object.keys(doms).length;
       panel.ev.textContent =
         meta.size +
-        " skills · strongest node " +
+        " skills · most connected: " +
         meta.hub +
         (spread > 1 ? " · spans " + spread + " declared domains" : "");
     }
