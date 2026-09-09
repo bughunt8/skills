@@ -102,10 +102,16 @@ test.describe("no third party in the request path", () => {
 test.describe("graceful failure", () => {
   for (const missing of ["app.js", "data.js"]) {
     test(`complete native fallback survives missing ${missing}`, async ({ page }) => {
-      await page.route(`**/${missing}`, (route) => route.abort());
+      const blocked = [];
+      await page.route((url) => url.pathname === `/${missing}`, async (route) => {
+        blocked.push(route.request().url());
+        await route.abort();
+      });
       const errors = [];
       page.on("pageerror", (error) => errors.push(String(error)));
       await page.goto("/index.html");
+      expect(blocked, "fallback proof must actually block the versioned runtime asset").toHaveLength(1);
+      await expect(page.locator("#top")).not.toHaveAttribute("data-ready", "true");
       await expect(page.locator(".card")).toHaveCount(490);
       await expect(page.locator(".sol")).toHaveCount(50);
       await page.locator("#library > summary").click();

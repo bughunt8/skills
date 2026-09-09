@@ -1045,6 +1045,22 @@ def audit_svg(html: str) -> None:
         fail(f"the graph is not well-formed XML: {e}")
 
 
+def version_assets(page: str, data: str) -> str:
+    """Keep fresh HTML from loading an hour-old interaction bundle from cache."""
+    payloads = {
+        "app.js": (ROOT / "app.js").read_bytes(),
+        "styles.css": (ROOT / "styles.css").read_bytes(),
+        "data.js": data.encode("utf-8"),
+    }
+    for name, payload in payloads.items():
+        digest = hashlib.sha256(payload).hexdigest()[:12]
+        pattern = r'((?:src|href)="\./' + re.escape(name) + r')(?:\?v=[0-9a-f]+)?(")'
+        page, count = re.subn(pattern, rf'\g<1>?v={digest}\2', page)
+        if count != 1:
+            fail(f"expected one versioned asset reference for {name}, found {count}")
+    return page
+
+
 def audit_claims(page: str, total: int, cats: int) -> list:
     """Find count claims in the hand-written region that the build does not own."""
     begin, end = MARKERS["main"]
@@ -1094,6 +1110,7 @@ def main(argv: list) -> int:
 
     current = INDEX.read_text(encoding="utf-8")
     updated = splice(current, blocks, len(rows), len(counts), nsols, nstated)
+    updated = version_assets(updated, data)
 
     audit_svg(updated)
     drift = audit_claims(updated, len(rows), len(counts))
