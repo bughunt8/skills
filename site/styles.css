@@ -218,55 +218,152 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* nodes */
-.g-node { fill: var(--bg); stroke: var(--c, var(--accent)); vector-effect: non-scaling-stroke; }
-.g-node--tail { fill: var(--c, var(--accent)); stroke: none; opacity: 0.34; }
-.g-node--member { stroke-width: 1.4; opacity: 0.9; }
-.g-node--lead { stroke-width: 2.2; fill: var(--c); fill-opacity: 0.22; }
-.g-edge { stroke: var(--c, var(--line)); stroke-width: 0.9; opacity: 0.42; }
-/* A shared skill: one node, two Solutions, so the edge crosses the frame. */
-.g-edge--cross { stroke-dasharray: 3 4; opacity: 0.3; }
-.g-hit { fill: transparent; stroke: none; }
-/* Labels are opt-in. At rest only the featured leads are named; the rest name
-   themselves on hover, on focus, or when the traversal reaches them. */
-.g-label { opacity: 0; transition: opacity 0.2s var(--ease); }
-.g-label.is-named,
-.g-label.is-on,
-.g-label.is-hit { opacity: 1; }
-.stage.is-focus .g-label:not(.is-on) { opacity: 0; }
-.stage.is-dim .g-label:not(.is-hit) { opacity: 0; }
+/* ---------------- the tree ----------------------------------------------------
+   Four layers drawn left to right: domain, group, Solution, skill. Depth runs along
+   the long axis of the box because the box is two and a half times wider than it is
+   tall, which is also why this is not radial — a circle in that box either wastes
+   the width or flattens into an ellipse whose rings crowd at top and bottom, exactly
+   where the nodes are densest.
 
+   The two deeper layers are drawn but held at zero opacity. Revealing all 490 leaves
+   at once is what made the previous version an even speckle of dots, and 50
+   Solutions in one column sit 9 units apart. Opening a branch is what gives it
+   room. */
+
+.g-dot {
+  fill: var(--bg);
+  stroke: var(--c, var(--accent));
+  vector-effect: non-scaling-stroke;
+  transition: fill-opacity 0.2s var(--ease), stroke-width 0.2s var(--ease);
+}
+.g-hit { fill: transparent; stroke: none; }
+
+.g-node--domain .g-dot { stroke-width: 2.4; fill: var(--c); fill-opacity: 0.3; }
+.g-node--practice .g-dot { stroke-width: 1.9; fill: var(--c); fill-opacity: 0.14; }
+.g-node--solution .g-dot { stroke-width: 1.7; fill: var(--c); fill-opacity: 0.2; }
+.g-node--skill .g-dot { stroke-width: 1.3; }
+
+/* An unclaimed skill is hollow and dashed: no Solution leads it yet, and 158 of the
+   490 are in that state, which is worth being able to see rather than read. */
+.g-node--skill[data-unclaimed] .g-dot { stroke-dasharray: 2 2; opacity: 0.72; }
+
+.g-edge {
+  fill: none;
+  stroke: var(--c, var(--line));
+  stroke-width: 1;
+  opacity: 0.34;
+  vector-effect: non-scaling-stroke;
+}
+.g-edge--branch { opacity: 0.5; stroke-width: 1.3; }
+
+.g-edge--cross { stroke-dasharray: 3 4; opacity: 0; }
+
+/* Everything below the first layer is closed until its branch is opened. The seven
+   domains are the fixed spine and are always drawn; groups and Solutions arrive with
+   their domain, skills with their Solution. */
+.g-node--practice,
+.g-node--solution,
+.g-node--skill,
+.g-edge--branch,
+.g-edge--sol,
+.g-edge--leaf,
+.g-label--practice,
+.g-label--solution,
+.g-label--skill {
+  opacity: 0;
+  /* visibility, not just opacity.
+     A transparent SVG link is still a focusable one, so with scripting disabled — when
+     no branch can ever be opened — the drawing put 564 invisible tab stops between the
+     top of the page and everything after it. visibility:hidden takes an element out of
+     the tab order as well as out of view, and unlike display:none it can be
+     transitioned, so the fade still works.
+     The delay is what makes it fade out rather than vanish: visibility flips at the end
+     of the opacity transition on the way out, and immediately on the way in. */
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.24s var(--ease), visibility 0s linear 0.24s;
+}
+.g-node--practice.is-open,
+.g-node--solution.is-open,
+.g-node--skill.is-open,
+.g-edge--branch.is-open,
+.g-edge--sol.is-open,
+.g-edge--leaf.is-open,
+.g-label--practice.is-open,
+.g-label--solution.is-open,
+.g-label--skill.is-open {
+  visibility: visible;
+  transition: opacity 0.24s var(--ease), visibility 0s linear 0s;
+}
+.g-node--practice.is-open,
+.g-label--practice.is-open { opacity: 1; pointer-events: auto; }
+.g-edge--branch.is-open { opacity: 0.5; }
+.g-node--solution.is-open,
+.g-label--solution.is-open { opacity: 1; pointer-events: auto; }
+.g-node--skill.is-open,
+.g-label--skill.is-open { opacity: 1; pointer-events: auto; }
+.g-edge--sol.is-open { opacity: 0.5; }
+.g-edge--leaf.is-open { opacity: 0.42; }
+.g-edge--cross.is-open { opacity: 0.55; }
+
+.g-node { cursor: pointer; }
+.g-node:hover .g-dot,
+.g-node.is-on .g-dot { fill-opacity: 1; }
+.g-node:focus-visible { outline: none; }
+.g-node:focus-visible .g-dot { stroke: var(--text); stroke-width: 3.2; }
+
+/* Labels.
+   The two upper layers are always legible; the lower two arrive with their branch.
+   Text is drawn over the edges, so every glyph carries a halo of the page
+   background — without it the curves run straight through the labels at the centre
+   of the tree, where the most lines converge. */
 .g-label {
   font-family: var(--font-body);
-  /* User units, not screen pixels: the 1400-unit frame renders at about 1164px, so
-     10 units read as 8px and the labels were near-illegible. */
-  font-size: 13px;
-  letter-spacing: var(--tr-snug);
   fill: var(--text-dim);
+  letter-spacing: var(--tr-snug);
   paint-order: stroke;
   stroke: var(--bg);
-  stroke-width: 4px;
+  stroke-width: 3.4px;
+  stroke-linejoin: round;
   pointer-events: none;
 }
-.g-lead { cursor: pointer; }
-.g-lead:hover .g-node--lead,
-.g-lead.is-on .g-node--lead { fill-opacity: 1; }
-.g-lead:hover .g-label,
-.g-lead.is-on .g-label { fill: var(--text); }
-.g-lead:focus-visible { outline: none; }
-.g-lead:focus-visible .g-node--lead { stroke: var(--text); stroke-width: 3.4; }
+.g-label--domain { font-size: 14px; fill: var(--text); letter-spacing: var(--tr-tight); }
+/* Labels are text and are held to the contrast text is held to. The dim state used to
+   be --text-dim at 0.3 opacity, which computes to 2.44:1 against this background —
+   below AA, and invisible to the accessibility gate because the label layer was
+   excluded from it. Nodes and edges recede instead; the words stay readable. */
+.g-label--practice { font-size: 11.5px; }
+.g-label--solution { font-size: 11px; }
+.g-label--skill { font-size: 10px; }
+.g-label.is-on { fill: var(--text); }
 
-/* focus state: one Solution lit, everything else pushed back but still present,
-   because the point of the graph is that the rest exists. */
-.stage.is-focus .g-edge { opacity: 0.12; }
-.stage.is-focus .g-edge.is-on { opacity: 0.95; stroke: var(--c, var(--accent)); stroke-width: 1.7; }
-.stage.is-focus .g-node--tail { opacity: 0.12; }
-.stage.is-focus .g-node--member { opacity: 0.22; }
-.stage.is-focus .g-node--member.is-on { opacity: 1; stroke-width: 2; }
-.stage.is-focus .g-lead { opacity: 0.34; }
-.stage.is-focus .g-lead.is-on { opacity: 1; }
-.stage.is-dim .g-node { opacity: 0.1; }
+/* Selecting dims what it is not about rather than hiding it: the shape of the whole
+   library should stay visible while you read one branch of it. */
+.stage.is-focus .g-edge:not(.is-on) { opacity: 0.1; }
+.stage.is-focus .g-edge.is-on { opacity: 0.95; stroke-width: 1.8; }
+.stage.is-focus .g-node:not(.is-on) { opacity: 0.28; }
+.stage.is-focus .g-node--practice:not(.is-open),
+.stage.is-focus .g-node--solution:not(.is-open),
+.stage.is-focus .g-node--skill:not(.is-open),
+.stage.is-focus .g-edge--branch:not(.is-open),
+.stage.is-focus .g-edge--sol:not(.is-open),
+.stage.is-focus .g-edge--leaf:not(.is-open) { opacity: 0; }
+.stage.is-focus .g-node.is-on { opacity: 1; }
+.stage.is-focus .g-label:not(.is-on) { fill: var(--text-dim); }
+.stage.is-focus .g-label--practice:not(.is-open),
+.stage.is-focus .g-label--solution:not(.is-open),
+.stage.is-focus .g-label--skill:not(.is-open) { opacity: 0; }
+.stage.is-dim .g-node:not(.is-hit) { opacity: 0.1; }
+.stage.is-dim .g-node--practice:not(.is-open),
+.stage.is-dim .g-node--solution:not(.is-open),
+.stage.is-dim .g-node--skill:not(.is-open),
+.stage.is-dim .g-edge--branch:not(.is-open),
+.stage.is-dim .g-edge--sol:not(.is-open),
+.stage.is-dim .g-edge--leaf:not(.is-open) { opacity: 0; }
 .stage.is-dim .g-node.is-hit { opacity: 1; }
 .stage.is-dim .g-edge { opacity: 0.06; }
+.stage.is-dim .g-label:not(.is-hit) { fill: var(--text-dim); }
+.g-label.is-hit { fill: var(--text); opacity: 1; }
 
 
 /* intro */
@@ -577,10 +674,6 @@ a { color: inherit; text-decoration: none; }
 
 /* Search and filter hits. The graph dims to 10% and only hits stay lit, which is
    how you find one skill among 490 without a list to scroll. */
-.g-node.is-hit { opacity: 1; stroke-width: 2.4; }
-.g-node--tail.is-hit { opacity: 1; }
-.g-lead.is-hit .g-node--lead { fill-opacity: 1; }
-.g-label.is-hit { fill: var(--text); }
 
 /* Without JavaScript the progress bar has nothing to report, so it reads full
    rather than sitting empty and implying no progress. */
@@ -674,8 +767,21 @@ a { color: inherit; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   .stage__svg { transition: none !important; }
   .cue { display: none; }
-  .stage.is-focus .g-node--member,
-  .stage.is-focus .g-node--tail,
-  .stage.is-focus .g-lead,
-  .stage.is-focus .g-edge { opacity: 1; }
+  /* No transitions, and nothing dimmed. Someone who has asked for reduced motion
+     should get the whole tree at full contrast rather than a version that fades
+     parts of itself in and out as the pointer moves.
+
+     Opening a branch is still opening: is-open controls presence, not motion, and a
+     closed branch stays closed here too, because 490 leaves at their overlapping
+     slot positions is not a legible alternative. */
+  .g-dot,
+  .g-node--solution,
+  .g-node--skill,
+  .g-edge--sol,
+  .g-edge--leaf,
+  .g-label--solution,
+  .g-label--skill { transition: none !important; }
+  .stage.is-focus .g-node:not(.is-on),
+  .stage.is-focus .g-edge:not(.is-on),
+  .stage.is-focus .g-label:not(.is-on) { opacity: 1; }
 }

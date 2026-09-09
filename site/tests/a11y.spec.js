@@ -65,7 +65,9 @@ test.describe("accessibility", () => {
 
     // Lead nodes are the graph's navigation, so they must be focusable and named,
     // not decorative circles.
-    const leads = await page.locator(".g-lead").evaluateAll((gs) =>
+    // Every node in the tree is the page's navigation, so all four layers must be
+    // focusable and named, not decorative circles.
+    const leads = await page.locator(".g-node").evaluateAll((gs) =>
       gs.every((g) => g.tabIndex === 0 && g.getAttribute("aria-label"))
     );
     expect(leads, "every lead node focusable and named").toBe(true);

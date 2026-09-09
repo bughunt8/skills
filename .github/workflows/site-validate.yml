@@ -178,6 +178,28 @@ jobs:
         working-directory: site
         run: python3 tests/test_compose.py
 
+      # The browser can see whether the tree is legible. It cannot see whether it is
+      # true: every skill a leaf exactly once, every group's count the size of its own
+      # subtree, every group sitting on the Solutions it leads. This layout went
+      # through three arrangements and the browser suite passed on all three.
+      - name: Unit-test the hierarchy and its layout
+        working-directory: site
+        run: python3 tests/test_tree.py
+
+      - name: Confirm the layout tests can actually fail
+        working-directory: site
+        run: |
+          python3 scripts/plant_layout_defect.py plant
+          if python3 tests/test_tree.py > /tmp/planted-layout.log 2>&1; then
+            echo "::error::the tree tests passed with the crossing layout planted"
+            python3 scripts/plant_layout_defect.py restore
+            exit 1
+          fi
+          echo "gate confirmed: uncentred groups fail these tests"
+          grep -E "^  FAIL" /tmp/planted-layout.log | head -5 || true
+          python3 scripts/plant_layout_defect.py restore
+          python3 tests/test_tree.py
+
       - name: Confirm the composition tests can actually fail
         working-directory: site
         run: |

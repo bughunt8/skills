@@ -39,7 +39,9 @@ test.describe("prerendered content", () => {
     // The Solutions are the page's subject, so they must be present with the
     // script off too, not assembled from a data blob on load.
     await expect(page.locator(".sol")).toHaveCount(data.solutions);
-    await expect(page.locator(".g-lead")).toHaveCount(data.solutions);
+    await expect(page.locator('.g-node[data-layer="solution"]')).toHaveCount(
+      data.solutions
+    );
 
     // Substantive text, not just a shell. The JS-built version scored 858.
     //
@@ -99,11 +101,14 @@ test.describe("prerendered content", () => {
       );
       // Nodes only. Each lead also has a <text> label carrying the same identity,
       // and counting those makes every lead look like two nodes.
+      // Keyed by the skill's identity, not by the node's id: a node id is prefixed
+      // with its layer (k: for a skill, s: for a Solution) so the four layers cannot
+      // collide, and a Solution's lead has a node in both layers.
       const graph = [
-        ...document.querySelectorAll(".g-lead[data-id], .g-node[data-id]")
+        ...document.querySelectorAll('.g-node[data-layer="skill"]')
       ].reduce((m, el) => {
-        const id = el.getAttribute("data-id");
-        m[id] = (m[id] || 0) + 1;
+        const key = el.getAttribute("data-key");
+        m[key] = (m[key] || 0) + 1;
         return m;
       }, {});
       const bad = [];

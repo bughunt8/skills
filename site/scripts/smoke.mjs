@@ -87,7 +87,7 @@ try {
 
   // The Solutions and the graph are the page's subject, so a deploy that served
   // the library without them would be a deploy of a different page.
-  const leads = (html.match(/class="g-lead\b/g) || []).length;
+  const leads = (html.match(/data-layer="solution"/g) || []).length;
   const sols = (html.match(/<article class="sol"/g) || []).length;
   if (leads < 10 || sols < 10) {
     fail(`served HTML has ${sols} Solutions and ${leads} graph nodes; expected both`);

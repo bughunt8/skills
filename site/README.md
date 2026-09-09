@@ -119,7 +119,7 @@ Three sections, in this order:
 
 | Section | What it is |
 | --- | --- |
-| The stage | The graph, one screen tall. Every Solution is a node; the ring around them is the skills no Solution claims yet. Search, provenance filters and the traversal beats live here. |
+| The stage | The tree, one screen tall. Four layers left to right: 7 domains, 24 groups, 50 Solutions, 490 skills. Search, provenance filters and the traversal beats live here. |
 | Solutions | Every Solution the library can form: a lead skill, the subset it leads, and the evidence for saying so. |
 | The library | All 490 skills, one collapsed disclosure per category. Searching opens the categories that hold a hit. |
 
@@ -127,6 +127,35 @@ This replaced 24 pinned chapters that scrubbed a filmstrip of cards sideways, on
 category at a time. The effect was good once and then it was 76,000 pixels of
 scrolling between a reader and the skill they came for. The page is now about
 12,000.
+
+### The four layers
+
+    domain (7)  ->  group (24)  ->  Solution (50)  ->  skill (490)
+
+Measured rather than assumed. Every one of the 50 Solutions draws all of its members
+from a single category, so no Solution straddles a branch, and exactly one skill
+belongs to two Solutions — `code-review`, which serves both `idea-to-shipped-code` and
+`hard-to-find-bug` — so there is exactly one edge a tree cannot express and it is
+drawn as a cross-link rather than pretended away.
+
+The 24 groups are the repository's own directory names, which is why they read like
+`pstack` and `ra-qm-team`: source layout, not a taxonomy, and too many of them to be
+an opening view. The 7 domains above them are the only editorial judgement on the
+page, and they live in `domains.json` so that judgement is reviewable in a diff.
+Nothing there invents a skill or moves one between categories; it groups categories
+that already exist, and the build fails if a category is missing, duplicated or
+unknown.
+
+One branch is open at a time. That is not a preference — the drawing is about 500
+pixels tall, so all 50 Solutions in one column sit 9 units apart, too close to label,
+and 490 leaves sit 1.1 units apart, which is a visualisation of nothing. Revealing one
+domain at a time gives whichever branch is open the full height: at most 19 Solutions,
+26 units apart, with room for a label on each.
+
+`tree.py` holds the hierarchy and the geometry; `compose.py` holds what a Solution is
+and which skills it leads. Both are tested directly, in `tests/test_tree.py` and
+`tests/test_compose.py`, because the browser suite passed on three successive
+arrangements of this layout that were each wrong on screen.
 
 ## Development
 
