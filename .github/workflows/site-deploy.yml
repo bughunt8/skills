@@ -210,6 +210,21 @@ jobs:
           local-dir: ./site/_site/
           server-dir: ${{ vars.SITE_FTP_REMOTE_DIR || './' }}
           dangerous-clean-slate: false
+          # Do not attempt remote cleanup of historical build/cache folders.
+          # An older sync record can name a cache directory that no longer
+          # exists, causing FTP 550 after all public UI files were uploaded.
+          # These paths are already excluded from the local publish assembly.
+          # Preserve the action's default exclusions when adding our own.
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/__pycache__
+            **/__pycache__/**
+            **/.cache
+            **/.cache/**
+            **/vendor
+            **/vendor/**
 
   verify:
     name: verify the deployment is live and correct
