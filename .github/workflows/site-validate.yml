@@ -178,27 +178,32 @@ jobs:
         working-directory: site
         run: python3 tests/test_compose.py
 
-      # The browser can see whether the tree is legible. It cannot see whether it is
-      # true: every skill a leaf exactly once, every group's count the size of its own
-      # subtree, every group sitting on the Solutions it leads. This layout went
-      # through three arrangements and the browser suite passed on all three.
-      - name: Unit-test the hierarchy and its layout
+      # The browser can see whether the graph renders. It cannot see whether no two of
+      # 490 nodes are drawn on top of each other, whether the communities are the ones
+      # the next build will find, or whether the shortest route between two skills is
+      # actually the shortest. Four openings were written for this page and the browser
+      # suite passed on all of them.
+      - name: Unit-test the graph, its communities and its geometry
         working-directory: site
-        run: python3 tests/test_tree.py
+        run: python3 tests/test_network.py
 
-      - name: Confirm the layout tests can actually fail
+      # Each planted defect below was actually written and actually shipped. If the tests
+      # pass with one planted, the matching assertion is decorative.
+      - name: Confirm the graph tests can actually fail
         working-directory: site
         run: |
-          python3 scripts/plant_layout_defect.py plant
-          if python3 tests/test_tree.py > /tmp/planted-layout.log 2>&1; then
-            echo "::error::the tree tests passed with the crossing layout planted"
-            python3 scripts/plant_layout_defect.py restore
-            exit 1
-          fi
-          echo "gate confirmed: uncentred groups fail these tests"
-          grep -E "^  FAIL" /tmp/planted-layout.log | head -5 || true
-          python3 scripts/plant_layout_defect.py restore
-          python3 tests/test_tree.py
+          for defect in spacing labels seed; do
+            python3 scripts/plant_network_defect.py plant "$defect"
+            if python3 tests/test_network.py > "/tmp/planted-$defect.log" 2>&1; then
+              echo "::error::the graph tests passed with the '$defect' defect planted"
+              python3 scripts/plant_network_defect.py restore
+              exit 1
+            fi
+            echo "gate confirmed: '$defect' fails these tests"
+            grep -E "^  FAIL" "/tmp/planted-$defect.log" | head -3 || true
+            python3 scripts/plant_network_defect.py restore
+          done
+          python3 tests/test_network.py
 
       - name: Confirm the composition tests can actually fail
         working-directory: site

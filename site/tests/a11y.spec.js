@@ -13,10 +13,12 @@ test.describe("accessibility", () => {
 
     const { violations } = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-      // The graph is aria-hidden decoration with a text equivalent below it; its
-      // is deliberately far below AA and they carry no information.
-      .exclude(".g-tail")
-      .exclude(".g-labels")
+      // Nothing is excluded. The previous version of this test excluded the entire
+      // .g-labels layer, and an independent review was right that this hid a real
+      // failure: eleven community labels were dimmed to 1.99:1 while the README claimed
+      // an unqualified AA gate. Those labels name the detected communities, which is
+      // information, so they were fixed rather than exempted. (.g-tail was also excluded
+      // and no longer exists anywhere in the page.)
       .analyze();
 
     const summary = violations.map((v) => ({
@@ -39,8 +41,6 @@ test.describe("accessibility", () => {
 
     const { violations } = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-      .exclude(".g-tail")
-      .exclude(".g-labels")
       .analyze();
 
     expect(
@@ -63,14 +63,44 @@ test.describe("accessibility", () => {
     expect(first.cls).toContain("skip");
     await expect(page.locator(first.href)).toHaveCount(1);
 
-    // Lead nodes are the graph's navigation, so they must be focusable and named,
-    // not decorative circles.
-    // Every node in the tree is the page's navigation, so all four layers must be
-    // focusable and named, not decorative circles.
-    const leads = await page.locator(".g-node").evaluateAll((gs) =>
-      gs.every((g) => g.tabIndex === 0 && g.getAttribute("aria-label"))
+    // Every node is named, and the graph is entered once and then walked.
+    //
+    // This used to require tabIndex === 0 on all 490, which is what the page did and what
+    // made it unusable by keyboard: reaching the section below the graph meant several
+    // hundred Tab presses. A roving tabindex replaced it, so the requirement is now that
+    // there is exactly one way in, that every node still carries its own name for a screen
+    // reader, and that the arrow keys move between them.
+    const named = await page.locator(".g-node").evaluateAll((gs) =>
+      gs.every((g) => g.getAttribute("aria-label"))
     );
-    expect(leads, "every lead node focusable and named").toBe(true);
+    expect(named, "every node carries its own name").toBe(true);
+
+    // One way in on desktop; none below the narrow breakpoint, where the click targets are
+    // under three and a half pixels and the search box and text list are the interface.
+    const wide = await page.evaluate(
+      () => window.innerWidth > 1000 && window.innerHeight > 720
+    );
+    const stops = await page.locator('.g-node[tabindex="0"]').count();
+    expect(stops, "one tab stop for the graph on desktop, none on a phone").toBe(
+      wide ? 1 : 0
+    );
+    if (!wide) return;
+
+    await page.locator('.g-node[tabindex="0"]').focus();
+    const before = await page.evaluate(() =>
+      document.activeElement.getAttribute("data-key")
+    );
+    await page.keyboard.press("ArrowRight");
+    await page.waitForTimeout(250);
+    const after = await page.evaluate(() =>
+      document.activeElement.getAttribute("data-key")
+    );
+    expect(after, "arrow keys move between nodes").not.toBe(before);
+    expect(after).toBeTruthy();
+    expect(
+      await page.locator('.g-node[tabindex="0"]').count(),
+      "still one way in after moving"
+    ).toBe(1);
 
     // Rail links are real anchors, so they are reachable and focusable.
     const focusable = await page.locator("#rail a").evaluateAll((as) =>

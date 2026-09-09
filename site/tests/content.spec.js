@@ -39,9 +39,14 @@ test.describe("prerendered content", () => {
     // The Solutions are the page's subject, so they must be present with the
     // script off too, not assembled from a data blob on load.
     await expect(page.locator(".sol")).toHaveCount(data.solutions);
-    await expect(page.locator('.g-node[data-layer="solution"]')).toHaveCount(
-      data.solutions
+    // The graph draws skills, and every one of them is a real link to its own card, so with
+    // the script off the graph is a table of contents rather than an ornament. It used to
+    // draw Solutions as nodes too; it does not, and this asserted the old shape.
+    await expect(page.locator(".g-node")).toHaveCount(data.total);
+    const linked = await page.locator(".g-node").evaluateAll((ns) =>
+      ns.every((n) => (n.getAttribute("href") || "").startsWith("#skill-"))
     );
+    expect(linked, "every node is a link into the library").toBe(true);
 
     // Substantive text, not just a shell. The JS-built version scored 858.
     //
@@ -99,14 +104,11 @@ test.describe("prerendered content", () => {
       const cards = new Set(
         [...document.querySelectorAll(".card")].map((c) => c.getAttribute("data-id"))
       );
-      // Nodes only. Each lead also has a <text> label carrying the same identity,
-      // and counting those makes every lead look like two nodes.
-      // Keyed by the skill's identity, not by the node's id: a node id is prefixed
-      // with its layer (k: for a skill, s: for a Solution) so the four layers cannot
-      // collide, and a Solution's lead has a node in both layers.
-      const graph = [
-        ...document.querySelectorAll('.g-node[data-layer="skill"]')
-      ].reduce((m, el) => {
+      // Nodes only, keyed by the skill's identity. Each node also has a <text> label
+      // carrying the same identity, and counting those makes every skill look like two
+      // nodes. The layer filter this used to carry is gone with the layers: every node in
+      // the graph is a skill now.
+      const graph = [...document.querySelectorAll(".g-node")].reduce((m, el) => {
         const key = el.getAttribute("data-key");
         m[key] = (m[key] || 0) + 1;
         return m;

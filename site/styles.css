@@ -218,152 +218,139 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* nodes */
-/* ---------------- the tree ----------------------------------------------------
-   Four layers drawn left to right: domain, group, Solution, skill. Depth runs along
-   the long axis of the box because the box is two and a half times wider than it is
-   tall, which is also why this is not radial — a circle in that box either wastes
-   the width or flattens into an ellipse whose rings crowd at top and bottom, exactly
-   where the nodes are densest.
+/* ---------------- the graph ---------------------------------------------------
+   490 skills, 1,868 relationships, communities found rather than declared.
 
-   The two deeper layers are drawn but held at zero opacity. Revealing all 490 leaves
-   at once is what made the previous version an even speckle of dots, and 50
-   Solutions in one column sit 9 units apart. Opening a branch is what gives it
-   room. */
+   This replaced a four-column dendrogram of the taxonomy. That was tidy and it was
+   inert: it drew the filing system, and a filing system is not a finding. Before it,
+   a spiral packing of everything at once was an even speckle. What makes this legible
+   is not the layout alone — it is that size means degree, colour means a detected
+   community, and a dashed edge means the relationship was inferred rather than
+   stated. */
+
+/* The camera. Transform on one group; --k is the factor everything measured in user
+   units has to divide by to keep its rendered size. */
+.g-vp {
+  --k: 1;
+  transform-origin: 0 0;
+  transition: transform 0.62s var(--ease);
+}
+.is-static .g-vp,
+.stage.is-picking .g-vp { transition: none; }
 
 .g-dot {
-  fill: var(--bg);
+  fill: var(--c, var(--accent));
+  fill-opacity: 0.5;
   stroke: var(--c, var(--accent));
+  stroke-width: 1;
   vector-effect: non-scaling-stroke;
-  transition: fill-opacity 0.2s var(--ease), stroke-width 0.2s var(--ease);
+  transition: fill-opacity 0.16s var(--ease), stroke-width 0.16s var(--ease);
 }
 .g-hit { fill: transparent; stroke: none; }
 
-.g-node--domain .g-dot { stroke-width: 2.4; fill: var(--c); fill-opacity: 0.3; }
-.g-node--practice .g-dot { stroke-width: 1.9; fill: var(--c); fill-opacity: 0.14; }
-.g-node--solution .g-dot { stroke-width: 1.7; fill: var(--c); fill-opacity: 0.2; }
-.g-node--skill .g-dot { stroke-width: 1.3; }
-
-/* An unclaimed skill is hollow and dashed: no Solution leads it yet, and 158 of the
-   490 are in that state, which is worth being able to see rather than read. */
-.g-node--skill[data-unclaimed] .g-dot { stroke-dasharray: 2 2; opacity: 0.72; }
+/* A Solution's lead is drawn hollow with a heavier ring: it is the skill that drives
+   the others, and that is worth seeing without having to select it. */
+.g-node.is-lead .g-dot { fill-opacity: 0.1; stroke-width: 2.2; }
+/* A skill no Solution leads and nothing references. 34 of them, drawn faintly on a
+   ring outside everything else rather than hidden — that is the frontier of the
+   library, and it is a fact about it. */
+.g-node.is-loose .g-dot { fill-opacity: 0.16; stroke-dasharray: 1.6 1.6; }
 
 .g-edge {
   fill: none;
   stroke: var(--c, var(--line));
-  stroke-width: 1;
-  opacity: 0.34;
   vector-effect: non-scaling-stroke;
 }
-.g-edge--branch { opacity: 0.5; stroke-width: 1.3; }
-
-.g-edge--cross { stroke-dasharray: 3 4; opacity: 0; }
-
-/* Everything below the first layer is closed until its branch is opened. The seven
-   domains are the fixed spine and are always drawn; groups and Solutions arrive with
-   their domain, skills with their Solution. */
-.g-node--practice,
-.g-node--solution,
-.g-node--skill,
-.g-edge--branch,
-.g-edge--sol,
-.g-edge--leaf,
-.g-label--practice,
-.g-label--solution,
-.g-label--skill {
-  opacity: 0;
-  /* visibility, not just opacity.
-     A transparent SVG link is still a focusable one, so with scripting disabled — when
-     no branch can ever be opened — the drawing put 564 invisible tab stops between the
-     top of the page and everything after it. visibility:hidden takes an element out of
-     the tab order as well as out of view, and unlike display:none it can be
-     transitioned, so the fade still works.
-     The delay is what makes it fade out rather than vanish: visibility flips at the end
-     of the opacity transition on the way out, and immediately on the way in. */
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.24s var(--ease), visibility 0s linear 0.24s;
-}
-.g-node--practice.is-open,
-.g-node--solution.is-open,
-.g-node--skill.is-open,
-.g-edge--branch.is-open,
-.g-edge--sol.is-open,
-.g-edge--leaf.is-open,
-.g-label--practice.is-open,
-.g-label--solution.is-open,
-.g-label--skill.is-open {
-  visibility: visible;
-  transition: opacity 0.24s var(--ease), visibility 0s linear 0s;
-}
-.g-node--practice.is-open,
-.g-label--practice.is-open { opacity: 1; pointer-events: auto; }
-.g-edge--branch.is-open { opacity: 0.5; }
-.g-node--solution.is-open,
-.g-label--solution.is-open { opacity: 1; pointer-events: auto; }
-.g-node--skill.is-open,
-.g-label--skill.is-open { opacity: 1; pointer-events: auto; }
-.g-edge--sol.is-open { opacity: 0.5; }
-.g-edge--leaf.is-open { opacity: 0.42; }
-.g-edge--cross.is-open { opacity: 0.55; }
+/* Stated by the repository: a lead leading a skill, or two skills that are siblings in
+   the same bundle. */
+.g-edge--extracted { stroke-width: 1; opacity: 0.3; }
+/* Derived: two skills whose names share a subject. Fainter and dashed, because it is a
+   weaker claim and the page should not pretend otherwise. */
+.g-edge--inferred { stroke-width: 0.6; opacity: 0.085; stroke-dasharray: 2.5 3; }
 
 .g-node { cursor: pointer; }
-.g-node:hover .g-dot,
-.g-node.is-on .g-dot { fill-opacity: 1; }
+.g-node:hover .g-dot { fill-opacity: 1; }
 .g-node:focus-visible { outline: none; }
-.g-node:focus-visible .g-dot { stroke: var(--text); stroke-width: 3.2; }
+.g-node:focus-visible .g-dot { stroke: var(--text); stroke-width: 3; }
 
-/* Labels.
-   The two upper layers are always legible; the lower two arrive with their branch.
-   Text is drawn over the edges, so every glyph carries a halo of the page
-   background — without it the curves run straight through the labels at the centre
-   of the tree, where the most lines converge. */
-.g-label {
+.g-labels { pointer-events: none; }
+.g-clabel,
+.g-nlabel {
   font-family: var(--font-body);
-  fill: var(--text-dim);
-  letter-spacing: var(--tr-snug);
+  /* Divided by the camera factor, so a label is the same size on screen at every zoom
+     level. Without this the first camera made the labels grow with the zoom until they
+     overlapped each other. */
   paint-order: stroke;
   stroke: var(--bg);
-  stroke-width: 3.4px;
   stroke-linejoin: round;
-  pointer-events: none;
 }
-.g-label--domain { font-size: 14px; fill: var(--text); letter-spacing: var(--tr-tight); }
-/* Labels are text and are held to the contrast text is held to. The dim state used to
-   be --text-dim at 0.3 opacity, which computes to 2.44:1 against this background —
-   below AA, and invisible to the accessibility gate because the label layer was
-   excluded from it. Nodes and edges recede instead; the words stay readable. */
-.g-label--practice { font-size: 11.5px; }
-.g-label--solution { font-size: 11px; }
-.g-label--skill { font-size: 10px; }
-.g-label.is-on { fill: var(--text); }
+/* A community's name, generated from the tokens its own members share, so the name and
+   the shape agree by construction. */
+.g-clabel {
+  font-size: calc(11.5px / var(--k, 1));
+  fill: var(--text);
+  /* Counter-scaled with the font size. A 4-unit halo behind 4-unit-tall glyphs paints
+     over them completely: at 2.7x zoom the community labels vanished into their own
+     outline, which is a real fault this page shipped for one build. */
+  stroke-width: calc(4px / var(--k, 1));
+  letter-spacing: var(--tr-snug);
+}
+/* Only the 26 most connected skills are named unasked. 490 names at this scale is a
+   grey wash rather than a labelling; the rest arrive on hover, on selection, or through
+   search. */
+.g-nlabel {
+  font-size: calc(9.5px / var(--k, 1));
+  fill: var(--text-dim);
+  stroke-width: calc(3.2px / var(--k, 1));
+}
+/* Revealed for whatever is being read: the selection and its neighbours. */
+.g-nlabel.is-on,
+.g-nlabel.is-hit { fill: var(--text); opacity: 1; }
+.g-nlabel--extra { opacity: 0; }
+.g-nlabel--extra.is-on,
+.g-nlabel--extra.is-hit { opacity: 1; }
 
-/* Selecting dims what it is not about rather than hiding it: the shape of the whole
-   library should stay visible while you read one branch of it. */
-.stage.is-focus .g-edge:not(.is-on) { opacity: 0.1; }
-.stage.is-focus .g-edge.is-on { opacity: 0.95; stroke-width: 1.8; }
-.stage.is-focus .g-node:not(.is-on) { opacity: 0.28; }
-.stage.is-focus .g-node--practice:not(.is-open),
-.stage.is-focus .g-node--solution:not(.is-open),
-.stage.is-focus .g-node--skill:not(.is-open),
-.stage.is-focus .g-edge--branch:not(.is-open),
-.stage.is-focus .g-edge--sol:not(.is-open),
-.stage.is-focus .g-edge--leaf:not(.is-open) { opacity: 0; }
-.stage.is-focus .g-node.is-on { opacity: 1; }
-.stage.is-focus .g-label:not(.is-on) { fill: var(--text-dim); }
-.stage.is-focus .g-label--practice:not(.is-open),
-.stage.is-focus .g-label--solution:not(.is-open),
-.stage.is-focus .g-label--skill:not(.is-open) { opacity: 0; }
-.stage.is-dim .g-node:not(.is-hit) { opacity: 0.1; }
-.stage.is-dim .g-node--practice:not(.is-open),
-.stage.is-dim .g-node--solution:not(.is-open),
-.stage.is-dim .g-node--skill:not(.is-open),
-.stage.is-dim .g-edge--branch:not(.is-open),
-.stage.is-dim .g-edge--sol:not(.is-open),
-.stage.is-dim .g-edge--leaf:not(.is-open) { opacity: 0; }
-.stage.is-dim .g-node.is-hit { opacity: 1; }
-.stage.is-dim .g-edge { opacity: 0.06; }
-.stage.is-dim .g-label:not(.is-hit) { fill: var(--text-dim); }
-.g-label.is-hit { fill: var(--text); opacity: 1; }
+/* While something specific is being read, the only names on screen are that thing's.
+   The 26 names drawn by default are placed so they never collide with each other, but
+   they were never placed against the names revealed on demand, and in the densest
+   community the two sets landed on top of each other. Hiding the default set while a
+   selection is up means the revealed names are the only ones that need to fit, which is
+   a problem small enough to solve exactly. */
+.stage.is-focus .g-nlabel:not(.is-on),
+.stage.is-path .g-nlabel:not(.is-on),
+.stage.is-dim .g-nlabel:not(.is-hit) { opacity: 0; }
+
+/* Reading one node: it and its neighbours stay, everything else recedes. Nothing is
+   hidden — the shape of the whole library is the context that makes one node mean
+   anything. */
+.stage.is-focus .g-edge:not(.is-on) { opacity: 0.04; }
+.stage.is-focus .g-edge.is-on { opacity: 0.85; stroke-width: 1.6; }
+.stage.is-focus .g-node:not(.is-on) .g-dot { fill-opacity: 0.1; stroke-opacity: 0.22; }
+.stage.is-focus .g-node.is-on .g-dot { fill-opacity: 1; }
+.stage.is-focus .g-node.is-self .g-dot { stroke: var(--text); stroke-width: 2.6; }
+/* 0.55, not 0.24. At 0.24 these read as #414449 on #0b0d12 — 1.99:1, where AA wants 4.5 —
+   and an independent review found the a11y test was passing only because it excluded the
+   whole label layer. These labels name the detected communities, which is information, so
+   the honest fix is contrast rather than an exclusion. 0.55 is 5.63:1 and still recedes. */
+.stage.is-focus .g-clabel:not(.is-on) { opacity: 0.55; }
+
+/* A path between two skills: the hops light up and everything else goes quiet. */
+.stage.is-path .g-edge:not(.is-path) { opacity: 0.03; }
+.stage.is-path .g-node:not(.is-path) .g-dot { fill-opacity: 0.08; stroke-opacity: 0.16; }
+.g-edge.is-path { opacity: 1; stroke: var(--accent); stroke-width: 2.4; stroke-dasharray: none; }
+.g-node.is-path .g-dot { fill-opacity: 1; stroke: var(--accent); stroke-width: 2.4; }
+.g-node.is-path-end .g-dot { stroke: var(--text); stroke-width: 3; }
+.stage.is-path .g-clabel:not(.is-on) { opacity: 0.55; }
+
+/* Searching: matches stay, the rest of the library dims to context. */
+.stage.is-dim .g-node:not(.is-hit) .g-dot { fill-opacity: 0.07; stroke-opacity: 0.14; }
+.stage.is-dim .g-edge { opacity: 0.03; }
+.stage.is-dim .g-node.is-hit .g-dot { fill-opacity: 1; stroke-width: 2; }
+.stage.is-dim .g-clabel { opacity: 0.55; }
+
+/* Only relationships the repository states, for a reader who does not want the
+   derived ones. */
+.stage.is-extracted-only .g-edge--inferred { opacity: 0 !important; }
 
 
 /* intro */
@@ -767,27 +754,61 @@ a { color: inherit; text-decoration: none; }
   .sol__problem { -webkit-line-clamp: 2; }
   .card p { -webkit-line-clamp: 2; }
   .hud { display: none; }
+
+  /* Below this width the graph is a picture, not a control.
+     A node's click target is expressed in the graph's own 1,400-unit coordinate system, so
+     responsive scaling shrinks it with the viewport: about 10 CSS pixels at 1440 wide, but
+     3.3 at 390 and 2.6 at 320. An independent review was right that a 2.6-pixel target is
+     not a navigation control, and that 490 of them in the tab order is not a keyboard
+     interface. So on a narrow screen the drawing stays — it is worth seeing — and the
+     search box, the community chips and the full text list below are the interface.
+     Nothing here is information that the text below does not also carry. */
+  .stage__canvas .g-node {
+    pointer-events: none;
+    /* Removed from the tab order in app.js too; this is the visual half of the same
+       decision, and both have to be true or a keyboard user gets 490 stops that do
+       nothing. */
+  }
 }
 
 /* ---------------- reduced motion: everything static and complete ---------------- */
 @media (prefers-reduced-motion: reduce) {
   .stage__svg { transition: none !important; }
   .cue { display: none; }
-  /* No transitions, and nothing dimmed. Someone who has asked for reduced motion
-     should get the whole tree at full contrast rather than a version that fades
-     parts of itself in and out as the pointer moves.
-
-     Opening a branch is still opening: is-open controls presence, not motion, and a
-     closed branch stays closed here too, because 490 leaves at their overlapping
-     slot positions is not a legible alternative. */
+  /* No transitions, and nothing dimmed by a pointer.
+     Someone who has asked for reduced motion should get the whole graph at full
+     contrast rather than a version that fades parts of itself in and out as the pointer
+     moves across it. Deliberate states — a selection, a path, a search — still change
+     what is emphasised, because that is a result rather than an animation. */
   .g-dot,
-  .g-node--solution,
-  .g-node--skill,
-  .g-edge--sol,
-  .g-edge--leaf,
-  .g-label--solution,
-  .g-label--skill { transition: none !important; }
-  .stage.is-focus .g-node:not(.is-on),
-  .stage.is-focus .g-edge:not(.is-on),
-  .stage.is-focus .g-label:not(.is-on) { opacity: 1; }
+  .g-edge,
+  .g-vp { transition: none !important; }
+  .stage.is-focus .g-node:not(.is-on) .g-dot { fill-opacity: 0.5; stroke-opacity: 1; }
+  .stage.is-focus .g-edge:not(.is-on) { opacity: 0.12; }
+  .stage.is-focus .g-clabel:not(.is-on) { opacity: 1; }
 }
+
+
+/* The headline is text, and text should not swallow a click meant for the graph
+   underneath it. Its own links keep their events; the block itself stops intercepting.
+   Found by a click on a highlighted, labelled node doing nothing at all. */
+.stage__intro { pointer-events: none; }
+.stage__intro a,
+.stage__intro button { pointer-events: auto; }
+
+/* Once zoomed in, the way back out has to be obvious. */
+.stage.is-zoomed .stage__svg { cursor: zoom-out; }
+.stage.is-zoomed .g-node { cursor: pointer; }
+.stage.is-picking .g-node { cursor: crosshair; }
+
+/* While two skills are being picked, the overlays stop taking clicks. They still read,
+   but a node underneath the panel or the chip row has to be reachable — otherwise a
+   quarter of the library cannot be picked, which is how the first version of this
+   behaved. */
+.stage.is-picking .stage__panel,
+.stage.is-picking .stage__beats { pointer-events: none; }
+/* The category rail is a sibling of the stage, not a descendant, so a .stage-scoped rule
+   never matched it and it went on swallowing clicks meant for nodes underneath. The flag is
+   set on the document element as well for exactly this. */
+.is-picking .rail { pointer-events: none; }
+.stage.is-picking .stage__panel { opacity: 0.92; }

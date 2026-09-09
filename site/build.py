@@ -26,6 +26,7 @@ import collections
 import hashlib
 import html
 import json
+import math
 import os
 import re
 import shutil
@@ -35,7 +36,7 @@ import tempfile
 from pathlib import Path
 
 import compose
-import tree
+import network
 
 ROOT = Path(__file__).resolve().parent
 # The repository that contains this site. Its own skills are read from here.
@@ -385,6 +386,30 @@ def hue_class(name: str) -> str:
 # stop being. Eight is enough to teach the interaction and show the range.
 FEATURED = 8
 
+# Twelve hues is as many as anyone can hold apart at once. The communities beyond that
+# are drawn in grey and named in the panel rather than given a colour that means nothing.
+NAMED_COMMUNITIES = 12
+
+# Names are cheap; colours are not. Tightening the edge rules split the library into 31
+# communities rather than 19, and nineteen unnamed grey clusters is a worse page than
+# twelve coloured ones plus six more that at least say what they are.
+LABELLED_COMMUNITIES = 18
+
+# Names drawn without being asked for. The rest arrive on hover, on selection, or
+# through search: 490 names at this scale is a grey wash, not a labelling.
+HUB_LABELS = 26
+
+# Modularity resolution. Higher splits the library into more, smaller subjects; at 1.0
+# the largest community is 50 skills and the smallest with real structure is 5, which is
+# the range where the labels the members generate are still recognisable.
+COMMUNITY_RESOLUTION = 1.0
+
+# The graph's coordinate system, in one place. The layout used 1400x620 while the <svg>
+# declared a viewBox of 1400x560, so twenty-nine skills were positioned in a band the
+# browser clips away: highlighted, labelled, counted in the panel, and invisible. Both the
+# viewBox attribute and the layout now come from here.
+FRAME = network.FRAME
+
 
 def _domain_of(nodes: dict, node_id: str) -> str:
     cur = node_id
@@ -393,176 +418,222 @@ def _domain_of(nodes: dict, node_id: str) -> str:
     return cur
 
 
-def render_tree(lay: "dict", sols: list, rows: list) -> "tuple[str, list]":
-    """Draw the four-layer tree: domains, practices, Solutions, skills.
+def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -> tuple:
+    """Draw the library as a knowledge graph: communities, hubs, evidence, frontier.
 
-    Replaces a single-layer packing of all 540 Solutions and skills at once. That
-    view was accurate and unreadable — every node the same weight, no statement in
-    the geometry about what mattered — so this one draws the structure the library
-    actually has and reveals one branch of it at a time.
+    This is the fourth opening this page has had, and the first that draws something
+    nobody decided in advance. A spiral packing of all 540 nodes was an even speckle. A
+    four-column dendrogram of the taxonomy was tidy and inert — it drew the filing
+    system, and a filing system is not a finding. Both showed a structure that had
+    already been written down somewhere.
 
-    Every node is a link whose target exists, so the graph is a table of contents
-    before any script runs. Solutions and skills are drawn but held at zero opacity:
-    revealing all 490 leaves at once is what made the previous version a speckle, and
-    50 Solutions in one column would be 9 units apart. With scripting, opening a
-    domain fans its Solutions across the full height of the drawing, and opening a
-    Solution does the same for its skills.
+    Here the colours are communities found by modularity maximisation over evidence
+    taken from the files, the big nodes are big because everything runs through them,
+    and where a community cuts across the declared domains that disagreement is on
+    screen rather than smoothed away.
+
+    Every node is still a link to the skill's own card, so this is a table of contents
+    before any script runs.
     """
-    nodes = lay["nodes"]
-    domains = [n for n in nodes.values() if n["layer"] == "domain"]
-    hue_of = {d["id"]: f"h{i}" for i, d in enumerate(domains)}
+    pos = net["pos"]
+    degree = graph["degree"]
+    kinds = graph["kinds"]
+    by_key = {r["key"]: r for r in rows}
+    order = net["communities"]
 
-    def ancestor_domain(node_id: str) -> str:
-        cur = node_id
-        while nodes[cur]["parent"] is not None:
-            cur = nodes[cur]["parent"]
-        return cur
+    # Twelve distinct hues, then a neutral. Nineteen communities have real structure and
+    # twelve is as many colours as anyone can hold apart; the smaller ones are drawn in
+    # grey and named in the panel instead of being given a colour that means nothing.
+    hue_of = {}
+    for i, cid in enumerate(order):
+        hue_of[cid] = f"h{i}" if i < NAMED_COMMUNITIES else "hx"
 
-    dom_of = {nid: ancestor_domain(nid) for nid in nodes}
+    def hue(key):
+        return hue_of.get(comm[key], "hx")
 
-    # How many skills sit under each node, and how many Solutions. Counted by walking
-    # up from every leaf, so a node's number is the sum of its whole subtree rather
-    # than of its immediate children.
-    skills_under: dict = {}
-    sols_under: dict = {}
-    for node in nodes.values():
-        if node["layer"] not in ("skill", "solution"):
-            continue
-        cur = node["id"]
-        while cur is not None:
-            if node["layer"] == "skill":
-                skills_under[cur] = skills_under.get(cur, 0) + 1
-            else:
-                sols_under[cur] = sols_under.get(cur, 0) + 1
-            cur = nodes[cur]["parent"]
+    sol_of = collections.defaultdict(list)
+    lead_of = {}
+    for s in sols:
+        if s["lead"] in by_key:
+            lead_of[s["lead"]] = s
+        for m in s["members"]:
+            sol_of[m].append(s["lead"])
 
-    sol_by_key = {s["lead"]: s for s in sols}
-    row_by_key = {r["key"]: r for r in rows}
+    max_deg = max(degree.values()) if degree else 1
 
-    def href_of(node: dict) -> str:
-        if node["layer"] == "domain":
-            return "#solutions"
-        if node["layer"] == "practice":
-            return f'#cat-{node["cat"]}'
-        if node["layer"] == "solution":
-            return f'#{slug(node["key"])}'
-        return f'#skill-{slug(node["key"])}'
+    def radius(key):
+        # Area, not radius, in proportion to degree, so the hubs read as bigger without
+        # a 23-connection node being eleven times the width of a 2-connection one.
+        d = degree.get(key, 0)
+        return round(2.1 + 6.4 * math.sqrt(d / max_deg), 2)
 
     parts = []
+    # One group holds everything the camera moves, so framing a community is a single
+    # transform rather than 490 rewritten coordinates. Labels ride inside it and divide
+    # their font size by the same factor, which is what the first camera got wrong:
+    # SVG text is measured in user units, so zooming in made every label grow until they
+    # collided.
+    parts.append('        <g id="vp" class="g-vp">')
 
-    # ---------------------------------------------------------------- edges first
+    # ------------------------------------------------------------------- the edges
     #
-    # SVG has no z-index, so paint order is document order: edges before nodes, and
-    # labels after everything. An earlier version drew labels inside each node's
-    # group and a later node's circle sliced an earlier node's label in half.
+    # Drawn before the nodes, because SVG paints in document order and an edge crossing
+    # a node should pass behind it. Curved rather than straight: 1,868 straight lines
+    # between 490 points is a moiré, and a slight arc lets two edges between the same
+    # pair of clusters stay distinguishable.
     parts.append('        <g class="g-edges" aria-hidden="true">')
-    for a, b_id, kind in tree.edges(lay):
-        na, nb = nodes[a], nodes[b_id]
-        meta = f' data-from="{esc(a)}" data-to="{esc(b_id)}"'
-        d = tree.curve(na["x"], na["y"], nb["x"], nb["y"])
-        if kind == "cross":
-            # The one edge a tree cannot hold: code-review is led by two Solutions.
-            parts.append(
-                f'          <path class="g-edge g-edge--cross" '
-                f'data-sol="{esc(a)}"{meta} d="{d}"/>'
-            )
-        elif nb["layer"] == "solution":
-            parts.append(
-                f'          <path class="g-edge g-edge--sol {hue_of[dom_of[b_id]]}" '
-                f'data-dom="{esc(dom_of[b_id])}"{meta} d="{d}"/>'
-            )
-        elif nb["layer"] == "skill":
-            parts.append(
-                f'          <path class="g-edge g-edge--leaf {hue_of[dom_of[b_id]]}" '
-                f'data-branch="{esc(a)}"{meta} d="{d}"/>'
-            )
-        else:
-            parts.append(
-                f'          <path class="g-edge g-edge--branch {hue_of[dom_of[b_id]]}" '
-                f'data-dom="{esc(dom_of[b_id])}"{meta} d="{d}"/>'
-            )
-    parts.append("        </g>")
-
-    # ---------------------------------------------------------------- then nodes
-    parts.append('        <g class="g-nodes">')
-    for layer in ("skill", "solution", "practice", "domain"):
-        for node in nodes.values():
-            if node["layer"] != layer:
-                continue
-            nid = node["id"]
-            hue = hue_of[dom_of[nid]]
-            attrs = [
-                f'class="g-node g-node--{layer} {hue}"',
-                f'href="{esc(href_of(node))}"',
-                f'data-id="{esc(nid)}"',
-                f'data-layer="{layer}"',
-                f'data-name="{esc(node["label"])}"',
-                f'data-dom="{esc(dom_of[nid])}"',
-            ]
-            if node["parent"]:
-                attrs.append(f'data-parent="{esc(node["parent"])}"')
-            if layer == "solution":
-                attrs.append(f'data-tier="{esc(node["tier"])}"')
-                attrs.append(f'data-key="{esc(node["key"])}"')
-            if layer == "skill":
-                attrs.append(f'data-key="{esc(node["key"])}"')
-                if not node["claimed"]:
-                    attrs.append('data-unclaimed="1"')
-            aria = node["label"]
-            attrs.append(f'data-skills="{skills_under.get(nid, 0)}"')
-            attrs.append(f'data-sols="{sols_under.get(nid, 0)}"')
-            if layer == "domain":
-                attrs.append(f'data-blurb="{esc(node["blurb"])}"')
-                aria = (
-                    f'{node["label"]}: {skills_under.get(nid, 0)} skills in '
-                    f'{len(node["kids"])} groups, '
-                    f'{sols_under.get(nid, 0)} Solutions'
-                )
-            attrs.append(f'aria-label="{esc(aria)}"')
-            parts.append(f'          <a {" ".join(attrs)}>')
-            # A hit target larger than the dot. The smallest node is 2.8 units
-            # across in a 1400-unit frame, which is under three rendered pixels:
-            # without this the deeper layers would be decorative.
-            parts.append(
-                f'            <circle class="g-hit" cx="{node["x"]}" '
-                f'cy="{node["y"]}" r="{round(node["r"] + 6, 1)}"/>'
-            )
-            parts.append(
-                f'            <circle class="g-dot" cx="{node["x"]}" '
-                f'cy="{node["y"]}" r="{node["r"]}"/>'
-            )
-            parts.append("          </a>")
-    parts.append("        </g>")
-
-    # ---------------------------------------------------------------- labels last
-    parts.append('        <g class="g-labels" aria-hidden="true">')
-    for node in nodes.values():
-        layer = node["layer"]
-        nid = node["id"]
-        if layer == "domain":
-            x, anchor = round(node["x"] - node["r"] - 12, 1), "end"
-            text = node["label"]
-        elif layer == "practice":
-            x, anchor = round(node["x"] + node["r"] + 11, 1), "start"
-            text = f'{node["label"]}  {skills_under.get(nid, 0)}'
-        else:
-            x, anchor = round(node["x"] + node["r"] + 9, 1), "start"
-            text = node["label"]
+    edge_rows = []
+    for i, ((a, b), w) in enumerate(sorted(graph["weights"].items())):
+        x1, y1 = pos[a]
+        x2, y2 = pos[b]
+        mx = (x1 + x2) / 2 + (y2 - y1) * 0.11
+        my = (y1 + y2) / 2 - (x2 - x1) * 0.11
+        kind = kinds[(a, b)]
         parts.append(
-            f'          <text class="g-label g-label--{layer} {hue_of[dom_of[nid]]}" '
-            f'data-id="{esc(nid)}" x="{x}" y="{round(node["y"] + 3.6, 1)}" '
-            f'text-anchor="{anchor}">{esc(text)}</text>'
+            f'          <path class="g-edge g-edge--{kind} {hue(a)}" '
+            f'data-a="{esc(a)}" data-b="{esc(b)}" data-i="{i}" '
+            f'd="M{x1},{y1} Q{round(mx, 1)},{round(my, 1)} {x2},{y2}"/>'
         )
+        edge_rows.append((a, b, round(w, 2), kind, graph["why"].get((a, b), [])[:2]))
     parts.append("        </g>")
 
-    # The scroll traversal walks the domains, not the Solutions: seven beats instead
-    # of fifty, and each one opens a branch rather than moving a highlight.
-    return "\n".join(parts), [d["id"] for d in domains]
+    # ------------------------------------------------------------------- the nodes
+    parts.append('        <g class="g-nodes">')
+    # Smallest first, so a hub is never buried under the leaves it connects.
+    for key in sorted(pos, key=lambda k: (degree.get(k, 0), k)):
+        row = by_key[key]
+        x, y = pos[key]
+        r = radius(key)
+        cid = comm[key]
+        classes = f"g-node {hue(key)}"
+        if key in lead_of:
+            classes += " is-lead"
+        # The frontier: no edges at all, so nothing in the library connects this skill to
+        # anything. This was keyed on Solution membership before, which drew 158 skills as
+        # the frontier while 129 of them had edges, and left five genuine isolates out of
+        # it — a visible claim that was simply false.
+        if degree.get(key, 0) == 0:
+            classes += " is-loose"
+        attrs = [
+            f'class="{classes}"',
+            f'href="#skill-{slug(key)}"',
+            f'data-key="{esc(key)}"',
+            f'data-name="{esc(row["n"])}"',
+            f'data-comm="{cid}"',
+            f'data-deg="{degree.get(key, 0)}"',
+            f'data-dom="{esc(row["dom"])}"',
+            f'data-x="{x}"',
+            f'data-y="{y}"',
+        ]
+        if sol_of.get(key):
+            attrs.append(f'data-sol="{esc(" ".join(sol_of[key]))}"')
+        if key in lead_of:
+            attrs.append(f'data-leads="{esc(lead_of[key]["lead"])}"')
+        aria = f'{row["n"]}, {degree.get(key, 0)} connections'
+        attrs.append(f'aria-label="{esc(aria)}"')
+        parts.append(f'          <a {" ".join(attrs)}>')
+        # A hit target far larger than the dot: the smallest node is 4.2 units across in
+        # a 1400-unit frame, which is under four rendered pixels.
+        parts.append(
+            f'            <circle class="g-hit" cx="{x}" cy="{y}" '
+            f'r="{round(min(network.MIN_GAP / 2 - 0.6, max(6.4, r + 4.5)), 1)}"/>'
+        )
+        parts.append(f'            <circle class="g-dot" cx="{x}" cy="{y}" r="{r}"/>')
+        parts.append("          </a>")
+    parts.append("        </g>")
+
+    # ------------------------------------------------------------------ the labels
+    #
+    # Two kinds, both in their own layer so they paint above every node and every edge.
+    # Community names sit above their members; individual names are only drawn for the
+    # hubs, because 490 of them at this scale is a grey wash.
+    parts.append('        <g class="g-labels" aria-hidden="true">')
+    labels_by_cid = {
+        cid: network.label_community(net["members"][cid], by_key, graph) for cid in order
+    }
+    community_spots = network.place_community_labels(
+        order,
+        labels_by_cid,
+        net["members"],
+        pos,
+        LABELLED_COMMUNITIES,
+        frame=(0.0, 0.0, network.FRAME[0], network.FRAME[1]),
+    )
+    community_meta = []
+    for i, cid in enumerate(order):
+        members = net["members"][cid]
+        xs = [pos[m][0] for m in members]
+        ys = [pos[m][1] for m in members]
+        cx = round(sum(xs) / len(xs), 1)
+        top = round(min(ys) - 9.0, 1)
+        label = labels_by_cid[cid]
+        spot = community_spots.get(cid)
+        hub = max(members, key=lambda k: (degree.get(k, 0), k))
+        community_meta.append(
+            {
+                "id": cid,
+                "label": label,
+                "size": len(members),
+                "hub": by_key[hub]["n"],
+                "x": cx,
+                "y": top,
+            }
+        )
+        if spot is not None:
+            parts.append(
+                f'          <text class="g-clabel {hue_of[cid]}" data-comm="{cid}" '
+                f'x="{spot["x"]}" y="{spot["y"]}" text-anchor="middle">'
+                f'{esc(label)}</text>'
+            )
+
+    # A name for every skill, not only for the hubs. The hubs' names are visible from
+    # the start; the other 464 are drawn with zero opacity and revealed when something
+    # asks for them — a selection, a community, a traced path, a search hit.
+    #
+    # Emitting only the 26 hubs meant that opening a community whose own strongest
+    # member was not one of the library's 26 strongest named nothing at all.
+    ranked = sorted(pos, key=lambda k: (-degree.get(k, 0), k))
+    # The community names are already on the page and must not be written over, so they
+    # are reserved before any skill name is offered a position.
+    reserved = [spot["box"] for spot in community_spots.values()]
+    hubs = network.place_labels(
+        ranked,
+        {k: by_key[k]["n"] for k in ranked},
+        pos,
+        {k: radius(k) for k in ranked},
+        HUB_LABELS,
+        frame=(0.0, 0.0, network.FRAME[0], network.FRAME[1]),
+        reserved=reserved,
+    )
+    for key in ranked:
+        spot = hubs.get(key)
+        if spot is None:
+            # Present but invisible until something asks for it. Every skill has a name
+            # in the document; only the ones that fit are drawn without being asked.
+            x, y = pos[key]
+            parts.append(
+                f'          <text class="g-nlabel g-nlabel--extra {hue(key)}" '
+                f'data-key="{esc(key)}" x="{round(x + radius(key) + 4, 1)}" '
+                f'y="{round(y + 3.2, 1)}" text-anchor="start">'
+                f'{esc(by_key[key]["n"])}</text>'
+            )
+        else:
+            parts.append(
+                f'          <text class="g-nlabel {hue(key)}" data-key="{esc(key)}" '
+                f'x="{spot["x"]}" y="{spot["y"]}" '
+                f'text-anchor="{spot["anchor"]}">{esc(by_key[key]["n"])}</text>'
+            )
+    parts.append("        </g>")
+
+    parts.append("        </g>")
+    return "\n".join(parts), edge_rows, community_meta, hue_of
 
 
 def render(rows: list) -> "tuple[dict, str]":
     counts = collections.Counter(r["dom"] for r in rows)
-    order = [c for c, _ in counts.most_common()]
+    # Sorted by size then by name: two categories with the same count must not swap
+    # places between builds, or the page is not reproducible from source.
+    order = [c for c, _ in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))]
     total = len(rows)
 
     by = collections.defaultdict(list)
@@ -572,13 +643,34 @@ def render(rows: list) -> "tuple[dict, str]":
         by[k].sort(key=lambda r: r["n"])
 
     sols, stats = compose.build_solutions(REPO_ROOT, rows, _solution_frontmatter, fail)
-    spec = tree.load_domains(ROOT)
-    hier = tree.build_tree(rows, sols, spec)
-    lay = tree.layout(hier)
-    tstats = tree.stats(lay)
-    graph_svg, featured = render_tree(lay, sols, rows)
-    nodes = lay["nodes"]
-    dom_nodes = [n for n in nodes.values() if n["layer"] == "domain"]
+    spec = network.load_domains(ROOT)
+    graph = network.build_graph(rows, sols)
+    comm = network.communities(graph, sorted(r["key"] for r in rows), COMMUNITY_RESOLUTION)
+    net = network.layout(
+        graph, comm, {r["key"]: r for r in rows}, width=FRAME[0], height=FRAME[1]
+    )
+    agree = network.agreement(comm, rows, spec)
+    # How many of the drawn relationships the repository states outright, rather than this
+    # page having inferred them from names. Counted once and used everywhere it is claimed:
+    # in the intro, on the filter button, and in the audit that fails the build if the
+    # markup states a number the build does not own.
+    graph_svg, edge_rows, community_meta, hue_of = render_network(
+        net, graph, comm, rows, sols
+    )
+    n_stated = sum(1 for e in edge_rows if e[3] == "extracted")
+    # Spoken to anyone who cannot see the graph, so it has to describe what is drawn and
+    # be regenerated from the same numbers. It read "the library as a four-layer tree" for
+    # a build after the tree was gone.
+    graph_label = (
+        f"The library as a graph: {len(rows)} skills, "
+        f"{len(edge_rows):,} relationships, and {len(net['communities'])} communities "
+        f"detected from what the skills reference rather than from how they are filed. "
+        f"Each node is a link to that skill's own entry. The same information is listed "
+        f"as text under Solutions and The library below."
+    )
+    # The scroll traversal walks the largest communities, which is also the order the
+    # chapter markers use.
+    featured = [c["id"] for c in community_meta[:FEATURED]]
     by_lead = {s["lead"]: s for s in sols}
     key_row = {r["key"]: r for r in rows}
     claimed_keys = {m for x in sols for m in x["members"]} | set(by_lead)
@@ -614,17 +706,24 @@ def render(rows: list) -> "tuple[dict, str]":
         f'        <input class="stage__search" id="gsearch" type="search" '
         f'placeholder="Search {total} skills" autocomplete="off" spellcheck="false">'
     )
-    out.append('        <div class="stage__chips" id="gchips" role="group" aria-label="Filter by provenance">')
-    for tier, blurb in (
-        ("curated", "written by hand"),
-        ("declared", "the lead names its own members"),
-        ("composed", "derived candidate"),
-    ):
-        n = stats["by_tier"][tier]
-        out.append(
-            f'          <button class="chip" type="button" data-tier="{tier}" '
-            f'aria-pressed="false" title="{esc(blurb)}">{tier} <span>{n}</span></button>'
-        )
+    # Controls that act on the graph rather than on the Solutions list. The three
+    # provenance chips that used to sit here filtered Solution nodes, and the graph no
+    # longer draws Solutions as nodes: every node is a skill. Tier is still on every
+    # Solution card below, where it is read rather than filtered.
+    out.append(
+        '        <div class="stage__chips" id="gchips" role="group" '
+        'aria-label="Graph controls">'
+    )
+    out.append(
+        f'          <button class="chip" type="button" id="gstated" aria-pressed="false" '
+        f'title="hide the relationships this page inferred">stated only '
+        f'<span>{n_stated}</span></button>'
+    )
+    out.append(
+        '          <button class="chip" type="button" id="gpath" aria-pressed="false" '
+        'title="pick two skills and see the shortest route between them">'
+        'trace a path</button>'
+    )
     out.append('          <button class="chip chip--reset" type="button" id="greset">Reset</button>')
     out.append("        </div>")
     out.append("      </div>")
@@ -637,12 +736,9 @@ def render(rows: list) -> "tuple[dict, str]":
         # presentational, which is wrong here: the graph contains 54 controls. axe
         # flagged the aria-label on every lead as a prohibited attribute for
         # exactly this reason.
-        '        <svg class="stage__svg" id="gsvg" viewBox="0 0 1400 560" '
-        'role="group" aria-label="The library as a four-layer tree: seven domains, '
-        'twenty-four groups, fifty Solutions and four hundred and ninety skills. '
-        'Opening a domain shows its Solutions; opening a Solution shows its skills. '
-        'The same information is listed as text under Solutions and The library '
-        'below.">'
+        f'        <svg class="stage__svg" id="gsvg" '
+        f'viewBox="0 0 {FRAME[0]:.0f} {FRAME[1]:.0f}" '
+        f'role="group" aria-label="{esc(graph_label)}">'
     )
     out.append(graph_svg)
     out.append("        </svg>")
@@ -660,62 +756,53 @@ def render(rows: list) -> "tuple[dict, str]":
         f'        <h1><b>{len(sols)}</b> Solutions from <b>{total}</b> skills</h1>'
     )
     out.append(
-        f'        <p class="stage__sub">Four layers: {len(dom_nodes)} domains, '
-        f'{tstats["per_layer"]["practice"]} groups, {len(sols)} Solutions, '
-        f'{total} skills. Open a domain to see its Solutions, a Solution to see the '
-        f'skills it leads.</p>'
+        f'        <p class="stage__sub">Not a filing system: {len(net["communities"])} '
+        f'communities found from {len(edge_rows):,} relationships — {n_stated} the '
+        f'repository states outright, the rest inferred from names sharing a subject. '
+        f'Open a community, trace a path, or search.</p>'
     )
     out.append('        <p class="cue" id="cue"><span></span>Scroll</p>')
     out.append("      </div>")
 
-    # Graphify-shaped controls: search the graph, filter by how much the library
-    # actually asserts about each Solution, and get back out.
-    first_dom = dom_nodes[0]
-    # tabindex="0" because the panel is a scrollable region: c-level-agents leads
-    # 21 skills and the panel has a fixed height, so its content overflows and has
-    # to be reachable by keyboard. axe flags a scrollable region that cannot be
-    # focused, and it is right to: without this, a keyboard user cannot read the
-    # bottom of the largest Solution in the library.
+    # tabindex="0" because the panel is a scrollable region: a hub with 23 connections
+    # overflows it, and axe is right to flag a scrollable region that cannot be focused —
+    # without this a keyboard user cannot read the bottom of the largest node's entry.
     out.append(
         '      <aside class="stage__panel" id="panel" aria-live="polite" '
-        'tabindex="0" aria-label="Selected Solution">'
+        'tabindex="0" aria-label="Selected node">'
     )
-    # The panel describes whatever layer you are on, so it opens on the first
-    # domain rather than on a Solution: the graph's first statement is the shape of
-    # the library, not one composition inside it.
-    dom_sols = [
-        s
-        for prac in first_dom["kids"]
-        for s in nodes[prac]["kids"]
-        if nodes[s]["layer"] == "solution"
-    ]
-    dom_skills = sum(
-        1
-        for n in nodes.values()
-        if n["layer"] == "skill" and _domain_of(nodes, n["id"]) == first_dom["id"]
+    # Opens on the largest community rather than on one skill: the first statement the
+    # page makes should be the shape it found, not one item inside it.
+    first = community_meta[0]
+    out.append('        <p class="panel__tier" id="paneltier">community</p>')
+    out.append(
+        f'        <h2 class="panel__name" id="panelname">{esc(first["label"])}</h2>'
     )
-    out.append('        <p class="panel__tier" id="paneltier">domain</p>')
-    out.append(f'        <h2 class="panel__name" id="panelname">{esc(first_dom["label"])}</h2>')
-    out.append(f'        <p class="panel__desc" id="paneldesc">{esc(first_dom["blurb"])}</p>')
+    out.append(
+        f'        <p class="panel__desc" id="paneldesc">'
+        f'{first["size"]} skills grouped by what their names and their Solutions say '
+        f'they have in common, not by where they are filed. Its most connected member '
+        f'is {esc(first["hub"])}.</p>'
+    )
     out.append('        <ol class="panel__chain" id="panelchain">')
-    for prac in first_dom["kids"]:
-        out.append(f'          <li>{esc(nodes[prac]["label"])}</li>')
+    for key in net["members"][first["id"]][:10]:
+        out.append(f'          <li>{esc(key_row[key]["n"])}</li>')
     out.append("        </ol>")
     out.append(
         f'        <p class="panel__ev" id="panelev">'
-        f'{len(first_dom["kids"])} groups, {len(dom_sols)} Solutions, '
-        f'{dom_skills} skills</p>'
+        f'{first["size"]} skills · most connected: {esc(first["hub"])}</p>'
     )
     out.append("      </aside>")
 
     # One scroll beat per featured Solution. app.js turns these into the traversal;
     # without JavaScript they are a plain list of links into the Solutions section.
     out.append('      <ol class="stage__beats" id="beats">')
-    for dom_id in featured:
-        node = nodes[dom_id]
+    meta_by_id = {c["id"]: c for c in community_meta}
+    for cid in featured:
+        c = meta_by_id[cid]
         out.append(
-            f'        <li class="beat" data-dom="{esc(dom_id)}">'
-            f'<a href="#solutions">{esc(node["label"])}</a></li>'
+            f'        <li class="beat" data-comm="{cid}">'
+            f'<a href="#solutions">{esc(c["label"])}</a></li>'
         )
     out.append("      </ol>")
     out.append("    </header>")
@@ -819,13 +906,17 @@ def render(rows: list) -> "tuple[dict, str]":
     lic_of = {r["repo"]: r["lic"] for r in rows}
     url_of = {r["repo"]: r["url"] for r in rows}
     cred = ['      <div class="credits" id="credits">']
-    for repo, cnt in per_repo.most_common():
+    for repo, cnt in sorted(per_repo.items(), key=lambda kv: (-kv[1], kv[0])):
         cred.append(
             f'        <div><strong><a href="{esc(url_of[repo])}" rel="noopener">{esc(repo)}</a>'
             f'</strong><span class="lic">{esc(lic_of[repo])}</span>'
             f'<span class="n">{cnt} skills</span></div>'
         )
     cred.append("      </div>")
+
+    # Index the nodes once, in the order the graph uses, so edges can be integers.
+    node_index_order = sorted(net["pos"])
+    node_index = {k: i for i, k in enumerate(node_index_order)}
 
     data = (
         "window.SKILLDATA="
@@ -838,12 +929,52 @@ def render(rows: list) -> "tuple[dict, str]":
                 "tiers": stats["by_tier"],
                 "covered": stats["in_a_solution"],
                 "unclaimed": stats["unclaimed"],
+                # The graph itself, so the browser can answer questions the DOM cannot:
+                # which nodes neighbour this one, and how do these two connect.
+                #
+                # Keys are indices into "nodes" rather than repeated strings — the same
+                # 1,868 edges written as pairs of identity keys came to 96 KB, and as
+                # pairs of integers they come to 21 KB.
+                "nodes": [k for k in node_index_order],
+                "edges": [
+                    [node_index[a], node_index[b], w, 0 if kind == "extracted" else 1]
+                    for (a, b, w, kind, _why) in edge_rows
+                ],
+                "why": [why for (_a, _b, _w, _k, why) in edge_rows],
+                "comms": [
+                    {
+                        "id": c["id"],
+                        "label": c["label"],
+                        "size": c["size"],
+                        "hub": c["hub"],
+                    }
+                    for c in community_meta
+                ],
+                "agreement": agree,
+                # The same character-width table the build places labels with, so the
+                # browser reveals names using identical arithmetic instead of measuring.
+                # Measuring was subtly wrong: the camera sets the zoom factor that the
+                # labels' font size divides by, and reading getComputedTextLength in the
+                # same tick could return a width from the layout before that recalculation
+                # landed. One pair of names overlapped at 1280 wide and not at 1440.
+                "charw": network.CHAR_W,
+                "charwFallback": network.CHAR_W_FALLBACK,
+                "labelFont": network.LABEL_FONT,
+                "labelHeight": network.LABEL_H,
+                "communityFont": network.COMMUNITY_FONT,
+                "domains": spec["titles"],
+                "catDomain": spec["cat_to_domain"],
             },
             separators=(",", ":"),
         )
         + ";\n"
     )
-    return {"main": "\n".join(out), "credits": "\n".join(cred)}, data, len(sols)
+    return (
+        {"main": "\n".join(out), "credits": "\n".join(cred)},
+        data,
+        len(sols),
+        n_stated,
+    )
 
 
 # Every phrasing in the hand-written part of the page that states a count. Each
@@ -857,6 +988,10 @@ CLAIMS = [
     # claim itself and not the markup around it.
     (re.compile(r'(<div class="hud__count" id="hudcount">)[^<]*'),
      r"\g<1>{t} skills / {s} Solutions"),
+    # The evidence filter names how many relationships the repository states outright.
+    # It is a measurement of the graph, so the build owns it: hand-typing 357 into the
+    # markup is exactly the drift the rest of this list exists to stop.
+    (re.compile(r'(id="gstated"[^>]*>stated only <span>)\d+'), r"\g<1>{e}"),
 ]
 
 # Any surviving number attached to these nouns outside the generated region is a
@@ -864,7 +999,9 @@ CLAIMS = [
 AUDIT = re.compile(r"\b(\d+)\s+(?:AI\s+)?(?:agent\s+)?(?:skills|categories)\b")
 
 
-def splice(page: str, blocks: dict, total: int, cats: int, sols: int) -> str:
+def splice(
+    page: str, blocks: dict, total: int, cats: int, sols: int, stated: int
+) -> str:
     for key, (begin, end) in MARKERS.items():
         if page.count(begin) != 1 or page.count(end) != 1:
             fail(
@@ -876,7 +1013,9 @@ def splice(page: str, blocks: dict, total: int, cats: int, sols: int) -> str:
         page = head + begin + "\n" + blocks[key] + "\n    " + end + tail
 
     for pattern, template in CLAIMS:
-        page = pattern.sub(template.format(t=total, c=cats, s=sols), page)
+        page = pattern.sub(
+            template.format(t=total, c=cats, s=sols, e=stated), page
+        )
     return page
 
 
@@ -946,11 +1085,11 @@ def main(argv: list) -> int:
     rows = collect(fetch())
     if not rows:
         fail("no skills collected; check sources.json", 1)
-    blocks, data, nsols = render(rows)
+    blocks, data, nsols, nstated = render(rows)
     counts = collections.Counter(r["dom"] for r in rows)
 
     current = INDEX.read_text(encoding="utf-8")
-    updated = splice(current, blocks, len(rows), len(counts), nsols)
+    updated = splice(current, blocks, len(rows), len(counts), nsols, nstated)
 
     audit_svg(updated)
     drift = audit_claims(updated, len(rows), len(counts))

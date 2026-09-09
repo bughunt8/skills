@@ -13,692 +13,547 @@ const data = JSON.parse(
 );
 
 /*
- * The tree is the opening of the page and its navigation, so these are function
- * tests. Each one below corresponds to something that was actually wrong at some
- * point in this build, which is the only reason any of them are worth running.
+ * The graph is the opening of the page and its navigation, so these are function tests.
+ * Each corresponds to something that was actually wrong in this build, which is the only
+ * reason any of them is worth running.
  *
- * The layout went through three arrangements before this one. All 50 Solutions in a
- * single column put them 9 units apart, too close to label. Spreading one domain's
- * Solutions over the full height while its groups stayed on their rows made 19 edges
- * fan out of a 90-unit cluster and cross each other. Moving the groups onto their
- * Solutions fixed the crossings and collided with the groups of other domains. So
- * several tests here are about geometry, because geometry is what kept being wrong.
+ * Four openings were written before this one. A spiral of all 490 nodes was an even
+ * speckle. A four-column dendrogram of the declared taxonomy was tidy and inert — it drew
+ * the filing system, and a filing system is not a finding. Then this graph, whose first
+ * two versions drew nine names on top of each other in the densest community and pushed
+ * the nodes it had just highlighted underneath the chip row, where they were unclickable.
+ *
+ * So most of what follows measures geometry and reachability in a real browser, because
+ * geometry and reachability are what kept being wrong. tests/test_network.py covers the
+ * same properties on the engine before it reaches the page.
  */
 
-const LAYERS = ["domain", "practice", "solution", "skill"];
-
-test.describe("the four-layer tree", () => {
-  test("is prerendered, not drawn by script", async ({ page }) => {
-    // Asserted against the shipped file first: if the tree only exists after
-    // JavaScript runs, the opening image of the page is a blank box for anyone the
-    // script fails for.
-    for (const layer of LAYERS) {
-      expect(
-        (html.match(new RegExp(`data-layer="${layer}"`, "g")) || []).length,
-        `${layer} nodes in the built file`
-      ).toBeGreaterThan(0);
+// Every label that is currently drawn, and whether any two of them collide. Measured
+// with getBBox in the SVG's own coordinate system rather than by estimating character
+// widths: an estimate was two units short vertically, which is exactly how much the
+// collisions that survived the first placer overlapped by.
+// Wrapped in an immediately-invoked expression on purpose.
+//
+// page.evaluate() given a STRING evaluates it as an expression. `() => {...}` is an
+// expression whose value is a function, and a function is not serialisable, so Playwright
+// returned undefined and every assertion below read properties of it. The test threw instead
+// of measuring anything, and it did so only in CI: the Python binding this was prototyped
+// against does auto-invoke a function expression, so it passed locally for the wrong reason.
+const LABEL_OVERLAPS = `(() => {
+  const vb = document.getElementById("gsvg").viewBox.baseVal;
+  const els = [...document.querySelectorAll(".g-nlabel, .g-clabel")].filter(
+    (e) => getComputedStyle(e).opacity !== "0" && getComputedStyle(e).visibility !== "hidden"
+  );
+  const boxes = els.map((e) => {
+    const b = e.getBBox();
+    return { x0: b.x, y0: b.y, x1: b.x + b.width, y1: b.y + b.height, t: e.textContent };
+  });
+  const bad = [];
+  for (let i = 0; i < boxes.length; i++) {
+    for (let j = i + 1; j < boxes.length; j++) {
+      const a = boxes[i], b = boxes[j];
+      if (a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1) {
+        bad.push(a.t + " / " + b.t);
+      }
     }
-    expect((html.match(/data-layer="solution"/g) || []).length).toBe(data.solutions);
-    expect((html.match(/data-layer="skill"/g) || []).length).toBe(data.total);
-    expect((html.match(/class="g-edge/g) || []).length).toBeGreaterThan(500);
+  }
+  // A label outside the frame is not an overlap and is not acceptable either: the runtime
+  // placer had no boundary test, so selecting a node near the right edge pushed its name to
+  // x=1503 in a 1400-wide viewBox, where it cleared every other label by being off screen.
+  const clipped = boxes
+    .filter((b) => b.x0 < -1 || b.x1 > vb.width + 1 || b.y0 < -1 || b.y1 > vb.height + 1)
+    .map((b) => b.t);
+  return { visible: els.length, overlaps: bad, clipped: clipped };
+})()`;
 
-    await page.goto("/index.html");
-    await expect(page.locator('.g-node[data-layer="solution"]')).toHaveCount(
-      data.solutions
-    );
-    await expect(page.locator('.g-node[data-layer="skill"]')).toHaveCount(data.total);
-    await expect(page.locator(".sol")).toHaveCount(data.solutions);
-    await expect(page.locator(".card")).toHaveCount(data.total);
+async function settle(page) {
+  // The camera eases over 620ms and the labels are placed against its final scale.
+  await page.waitForTimeout(900);
+}
+
+test.describe("the graph", () => {
+  // Desktop behaviour: hover, path tracing, the camera and the keyboard walk. Below the
+  // narrow breakpoint the graph deliberately takes neither pointer nor keyboard input, so
+  // running these against a phone profile asserts the opposite of what the page intends -
+  // which is what the mobile project was doing, failing eight of them.
+  //
+  // "the graph on a narrow screen" below covers that width, and it is where the claim that
+  // the graph is inert there is actually asserted.
+  test.skip(
+    ({ viewport }) => !viewport || viewport.width <= 1000 || viewport.height <= 720,
+    "the graph is a picture, not a control, below the narrow breakpoint"
+  );
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/index.html", { waitUntil: "load" });
+    await settle(page);
   });
 
-  test("every node has exactly one parent, and the layers nest correctly", async ({
+  test("every skill is a node, and every node is a link to its own card", async ({
     page
   }) => {
-    await page.goto("/index.html");
-    const bad = await page.evaluate((layers) => {
-      const nodes = [...document.querySelectorAll(".g-node")];
-      const byId = {};
-      nodes.forEach((n) => {
-        byId[n.getAttribute("data-id")] = n;
-      });
-      const problems = [];
-      let roots = 0;
-      nodes.forEach((n) => {
-        const id = n.getAttribute("data-id");
-        const layer = n.getAttribute("data-layer");
-        const parent = n.getAttribute("data-parent");
-        if (!parent) {
-          roots++;
-          if (layer !== "domain") problems.push(`${id} is a root but a ${layer}`);
-          return;
-        }
-        const p = byId[parent];
-        if (!p) return problems.push(`${id} points at a missing parent ${parent}`);
-        const pl = p.getAttribute("data-layer");
-        // A skill may hang off a Solution or, when no Solution leads it, off a group.
-        // Everything else must sit exactly one layer below its parent.
-        const ok =
-          layer === "skill"
-            ? pl === "solution" || pl === "practice"
-            : layers.indexOf(pl) === layers.indexOf(layer) - 1;
-        if (!ok) problems.push(`a ${layer} (${id}) hangs off a ${pl}`);
-        if (n.getAttribute("data-dom") !== p.getAttribute("data-dom")) {
-          problems.push(`${id} is in a different domain from its parent`);
-        }
-      });
-      if (roots !== 7) problems.push(`${roots} roots, expected 7`);
-      return problems;
-    }, LAYERS);
-    expect(bad, "the tree does not nest").toEqual([]);
+    await expect(page.locator(".g-node")).toHaveCount(data.total);
+    // The graph is a table of contents before any script runs, so every node has to
+    // resolve to a card that exists. A node pointing at a missing anchor is a dead link
+    // for anyone with JavaScript off.
+    const broken = await page.evaluate(() =>
+      [...document.querySelectorAll(".g-node")]
+        .map((n) => n.getAttribute("href"))
+        .filter((h) => !h || !document.querySelector(h.replace("#", "#")))
+        .slice(0, 5)
+    );
+    expect(broken).toEqual([]);
   });
 
-  test("the counts on the nodes agree with the tree under them", async ({ page }) => {
-    await page.goto("/index.html");
-    // Every group label carries a skill count. They all read 0 at one point, because
-    // the count was being looked up under the domain's key rather than the node's.
-    const wrong = await page.evaluate(() => {
-      const nodes = [...document.querySelectorAll(".g-node")];
-      const kids = {};
-      nodes.forEach((n) => {
-        const p = n.getAttribute("data-parent");
-        if (p) (kids[p] = kids[p] || []).push(n);
-      });
-      function countSkills(id) {
-        const mine = kids[id] || [];
-        return mine.reduce(
-          (sum, k) =>
-            sum +
-            (k.getAttribute("data-layer") === "skill"
-              ? 1
-              : countSkills(k.getAttribute("data-id"))),
-          0
-        );
+  test("the drawn relationships are the ones the data reports", async ({ page }) => {
+    await expect(page.locator(".g-edge")).toHaveCount(data.edges.length);
+    const stated = data.edges.filter((e) => e[3] === 0).length;
+    await expect(page.locator(".g-edge--extracted")).toHaveCount(stated);
+    await expect(page.locator(".g-edge--inferred")).toHaveCount(
+      data.edges.length - stated
+    );
+    // The count printed on the filter button is a claim about the graph, and the build
+    // owns it. Hand-typing it into the markup is the drift this checks for.
+    await expect(page.locator("#gstated span")).toHaveText(String(stated));
+  });
+
+  test("both ends of every edge are nodes that exist", async ({ page }) => {
+    const orphans = await page.evaluate(() => {
+      const keys = new Set(
+        [...document.querySelectorAll(".g-node")].map((n) => n.getAttribute("data-key"))
+      );
+      return [...document.querySelectorAll(".g-edge")]
+        .filter(
+          (e) => !keys.has(e.getAttribute("data-a")) || !keys.has(e.getAttribute("data-b"))
+        )
+        .map((e) => e.getAttribute("data-a") + " -> " + e.getAttribute("data-b"))
+        .slice(0, 5);
+    });
+    expect(orphans).toEqual([]);
+  });
+
+  test("every skill belongs to a community and the largest are named", async ({
+    page
+  }) => {
+    const unassigned = await page.evaluate(
+      () =>
+        [...document.querySelectorAll(".g-node")].filter(
+          (n) => n.getAttribute("data-comm") === null
+        ).length
+    );
+    expect(unassigned).toBe(0);
+    // Every community that got a name placed. Names are cheap and colours are not, so more
+    // communities are named than are given a distinct hue.
+    const named = await page.locator(".g-clabel").count();
+    expect(named).toBeGreaterThan(10);
+    expect(named).toBeLessThanOrEqual(data.comms.length);
+    // The names are generated from the tokens the members share, so an empty or
+    // placeholder name means the generator fell through.
+    const names = await page.locator(".g-clabel").allTextContents();
+    for (const n of names) {
+      expect(n.trim().length).toBeGreaterThan(2);
+      expect(n).not.toBe("unnamed");
+    }
+  });
+
+  test("the page opens on the largest community rather than on nothing", async ({
+    page
+  }) => {
+    // A panel waiting for a hover is an empty box on a touch screen, and the counter on
+    // this page once sat at zero until the first scroll, which looked broken.
+    await expect(page.locator("#paneltier")).toHaveText(/community/i);
+    await expect(page.locator("#panelname")).toHaveText(data.comms[0].label);
+    await expect(page.locator("#panelev")).toContainText(String(data.comms[0].size));
+    const lit = await page.locator(".g-node.is-on").count();
+    expect(lit).toBe(data.comms[0].size);
+  });
+
+  test("no two visible names overlap, in any state the reader can reach", async ({
+    page
+  }) => {
+    // The assertion this whole file exists for. Nine names in one pile is what the first
+    // version of this graph shipped, and an earlier version of the page had 31
+    // overlapping label pairs on one search term.
+    const seen = [];
+    seen.push(["opening", await page.evaluate(LABEL_OVERLAPS)]);
+
+    const chips = await page.locator(".beat").count();
+    for (let i = 1; i <= Math.min(chips, 8); i++) {
+      await page.locator(`.beat:nth-child(${i}) a`).click();
+      await settle(page);
+      seen.push([`community ${i}`, await page.evaluate(LABEL_OVERLAPS)]);
+    }
+
+    for (const q of ["review", "design", "principle", "manager", "a", ""]) {
+      await page.fill("#gsearch", q);
+      await settle(page);
+      seen.push([`search ${JSON.stringify(q)}`, await page.evaluate(LABEL_OVERLAPS)]);
+    }
+
+    const failures = seen
+      .filter(([, r]) => r.overlaps.length > 0)
+      .map(([where, r]) => `${where}: ${r.overlaps.slice(0, 3).join(", ")}`);
+    expect(failures).toEqual([]);
+    const offscreen = seen
+      .filter(([, r]) => r.clipped.length > 0)
+      .map(([where, r]) => `${where}: ${r.clipped.slice(0, 3).join(", ")}`);
+    expect(offscreen).toEqual([]);
+    // Every state must actually have drawn something, or the check above passes by
+    // measuring nothing.
+    for (const [where, r] of seen) {
+      expect(r.visible, `${where} drew no labels at all`).toBeGreaterThan(4);
+    }
+  });
+
+  test("opening a community frames it and counter-scales its names", async ({
+    page
+  }) => {
+    const before = await page.evaluate(() => {
+      const el = document.querySelector(".g-clabel");
+      return el.getBoundingClientRect().height;
+    });
+    await page.locator(".beat:nth-child(3) a").click();
+    await settle(page);
+    const after = await page.evaluate(() => {
+      const vp = document.getElementById("vp");
+      const el = document.querySelector(".g-clabel");
+      return {
+        k: +getComputedStyle(vp).getPropertyValue("--k"),
+        transform: vp.style.transform,
+        height: el.getBoundingClientRect().height
+      };
+    });
+    expect(after.k).toBeGreaterThan(1.05);
+    expect(after.transform).toContain("scale(");
+    // The point of dividing the font size by the zoom factor: a label is the same size on
+    // screen at every zoom level. Without it the labels grew with the zoom until they
+    // collided, and the community names disappeared behind their own outline.
+    expect(Math.abs(after.height - before)).toBeLessThan(2.5);
+  });
+
+  test("hovering a node explains it with its own evidence", async ({ page }) => {
+    const hub = await page.evaluate(
+      () =>
+        [...document.querySelectorAll(".g-node")].sort(
+          (a, b) => +b.getAttribute("data-deg") - +a.getAttribute("data-deg")
+        )[0].outerHTML.match(/data-key="([^"]+)"/)[1]
+    );
+    await page.locator(`.g-node[data-key="${hub}"]`).hover();
+    await page.waitForTimeout(350);
+    const name = await page.locator(`.g-node[data-key="${hub}"]`).getAttribute("data-name");
+    const deg = await page.locator(`.g-node[data-key="${hub}"]`).getAttribute("data-deg");
+    await expect(page.locator("#panelname")).toHaveText(name);
+    await expect(page.locator("#panelev")).toContainText(`${deg} connections`);
+    await expect(page.locator("#panelev")).toContainText("stated");
+    // Its neighbours light up with it: reading one node means seeing what it reaches.
+    const on = await page.locator(".g-node.is-on").count();
+    expect(on).toBe(+deg + 1);
+  });
+
+  test("a traced path is a real walk along real edges", async ({ page }) => {
+    await page.click("#gpath");
+    await settle(page);
+    await expect(page.locator("#gpath")).toHaveAttribute("aria-pressed", "true");
+
+    // Two well-connected skills from different communities, so the route is more than one
+    // hop and crosses the graph.
+    const pair = await page.evaluate(() => {
+      const ns = [...document.querySelectorAll(".g-node")].sort(
+        (a, b) => +b.getAttribute("data-deg") - +a.getAttribute("data-deg")
+      );
+      const first = ns[0];
+      const other = ns.find(
+        (n) => n.getAttribute("data-comm") !== first.getAttribute("data-comm")
+      );
+      return [first.getAttribute("data-key"), other.getAttribute("data-key")];
+    });
+    for (const key of pair) {
+      await page.locator(`.g-node[data-key="${key}"]`).click();
+      await settle(page);
+    }
+
+    await expect(page.locator("#paneltier")).toHaveText(/\d+ hops/);
+    const hops = +(await page.locator("#paneltier").innerText()).split(" ")[0];
+    const walk = await page.locator("#panelchain li").allTextContents();
+    expect(walk.length).toBe(hops + 1);
+
+    // Every consecutive pair in the reported walk has to be an edge that is actually
+    // drawn. A path panel that lists plausible names but not a real route is worse than
+    // no path panel.
+    const lit = await page.locator(".g-edge.is-path").count();
+    expect(lit).toBe(hops);
+    const fake = await page.evaluate((names) => {
+      const byName = {};
+      for (const n of document.querySelectorAll(".g-node")) {
+        byName[n.getAttribute("data-name")] = n.getAttribute("data-key");
       }
       const bad = [];
-      nodes.forEach((n) => {
-        const layer = n.getAttribute("data-layer");
-        if (layer === "skill") return;
-        const id = n.getAttribute("data-id");
-        const claimed = +n.getAttribute("data-skills");
-        const actual = countSkills(id);
-        if (claimed !== actual) bad.push(`${id} says ${claimed}, has ${actual}`);
-        if (layer === "practice") {
-          const shown = (
-            document.querySelector(`.g-label[data-id="${id}"]`) || { textContent: "" }
-          ).textContent;
-          if (shown.indexOf(String(actual)) < 0) {
-            bad.push(`${id} label reads "${shown.trim()}", should show ${actual}`);
-          }
-        }
-      });
+      for (let i = 1; i < names.length; i++) {
+        const a = byName[names[i - 1]];
+        const b = byName[names[i]];
+        const found = [...document.querySelectorAll(".g-edge")].some((e) => {
+          const x = e.getAttribute("data-a");
+          const y = e.getAttribute("data-b");
+          return (x === a && y === b) || (x === b && y === a);
+        });
+        if (!found) bad.push(names[i - 1] + " -> " + names[i]);
+      }
+      return bad;
+    }, walk);
+    expect(fake).toEqual([]);
+    // Picking mode releases itself once it has both ends, or the next click silently
+    // starts another path.
+    await expect(page.locator("#gpath")).toHaveAttribute("aria-pressed", "false");
+  });
+
+  test("every node is pickable while a path is being traced", async ({ page }) => {
+    // The overlays cover roughly a quarter of the frame. Framing a community moved nodes
+    // under the chip row, which swallowed the clicks: the second end of a path could not
+    // be picked at all. Entering picking mode has to pull the camera back out and stop
+    // the overlays taking clicks.
+    await page.locator(".beat:nth-child(2) a").click();
+    await settle(page);
+    await page.click("#gpath");
+    await settle(page);
+    const state = await page.evaluate(() => {
+      const vp = document.getElementById("vp");
+      const names = ["#panel", "#beats", "#rail"];
+      return {
+        k: +getComputedStyle(vp).getPropertyValue("--k"),
+        blocking: names.filter(
+          (s) =>
+            document.querySelector(s) &&
+            getComputedStyle(document.querySelector(s)).pointerEvents !== "none"
+        )
+      };
+    });
+    expect(state.k).toBeLessThan(1.05);
+    expect(state.blocking).toEqual([]);
+  });
+
+  test("the evidence filter hides the inferred relationships and nothing else", async ({
+    page
+  }) => {
+    await page.click("#gstated");
+    await page.waitForTimeout(300);
+    const shown = await page.evaluate(() => {
+      const vis = (e) => getComputedStyle(e).opacity !== "0";
+      return {
+        inferred: [...document.querySelectorAll(".g-edge--inferred")].filter(vis).length,
+        extracted: [...document.querySelectorAll(".g-edge--extracted")].filter(vis).length,
+        nodes: document.querySelectorAll(".g-node").length
+      };
+    });
+    expect(shown.inferred).toBe(0);
+    expect(shown.extracted).toBe(data.edges.filter((e) => e[3] === 0).length);
+    expect(shown.nodes).toBe(data.total);
+  });
+
+  test("search dims the library to its matches without hiding it", async ({ page }) => {
+    await page.fill("#gsearch", "architect");
+    await settle(page);
+    const r = await page.evaluate(() => ({
+      hits: document.querySelectorAll(".g-node.is-hit").length,
+      total: document.querySelectorAll(".g-node").length,
+      dim: document.getElementById("top").classList.contains("is-dim")
+    }));
+    expect(r.dim).toBe(true);
+    expect(r.hits).toBeGreaterThan(0);
+    expect(r.hits).toBeLessThan(r.total);
+    // Matching on the visible name, not on the identity key: the key carries the category,
+    // so matching it made "engineering" hit all 105 skills filed under it.
+    const wrong = await page.evaluate(() =>
+      [...document.querySelectorAll(".g-node.is-hit")]
+        .filter((n) => !n.getAttribute("data-name").includes("architect"))
+        .map((n) => n.getAttribute("data-name"))
+        .slice(0, 3)
+    );
+    expect(wrong).toEqual([]);
+  });
+
+  test("Escape releases every mode at once", async ({ page }) => {
+    // A reset that leaves a button pressed, a path lit or the camera zoomed is a fault
+    // this page has had: clicking a node appeared to work and then silently stopped
+    // holding, because a scroll tick was clearing the selection behind it.
+    await page.click("#gstated");
+    await page.locator(".beat:nth-child(4) a").click();
+    await settle(page);
+    await page.fill("#gsearch", "review");
+    await settle(page);
+    await page.keyboard.press("Escape");
+    await settle(page);
+    const after = await page.evaluate(() => {
+      const stage = document.getElementById("top");
+      return {
+        stated: document.getElementById("gstated").getAttribute("aria-pressed"),
+        path: document.getElementById("gpath").getAttribute("aria-pressed"),
+        query: document.getElementById("gsearch").value,
+        k: +getComputedStyle(document.getElementById("vp")).getPropertyValue("--k"),
+        classes: [...stage.classList].filter((c) => c.startsWith("is-")),
+        lit: document.querySelectorAll(".g-node.is-path, .g-node.is-hit").length
+      };
+    });
+    expect(after.stated).toBe("false");
+    expect(after.path).toBe("false");
+    expect(after.query).toBe("");
+    expect(after.k).toBeLessThan(1.05);
+    expect(after.lit).toBe(0);
+    expect(after.classes).not.toContain("is-dim");
+    expect(after.classes).not.toContain("is-extracted-only");
+    // Back to the opening statement, not to a blank stage.
+    await expect(page.locator("#panelname")).toHaveText(data.comms[0].label);
+  });
+
+  test("a node can be reached and read with the keyboard alone", async ({ page }) => {
+    const key = await page.evaluate(
+      () => document.querySelector(".g-node").getAttribute("data-key")
+    );
+    const node = page.locator(`.g-node[data-key="${key}"]`);
+    await node.focus();
+    await page.waitForTimeout(300);
+    const name = await node.getAttribute("data-name");
+    await expect(page.locator("#panelname")).toHaveText(name);
+    // aria-label carries the same two facts the panel does, for a reader who never sees
+    // the panel.
+    await expect(node).toHaveAttribute("aria-label", new RegExp(`^${name}, \\d+ connection`));
+  });
+
+
+  test("the panel gives the evidence for each connection, not just the count", async ({
+    page
+  }) => {
+    // 52 KB of the data file was an explanation the page had no way to show, while a comment
+    // claimed it said what an edge is when you select it. Either surface it or drop it.
+    const hub = await page.evaluate(
+      () =>
+        [...document.querySelectorAll(".g-node")].sort(
+          (a, b) => +b.getAttribute("data-deg") - +a.getAttribute("data-deg")
+        )[0].getAttribute("data-key")
+    );
+    await page.locator(`.g-node[data-key="${hub}"]`).hover();
+    await page.waitForTimeout(350);
+    const lines = await page.locator("#panelchain li").allTextContents();
+    expect(lines.length).toBeGreaterThan(2);
+    // Every line names a skill and says why it is joined: led by a Solution, packaged
+    // together, or which words the two names share.
+    const bare = lines.filter((l) => !/ — /.test(l));
+    expect(bare).toEqual([]);
+    const reasons = lines.map((l) => l.split(" — ")[1]);
+    for (const r of reasons) {
+      expect(r).toMatch(/^(led by |leads it|steps of |siblings in |names share |named )/);
+    }
+  });
+
+  test("the graph is one tab stop, not one per skill", async ({ page }) => {
+    // Every node is a real link, which is what makes this a table of contents with
+    // JavaScript off. With JavaScript on that put 490 sequential stops in the tab order and
+    // several hundred Tab presses between the graph and the section below it.
+    const stops = await page.evaluate(
+      () => document.querySelectorAll('.g-node[tabindex="0"]').length
+    );
+    expect(stops).toBe(1);
+    const rest = await page.evaluate(
+      () => document.querySelectorAll('.g-node[tabindex="-1"]').length
+    );
+    expect(rest).toBe(data.total - 1);
+  });
+
+  test("arrow keys walk the graph from the single tab stop", async ({ page }) => {
+    await page.locator('.g-node[tabindex="0"]').focus();
+    const first = await page.evaluate(() => document.activeElement.getAttribute("data-key"));
+    await page.keyboard.press("ArrowRight");
+    await page.waitForTimeout(250);
+    const second = await page.evaluate(() =>
+      document.activeElement.getAttribute("data-key")
+    );
+    expect(second).not.toBe(first);
+    expect(second).toBeTruthy();
+    // The stop travels with the focus, so there is still exactly one way in.
+    const stops = await page.evaluate(
+      () => document.querySelectorAll('.g-node[tabindex="0"]').length
+    );
+    expect(stops).toBe(1);
+    await expect(page.locator("#panelname")).toHaveText(
+      await page.locator(`.g-node[data-key="${second}"]`).getAttribute("data-name")
+    );
+  });
+
+  test("the frontier ring is exactly the skills with no relationships", async ({
+    page
+  }) => {
+    // The styling says "nothing in the library connects this skill to anything". It was
+    // keyed on Solution membership, which drew 158 skills that way while 129 of them had
+    // edges, and left five genuine isolates out of it.
+    const wrong = await page.evaluate(() => {
+      const deg = {};
+      for (const e of document.querySelectorAll(".g-edge")) {
+        deg[e.getAttribute("data-a")] = (deg[e.getAttribute("data-a")] || 0) + 1;
+        deg[e.getAttribute("data-b")] = (deg[e.getAttribute("data-b")] || 0) + 1;
+      }
+      const bad = [];
+      for (const n of document.querySelectorAll(".g-node")) {
+        const isolated = !deg[n.getAttribute("data-key")];
+        const styled = n.classList.contains("is-loose");
+        if (isolated !== styled) bad.push(n.getAttribute("data-name"));
+      }
       return bad;
     });
-    expect(wrong, "node counts disagree with the tree").toEqual([]);
+    expect(wrong).toEqual([]);
   });
 
-  test("every skill in the library is a leaf of the tree exactly once", async ({
-    page
-  }) => {
-    await page.goto("/index.html");
-    const check = await page.evaluate(() => {
-      const leaves = [...document.querySelectorAll('.g-node[data-layer="skill"]')].map(
-        (n) => n.getAttribute("data-key")
-      );
-      const cards = [...document.querySelectorAll(".card")].map((c) =>
-        c.getAttribute("data-id")
-      );
-      const seen = {};
-      const dupes = [];
-      leaves.forEach((k) => {
-        if (seen[k]) dupes.push(k);
-        seen[k] = true;
-      });
-      return {
-        dupes,
-        missing: cards.filter((k) => !seen[k]),
-        extra: leaves.filter((k) => cards.indexOf(k) < 0)
-      };
-    });
-    expect(check.dupes, "skills drawn twice").toEqual([]);
-    expect(check.missing, "skills in the library with no node").toEqual([]);
-    expect(check.extra, "nodes with no skill").toEqual([]);
-  });
-
-  test("opening a domain shows its Solutions and no others", async ({ page }) => {
-    await page.goto("/index.html");
-    await page.waitForTimeout(900);
-
-    const domains = await page.evaluate(() =>
-      [...document.querySelectorAll('.g-node[data-layer="domain"]')].map((n) => ({
-        id: n.getAttribute("data-id"),
-        sols: +n.getAttribute("data-sols")
-      }))
+  test("the community chips walk the largest communities", async ({ page }) => {
+    const chips = await page.locator(".beat a").allTextContents();
+    expect(chips.length).toBe(data.featured.length);
+    const labels = data.featured.map(
+      (id) => data.comms.find((c) => c.id === id).label
     );
-    expect(domains.length).toBe(7);
-
-    for (const d of domains) {
-      await page.locator(`.g-node[data-id="${d.id}"]`).dispatchEvent("click");
-      const state = await page.evaluate((domId) => {
-        const open = [...document.querySelectorAll(".g-node--solution.is-open")];
-        return {
-          open: open.length,
-          foreign: open.filter((n) => n.getAttribute("data-dom") !== domId).length,
-          groups: [...document.querySelectorAll(".g-node--practice.is-open")].length,
-          groupsForeign: [
-            ...document.querySelectorAll(".g-node--practice.is-open")
-          ].filter((n) => n.getAttribute("data-dom") !== domId).length,
-          skills: [...document.querySelectorAll(".g-node--skill.is-open")].length,
-          stage: document.getElementById("top").getAttribute("data-domain")
-        };
-      }, d.id);
-      expect(state.open, `${d.id} opens its Solutions`).toBe(d.sols);
-      expect(state.foreign, `${d.id} shows no other domain's Solutions`).toBe(0);
-      expect(state.groupsForeign, `${d.id} shows no other domain's groups`).toBe(0);
-      expect(state.groups, `${d.id} opens its groups`).toBeGreaterThan(0);
-      // Opening a domain must close the branch that was open in the previous one,
-      // or a column of skills belonging to an off-screen Solution stays behind.
-      expect(state.skills, `${d.id} starts with no branch open`).toBe(0);
-      expect(state.stage).toBe(d.id);
-    }
-  });
-
-  test("opening a Solution shows exactly the skills its card lists", async ({
-    page
-  }) => {
-    await page.goto("/index.html");
-    await page.waitForTimeout(900);
-
-    const sols = await page.evaluate(() =>
-      [...document.querySelectorAll('.g-node[data-layer="solution"]')].map((n) => ({
-        id: n.getAttribute("data-id"),
-        key: n.getAttribute("data-key"),
-        dom: n.getAttribute("data-dom"),
-        name: n.getAttribute("data-name")
-      }))
-    );
-    expect(sols.length).toBe(data.solutions);
-
-    for (const s of sols) {
-      // Its domain has to be open before it can be clicked, which is the whole
-      // interaction model: depth is reached by opening, not by scrolling.
-      await page.locator(`.g-node[data-id="${s.dom}"]`).dispatchEvent("click");
-      await page.locator(`.g-node[data-id="${s.id}"]`).dispatchEvent("click");
-      const seen = await page.evaluate((sol) => {
-        const card = document.querySelector(`.sol[data-sol="${sol.key}"]`);
-        const steps = [...card.querySelectorAll(".sol__step")].map((x) =>
-          x.getAttribute("data-id")
-        );
-        const open = [...document.querySelectorAll(".g-node--skill.is-open")].map((n) =>
-          n.getAttribute("data-key")
-        );
-        return {
-          steps: steps.sort(),
-          // The lead is drawn as a leaf of its own Solution as well as being the
-          // Solution, so it is expected on screen and is not in the step list.
-          open: open.sort(),
-          panel: (document.getElementById("panelname") || {}).textContent || "",
-          chain: document.querySelectorAll("#panelchain li").length
-        };
-      }, s);
-
-      // Every step the card lists must be on screen. code-review is led by two
-      // Solutions and can only be a child of one of them, so the second reveals it
-      // through the cross-link — which is exactly the case that showed two skills
-      // for a three-step Solution.
-      const missing = seen.steps.filter((k) => seen.open.indexOf(k) < 0);
-      expect(missing, `${s.name} does not show all of its steps`).toEqual([]);
-      expect(seen.panel, `panel for ${s.name}`).toContain(s.name);
-      expect(seen.chain, `panel chain for ${s.name}`).toBe(seen.steps.length);
-    }
-  });
-
-  test("selecting a skill lights the whole path back to its domain", async ({
-    page
-  }) => {
-    await page.goto("/index.html");
-    await page.waitForTimeout(900);
-    await page.locator('.g-node[data-layer="solution"].is-open').first().dispatchEvent("click");
-    await page.waitForTimeout(300);
-
-    const leaf = page.locator(".g-node--skill.is-open").first();
-    await leaf.dispatchEvent("click");
-    const lit = await page.evaluate(() => {
-      const on = [...document.querySelectorAll(".g-node.is-on")];
-      return {
-        layers: on.map((n) => n.getAttribute("data-layer")).sort(),
-        edges: [...document.querySelectorAll(".g-edge.is-on")].length
-      };
-    });
-    // One of each layer at least: the skill, its Solution, its group, its domain.
-    for (const layer of LAYERS) {
-      expect(lit.layers, `the path includes a ${layer}`).toContain(layer);
-    }
-    expect(lit.edges, "the path's edges are lit").toBeGreaterThan(2);
-  });
-
-  test("clicking commits, hovering only previews", async ({ page }) => {
-    await page.goto("/index.html");
-    await page.waitForTimeout(900);
-
-    const two = await page.evaluate(() =>
-      [...document.querySelectorAll(".g-node--solution.is-open")]
-        .slice(0, 2)
-        .map((n) => n.getAttribute("data-id"))
-    );
-    expect(two.length).toBe(2);
-
-    await page.locator(`.g-node[data-id="${two[0]}"]`).dispatchEvent("click");
-    await expect(page.locator("#top")).toHaveAttribute("data-pinned", two[0]);
-
-    // Hovering elsewhere must not silently replace a committed selection. Before the
-    // pin existed, moving the pointer off a clicked node onto any neighbour changed
-    // the panel, so it described something the reader had not chosen.
-    await page.locator(`.g-node[data-id="${two[1]}"]`).dispatchEvent("mouseenter");
-    await expect(page.locator("#top")).toHaveAttribute("data-pinned", two[0]);
-    await expect(page.locator("#top")).toHaveAttribute("data-focused", two[0]);
-
-    await page.keyboard.press("Escape");
-    await expect(page.locator("#top")).toHaveAttribute("data-pinned", "");
-
-    // And hovering works again once the pin is released.
-    await page.mouse.move(5, 5);
-    await page.locator(`.g-node[data-id="${two[1]}"]`).dispatchEvent("mouseenter");
-    await expect(page.locator("#top")).toHaveAttribute("data-focused", two[1]);
-  });
-
-  test("a real pointer click hits a node at every layer", async ({ page }) => {
-    await page.goto("/index.html");
-    await page.waitForTimeout(1200);
-
-    // Wait for scrolling to come to rest before measuring anything. Lenis eases the
-    // scroll position, so a coordinate measured while it is still settling is stale
-    // by the time the pointer arrives and the click lands on the background.
-    await page.waitForFunction(
-      () => {
-        const y = Math.round(window.scrollY);
-        if (window.__lastY === y) return true;
-        window.__lastY = y;
-        return false;
-      },
-      null,
-      { timeout: 5000, polling: 250 }
-    );
-
-    // The rest of the suite dispatches events, so this is the one test that proves the
-    // nodes are big enough to hit with a pointer and that nothing is layered over the
-    // tree intercepting clicks. The panel and the intro used to sit on top of it.
-    // A Solution has to be open before its skills exist on screen, so the skill layer
-    // is reached the way a reader reaches it.
-    await page.locator(".g-node--solution.is-open").first().dispatchEvent("click");
-    await page.waitForTimeout(400);
-
-    for (const sel of [
-      '.g-node[data-layer="domain"]',
-      ".g-node--practice.is-open",
-      ".g-node--solution.is-open",
-      ".g-node--skill.is-open"
-    ]) {
-      // Bring it on screen first. elementFromPoint only sees the viewport, and on a
-      // phone the stage is an ordinary scrolling column, so a node can sit below the
-      // fold — which reads as "covered by nothing" rather than "not visible".
-      await page.locator(sel).first().scrollIntoViewIfNeeded();
-      await page.waitForTimeout(250);
-
-      const pt = await page.evaluate((selector) => {
-        const el = document.querySelector(selector);
-        const r = el.querySelector(".g-hit").getBoundingClientRect();
-        const cx = Math.round(r.left + r.width / 2);
-        const cy = Math.round(r.top + r.height / 2);
-        const top = document.elementFromPoint(cx, cy);
-        const owner = top && top.closest ? top.closest(".g-node") : null;
-        return {
-          cx,
-          cy,
-          id: el.getAttribute("data-id"),
-          onTop: owner && owner.getAttribute("data-id")
-        };
-      }, sel);
-
-      expect(pt.onTop, `what is on top at ${sel}`).toBe(pt.id);
-      await page.mouse.move(pt.cx, pt.cy);
-      await page.mouse.down();
-      await page.mouse.up();
-      await expect(page.locator("#top")).toHaveAttribute("data-pinned", pt.id);
-    }
-  });
-
-  test("search finds skills and opens the branch holding them", async ({ page }) => {
-    await page.goto("/index.html");
-    await page.waitForTimeout(900);
-
-    // A hit deeper than the open branch is a hit nobody can see, so searching has to
-    // open the domain and the Solution that hold it.
-    await page.fill("#gsearch", "code-review");
-    await page.waitForTimeout(500);
-    const found = await page.evaluate(() => ({
-      nodes: [...document.querySelectorAll(".g-node.is-hit")].map((n) => ({
-        layer: n.getAttribute("data-layer"),
-        name: n.getAttribute("data-name"),
-        visible: +getComputedStyle(n).opacity > 0.05
-      })),
-      cards: document.querySelectorAll(".card.is-hit").length
-    }));
-    const skillHits = found.nodes.filter((n) => n.layer === "skill");
-    expect(skillHits.length, "code-review is somewhere in the tree").toBeGreaterThan(0);
-    expect(
-      skillHits.some((n) => n.visible),
-      "at least one hit is actually on screen"
-    ).toBe(true);
-    expect(found.cards, "the library shows the hit too").toBeGreaterThan(0);
-
-    await page.fill("#gsearch", "");
-    await page.waitForTimeout(400);
-    expect(await page.locator(".g-node.is-hit").count()).toBe(0);
-  });
-
-  test("the provenance filters select by tier", async ({ page }) => {
-    await page.goto("/index.html");
-    await page.waitForTimeout(700);
-    await page.click('.chip[data-tier="curated"]');
-    await page.waitForTimeout(400);
-    const lit = await page.evaluate(() =>
-      [...document.querySelectorAll('.g-node[data-layer="solution"].is-hit')].map((n) =>
-        n.getAttribute("data-tier")
-      )
-    );
-    expect(lit.length).toBeGreaterThan(0);
-    expect([...new Set(lit)]).toEqual(["curated"]);
-  });
-
-  test("scrolling opens each domain in turn", async ({ page, isMobile }) => {
-    // Desktop only, deliberately. Below the stacking breakpoint the stage is a single
-    // column with its own height and there is no pin, because pinning a stage taller
-    // than the viewport hides its own controls for the length of the pin.
-    test.skip(!!isMobile, "no traversal without a pin");
-
-    await page.goto("/index.html");
-    await page.waitForTimeout(800);
-    const seen = new Set();
-    for (let i = 0; i < 9; i++) {
-      await page.mouse.wheel(0, 320);
-      await page.waitForTimeout(320);
-      const open = await page.getAttribute("#top", "data-domain");
-      if (open) seen.add(open);
-      expect(
-        await page.locator(".beat.is-on").count(),
-        "exactly one chapter marker is active"
-      ).toBe(1);
-    }
-    expect(seen.size, "scrolling moves through more than one domain").toBeGreaterThan(2);
-  });
-
-  test("every panel's counts are the counts of its own subtree", async ({ page }) => {
-    await page.goto("/index.html");
-    await page.waitForTimeout(900);
-
-    // A group's children are not all Solutions: a skill no Solution leads hangs
-    // directly off its group. The panel printed the number of children as the number
-    // of Solutions, so 19 of the 24 groups overstated it — Engineering claimed 44
-    // Solutions and has 10.
-    const wrong = await page.evaluate(() => {
-      const out = [];
-      const click = (el) => el.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-      document.querySelectorAll('.g-node[data-layer="domain"]').forEach((d) => {
-        click(d);
-        const ev = document.getElementById("panelev").textContent.trim();
-        const want =
-          d.querySelectorAll === undefined
-            ? ""
-            : [...document.querySelectorAll(".g-node--practice.is-open")].length +
-              " groups, " +
-              d.getAttribute("data-sols") +
-              " Solutions, " +
-              d.getAttribute("data-skills") +
-              " skills";
-        if (ev !== want) out.push(`${d.getAttribute("data-id")}: "${ev}" != "${want}"`);
-
-        document.querySelectorAll(".g-node--practice.is-open").forEach((p) => {
-          click(p);
-          const pev = document.getElementById("panelev").textContent.trim();
-          const pwant =
-            p.getAttribute("data-sols") +
-            " Solutions, " +
-            p.getAttribute("data-skills") +
-            " skills";
-          if (pev !== pwant) {
-            out.push(`${p.getAttribute("data-id")}: "${pev}" != "${pwant}"`);
-          }
-        });
-      });
-      return out;
-    });
-    expect(wrong, "panels whose counts disagree with the tree").toEqual([]);
-  });
-
-  test("Escape returns every control to its resting state", async ({ page }) => {
-    await page.goto("/index.html");
-    await page.waitForTimeout(900);
-
-    // Escape used to clear the input and the focus and leave the tier chips pressed
-    // with the library disclosures standing open on results that had just been
-    // cleared — a state no sequence of deliberate clicks can produce. Escape and the
-    // Reset button now run the same reset, so this asserts the whole state vector.
-    await page.click('.chip[data-tier="curated"]');
-    await page.fill("#gsearch", "review");
-    await page.waitForTimeout(500);
-
-    const busy = await page.evaluate(() => ({
-      pressed: document.querySelectorAll('.chip[aria-pressed="true"]').length,
-      openCats: document.querySelectorAll(".lib__cat[open]").length
-    }));
-    expect(busy.pressed, "a filter is on").toBeGreaterThan(0);
-    expect(busy.openCats, "the search opened a category").toBeGreaterThan(0);
-
-    await page.keyboard.press("Escape");
-    await page.waitForTimeout(400);
-    const rest = await page.evaluate(() => ({
-      search: document.getElementById("gsearch").value,
-      pressed: document.querySelectorAll('.chip[aria-pressed="true"]').length,
-      openCats: document.querySelectorAll(".lib__cat[open]").length,
-      hits: document.querySelectorAll(".is-hit").length,
-      pinned: document.getElementById("top").getAttribute("data-pinned"),
-      dim: document.getElementById("top").classList.contains("is-dim"),
-      focus: document.getElementById("top").classList.contains("is-focus")
-    }));
-    expect(rest).toEqual({
-      search: "",
-      pressed: 0,
-      openCats: 0,
-      hits: 0,
-      pinned: "",
-      dim: false,
-      focus: false
-    });
-
-    // And the Reset button must land in the same place, since they share one function.
-    await page.click('.chip[data-tier="declared"]');
-    await page.fill("#gsearch", "review");
-    await page.waitForTimeout(400);
-    await page.click("#greset");
-    await page.waitForTimeout(400);
-    expect(
-      await page.evaluate(() => ({
-        search: document.getElementById("gsearch").value,
-        pressed: document.querySelectorAll('.chip[aria-pressed="true"]').length,
-        openCats: document.querySelectorAll(".lib__cat[open]").length
-      }))
-    ).toEqual({ search: "", pressed: 0, openCats: 0 });
-  });
-
-  test("no two visible labels are drawn across each other", async ({ page }) => {
-    await page.goto("/index.html");
-    await page.waitForTimeout(1200);
-
-    const overlapping = () =>
-      page.evaluate(() => {
-        const vis = [...document.querySelectorAll(".g-label")]
-          .filter((e) => {
-            const s = getComputedStyle(e);
-            return +s.opacity > 0.4 && s.visibility !== "hidden";
-          })
-          .map((e) => ({ n: e.textContent.trim(), b: e.getBoundingClientRect() }));
-        const pairs = [];
-        for (let i = 0; i < vis.length; i++) {
-          for (let j = i + 1; j < vis.length; j++) {
-            const a = vis[i].b;
-            const b = vis[j].b;
-            if (a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom) {
-              pairs.push(`${vis[i].n} / ${vis[j].n}`);
-            }
-          }
-        }
-        return pairs;
-      });
-
-    expect(await overlapping(), "labels overlapping at rest").toEqual([]);
-
-    // And with the largest branch in the library open, which is the densest state the
-    // drawing ever reaches: 22 skills in one column.
-    const biggest = await page.evaluate(() => {
-      const all = [...document.querySelectorAll('.g-node[data-layer="solution"]')];
-      all.sort((a, b) => +b.getAttribute("data-skills") - +a.getAttribute("data-skills"));
-      return { id: all[0].getAttribute("data-id"), dom: all[0].getAttribute("data-dom") };
-    });
-    await page.locator(`.g-node[data-id="${biggest.dom}"]`).dispatchEvent("click");
-    await page.locator(`.g-node[data-id="${biggest.id}"]`).dispatchEvent("click");
-    await page.waitForTimeout(500);
-    expect(await overlapping(), "labels overlapping with the largest branch open").toEqual(
-      []
-    );
-
-    // And under a broad query, which is the case that broke it. Each branch is laid
-    // out as though it had the drawing to itself, so marking matches in branches that
-    // are not open drew them at positions belonging to the branch that is: "review"
-    // matches across several domains and produced 31 overlapping pairs.
-    for (const q of ["review", "e", "a", "skills", "agent"]) {
-      await page.fill("#gsearch", q);
-      await page.waitForTimeout(450);
-      expect(await overlapping(), `labels overlapping while searching "${q}"`).toEqual([]);
-    }
-    await page.fill("#gsearch", "");
-  });
-
-  test("every node is a link that resolves, so the tree works without scripting", async ({
-    page
-  }) => {
-    await page.goto("/index.html");
-
-    // The nodes used to be role="button" with a click handler, which made every one of
-    // them inert on a page whose whole claim is that it works with JavaScript off.
-    const bad = await page.evaluate(() =>
-      [...document.querySelectorAll(".g-node")]
-        .map((n) => ({
-          id: n.getAttribute("data-id"),
-          href: n.getAttribute("href")
-        }))
-        .filter((n) => !n.href || !document.querySelector(n.href))
-    );
-    expect(bad, "nodes whose link goes nowhere").toEqual([]);
-
-    await page.locator('.g-node[data-layer="domain"]').first().focus();
-    await page.keyboard.press("Enter");
-    await page.waitForTimeout(300);
-    await expect(page.locator("#panelname")).not.toBeEmpty();
-  });
-
-  test("activating a node does not scroll the tree out from under you", async ({
-    page,
-    isMobile
-  }) => {
-    // On desktop the script shows the selection in the panel instead of following the
-    // link. On a phone there is no panel beside the tree and no pin, so following the
-    // link to the card is the correct outcome, not a regression.
-    test.skip(!!isMobile, "no panel beside the tree on a phone");
-    await page.goto("/index.html");
-    await page.waitForTimeout(900);
-    await page.locator(".g-node--solution.is-open").first().dispatchEvent("click");
-    await page.waitForTimeout(300);
-    expect(await page.evaluate(() => Math.round(window.scrollY))).toBeLessThan(60);
+    expect(chips.map((c) => c.trim())).toEqual(labels);
   });
 });
 
-test.describe("with scripting disabled", () => {
-  // The suite never actually loaded the page without JavaScript, so the claim that
-  // the tree is a table of contents before any script runs was never tested. It is
-  // the state in which the drawing contributed 564 invisible tab stops.
-  test("the tree is a working table of contents", async ({ browser }) => {
-    const ctx = await browser.newContext({
-      viewport: { width: 1440, height: 900 },
-      javaScriptEnabled: false
-    });
-    const page = await ctx.newPage();
+test.describe("the graph on a narrow screen", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("is a picture, not a control", async ({ page }) => {
     await page.goto("/index.html", { waitUntil: "load" });
-
-    // The domain spine is on screen and every one of its links resolves.
-    const spine = await page.evaluate(() =>
-      [...document.querySelectorAll('.g-node[data-layer="domain"]')].map((n) => ({
-        name: n.getAttribute("data-name"),
-        href: n.getAttribute("href"),
-        resolves: !!document.querySelector(n.getAttribute("href")),
-        visible: getComputedStyle(n).visibility !== "hidden"
-      }))
-    );
-    expect(spine.length).toBe(7);
-    expect(spine.filter((s) => !s.resolves), "domain links that go nowhere").toEqual([]);
-    expect(spine.filter((s) => !s.visible), "domains hidden without scripting").toEqual(
-      []
-    );
-
-    // Nothing invisible may be focusable, or the drawing is 564 dead tab stops in
-    // front of everything else on the page.
-    const ghosts = await page.evaluate(() => {
-      const out = [];
-      document.querySelectorAll("a[href], button, input, [tabindex]").forEach((el) => {
-        const s = getComputedStyle(el);
-        const hidden =
-          s.visibility === "hidden" || s.display === "none" || +s.opacity < 0.05;
-        if (!hidden) return;
-        el.focus();
-        if (document.activeElement === el) out.push(el.getAttribute("data-id") || el.tagName);
-      });
-      return out;
-    });
-    expect(ghosts.slice(0, 8), `${ghosts.length} focusable but invisible`).toEqual([]);
-
-    // And the content itself is all present as text, since the drawing cannot be
-    // opened here.
-    const text = await page.evaluate(() => document.body.textContent || "");
-    expect(text.length, "substantive text without scripting").toBeGreaterThan(100000);
-    await expect(page.locator(".sol")).toHaveCount(50);
-    await expect(page.locator(".card")).toHaveCount(490);
-    await ctx.close();
+    await page.waitForTimeout(900);
+    // A node's click target is expressed in the graph's own 1,400-unit coordinate system, so
+    // it scales with the viewport: about 10 CSS pixels at 1440 wide and under 3.5 at 390.
+    // Offering a 3-pixel target, or 490 keyboard stops into 3-pixel targets, is worse than
+    // not offering them: the search box and the text list below carry the same information.
+    const state = await page.evaluate(() => ({
+      pointer: getComputedStyle(document.querySelector(".g-node")).pointerEvents,
+      stops: document.querySelectorAll('.g-node[tabindex="0"]').length,
+      stillLinks: [...document.querySelectorAll(".g-node")].every((n) =>
+        n.getAttribute("href")
+      )
+    }));
+    expect(state.pointer).toBe("none");
+    expect(state.stops).toBe(0);
+    // Still real links in the document, so the no-JavaScript table of contents survives.
+    expect(state.stillLinks).toBe(true);
+    await expect(page.locator("#gsearch")).toBeVisible();
+    await expect(page.locator(".beat").first()).toBeVisible();
   });
 });
 
-test.describe("the page states its size honestly", () => {
-  test("the headline never reads zero", async ({ page }) => {
-    // The first version animated its number up from 0 as you scrolled, so the first
-    // thing every visitor read was "0 skills, 24 categories". A headline's resting
-    // state should not be a false statement.
-    await page.goto("/index.html");
-    const h1 = await page.locator("h1").innerText();
-    expect(h1).not.toMatch(/\b0\b/);
-    expect(h1).toContain(String(data.total));
-    expect(h1).toContain(String(data.solutions));
-
-    await page.mouse.wheel(0, 600);
-    await page.waitForTimeout(400);
-    expect(await page.locator("h1").innerText()).toContain(String(data.total));
+test.describe("the graph as markup", () => {
+  test("the community and node counts in the document match the data", () => {
+    expect((html.match(/class="g-node /g) || []).length).toBe(data.total);
+    const namedInMarkup = (html.match(/class="g-clabel /g) || []).length;
+    expect(namedInMarkup).toBeGreaterThan(10);
+    expect(namedInMarkup).toBeLessThanOrEqual(data.comms.length);
+    // A name for every skill, so anything can be revealed on demand. Emitting only the
+    // hubs meant opening a community whose strongest member was not one of the library's
+    // strongest named nothing at all.
+    expect((html.match(/class="g-nlabel/g) || []).length).toBe(data.total);
   });
 
-  test("the whole page fits in a sane amount of scrolling", async ({ page }) => {
-    // The version before this one was 76,095px tall, most of it pinned chapters, and
-    // reaching a named skill meant travelling past hundreds of others. Depth is now
-    // reached by opening a branch, which costs no page height at all.
-    await page.goto("/index.html");
-    await page.waitForTimeout(1500);
-    const height = await page.evaluate(() => document.body.scrollHeight);
-    expect(height).toBeLessThan(26000);
-    expect(height).toBeGreaterThan(2000);
+  test("the graph carries no inline style for the CSP to block", () => {
+    // The page ships a Content-Security-Policy without unsafe-inline. An inline style
+    // attribute is silently dropped, which is how the hero counter sat at zero on the
+    // live site while working locally.
+    const svg = html.slice(html.indexOf("<svg"), html.indexOf("</svg>"));
+    expect(svg.match(/ style="/g)).toBeNull();
   });
 });

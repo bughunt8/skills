@@ -103,15 +103,14 @@ use since April 2025 under its [standard licence](https://gsap.com/community/sta
 Lenis is driven from GSAP's ticker rather than its own `requestAnimationFrame`
 loop, so there is exactly one animation loop on the page.
 
-The opening pins the graph and steps the highlight through the featured Solutions
-as you scroll. The camera does not move: an earlier version eased the SVG viewBox
-to frame each Solution, which scaled every label with it, let a node slide under a
-stationary cursor and hijack the selection, and put every other Solution outside
-the frame where it could not be clicked. Highlighting keeps all 54 reachable.
+The opening pins the graph and steps the highlight through the largest communities as you
+scroll, without moving the camera. Selecting a community deliberately does move it; see
+"The camera, and the keyboard" below for what that broke the first time and how each fault
+is handled now.
 
-Graph interaction is not part of the motion layer. Hover, click, search and the
-provenance filters run under `prefers-reduced-motion`, on touch, and with GSAP
-absent, because they are how the page is used rather than how it is decorated.
+Graph interaction is not part of the motion layer. Hover, click, search, path tracing and
+the evidence filter all run under `prefers-reduced-motion`, on touch, and with GSAP absent,
+because they are how the page is used rather than how it is decorated.
 
 ## Structure
 
@@ -119,43 +118,115 @@ Three sections, in this order:
 
 | Section | What it is |
 | --- | --- |
-| The stage | The tree, one screen tall. Four layers left to right: 7 domains, 24 groups, 50 Solutions, 490 skills. Search, provenance filters and the traversal beats live here. |
+| The stage | The library as a graph, one screen tall: every skill a node, relationships as edges, communities detected rather than declared. Search, an evidence filter, path tracing and the community chips live here. |
 | Solutions | Every Solution the library can form: a lead skill, the subset it leads, and the evidence for saying so. |
-| The library | All 490 skills, one collapsed disclosure per category. Searching opens the categories that hold a hit. |
+| The library | Every skill, one collapsed disclosure per category. Searching opens the categories that hold a hit. |
 
 This replaced 24 pinned chapters that scrubbed a filmstrip of cards sideways, one
 category at a time. The effect was good once and then it was 76,000 pixels of
 scrolling between a reader and the skill they came for. The page is now about
 12,000.
 
-### The four layers
+### The graph
 
-    domain (7)  ->  group (24)  ->  Solution (50)  ->  skill (490)
+The page draws something nobody decided in advance, which is the whole reason it exists.
+Three earlier openings drew things that had already been written down: a spiral of every
+skill at once (an even speckle), a filmstrip of the categories, and a four-column
+dendrogram of `domains.json` — tidy, inert, and a picture of the filing system rather than
+a finding.
 
-Measured rather than assumed. Every one of the 50 Solutions draws all of its members
-from a single category, so no Solution straddles a branch, and exactly one skill
-belongs to two Solutions — `code-review`, which serves both `idea-to-shipped-code` and
-`hard-to-find-bug` — so there is exactly one edge a tree cannot express and it is
-drawn as a cross-link rather than pretended away.
+Exact counts are deliberately not written here. Every number the page states is generated
+by `build.py` and audited by it, and a count repeated in prose is a count that goes stale:
+this section claimed "all 54 Solutions" for a build in which there were 50. Read the
+current figures off the page, or out of `data.js`.
 
-The 24 groups are the repository's own directory names, which is why they read like
-`pstack` and `ra-qm-team`: source layout, not a taxonomy, and too many of them to be
-an opening view. The 7 domains above them are the only editorial judgement on the
-page, and they live in `domains.json` so that judgement is reviewable in a diff.
-Nothing there invents a skill or moves one between categories; it groups categories
-that already exist, and the build fails if a category is missing, duplicated or
-unknown.
+**Edges are evidence, and the page says which kind.** *Stated* edges come from the
+repository: a Solution's lead joined to a skill it leads, the steps of a Solution joined to
+each other, or two skills packaged in the same bundle. *Inferred* edges come from names
+sharing a subject, drawn dashed and faint because it is a weaker claim, and the
+`stated only` control throws them all away so a reader can see what is left.
 
-One branch is open at a time. That is not a preference — the drawing is about 500
-pixels tall, so all 50 Solutions in one column sit 9 units apart, too close to label,
-and 490 leaves sit 1.1 units apart, which is a visualisation of nothing. Revealing one
-domain at a time gives whichever branch is open the full height: at most 19 Solutions,
-26 units apart, with room for a label on each.
+An inferred edge is not simply "these two names share a word". That was the first version,
+and it joined `creative-research` to `clinical-research`, and `customer-success-manager` to
+`env-secrets-manager`. One word in common is not evidence, so an edge now needs either two
+shared subject words, or one word specific enough to mean something (used by at most
+`NARROW_TOKEN` skills), or a shared family prefix — the `principle-*` and `stitch-*` skills
+are deliberately named as sets, and that convention is worth trusting. Seniority, role and
+artefact-shape words (`senior`, `advisor`, `manager`, `builder`, `prep`, `toolkit`) are in
+`STOP`, because they describe the wrapper and not the subject.
 
-`tree.py` holds the hierarchy and the geometry; `compose.py` holds what a Solution is
-and which skills it leads. Both are tested directly, in `tests/test_tree.py` and
-`tests/test_compose.py`, because the browser suite passed on three successive
-arrangements of this layout that were each wrong on screen.
+**Colours are communities, not categories.** They come from modularity maximisation
+(two-phase Louvain, deterministic: sorted visit order, ties broken on the lower id) over
+those edges. Each community's name is generated from the tokens its own members share, so
+the name and the shape agree by construction — no hand-written list and no model.
+
+**How much the detected structure agrees with the declared one is reported honestly.**
+`agreement()` computes majority-label purity, and says so: a detected community has no
+domain label of its own, so the measure assigns it whichever domain its members are most
+often filed under and can only flatter the clustering. It reports the value with and
+without single-member communities — every isolated skill is its own community and scores a
+free point — and alongside normalised mutual information, which is symmetric, needs no
+majority assignment, and is 0 when two labellings are independent. NMI is the number worth
+reading. `domains.json` is still here, but as the thing the detected structure is measured
+against rather than as the structure itself.
+
+**Size is degree**, by area rather than radius, so a hub reads as bigger than a leaf
+without being eleven times the width. **Paths are breadth-first** — "how many steps from
+here to there", where a strong edge is not a shorter one — and the panel reports how many
+of those steps the repository actually states, and the evidence for each one.
+
+The skills that no Solution leads and that share a subject with nothing sit on a ring
+outside everything else. Drawn faintly rather than dropped: the frontier of a library is a
+fact about it. That styling is keyed on having no edges, which is what it claims —
+an earlier version keyed it on Solution membership and drew 158 skills as the frontier
+while 129 of them had edges.
+
+### The camera, and the keyboard
+
+Selecting a community frames it: the whole library in one screen is an overview, and an
+overview you cannot go into is a picture. Labels divide their font size *and their halo* by the zoom
+factor, so a name is the same size on screen at every level — without that, they grow until
+they collide, and at 2.7x the community names vanished behind their own outline. Hover is
+ignored while the camera moves, because a node sliding under a stationary cursor otherwise
+replaces the selection the reader just clicked. The page opens unzoomed, so every node is
+clickable before the reader does anything, and Escape, Reset and a click on the background
+all pull back out.
+
+Every node is a real link to that skill's entry, which is what makes the graph a table of
+contents with JavaScript off. With JavaScript on, that same fact put hundreds of sequential
+stops in the tab order, so the links are taken out of the sequential order and the graph is
+entered once and then walked with the arrow keys, in community order. Below the narrow
+breakpoint the graph stops taking pointer and keyboard input altogether: its click target
+is expressed in the graph's own coordinate system, so it scales with the viewport and is
+under three pixels on a phone. There, the search box, the community chips and the text list
+below are the interface, and they carry the same information.
+
+### Why the geometry is tested
+
+`network.py` holds the graph, the communities, the layout and the label placement;
+`compose.py` holds what a Solution is and which skills it leads. Both are tested directly,
+in `tests/test_network.py` and `tests/test_compose.py`, because the browser suite passed on
+four successive openings of this page that were each wrong on screen. What it could not
+see:
+
+- 9,462 pairs of nodes closer together than a node is wide, from a layout that sized
+  community discs by `sqrt(n)` and left the big ones four times denser than the small
+  ones;
+- nine names drawn on top of each other in the densest community, from labels placed at a
+  fixed offset with no collision test;
+- 29 skills positioned in a band the browser clips away, because the layout used a
+  1400x620 frame while the `<svg>` declared a viewBox of 1400x560 and nothing compared
+  the two;
+- six skills that were drawn, coloured, labelled and impossible to click, because SVG has
+  no z-index and a community label's text box covered their centres;
+- and community names that changed between builds — `principle · discipline · first` or
+  `principle · discipline · redesign` depending on `PYTHONHASHSEED`, because a tie in
+  `Counter.most_common` breaks in insertion order. In a repository whose CI asserts the
+  page is reproducible from source.
+
+Every one of those is now an assertion, and `scripts/plant_network_defect.py` puts three
+of them back so CI can prove the assertions still fail. A test suite that has never failed
+is a suite nobody has checked.
 
 ## Development
 
