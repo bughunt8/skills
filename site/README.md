@@ -119,7 +119,7 @@ Three sections, in this order:
 
 | Section | What it is |
 | --- | --- |
-| The stage | The tree, one screen tall. Four layers left to right: 7 domains, 24 groups, 50 Solutions, 490 skills. Search, provenance filters and the traversal beats live here. |
+| The stage | The library as a graph, one screen tall: 490 skills, 1,868 relationships, 19 detected communities. Search, an evidence filter, path tracing and the community chips live here. |
 | Solutions | Every Solution the library can form: a lead skill, the subset it leads, and the evidence for saying so. |
 | The library | All 490 skills, one collapsed disclosure per category. Searching opens the categories that hold a hit. |
 
@@ -128,34 +128,67 @@ category at a time. The effect was good once and then it was 76,000 pixels of
 scrolling between a reader and the skill they came for. The page is now about
 12,000.
 
-### The four layers
+### The graph
 
-    domain (7)  ->  group (24)  ->  Solution (50)  ->  skill (490)
+    490 nodes    1,868 edges    19 communities    34 on the frontier
 
-Measured rather than assumed. Every one of the 50 Solutions draws all of its members
-from a single category, so no Solution straddles a branch, and exactly one skill
-belongs to two Solutions — `code-review`, which serves both `idea-to-shipped-code` and
-`hard-to-find-bug` — so there is exactly one edge a tree cannot express and it is
-drawn as a cross-link rather than pretended away.
+The page draws something nobody decided in advance, which is the whole reason it exists.
+Three earlier openings drew things that had already been written down: a spiral of every
+skill at once (an even speckle), a filmstrip of the 24 categories, and a four-column
+dendrogram of `domains.json` — tidy, inert, and a picture of the filing system rather
+than a finding.
 
-The 24 groups are the repository's own directory names, which is why they read like
-`pstack` and `ra-qm-team`: source layout, not a taxonomy, and too many of them to be
-an opening view. The 7 domains above them are the only editorial judgement on the
-page, and they live in `domains.json` so that judgement is reviewable in a diff.
-Nothing there invents a skill or moves one between categories; it groups categories
-that already exist, and the build fails if a category is missing, duplicated or
-unknown.
+**Edges are evidence, and the page says which kind.** 357 are *stated*: a Solution's lead
+joined to a skill it leads, or two skills packaged in the same bundle. 1,511 are
+*inferred* from names sharing a subject token, weighted down by how many skills share it
+and drawn dashed and faint, because it is a weaker claim. The "stated only" control throws
+the inferred half away so a reader can see what is left.
 
-One branch is open at a time. That is not a preference — the drawing is about 500
-pixels tall, so all 50 Solutions in one column sit 9 units apart, too close to label,
-and 490 leaves sit 1.1 units apart, which is a visualisation of nothing. Revealing one
-domain at a time gives whichever branch is open the full height: at most 19 Solutions,
-26 units apart, with room for a label on each.
+**Colours are communities, not categories.** They come from modularity maximisation
+(two-phase Louvain, deterministic: sorted visit order, ties broken on the lower id) over
+those edges. Each community's name is generated from the tokens its own members share, so
+the name and the shape agree by construction — no hand-written list and no model.
 
-`tree.py` holds the hierarchy and the geometry; `compose.py` holds what a Solution is
-and which skills it leads. Both are tested directly, in `tests/test_tree.py` and
-`tests/test_compose.py`, because the browser suite passed on three successive
-arrangements of this layout that were each wrong on screen.
+**The disagreement is the point.** 371 of 490 skills land in a community that matches
+their declared domain; 14 communities span more than one. `domains.json` is still here,
+but as the thing the detected structure is measured against rather than as the structure
+itself.
+
+**Size is degree**, by area rather than radius, so a 23-connection hub reads as bigger
+than a 2-connection leaf without being eleven times the width. **Paths are breadth-first**
+— "how many steps from here to there", where a strong edge is not a shorter one — and the
+panel reports how many of those steps the repository actually states.
+
+The 34 skills that no Solution leads and that share a subject with nothing sit on a ring
+outside everything else. Drawn faintly rather than dropped: the frontier of a library is a
+fact about it.
+
+### Why the geometry is tested
+
+`network.py` holds the graph, the communities, the layout and the label placement;
+`compose.py` holds what a Solution is and which skills it leads. Both are tested directly,
+in `tests/test_network.py` and `tests/test_compose.py`, because the browser suite passed on
+four successive openings of this page that were each wrong on screen. What it could not
+see:
+
+- 9,462 pairs of nodes closer together than a node is wide, from a layout that sized
+  community discs by `sqrt(n)` and left the big ones four times denser than the small
+  ones;
+- nine names drawn on top of each other in the densest community, from labels placed at a
+  fixed offset with no collision test;
+- 29 skills positioned in a band the browser clips away, because the layout used a
+  1400x620 frame while the `<svg>` declared a viewBox of 1400x560 and nothing compared
+  the two;
+- six skills that were drawn, coloured, labelled and impossible to click, because SVG has
+  no z-index and a community label's text box covered their centres;
+- and community names that changed between builds — `principle · discipline · first` or
+  `principle · discipline · redesign` depending on `PYTHONHASHSEED`, because a tie in
+  `Counter.most_common` breaks in insertion order. In a repository whose CI asserts the
+  page is reproducible from source.
+
+Every one of those is now an assertion, and `scripts/plant_network_defect.py` puts three
+of them back so CI can prove the assertions still fail. A test suite that has never failed
+is a suite nobody has checked.
 
 ## Development
 

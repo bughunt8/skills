@@ -48,6 +48,11 @@
   };
   var search = document.getElementById("gsearch");
   var chips = document.getElementById("gchips");
+  // How many of the drawn relationships the repository states outright, rather than
+  // this page having derived them. Reported rather than assumed.
+  var STATED_COUNT = (DATA.edges || []).filter(function (e) {
+    return e[3] === 0;
+  }).length;
   var resetBtn = document.getElementById("greset");
   var beats = document.getElementById("beats");
   var bar = document.getElementById("bar");
@@ -56,63 +61,72 @@
 
   if (!stage || !svg) return;
 
-  /* ---------------------------------------------------------------- the tree
-   * Four layers: domain, group, Solution, skill. Everything is prerendered; the two
-   * deeper layers are held closed because 490 leaves at once is a speckle, and 50
-   * Solutions in one column sit 9 units apart. Opening a branch is what gives it
-   * room, and only one branch of each layer is ever open.
+  /* --------------------------------------------------------------- the graph
+   * 490 skills, 1,868 relationships, communities detected rather than declared.
+   *
+   * Everything is prerendered and positioned by the build. What happens here is
+   * reading: which nodes neighbour this one, which community is this, how do these two
+   * connect, and what is the evidence for each edge.
    */
 
   var nodes = Array.prototype.slice.call(svg.querySelectorAll(".g-node"));
   var edges = Array.prototype.slice.call(svg.querySelectorAll(".g-edge"));
   var cards = Array.prototype.slice.call(document.querySelectorAll(".card"));
   var sols = Array.prototype.slice.call(document.querySelectorAll(".sol"));
+  var viewport = document.getElementById("vp");
 
-  var nodeById = {};
+  var nodeByKey = {};
   nodes.forEach(function (n) {
-    nodeById[n.getAttribute("data-id")] = n;
+    nodeByKey[n.getAttribute("data-key")] = n;
   });
 
-  // Labels live in their own layer so they paint above every node — SVG has no
-  // z-index — so they are keyed by node id and toggled alongside it.
-  var labelBy = {};
-  Array.prototype.slice.call(svg.querySelectorAll(".g-label")).forEach(function (el) {
-    labelBy[el.getAttribute("data-id")] = el;
+  // Labels live in their own layer so they paint above every node and edge — SVG has no
+  // z-index — so they are keyed and toggled alongside the node they belong to.
+  var labelByKey = {};
+  Array.prototype.slice.call(svg.querySelectorAll(".g-nlabel")).forEach(function (el) {
+    labelByKey[el.getAttribute("data-key")] = el;
   });
-  function label(id) {
-    return labelBy[id];
-  }
-  function setLabel(id, cls, on) {
-    var el = labelBy[id];
-    if (el) el.classList.toggle(cls, on);
-  }
+  var commLabels = Array.prototype.slice.call(svg.querySelectorAll(".g-clabel"));
 
-  function layerOf(id) {
-    var n = nodeById[id];
-    return n ? n.getAttribute("data-layer") : "";
-  }
-  function parentOf(id) {
-    var n = nodeById[id];
-    return n ? n.getAttribute("data-parent") : null;
-  }
-  // Every ancestor of a node, itself included. The whole path lights up, so a
-  // selected skill shows which Solution, group and domain it belongs to.
-  function pathOf(id) {
-    var out = [];
-    var cur = id;
-    while (cur) {
-      out.push(cur);
-      cur = parentOf(cur);
-    }
-    return out;
-  }
+  // How many names to reveal at once. Every skill has a label element, but 50 of them
+  // drawn at their node positions overlap into a grey wash — the fault the first version
+  // of this graph shipped with. Ten is about what fits without collisions at the zoom
+  // the camera settles on.
+  var NAME_CAP = 10;
+
+  /* The adjacency, rebuilt once from the integers in data.js.
+   *
+   * The DOM knows which two nodes an edge joins, but answering "what are this node's
+   * neighbours" from the DOM means walking 1,868 elements per hover, and answering "how
+   * do these two connect" means a search over them. The graph is small; an index is
+   * cheap and makes both immediate.
+   */
+  var GKEYS = DATA.nodes || [];
+  var GEDGES = DATA.edges || [];
+  var GWHY = DATA.why || [];
+  var adj = {};
+  var edgeByPair = {};
+  GKEYS.forEach(function (k) {
+    adj[k] = [];
+  });
+  GEDGES.forEach(function (e, i) {
+    var a = GKEYS[e[0]];
+    var b = GKEYS[e[1]];
+    if (a === undefined || b === undefined) return;
+    adj[a].push({ to: b, w: e[2], kind: e[3], i: i });
+    adj[b].push({ to: a, w: e[2], kind: e[3], i: i });
+    edgeByPair[a + "|" + b] = i;
+    edgeByPair[b + "|" + a] = i;
+  });
+  var edgeEl = {};
+  edges.forEach(function (el) {
+    edgeEl[el.getAttribute("data-i")] = el;
+  });
 
   var beatItems = beats
     ? Array.prototype.slice.call(beats.querySelectorAll(".beat"))
     : [];
 
-  // The panel reads its text from the rendered page rather than from a second copy
-  // in JavaScript, so it cannot disagree with the card it describes.
   var solByKey = {};
   sols.forEach(function (el) {
     var key = el.getAttribute("data-sol");
@@ -121,88 +135,130 @@
       el: el,
       tier: el.getAttribute("data-tier") || "",
       label: (el.querySelector("h3") || {}).textContent || key,
-      problem: (el.querySelector(".sol__problem") || {}).textContent || "",
-      evidence: (el.querySelector(".sol__ev") || {}).textContent || "",
-      members: Array.prototype.slice
-        .call(el.querySelectorAll(".sol__step"))
-        .map(function (s) {
-          return s.textContent;
-        })
+      problem: (el.querySelector(".sol__problem") || {}).textContent || ""
     };
   });
   var cardByKey = {};
   cards.forEach(function (c) {
     cardByKey[c.getAttribute("data-id")] = c;
   });
+  var commByIdMeta = {};
+  (DATA.comms || []).forEach(function (c) {
+    commByIdMeta[c.id] = c;
+  });
 
-  /* ------------------------------------------------------------------ opening */
+  /* ------------------------------------------------------------------ the camera
+   * A previous version of this page had no camera on purpose, because the first one
+   * caused three faults: labels grew with the zoom until they collided, a node sliding
+   * under a stationary cursor fired mouseenter and stole the selection the reader had
+   * just clicked, and anything outside the frame became unreachable.
+   *
+   * All three are fixable and worth fixing — 490 nodes in one frame is an overview, and
+   * an overview you cannot go into is a picture. So: labels divide their size by the
+   * zoom factor in CSS, hover is ignored while the camera is moving, and Escape, the
+   * Reset button and a click on the background all pull back out.
+   */
 
-  var openDomain = null;
-  var openBranch = null;
+  // Read from the graph itself rather than restated here. The two disagreed once —
+  // the layout used 620 where the viewBox declared 560 — and twenty-nine skills were
+  // positioned in a band the browser clips away: highlighted, labelled, counted in the
+  // panel, and invisible.
+  var VB = { w: 1400, h: 560 };
+  if (svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width) {
+    VB = { w: svg.viewBox.baseVal.width, h: svg.viewBox.baseVal.height };
+  }
+  /* The part of the frame nothing is sitting on top of.
+   *
+   * The stage carries five overlays — the headline, the panel, the category rail, the
+   * search row and the community chips — and the graph is sized to sit clear of all of
+   * them, so this is a margin rather than a cut-out. It exists because framing a
+   * community into the exact middle of the frame put its outermost nodes half off the
+   * edge, where they were highlighted, labelled, and unclickable.
+   */
+  var SAFE = {
+    x0: VB.w * 0.03,
+    y0: VB.h * 0.05,
+    x1: VB.w * 0.97,
+    y1: VB.h * 0.94
+  };
+  SAFE.w = SAFE.x1 - SAFE.x0;
+  SAFE.h = SAFE.y1 - SAFE.y0;
+  SAFE.cx = (SAFE.x0 + SAFE.x1) / 2;
+  SAFE.cy = (SAFE.y0 + SAFE.y1) / 2;
+  var cam = { k: 1, x: 0, y: 0 };
+  var camMoving = false;
+  var camTimer = null;
 
-  function showDomain(domId) {
-    openDomain = domId;
-    // Opening a domain closes whatever branch was open inside the previous one:
-    // leaving it open left a column of skills belonging to a Solution no longer on
-    // screen, which read as a second, unexplained group of dots.
-    showBranch(null);
-    nodes.forEach(function (n) {
-      var layer = n.getAttribute("data-layer");
-      if (layer === "domain" || layer === "skill") return;
-      // Groups and Solutions belong to exactly one domain and are only ever drawn
-      // while that domain is the one being read, which is what lets whichever branch
-      // is open use the full height of the drawing.
-      var mine = n.getAttribute("data-dom") === domId;
-      n.classList.toggle("is-open", mine);
-      setLabel(n.getAttribute("data-id"), "is-open", mine);
-    });
-    edges.forEach(function (e) {
-      if (e.classList.contains("g-edge--leaf") || e.classList.contains("g-edge--cross")) {
-        return;
-      }
-      e.classList.toggle("is-open", e.getAttribute("data-dom") === domId);
-    });
-    beatItems.forEach(function (b) {
-      b.classList.toggle("is-on", b.getAttribute("data-dom") === domId);
-    });
+  function applyCam() {
+    if (!viewport) return;
+    viewport.style.transform =
+      "translate(" + cam.x + "px," + cam.y + "px) scale(" + cam.k + ")";
+    // Everything measured in user units — the labels — divides by this.
+    viewport.style.setProperty("--k", String(cam.k));
+    stage.classList.toggle("is-zoomed", cam.k > 1.02);
   }
 
-  function showBranch(parentId) {
-    openBranch = parentId;
-    // A skill can be led by two Solutions — code-review is led by both
-    // idea-to-shipped-code and hard-to-find-bug — and a tree can only hold one of
-    // those, so the second is a cross-link. Opening the second Solution has to reveal
-    // that skill too, or its card lists three steps while the graph shows two.
-    var alsoOpen = {};
-    if (parentId) {
-      edges.forEach(function (e) {
-        if (e.classList.contains("g-edge--cross") && e.getAttribute("data-sol") === parentId) {
-          alsoOpen[e.getAttribute("data-to")] = true;
-        }
-      });
+  function moveCam(k, cx, cy) {
+    k = Math.max(1, Math.min(6, k));
+    cam.k = k;
+    // Clamped so the content cannot be dragged off the edge of its own frame.
+    var maxX = VB.w * (k - 1);
+    var maxY = VB.h * (k - 1);
+    cam.x = Math.max(-maxX, Math.min(0, SAFE.cx - cx * k));
+    cam.y = Math.max(-maxY, Math.min(0, SAFE.cy - cy * k));
+    applyCam();
+
+    // Hover is suppressed until the move finishes. This is the fix for the fault that
+    // killed the first camera: while the transform eases, nodes slide under a cursor
+    // that has not moved, each firing mouseenter, and the selection the reader clicked
+    // is replaced by whatever happened to pass beneath the pointer.
+    camMoving = true;
+    clearTimeout(camTimer);
+    camTimer = setTimeout(function () {
+      camMoving = false;
+    }, reduced ? 0 : 660);
+  }
+
+  function frameNodes(list, pad) {
+    if (!list.length) {
+      moveCam(1, VB.w / 2, VB.h / 2);
+      return;
     }
-    nodes.forEach(function (n) {
-      if (n.getAttribute("data-layer") !== "skill") return;
-      var id = n.getAttribute("data-id");
-      var on = (!!parentId && n.getAttribute("data-parent") === parentId) || !!alsoOpen[id];
-      n.classList.toggle("is-open", on);
-      setLabel(id, "is-open", on);
+    var x0 = Infinity;
+    var y0 = Infinity;
+    var x1 = -Infinity;
+    var y1 = -Infinity;
+    list.forEach(function (n) {
+      var x = +n.getAttribute("data-x");
+      var y = +n.getAttribute("data-y");
+      if (x < x0) x0 = x;
+      if (x > x1) x1 = x;
+      if (y < y0) y0 = y;
+      if (y > y1) y1 = y;
     });
-    edges.forEach(function (e) {
-      if (e.classList.contains("g-edge--leaf")) {
-        e.classList.toggle("is-open", !!parentId && e.getAttribute("data-branch") === parentId);
-      } else if (e.classList.contains("g-edge--cross")) {
-        e.classList.toggle("is-open", !!parentId && e.getAttribute("data-sol") === parentId);
-      }
-    });
+    pad = pad === undefined ? 46 : pad;
+    var w = Math.max(60, x1 - x0) + pad * 2;
+    var h = Math.max(60, y1 - y0) + pad * 2;
+    moveCam(Math.min(SAFE.w / w, SAFE.h / h), (x0 + x1) / 2, (y0 + y1) / 2);
   }
+
+  function resetCam() {
+    moveCam(1, VB.w / 2, VB.h / 2);
+  }
+
+  // Clicking the empty background pulls back out, which is the gesture people try
+  // first and the answer to "anything outside the frame is unreachable".
+  svg.addEventListener("click", function (e) {
+    if (e.target.closest(".g-node") || e.target.closest(".g-clabel")) return;
+    if (cam.k > 1.02) resetCam();
+  });
 
   /* ------------------------------------------------------------------- panel */
 
   function setChain(items) {
     if (!panel.chain) return;
-    // Rebuilt element by element rather than assigned as innerHTML: these strings
-    // come from skill frontmatter, and textContent cannot be talked into markup.
+    // Rebuilt element by element rather than assigned as innerHTML: these strings come
+    // from skill frontmatter, and textContent cannot be talked into becoming markup.
     while (panel.chain.firstChild) panel.chain.removeChild(panel.chain.firstChild);
     items.forEach(function (text) {
       var li = document.createElement("li");
@@ -211,218 +267,582 @@
     });
   }
 
-  function fillPanel(id) {
-    var node = nodeById[id];
+  function nameOf(key) {
+    var n = nodeByKey[key];
+    return n ? n.getAttribute("data-name") : key;
+  }
+
+  function explainNode(key) {
+    var node = nodeByKey[key];
     if (!node) return;
-    var layer = node.getAttribute("data-layer");
-    var name = node.getAttribute("data-name") || id;
-
-    if (panel.tier) panel.tier.textContent = layer === "practice" ? "group" : layer;
-    if (panel.name) panel.name.textContent = name;
-
-    if (layer === "solution") {
-      var s = solByKey[node.getAttribute("data-key")];
-      if (panel.desc) panel.desc.textContent = s ? s.problem : "";
-      setChain(s ? s.members : []);
-      if (panel.ev) panel.ev.textContent = s ? s.evidence : "";
-      return;
-    }
-
-    if (layer === "skill") {
-      var card = cardByKey[node.getAttribute("data-key")];
-      var desc = card ? card.querySelector("p") : null;
-      if (panel.desc) panel.desc.textContent = desc ? desc.textContent : "";
-      var owner = parentOf(id);
-      setChain(
-        owner && layerOf(owner) === "solution"
-          ? ["led by " + (nodeById[owner].getAttribute("data-name") || "")]
-          : ["no Solution leads this skill yet"]
-      );
-      if (panel.ev) {
-        panel.ev.textContent = card ? card.getAttribute("data-name") || "" : "";
-        var meta = card ? card.querySelector(".card__meta") : null;
-        if (meta) panel.ev.textContent = meta.textContent;
-      }
-      return;
-    }
-
-    // A domain or a group: describe what it contains, since that is the only claim
-    // either of them makes.
-    var kids = nodes.filter(function (n) {
-      return n.getAttribute("data-parent") === id;
+    var card = cardByKey[key];
+    var desc = card ? card.querySelector("p") : null;
+    var cid = +node.getAttribute("data-comm");
+    var meta = commByIdMeta[cid];
+    var neighbours = (adj[key] || []).slice().sort(function (a, b) {
+      if (b.w !== a.w) return b.w - a.w;
+      return nameOf(a.to) < nameOf(b.to) ? -1 : 1;
     });
-    if (panel.desc) panel.desc.textContent = node.getAttribute("data-blurb") || "";
+    var stated = neighbours.filter(function (e) {
+      return e.kind === 0;
+    }).length;
+
+    if (panel.tier) {
+      panel.tier.textContent = meta ? "in " + meta.label : "unconnected";
+    }
+    if (panel.name) panel.name.textContent = node.getAttribute("data-name");
+    if (panel.desc) panel.desc.textContent = desc ? desc.textContent : "";
     setChain(
-      kids.slice(0, 24).map(function (k) {
-        return k.getAttribute("data-name") || "";
+      neighbours.slice(0, 12).map(function (e) {
+        return nameOf(e.to) + (e.kind === 0 ? "" : " (inferred)");
       })
     );
-    var skillCount = +node.getAttribute("data-skills") || 0;
-    var solCount = +node.getAttribute("data-sols") || 0;
     if (panel.ev) {
-      // Counted from the node, not from its children.
-      //
-      // A group's children are not all Solutions: a skill no Solution leads hangs
-      // directly off its group, which is how 158 unclaimed skills stay reachable. So
-      // printing the number of children as the number of Solutions overstated 19 of
-      // the 24 groups — Engineering claimed 44 Solutions and has 10 — because the
-      // unclaimed skills were being counted as compositions.
+      var domain = (DATA.domains || {})[(DATA.catDomain || {})[node.getAttribute("data-dom")]];
       panel.ev.textContent =
-        layer === "domain"
-          ? kids.length +
-            " groups, " +
-            solCount +
-            " Solutions, " +
-            skillCount +
-            " skills"
-          : solCount + " Solutions, " + skillCount + " skills";
+        neighbours.length +
+        " connections, " +
+        stated +
+        " stated" +
+        (domain ? " · filed under " + domain : "");
     }
   }
 
-  /* ------------------------------------------------------------------ focus */
+  function explainCommunity(cid) {
+    var meta = commByIdMeta[cid];
+    if (!meta) return;
+    var members = nodes.filter(function (n) {
+      return +n.getAttribute("data-comm") === cid;
+    });
+    if (panel.tier) panel.tier.textContent = "community";
+    if (panel.name) panel.name.textContent = meta.label;
+    if (panel.desc) {
+      panel.desc.textContent =
+        meta.size +
+        " skills held together by what they reference, not by where they are filed. " +
+        "Everything here runs through " +
+        meta.hub +
+        ".";
+    }
+    setChain(
+      members
+        .slice()
+        .sort(function (a, b) {
+          return +b.getAttribute("data-deg") - +a.getAttribute("data-deg");
+        })
+        .slice(0, 12)
+        .map(function (n) {
+          return n.getAttribute("data-name");
+        })
+    );
+    if (panel.ev) {
+      var doms = {};
+      members.forEach(function (n) {
+        doms[(DATA.catDomain || {})[n.getAttribute("data-dom")]] = true;
+      });
+      var spread = Object.keys(doms).length;
+      panel.ev.textContent =
+        meta.size +
+        " skills · strongest node " +
+        meta.hub +
+        (spread > 1 ? " · spans " + spread + " declared domains" : "");
+    }
+  }
+
+  /* Placing the names that are revealed on demand.
+   *
+   * The build places the 26 default names so none of them collide, but it cannot place
+   * the other 464: which ones appear depends on what the reader selects. Ten names
+   * revealed at their nodes' own offsets inside one dense community landed on top of
+   * each other — six overlapping words where six readable ones were intended.
+   *
+   * So the same greedy placement the build does, done here for the handful being
+   * revealed: four candidate positions per name, first one that clears the names already
+   * placed wins, and a name with nowhere to go is not shown. Every measurement is divided
+   * by the zoom factor, because that is what the labels' own font size is divided by.
+   */
+
+  var labelHome = {};
+  Object.keys(labelByKey).forEach(function (k) {
+    var el = labelByKey[k];
+    labelHome[k] = {
+      x: el.getAttribute("x"),
+      y: el.getAttribute("y"),
+      a: el.getAttribute("text-anchor") || "start"
+    };
+  });
+
+  var CHAR_W = 0.505;
+  var LABEL_FONT = 9.5;
+  var LABEL_H = 12.4;
+  // Labels must clear each other, not merely fail to intersect. Two names a fifth of a
+  // unit apart read as one word.
+  var LABEL_GAP = 1.8;
+
+  function homeLabels() {
+    Object.keys(labelByKey).forEach(function (k) {
+      var el = labelByKey[k];
+      var h = labelHome[k];
+      el.setAttribute("x", h.x);
+      el.setAttribute("y", h.y);
+      el.setAttribute("text-anchor", h.a);
+      // Both classes come off here. Moving a label back to where the build put it while
+      // leaving it lit is how a previous search kept its names on screen underneath the
+      // next one's: searching "review" then "agent" left eleven overlapping names, none
+      // of which matched the query being typed.
+      el.classList.remove("is-on", "is-hit");
+    });
+  }
+
+  function light(keys, cls) {
+    homeLabels();
+    var k = cam.k || 1;
+    var boxes = [];
+    // The community names stay on screen while a selection is up, dimmed but legible, so
+    // they are reserved before any skill name is offered a position.
+    commLabels.forEach(function (cl) {
+      if (!cl.getBBox) return;
+      var bb = cl.getBBox();
+      boxes.push([bb.x, bb.y, bb.x + bb.width, bb.y + bb.height]);
+    });
+    keys.forEach(function (key) {
+      var el = labelByKey[key];
+      var node = nodeByKey[key];
+      if (!el || !node) return;
+      var x = +node.getAttribute("data-x");
+      var y = +node.getAttribute("data-y");
+      var dot = node.querySelector(".g-dot");
+      var r = dot ? +dot.getAttribute("r") : 3;
+      // Measured, not estimated. Multiplying a character count by an average width is
+      // close but not exact, and "caio-review" and "md-review" overlapped by four pixels
+      // because of the difference. getComputedTextLength returns the real advance width in
+      // user units at the size the label is currently drawn.
+      var w = el.getComputedTextLength
+        ? el.getComputedTextLength()
+        : (el.textContent.length * CHAR_W * LABEL_FONT) / k;
+      var h = LABEL_H / k;
+      var options = [
+        [x + r + 4 / k, y + (3.2 / k), "start"],
+        [x - r - 4 / k, y + (3.2 / k), "end"],
+        [x, y - r - 5 / k, "middle"],
+        [x, y + r + h, "middle"]
+      ];
+      for (var i = 0; i < options.length; i++) {
+        var ox = options[i][0];
+        var oy = options[i][1];
+        var anchor = options[i][2];
+        var x0 = anchor === "start" ? ox : anchor === "end" ? ox - w : ox - w / 2;
+        var box = [x0, oy - h * 0.78, x0 + w, oy + h * 0.22];
+        var clash = false;
+        for (var j = 0; j < boxes.length; j++) {
+          var o = boxes[j];
+          if (
+            box[0] < o[2] + LABEL_GAP &&
+            o[0] < box[2] + LABEL_GAP &&
+            box[1] < o[3] + LABEL_GAP &&
+            o[1] < box[3] + LABEL_GAP
+          ) {
+            clash = true;
+            break;
+          }
+        }
+        if (clash) continue;
+        el.setAttribute("x", ox);
+        el.setAttribute("y", oy);
+        el.setAttribute("text-anchor", anchor);
+        el.classList.add(cls);
+        boxes.push(box);
+        return;
+      }
+    });
+  }
+
+  /* ------------------------------------------------------------------ reading */
 
   var focused = null;
-  // An explicit choice is sticky: hover previews, clicking commits. Without this,
-  // moving the pointer off a clicked node onto any neighbour silently replaced the
-  // selection, so the panel described something the reader had not chosen.
   var pinned = null;
+  var openComm = null;
+  var pathEnds = [];
 
-  // Reflected onto the stage so the selection model is inspectable rather than
-  // trapped in a closure: "pinned or merely hovered" is exactly the distinction
-  // that broke twice, and a test cannot assert it otherwise.
   function mark() {
     stage.setAttribute("data-pinned", pinned || "");
     stage.setAttribute("data-focused", focused || "");
-    stage.setAttribute("data-domain", openDomain || "");
-    stage.setAttribute("data-branch", openBranch || "");
+    stage.setAttribute("data-comm", openComm === null ? "" : String(openComm));
+    stage.setAttribute("data-path", pathEnds.join(" "));
   }
 
-  function focus(id, opts) {
-    opts = opts || {};
-    if (!nodeById[id]) return;
-    if (opts.pin) pinned = id;
-    focused = id;
-
-    var path = pathOf(id);
-    var domId = path[path.length - 1];
-    var layer = layerOf(id);
-
-    if (domId !== openDomain) showDomain(domId);
-    // Selecting a Solution or a group opens it; selecting a skill keeps its own
-    // parent open so the skill you picked stays on screen.
-    if (layer === "solution" || layer === "practice") {
-      showBranch(id);
-    } else if (layer === "skill") {
-      showBranch(parentOf(id));
-    } else {
-      showBranch(null);
-    }
-
-    stage.classList.add("is-focus");
-    stage.classList.remove("is-dim");
-    mark();
-
+  function clearClasses() {
     nodes.forEach(function (n) {
-      var nid = n.getAttribute("data-id");
-      var on = path.indexOf(nid) > -1 || parentOf(nid) === id;
-      n.classList.toggle("is-on", on);
-      setLabel(nid, "is-on", on);
+      n.classList.remove("is-on", "is-self", "is-hit", "is-path", "is-path-end");
     });
     edges.forEach(function (e) {
-      var from = e.getAttribute("data-from");
-      var to = e.getAttribute("data-to");
-      // On the path from the root to the selection, or hanging directly off it.
-      var on =
-        (path.indexOf(from) > -1 && path.indexOf(to) > -1) || from === id;
-      e.classList.toggle("is-on", on);
+      e.classList.remove("is-on", "is-path");
     });
-    sols.forEach(function (s) {
-      s.classList.toggle("is-on", "s:" + s.getAttribute("data-sol") === id);
+    Object.keys(labelByKey).forEach(function (k) {
+      labelByKey[k].classList.remove("is-on", "is-hit");
     });
-    cards.forEach(function (c) {
-      c.classList.toggle("is-on", "k:" + c.getAttribute("data-id") === id);
+    commLabels.forEach(function (l) {
+      l.classList.remove("is-on");
+    });
+  }
+
+  function focus(key, opts) {
+    opts = opts || {};
+    if (!nodeByKey[key]) return;
+    if (opts.pin) pinned = key;
+    focused = key;
+    pathEnds = [];
+
+    clearClasses();
+    stage.classList.remove("is-dim", "is-path");
+    stage.classList.add("is-focus");
+
+    var self = nodeByKey[key];
+    self.classList.add("is-on", "is-self");
+    var cid = self.getAttribute("data-comm");
+    commLabels.forEach(function (l) {
+      l.classList.toggle("is-on", l.getAttribute("data-comm") === cid);
     });
 
-    fillPanel(id);
+    // Every neighbour is highlighted; only the strongest few are named. A hub has 23
+    // neighbours, and 23 names at their node positions overlap into a smudge.
+    var nb_sorted = (adj[key] || []).slice().sort(function (x, y) {
+      if (y.w !== x.w) return y.w - x.w;
+      return x.to < y.to ? -1 : 1;
+    });
+    nb_sorted.forEach(function (e) {
+      var nb = nodeByKey[e.to];
+      if (nb) nb.classList.add("is-on");
+      var el = edgeEl[e.i];
+      if (el) el.classList.add("is-on");
+    });
+    // The selection first, so its own name is never the one that fails to fit.
+    light(
+      [key].concat(
+        nb_sorted.slice(0, NAME_CAP).map(function (e) {
+          return e.to;
+        })
+      ),
+      "is-on"
+    );
+
+    sols.forEach(function (s) {
+      s.classList.toggle("is-on", s.getAttribute("data-sol") === key);
+    });
+    cards.forEach(function (c) {
+      c.classList.toggle("is-on", c.getAttribute("data-id") === key);
+    });
+
+    explainNode(key);
+    mark();
+  }
+
+  function showCommunity(cid, opts) {
+    opts = opts || {};
+    openComm = cid;
+    pinned = null;
+    focused = null;
+    pathEnds = [];
+    clearClasses();
+    stage.classList.remove("is-dim", "is-path");
+    stage.classList.add("is-focus");
+
+    var mine = nodes.filter(function (n) {
+      return +n.getAttribute("data-comm") === cid;
+    });
+    nodes.forEach(function (n) {
+      n.classList.toggle("is-on", mine.indexOf(n) > -1);
+    });
+    // The strongest handful get named. The rest are readable by hovering them, which is
+    // the trade that keeps the names legible instead of a wash of overlapping text.
+    var named = mine
+      .slice()
+      .sort(function (a, b) {
+        return +b.getAttribute("data-deg") - +a.getAttribute("data-deg");
+      })
+      .slice(0, NAME_CAP)
+      .map(function (n) {
+        return n.getAttribute("data-key");
+      });
+    // The camera moves first. Label positions and widths are both measured at the
+    // current zoom — the offsets are divided by it and the font size is divided by it —
+    // so placing names and then zooming means every measurement was taken against the
+    // wrong scale, which is where the last few collisions came from.
+    // Framing is what selecting does, not what arriving does. The page's opening image is
+    // the whole library with its largest community named — zooming straight in on one
+    // cluster hides the thing the page is trying to show, and makes every node outside
+    // that cluster unclickable before the reader has done anything.
+    if (opts.frame !== false) frameNodes(mine);
+    light(named, "is-on");
+    edges.forEach(function (e) {
+      var a = nodeByKey[e.getAttribute("data-a")];
+      var b = nodeByKey[e.getAttribute("data-b")];
+      e.classList.toggle(
+        "is-on",
+        !!a && !!b &&
+          +a.getAttribute("data-comm") === cid &&
+          +b.getAttribute("data-comm") === cid
+      );
+    });
+    commLabels.forEach(function (l) {
+      l.classList.toggle("is-on", +l.getAttribute("data-comm") === cid);
+    });
+    beatItems.forEach(function (b) {
+      b.classList.toggle("is-on", +b.getAttribute("data-comm") === cid);
+    });
+    explainCommunity(cid);
+    mark();
+  }
+
+  /* --------------------------------------------------------------------- path
+   * Graphify traces how any two things connect; this does the same over the skill
+   * graph. Breadth-first and unweighted, because "how many steps from here to there"
+   * is the question, and a strong edge is not a shorter one.
+   */
+
+  function shortestPath(a, b) {
+    if (a === b) return [a];
+    var prev = {};
+    prev[a] = null;
+    var queue = [a];
+    var head = 0;
+    while (head < queue.length) {
+      var cur = queue[head++];
+      var out = (adj[cur] || []).slice().sort(function (x, y) {
+        return x.to < y.to ? -1 : 1;
+      });
+      for (var i = 0; i < out.length; i++) {
+        var nb = out[i].to;
+        if (nb in prev) continue;
+        prev[nb] = cur;
+        if (nb === b) {
+          var path = [nb];
+          while (prev[path[path.length - 1]] !== null) {
+            path.push(prev[path[path.length - 1]]);
+          }
+          return path.reverse();
+        }
+        queue.push(nb);
+      }
+    }
+    return [];
+  }
+
+  function showPath(a, b) {
+    var path = shortestPath(a, b);
+    clearClasses();
+    stage.classList.remove("is-focus", "is-dim");
+    focused = null;
+    pinned = null;
+
+    if (!path.length) {
+      stage.classList.remove("is-path");
+      if (panel.tier) panel.tier.textContent = "no path";
+      if (panel.name) panel.name.textContent = nameOf(a) + " → " + nameOf(b);
+      if (panel.desc) {
+        panel.desc.textContent =
+          "Nothing in the library connects these two, directly or through anything " +
+          "else. One of them is on the frontier: 34 skills belong to no Solution and " +
+          "share a subject with nothing.";
+      }
+      setChain([]);
+      if (panel.ev) panel.ev.textContent = "not connected";
+      pathEnds = [a, b];
+      mark();
+      return;
+    }
+
+    stage.classList.add("is-path");
+    // Framing the route is the whole reason the camera exists here: two ends five hops
+    // apart can sit in opposite corners of the frame.
+    frameNodes(
+      path
+        .map(function (k) {
+          return nodeByKey[k];
+        })
+        .filter(Boolean),
+      64
+    );
+    light(path, "is-on");
+    path.forEach(function (k, i) {
+      var n = nodeByKey[k];
+      if (n) n.classList.add("is-path");
+      if (i === 0 || i === path.length - 1) {
+        if (n) n.classList.add("is-path-end");
+      }
+      if (i > 0) {
+        var el = edgeEl[edgeByPair[path[i - 1] + "|" + k]];
+        if (el) el.classList.add("is-path");
+      }
+    });
+
+    if (panel.tier) panel.tier.textContent = path.length - 1 + " hops";
+    if (panel.name) panel.name.textContent = nameOf(a) + " → " + nameOf(b);
+    if (panel.desc) {
+      panel.desc.textContent =
+        "The shortest route between them in the library, one relationship per step.";
+    }
+    setChain(
+      path.map(function (k) {
+        return nameOf(k);
+      })
+    );
+    if (panel.ev) {
+      var stated = 0;
+      for (var i = 1; i < path.length; i++) {
+        var idx = edgeByPair[path[i - 1] + "|" + path[i]];
+        if (GEDGES[idx] && GEDGES[idx][3] === 0) stated++;
+      }
+      panel.ev.textContent =
+        path.length - 1 + " steps, " + stated + " of them stated by the repository";
+    }
+    pathEnds = [a, b];
+    mark();
   }
 
   function clearFocus() {
     focused = null;
     pinned = null;
-    stage.classList.remove("is-focus", "is-dim");
-    nodes.concat(edges).forEach(function (el) {
-      el.classList.remove("is-on", "is-hit");
-    });
-    Object.keys(labelBy).forEach(function (id) {
-      labelBy[id].classList.remove("is-on", "is-hit");
-    });
+    pathEnds = [];
+    clearClasses();
+    stage.classList.remove("is-focus", "is-dim", "is-path");
     sols.forEach(function (s) {
       s.classList.remove("is-on");
     });
     cards.forEach(function (c) {
       c.classList.remove("is-hit", "is-on");
     });
-    if (openDomain) fillPanel(openDomain);
+    beatItems.forEach(function (b) {
+      b.classList.remove("is-on");
+    });
+    if (openComm !== null) {
+      explainCommunity(openComm);
+    }
+    mark();
+  }
+
+  /* ------------------------------------------------------------- node events */
+
+  var pathMode = false;
+  var pathBtn = document.getElementById("gpath");
+
+  function setPathMode(on) {
+    pathMode = on;
+    pathEnds = [];
+    if (on) {
+      // Back to the whole library, and nothing dimmed. Picking two skills means both
+      // have to be clickable, and while the camera was framing one community every node
+      // outside it was off the edge of the view: the second pick was impossible.
+      openComm = null;
+      clearClasses();
+      stage.classList.remove("is-focus", "is-dim", "is-path");
+      resetCam();
+    }
+    if (pathBtn) pathBtn.setAttribute("aria-pressed", on ? "true" : "false");
+    if (stage) stage.classList.toggle("is-picking", on);
+    if (on && panel.tier) {
+      panel.tier.textContent = "trace";
+      if (panel.name) panel.name.textContent = "Pick two skills";
+      if (panel.desc) {
+        panel.desc.textContent =
+          "Click one node, then another, and the shortest route between them lights up.";
+      }
+      setChain([]);
+      if (panel.ev) panel.ev.textContent = "waiting for the first";
+    }
     mark();
   }
 
   nodes.forEach(function (n) {
-    var id = n.getAttribute("data-id");
+    var key = n.getAttribute("data-key");
     n.addEventListener("mouseenter", function () {
-      if (pinned) return;
-      focus(id);
+      if (pinned || pathMode || camMoving) return;
+      focus(key);
     });
     n.addEventListener("focus", function () {
-      focus(id, { pin: true });
+      if (pathMode) return;
+      focus(key, { pin: true });
     });
-    // Every node is a real link to the part of the page that describes it, so the
-    // tree is a table of contents when this script does not run. When it does run,
-    // the same activation means "show me this here" instead, and the jump is
-    // suppressed: following the link would scroll away from the tree being used.
+    // Every node is a real link to its own card in the library, so the graph is a table
+    // of contents when this script does not run. When it does run, activation means
+    // "read this here" and the jump is suppressed: following the link would scroll away
+    // from the graph being used.
     n.addEventListener("click", function (e) {
       if (wide()) e.preventDefault();
-      focus(id, { pin: true });
+      if (pathMode) {
+        pathEnds.push(key);
+        if (pathEnds.length === 1) {
+          clearClasses();
+          n.classList.add("is-path", "is-path-end");
+          if (panel.ev) panel.ev.textContent = "from " + nameOf(key) + ", now pick another";
+          mark();
+        } else {
+          var a = pathEnds[0];
+          showPath(a, key);
+          setPathModeOff();
+        }
+        return;
+      }
+      focus(key, { pin: true });
     });
     n.addEventListener("keydown", function (e) {
       if (e.key === "Enter" || e.key === " ") {
-        // Space does not activate a link by default, and here it should: the visitor
-        // is operating a graph, not reading prose.
         if (wide() || e.key === " ") e.preventDefault();
-        focus(id, { pin: true });
+        if (pathMode) {
+          n.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+          return;
+        }
+        focus(key, { pin: true });
       }
     });
   });
 
-  // Hovering a Solution card lights its branch in the tree, so the two halves of the
-  // page are visibly the same information.
-  sols.forEach(function (s) {
-    s.addEventListener("mouseenter", function () {
-      if (pinned) return;
-      focus("s:" + s.getAttribute("data-sol"));
+  function setPathModeOff() {
+    pathMode = false;
+    if (pathBtn) pathBtn.setAttribute("aria-pressed", "false");
+    if (stage) stage.classList.remove("is-picking");
+  }
+
+  if (pathBtn) {
+    pathBtn.addEventListener("click", function () {
+      setPathMode(pathBtn.getAttribute("aria-pressed") !== "true");
+    });
+  }
+
+  /* The community names are labels, not controls.
+   *
+   * They were clickable for one build, and that cost more than it gave. A name's text box
+   * is wide, and SVG has no z-index, so twelve labels covered the centres of six nodes
+   * underneath them: those skills were drawn, coloured, sized and completely unclickable.
+   * Worse, making them clickable meant setting pointer-events as an inline style, which the
+   * page's own Content-Security-Policy drops without a word — the same class of failure
+   * that left the hero counter frozen at zero on the live site.
+   *
+   * The chip row below the graph selects communities, and it is one obvious control rather
+   * than two half-discoverable ones.
+   */
+
+  beatItems.forEach(function (b) {
+    b.addEventListener("click", function (e) {
+      if (!wide()) return;
+      e.preventDefault();
+      showCommunity(+b.getAttribute("data-comm"));
     });
   });
 
-  // One reset, so Escape and the Reset button cannot disagree.
-  //
-  // Escape used to clear the input and the focus and leave the tier chips reading
-  // aria-pressed="true" with the library disclosures standing open on results that had
-  // just been cleared — a state no sequence of deliberate clicks can produce.
-  function resetAll() {
-    if (search) search.value = "";
-    runSearch("");
-    revealHits(false);
-    if (chips) {
-      Array.prototype.slice
-        .call(chips.querySelectorAll(".chip[data-tier]"))
-        .forEach(function (c) {
-          c.setAttribute("aria-pressed", "false");
-        });
-    }
-    clearFocus();
-  }
-
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") resetAll();
+  // Hovering a Solution card lights its lead in the graph, so the two halves of the
+  // page are visibly the same information.
+  sols.forEach(function (s) {
+    s.addEventListener("mouseenter", function () {
+      if (pinned || pathMode || camMoving) return;
+      focus(s.getAttribute("data-sol"));
+    });
+  });
+  cards.forEach(function (c) {
+    c.addEventListener("mouseenter", function () {
+      if (pinned || pathMode || camMoving) return;
+      focus(c.getAttribute("data-id"));
+    });
   });
 
   /* ----------------------------------------------------------------- search */
@@ -434,68 +854,43 @@
       nodes.forEach(function (n) {
         n.classList.remove("is-hit");
       });
-      Object.keys(labelBy).forEach(function (id) {
-        labelBy[id].classList.remove("is-hit");
-      });
+      // Back to where the build placed them. Clearing the class without restoring the
+      // position left the default 26 names wherever the last search had moved them to,
+      // and two of them overlapped in the page's own opening state.
+      homeLabels();
       cards.forEach(function (c) {
         c.classList.remove("is-hit");
       });
       return;
     }
-    stage.classList.remove("is-focus");
+    stage.classList.remove("is-focus", "is-path");
     stage.classList.add("is-dim");
+    // A search is a question about the whole library, so it pulls the camera back out.
+    // Leaving it framed on one community showed a match count that included nodes off
+    // the edge of the view.
+    resetCam();
 
-    // Search reads data-name, the label, not data-id, which is an identity key of
-    // the form category~bundle~name. Searching the key would make "engineering"
-    // match all 105 skills in that category through their ids as well as their
-    // names, which is not what someone typing a skill name means.
-    //
-    // A hit deeper than the open branch is a hit nobody can see, so any domain
-    // holding one is opened, and so is any Solution holding one.
-    var hitDomains = {};
-    var hitBranches = {};
+    // Matches on the name a reader can see, not on the identity key, which carries the
+    // category and bundle and would make "engineering" match all 105 skills in it.
+    var hits = [];
     nodes.forEach(function (n) {
-      var name = (n.getAttribute("data-name") || "").toLowerCase();
-      var hit = name.indexOf(q) > -1;
+      var hit = (n.getAttribute("data-name") || "").toLowerCase().indexOf(q) > -1;
       n.classList.toggle("is-hit", hit);
-      setLabel(n.getAttribute("data-id"), "is-hit", hit);
-      if (hit) {
-        hitDomains[n.getAttribute("data-dom")] = true;
-        var parent = n.getAttribute("data-parent");
-        if (parent && n.getAttribute("data-layer") === "skill") hitBranches[parent] = true;
-      }
+      if (hit) hits.push(n.getAttribute("data-key"));
     });
+    // Strongest first, so when a query matches more names than can be drawn without
+    // collisions the ones that survive are the ones worth reading.
+    hits.sort(function (a, b) {
+      return (
+        +nodeByKey[b].getAttribute("data-deg") - +nodeByKey[a].getAttribute("data-deg")
+      );
+    });
+    light(hits.slice(0, 24), "is-hit");
     cards.forEach(function (c) {
-      var name = (c.getAttribute("data-name") || "").toLowerCase();
-      c.classList.toggle("is-hit", name.indexOf(q) > -1);
-    });
-
-    var domainKeys = Object.keys(hitDomains);
-    if (domainKeys.length) {
-      // One branch is open at a time, and each branch is laid out as though it had
-      // the drawing to itself, so two branches' positions overlap by design.
-      if (domainKeys.indexOf(openDomain) < 0) showDomain(domainKeys[0]);
-      var branchKeys = Object.keys(hitBranches).filter(function (b) {
-        var n = nodeById[b];
-        return n && n.getAttribute("data-dom") === openDomain;
-      });
-      showBranch(branchKeys.length ? branchKeys[0] : null);
-    }
-
-    // Only what is actually on screen may light up in the drawing.
-    //
-    // Marking every match everywhere made a broad query draw nodes from branches that
-    // are not open, at positions belonging to the branch that is: searching "review"
-    // put 31 pairs of labels on top of each other. Those matches are still findable —
-    // every one appears in the library below, which the search opens — they are just
-    // not drawn in a place that means something else.
-    nodes.forEach(function (n) {
-      var name = (n.getAttribute("data-name") || "").toLowerCase();
-      var visible =
-        n.getAttribute("data-layer") === "domain" || n.classList.contains("is-open");
-      var hit = visible && name.indexOf(q) > -1;
-      n.classList.toggle("is-hit", hit);
-      setLabel(n.getAttribute("data-id"), "is-hit", hit);
+      c.classList.toggle(
+        "is-hit",
+        (c.getAttribute("data-name") || "").toLowerCase().indexOf(q) > -1
+      );
     });
     mark();
   }
@@ -523,6 +918,27 @@
     });
   }
 
+  /* Back to the opening state, from any of them: a search, a pinned node, a traced
+   * path, an evidence filter, a community. One key, one button, and it has to release
+   * every mode — a reset that leaves a chip pressed or a path lit is the fault this
+   * page has already had once. */
+  function resetAll() {
+    if (search) search.value = "";
+    runSearch("");
+    revealHits(false);
+    setPathModeOff();
+    if (statedBtn) statedBtn.setAttribute("aria-pressed", "false");
+    stage.classList.remove("is-extracted-only", "is-picking");
+    openComm = null;
+    clearFocus();
+    resetCam();
+    if (featured.length) showCommunity(featured[0], { frame: false });
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") resetAll();
+  });
+
   // Following a rail link into a closed category should open it, otherwise the
   // link lands on a heading and appears to do nothing.
   function openTarget(hash) {
@@ -540,57 +956,43 @@
     openTarget(window.location.hash);
   });
   openTarget(window.location.hash);
+  /* --------------------------------------------------------- what is asserted
+   * The graph draws two kinds of relationship and says which is which. This lets a
+   * reader throw away the weaker kind and see what is left: 357 relationships the
+   * repository states outright, out of 1,868 drawn.
+   */
 
-  /* ------------------------------------------------------ provenance filters */
-
-  if (chips) {
-    chips.addEventListener("click", function (e) {
-      var btn = e.target.closest("button");
-      if (!btn) return;
-      if (btn === resetBtn) {
-        resetAll();
-        return;
+  var statedBtn = document.getElementById("gstated");
+  if (statedBtn) {
+    statedBtn.addEventListener("click", function () {
+      var on = statedBtn.getAttribute("aria-pressed") !== "true";
+      statedBtn.setAttribute("aria-pressed", on ? "true" : "false");
+      stage.classList.toggle("is-extracted-only", on);
+      if (on && panel.tier) {
+        panel.tier.textContent = "stated only";
+        if (panel.name) panel.name.textContent = "Evidence filter";
+        if (panel.desc) {
+          panel.desc.textContent =
+            "Showing only relationships the repository states: a Solution leading a " +
+            "skill, or two skills packaged in the same bundle. The rest were inferred " +
+            "from names sharing a subject.";
+        }
+        setChain([]);
+        if (panel.ev) {
+          panel.ev.textContent = STATED_COUNT + " stated of " + GEDGES.length + " drawn";
+        }
+      } else if (openComm !== null) {
+        explainCommunity(openComm);
       }
-      var tier = btn.getAttribute("data-tier");
-      if (!tier) return;
-      var on = btn.getAttribute("aria-pressed") !== "true";
-      btn.setAttribute("aria-pressed", on ? "true" : "false");
-
-      var active = Array.prototype.slice
-        .call(chips.querySelectorAll('.chip[aria-pressed="true"]'))
-        .map(function (c) {
-          return c.getAttribute("data-tier");
-        });
-
-      if (!active.length) {
-        clearFocus();
-        return;
-      }
-      stage.classList.remove("is-focus");
-      stage.classList.add("is-dim");
-      // The filter is about Solutions, so it lights Solution nodes and the skills
-      // hanging off them. A Solution node carries its own tier, so this no longer
-      // has to look the tier up through a member's owner list.
-      var lit = {};
-      nodes.forEach(function (n) {
-        if (n.getAttribute("data-layer") !== "solution") return;
-        var hit = active.indexOf(n.getAttribute("data-tier")) > -1;
-        n.classList.toggle("is-hit", hit);
-        setLabel(n.getAttribute("data-id"), "is-hit", hit);
-        if (hit) lit[n.getAttribute("data-id")] = true;
-      });
-      nodes.forEach(function (n) {
-        if (n.getAttribute("data-layer") !== "skill") return;
-        n.classList.toggle("is-hit", !!lit[n.getAttribute("data-parent")]);
-      });
-      sols.forEach(function (s) {
-        s.classList.toggle(
-          "is-on",
-          active.indexOf(s.getAttribute("data-tier")) > -1
-        );
-      });
     });
   }
+
+  if (resetBtn) {
+    resetBtn.addEventListener("click", function () {
+      resetAll();
+    });
+  }
+
 
   /* ------------------------------------------------------------------ camera
    * There isn't one, and that is deliberate.
@@ -614,18 +1016,13 @@
    * readable, rather than waiting for a hover that never arrives on a touch
    * screen.
    */
-  // DATA.featured holds the domain ids, in the order the tree presents them. The
-  // first one is opened immediately: the panel and the graph should be showing
-  // something the moment the page is readable, rather than waiting for a hover that
-  // never arrives on a touch screen.
+  // DATA.featured holds the largest communities, in size order. The first is opened
+  // immediately: the panel and the graph should be showing something the moment the page
+  // is readable, rather than waiting for a hover that never arrives on a touch screen.
   var featured = (DATA.featured || []).filter(function (id) {
-    return !!nodeById[id];
+    return commByIdMeta[id] !== undefined;
   });
-  if (featured.length) {
-    showDomain(featured[0]);
-    fillPanel(featured[0]);
-    mark();
-  }
+  if (featured.length) showCommunity(featured[0], { frame: false });
 
   /* -------------------------------------------------------------- traversal */
 
@@ -707,20 +1104,21 @@
           // the next hover take over: clicking a Solution appeared to work and then
           // silently stopped holding.
           if (self.progress < 0.06) {
-            if (focused && !pinned) clearFocus();
+            if (openComm !== featured[0]) {
+              showCommunity(featured[0], { frame: false });
+            }
             return;
           }
           var i = Math.min(
             featured.length - 1,
             Math.floor(((self.progress - 0.06) / 0.94) * featured.length)
           );
-          if (featured[i] !== openDomain) {
-            pinned = null;
-            focus(featured[i]);
+          if (featured[i] !== openComm) {
+            showCommunity(featured[i]);
           }
         },
         onLeaveBack: function () {
-          clearFocus();
+          if (featured.length) showCommunity(featured[0], { frame: false });
         }
       }
     }).to(cue, { opacity: 0, duration: 0.3 }, 0);
