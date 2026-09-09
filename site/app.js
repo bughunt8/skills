@@ -56,43 +56,71 @@
 
   if (!stage || !svg) return;
 
-  var leads = Array.prototype.slice.call(svg.querySelectorAll(".g-lead"));
-  // Labels are a separate layer so they paint above every node, so they are
-  // keyed by lead and toggled alongside it.
-  var labelBy = {};
-  Array.prototype.slice.call(svg.querySelectorAll(".g-label")).forEach(function (el) {
-    labelBy[el.getAttribute("data-id")] = el;
-  });
-  function setLabel(id, cls, on) {
-    var el = labelBy[id];
-    if (el) el.classList.toggle(cls, on);
-  }
+  /* ---------------------------------------------------------------- the tree
+   * Four layers: domain, group, Solution, skill. Everything is prerendered; the two
+   * deeper layers are held closed because 490 leaves at once is a speckle, and 50
+   * Solutions in one column sit 9 units apart. Opening a branch is what gives it
+   * room, and only one branch of each layer is ever open.
+   */
+
   var nodes = Array.prototype.slice.call(svg.querySelectorAll(".g-node"));
   var edges = Array.prototype.slice.call(svg.querySelectorAll(".g-edge"));
   var cards = Array.prototype.slice.call(document.querySelectorAll(".card"));
   var sols = Array.prototype.slice.call(document.querySelectorAll(".sol"));
-  // data-sol holds every Solution that leads this skill, space separated, so
-  // membership is a token test rather than an equality test.
-  function owns(el, id) {
-    var v = el.getAttribute("data-sol") || "";
-    return (" " + v + " ").indexOf(" " + id + " ") > -1;
+
+  var nodeById = {};
+  nodes.forEach(function (n) {
+    nodeById[n.getAttribute("data-id")] = n;
+  });
+
+  // Labels live in their own layer so they paint above every node — SVG has no
+  // z-index — so they are keyed by node id and toggled alongside it.
+  var labelBy = {};
+  Array.prototype.slice.call(svg.querySelectorAll(".g-label")).forEach(function (el) {
+    labelBy[el.getAttribute("data-id")] = el;
+  });
+  function label(id) {
+    return labelBy[id];
+  }
+  function setLabel(id, cls, on) {
+    var el = labelBy[id];
+    if (el) el.classList.toggle(cls, on);
+  }
+
+  function layerOf(id) {
+    var n = nodeById[id];
+    return n ? n.getAttribute("data-layer") : "";
+  }
+  function parentOf(id) {
+    var n = nodeById[id];
+    return n ? n.getAttribute("data-parent") : null;
+  }
+  // Every ancestor of a node, itself included. The whole path lights up, so a
+  // selected skill shows which Solution, group and domain it belongs to.
+  function pathOf(id) {
+    var out = [];
+    var cur = id;
+    while (cur) {
+      out.push(cur);
+      cur = parentOf(cur);
+    }
+    return out;
   }
 
   var beatItems = beats
     ? Array.prototype.slice.call(beats.querySelectorAll(".beat"))
     : [];
 
-  // Index the Solutions section by lead, so the panel reads its text from the
-  // rendered page instead of from a duplicate copy in JavaScript. One source of
-  // truth means the panel cannot disagree with the card it describes.
-  var solByLead = {};
+  // The panel reads its text from the rendered page rather than from a second copy
+  // in JavaScript, so it cannot disagree with the card it describes.
+  var solByKey = {};
   sols.forEach(function (el) {
-    var id = el.getAttribute("data-sol");
-    if (!id) return;
-    solByLead[id] = {
+    var key = el.getAttribute("data-sol");
+    if (!key) return;
+    solByKey[key] = {
       el: el,
       tier: el.getAttribute("data-tier") || "",
-      label: (el.querySelector("h3") || {}).textContent || id,
+      label: (el.querySelector("h3") || {}).textContent || key,
       problem: (el.querySelector(".sol__problem") || {}).textContent || "",
       evidence: (el.querySelector(".sol__ev") || {}).textContent || "",
       members: Array.prototype.slice
@@ -102,25 +130,142 @@
         })
     };
   });
+  var cardByKey = {};
+  cards.forEach(function (c) {
+    cardByKey[c.getAttribute("data-id")] = c;
+  });
 
-  /* ------------------------------------------------------------------ panel */
+  /* ------------------------------------------------------------------ opening */
+
+  var openDomain = null;
+  var openBranch = null;
+
+  function showDomain(domId) {
+    openDomain = domId;
+    // Opening a domain closes whatever branch was open inside the previous one:
+    // leaving it open left a column of skills belonging to a Solution no longer on
+    // screen, which read as a second, unexplained group of dots.
+    showBranch(null);
+    nodes.forEach(function (n) {
+      var layer = n.getAttribute("data-layer");
+      if (layer === "domain" || layer === "skill") return;
+      // Groups and Solutions belong to exactly one domain and are only ever drawn
+      // while that domain is the one being read, which is what lets whichever branch
+      // is open use the full height of the drawing.
+      var mine = n.getAttribute("data-dom") === domId;
+      n.classList.toggle("is-open", mine);
+      setLabel(n.getAttribute("data-id"), "is-open", mine);
+    });
+    edges.forEach(function (e) {
+      if (e.classList.contains("g-edge--leaf") || e.classList.contains("g-edge--cross")) {
+        return;
+      }
+      e.classList.toggle("is-open", e.getAttribute("data-dom") === domId);
+    });
+    beatItems.forEach(function (b) {
+      b.classList.toggle("is-on", b.getAttribute("data-dom") === domId);
+    });
+  }
+
+  function showBranch(parentId) {
+    openBranch = parentId;
+    // A skill can be led by two Solutions — code-review is led by both
+    // idea-to-shipped-code and hard-to-find-bug — and a tree can only hold one of
+    // those, so the second is a cross-link. Opening the second Solution has to reveal
+    // that skill too, or its card lists three steps while the graph shows two.
+    var alsoOpen = {};
+    if (parentId) {
+      edges.forEach(function (e) {
+        if (e.classList.contains("g-edge--cross") && e.getAttribute("data-sol") === parentId) {
+          alsoOpen[e.getAttribute("data-to")] = true;
+        }
+      });
+    }
+    nodes.forEach(function (n) {
+      if (n.getAttribute("data-layer") !== "skill") return;
+      var id = n.getAttribute("data-id");
+      var on = (!!parentId && n.getAttribute("data-parent") === parentId) || !!alsoOpen[id];
+      n.classList.toggle("is-open", on);
+      setLabel(id, "is-open", on);
+    });
+    edges.forEach(function (e) {
+      if (e.classList.contains("g-edge--leaf")) {
+        e.classList.toggle("is-open", !!parentId && e.getAttribute("data-branch") === parentId);
+      } else if (e.classList.contains("g-edge--cross")) {
+        e.classList.toggle("is-open", !!parentId && e.getAttribute("data-sol") === parentId);
+      }
+    });
+  }
+
+  /* ------------------------------------------------------------------- panel */
+
+  function setChain(items) {
+    if (!panel.chain) return;
+    // Rebuilt element by element rather than assigned as innerHTML: these strings
+    // come from skill frontmatter, and textContent cannot be talked into markup.
+    while (panel.chain.firstChild) panel.chain.removeChild(panel.chain.firstChild);
+    items.forEach(function (text) {
+      var li = document.createElement("li");
+      li.textContent = text;
+      panel.chain.appendChild(li);
+    });
+  }
 
   function fillPanel(id) {
-    var s = solByLead[id];
-    if (!s) return;
-    if (panel.tier) panel.tier.textContent = s.tier;
-    if (panel.name) panel.name.textContent = s.label;
-    if (panel.desc) panel.desc.textContent = s.problem;
-    if (panel.ev) panel.ev.textContent = s.evidence;
-    if (panel.chain) {
-      // Rebuilt rather than innerHTML-assigned: these strings come from skill
-      // frontmatter, and textContent cannot be talked into becoming markup.
-      while (panel.chain.firstChild) panel.chain.removeChild(panel.chain.firstChild);
-      s.members.forEach(function (m) {
-        var li = document.createElement("li");
-        li.textContent = m;
-        panel.chain.appendChild(li);
-      });
+    var node = nodeById[id];
+    if (!node) return;
+    var layer = node.getAttribute("data-layer");
+    var name = node.getAttribute("data-name") || id;
+
+    if (panel.tier) panel.tier.textContent = layer === "practice" ? "group" : layer;
+    if (panel.name) panel.name.textContent = name;
+
+    if (layer === "solution") {
+      var s = solByKey[node.getAttribute("data-key")];
+      if (panel.desc) panel.desc.textContent = s ? s.problem : "";
+      setChain(s ? s.members : []);
+      if (panel.ev) panel.ev.textContent = s ? s.evidence : "";
+      return;
+    }
+
+    if (layer === "skill") {
+      var card = cardByKey[node.getAttribute("data-key")];
+      var desc = card ? card.querySelector("p") : null;
+      if (panel.desc) panel.desc.textContent = desc ? desc.textContent : "";
+      var owner = parentOf(id);
+      setChain(
+        owner && layerOf(owner) === "solution"
+          ? ["led by " + (nodeById[owner].getAttribute("data-name") || "")]
+          : ["no Solution leads this skill yet"]
+      );
+      if (panel.ev) {
+        panel.ev.textContent = card ? card.getAttribute("data-name") || "" : "";
+        var meta = card ? card.querySelector(".card__meta") : null;
+        if (meta) panel.ev.textContent = meta.textContent;
+      }
+      return;
+    }
+
+    // A domain or a group: describe what it contains, since that is the only claim
+    // either of them makes.
+    var kids = nodes.filter(function (n) {
+      return n.getAttribute("data-parent") === id;
+    });
+    if (panel.desc) panel.desc.textContent = node.getAttribute("data-blurb") || "";
+    setChain(
+      kids.slice(0, 24).map(function (k) {
+        return k.getAttribute("data-name") || "";
+      })
+    );
+    var skillCount = +node.getAttribute("data-skills") || 0;
+    var solCount = +node.getAttribute("data-sols") || 0;
+    if (panel.ev) {
+      panel.ev.textContent =
+        kids.length +
+        (layer === "domain" ? " groups, " : " Solutions, ") +
+        (layer === "domain" ? solCount + " Solutions, " : "") +
+        skillCount +
+        " skills";
     }
   }
 
@@ -129,43 +274,63 @@
   var focused = null;
   // An explicit choice is sticky: hover previews, clicking commits. Without this,
   // moving the pointer off a clicked node onto any neighbour silently replaced the
-  // selection, so the panel described a Solution the reader had not chosen.
+  // selection, so the panel described something the reader had not chosen.
   var pinned = null;
 
   // Reflected onto the stage so the selection model is inspectable rather than
-  // trapped in a closure: "is this Solution pinned or merely hovered" is exactly
-  // the distinction that broke twice, and a test cannot assert it otherwise.
+  // trapped in a closure: "pinned or merely hovered" is exactly the distinction
+  // that broke twice, and a test cannot assert it otherwise.
   function mark() {
     stage.setAttribute("data-pinned", pinned || "");
     stage.setAttribute("data-focused", focused || "");
+    stage.setAttribute("data-domain", openDomain || "");
+    stage.setAttribute("data-branch", openBranch || "");
   }
 
   function focus(id, opts) {
     opts = opts || {};
+    if (!nodeById[id]) return;
     if (opts.pin) pinned = id;
     focused = id;
-    mark();
+
+    var path = pathOf(id);
+    var domId = path[path.length - 1];
+    var layer = layerOf(id);
+
+    if (domId !== openDomain) showDomain(domId);
+    // Selecting a Solution or a group opens it; selecting a skill keeps its own
+    // parent open so the skill you picked stays on screen.
+    if (layer === "solution" || layer === "practice") {
+      showBranch(id);
+    } else if (layer === "skill") {
+      showBranch(parentOf(id));
+    } else {
+      showBranch(null);
+    }
+
     stage.classList.add("is-focus");
     stage.classList.remove("is-dim");
+    mark();
 
-    leads.forEach(function (l) {
-      var lid = l.getAttribute("data-id");
-      l.classList.toggle("is-on", lid === id);
-      setLabel(lid, "is-on", lid === id);
-    });
     nodes.forEach(function (n) {
-      if (n.classList.contains("g-node--member")) {
-        n.classList.toggle("is-on", owns(n, id));
-      }
+      var nid = n.getAttribute("data-id");
+      var on = path.indexOf(nid) > -1 || parentOf(nid) === id;
+      n.classList.toggle("is-on", on);
+      setLabel(nid, "is-on", on);
     });
     edges.forEach(function (e) {
-      e.classList.toggle("is-on", owns(e, id));
-    });
-    beatItems.forEach(function (b) {
-      b.classList.toggle("is-on", b.getAttribute("data-sol") === id);
+      var from = e.getAttribute("data-from");
+      var to = e.getAttribute("data-to");
+      // On the path from the root to the selection, or hanging directly off it.
+      var on =
+        (path.indexOf(from) > -1 && path.indexOf(to) > -1) || from === id;
+      e.classList.toggle("is-on", on);
     });
     sols.forEach(function (s) {
-      s.classList.toggle("is-on", s.getAttribute("data-sol") === id);
+      s.classList.toggle("is-on", "s:" + s.getAttribute("data-sol") === id);
+    });
+    cards.forEach(function (c) {
+      c.classList.toggle("is-on", "k:" + c.getAttribute("data-id") === id);
     });
 
     fillPanel(id);
@@ -174,62 +339,56 @@
   function clearFocus() {
     focused = null;
     pinned = null;
-    mark();
     stage.classList.remove("is-focus", "is-dim");
-    leads.concat(nodes, edges).forEach(function (el) {
+    nodes.concat(edges).forEach(function (el) {
       el.classList.remove("is-on", "is-hit");
     });
     Object.keys(labelBy).forEach(function (id) {
       labelBy[id].classList.remove("is-on", "is-hit");
     });
-    beatItems.forEach(function (b) {
-      b.classList.remove("is-on");
-    });
     sols.forEach(function (s) {
       s.classList.remove("is-on");
     });
     cards.forEach(function (c) {
-      c.classList.remove("is-hit");
+      c.classList.remove("is-hit", "is-on");
     });
+    if (openDomain) fillPanel(openDomain);
+    mark();
   }
 
-  leads.forEach(function (l) {
-    var id = l.getAttribute("data-id");
-    // Hover focuses rather than only previewing. When hover merely filled the
-    // panel, the panel could describe one Solution while the graph highlighted
-    // another, which is worse than either behaviour on its own.
-    l.addEventListener("mouseenter", function () {
+  nodes.forEach(function (n) {
+    var id = n.getAttribute("data-id");
+    n.addEventListener("mouseenter", function () {
       if (pinned) return;
       focus(id);
     });
-    l.addEventListener("focus", function () {
+    n.addEventListener("focus", function () {
       focus(id, { pin: true });
     });
-    // Each lead is a real link to its Solution's card, so the graph is a table of
-    // contents when this script does not run. When it does run, the same activation
-    // means "show me this here" instead, and the jump is suppressed — following the
-    // link would scroll away from the graph the visitor is using.
-    l.addEventListener("click", function (e) {
+    // Every node is a real link to the part of the page that describes it, so the
+    // tree is a table of contents when this script does not run. When it does run,
+    // the same activation means "show me this here" instead, and the jump is
+    // suppressed: following the link would scroll away from the tree being used.
+    n.addEventListener("click", function (e) {
       if (wide()) e.preventDefault();
       focus(id, { pin: true });
     });
-    l.addEventListener("keydown", function (e) {
+    n.addEventListener("keydown", function (e) {
       if (e.key === "Enter" || e.key === " ") {
-        // Space does not activate a link by default, and here it should: the
-        // visitor is operating a graph, not reading prose.
+        // Space does not activate a link by default, and here it should: the visitor
+        // is operating a graph, not reading prose.
         if (wide() || e.key === " ") e.preventDefault();
         focus(id, { pin: true });
       }
     });
   });
 
-  // Hovering a Solution card lights its cluster in the graph, so the two halves
-  // of the page are visibly the same information.
+  // Hovering a Solution card lights its branch in the tree, so the two halves of the
+  // page are visibly the same information.
   sols.forEach(function (s) {
-    var id = s.getAttribute("data-sol");
     s.addEventListener("mouseenter", function () {
       if (pinned) return;
-      focus(id);
+      focus("s:" + s.getAttribute("data-sol"));
     });
   });
 
@@ -249,9 +408,8 @@
       nodes.forEach(function (n) {
         n.classList.remove("is-hit");
       });
-      leads.forEach(function (l) {
-        l.classList.remove("is-hit");
-        setLabel(l.getAttribute("data-id"), "is-hit", false);
+      Object.keys(labelBy).forEach(function (id) {
+        labelBy[id].classList.remove("is-hit");
       });
       cards.forEach(function (c) {
         c.classList.remove("is-hit");
@@ -261,28 +419,50 @@
     stage.classList.remove("is-focus");
     stage.classList.add("is-dim");
 
-    // Search reads data-name, the human label, not data-id, which is now an
-    // identity key of the form category~bundle~name. Searching the key would make
-    // "engineering" match all 105 skills in that category through their ids as
-    // well as their category, which is not what someone typing a skill name means.
-    var hits = 0;
+    // Search reads data-name, the label, not data-id, which is an identity key of
+    // the form category~bundle~name. Searching the key would make "engineering"
+    // match all 105 skills in that category through their ids as well as their
+    // names, which is not what someone typing a skill name means.
+    //
+    // A hit deeper than the open branch is a hit nobody can see, so any domain
+    // holding one is opened, and so is any Solution holding one.
+    var hitDomains = {};
+    var hitBranches = {};
     nodes.forEach(function (n) {
       var name = (n.getAttribute("data-name") || "").toLowerCase();
-      var dom = (n.getAttribute("data-dom") || "").toLowerCase();
-      var hit = name.indexOf(q) > -1 || dom.indexOf(q) > -1;
-      n.classList.toggle("is-hit", hit);
-      if (hit) hits++;
-    });
-    leads.forEach(function (l) {
-      var name = (l.getAttribute("data-name") || "").toLowerCase();
       var hit = name.indexOf(q) > -1;
-      l.classList.toggle("is-hit", hit);
-      setLabel(l.getAttribute("data-id") || "", "is-hit", hit);
+      n.classList.toggle("is-hit", hit);
+      setLabel(n.getAttribute("data-id"), "is-hit", hit);
+      if (hit) {
+        hitDomains[n.getAttribute("data-dom")] = true;
+        var parent = n.getAttribute("data-parent");
+        if (parent && n.getAttribute("data-layer") === "skill") hitBranches[parent] = true;
+      }
     });
     cards.forEach(function (c) {
       var name = (c.getAttribute("data-name") || "").toLowerCase();
       c.classList.toggle("is-hit", name.indexOf(q) > -1);
     });
+
+    var domainKeys = Object.keys(hitDomains);
+    if (domainKeys.length) {
+      // One domain can be open at a time, so the first match wins and the rest stay
+      // visible as dimmed hits at their own layer.
+      if (domainKeys.indexOf(openDomain) < 0) showDomain(domainKeys[0]);
+      var branchKeys = Object.keys(hitBranches).filter(function (b) {
+        var n = nodeById[b];
+        return n && n.getAttribute("data-dom") === openDomain;
+      });
+      showBranch(branchKeys.length ? branchKeys[0] : null);
+      // Re-mark, because opening a branch does not know about the query.
+      nodes.forEach(function (n) {
+        var name = (n.getAttribute("data-name") || "").toLowerCase();
+        var hit = name.indexOf(q) > -1;
+        n.classList.toggle("is-hit", hit);
+        setLabel(n.getAttribute("data-id"), "is-hit", hit);
+      });
+    }
+    mark();
   }
 
   // A hit inside a closed category is a hit nobody can see, so searching opens
@@ -357,18 +537,20 @@
       }
       stage.classList.remove("is-focus");
       stage.classList.add("is-dim");
-      leads.forEach(function (l) {
-        var hit = active.indexOf(l.getAttribute("data-tier")) > -1;
-        l.classList.toggle("is-hit", hit);
-        setLabel(l.getAttribute("data-id"), "is-hit", hit);
+      // The filter is about Solutions, so it lights Solution nodes and the skills
+      // hanging off them. A Solution node carries its own tier, so this no longer
+      // has to look the tier up through a member's owner list.
+      var lit = {};
+      nodes.forEach(function (n) {
+        if (n.getAttribute("data-layer") !== "solution") return;
+        var hit = active.indexOf(n.getAttribute("data-tier")) > -1;
+        n.classList.toggle("is-hit", hit);
+        setLabel(n.getAttribute("data-id"), "is-hit", hit);
+        if (hit) lit[n.getAttribute("data-id")] = true;
       });
       nodes.forEach(function (n) {
-        if (!n.classList.contains("g-node--member")) return;
-        var hit = (n.getAttribute("data-sol") || "").split(" ").some(function (o) {
-          var s = solByLead[o];
-          return !!s && active.indexOf(s.tier) > -1;
-        });
-        n.classList.toggle("is-hit", hit);
+        if (n.getAttribute("data-layer") !== "skill") return;
+        n.classList.toggle("is-hit", !!lit[n.getAttribute("data-parent")]);
       });
       sols.forEach(function (s) {
         s.classList.toggle(
@@ -401,10 +583,18 @@
    * readable, rather than waiting for a hover that never arrives on a touch
    * screen.
    */
+  // DATA.featured holds the domain ids, in the order the tree presents them. The
+  // first one is opened immediately: the panel and the graph should be showing
+  // something the moment the page is readable, rather than waiting for a hover that
+  // never arrives on a touch screen.
   var featured = (DATA.featured || []).filter(function (id) {
-    return !!solByLead[id];
+    return !!nodeById[id];
   });
-  if (featured.length) fillPanel(featured[0]);
+  if (featured.length) {
+    showDomain(featured[0]);
+    fillPanel(featured[0]);
+    mark();
+  }
 
   /* -------------------------------------------------------------- traversal */
 
@@ -455,12 +645,15 @@
     }
   });
 
-  /* The opening: pin the stage and step the highlight through the featured
-   * Solutions. The budget is deliberately small. The previous page pinned 24
-   * chapters and ran to 76,000 pixels; scrolling was the whole interface, and
-   * getting to a named skill meant travelling past hundreds of others. Eight
-   * beats teach the interaction, and everything else is reachable by search or
-   * by clicking a node.
+  /* The opening: pin the stage and open each domain in turn.
+   *
+   * Seven beats, one per domain, where there used to be eight per Solution — and
+   * before that 24 chapters over 76,000 pixels, where scrolling was the whole
+   * interface and reaching a named skill meant travelling past hundreds of others.
+   *
+   * Scrolling now demonstrates the top layer and nothing more. Depth is reached by
+   * clicking, which is faster than scrolling for a tree and does not make the
+   * visitor pay in page height for structure they may not want.
    */
   if (featured.length) {
     var PER_BEAT = 260;
@@ -490,7 +683,7 @@
             featured.length - 1,
             Math.floor(((self.progress - 0.06) / 0.94) * featured.length)
           );
-          if (featured[i] !== focused) {
+          if (featured[i] !== openDomain) {
             pinned = null;
             focus(featured[i]);
           }

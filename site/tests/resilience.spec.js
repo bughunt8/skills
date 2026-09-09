@@ -105,7 +105,7 @@ test.describe("prefers-reduced-motion", () => {
 
     // The graph is still there and still complete: reduced motion removes the
     // traversal, not the content or the ability to explore it.
-    expect(await page.locator(".g-lead").count()).toBeGreaterThan(0);
+    expect(await page.locator('.g-node[data-layer="domain"]').count()).toBe(7);
     const dimmed = await page.locator(".g-node").evaluateAll((ns) =>
       ns.filter((n) => Number(getComputedStyle(n).opacity) < 0.1).length
     );
@@ -157,7 +157,33 @@ test.describe("narrow viewports", () => {
 
     // Interaction is function, not decoration, so it survives on touch: tapping a
     // Solution fills the panel with that Solution.
-    await page.locator('.g-lead[data-name="agenthub"]').tap({ force: true });
+      // Tapped without force, and only after checking that the point belongs to the
+      // node. force:true skips exactly the checks this test claims to make: it passes
+      // when the target is covered or off-screen, which are the failures it exists
+      // for, so it proved only that a dispatched event reaches a listener.
+      async function tapNode(selector, label) {
+        const node = page.locator(selector).first();
+        await node.scrollIntoViewIfNeeded();
+        await page.waitForTimeout(250);
+        const hit = node.locator(".g-hit");
+        const box = await hit.boundingBox();
+        expect(box, label + " has no tappable box").not.toBeNull();
+        const owner = await page.evaluate(([x, y]) => {
+          const el = document.elementFromPoint(x, y);
+          const a = el && el.closest ? el.closest(".g-node") : null;
+          return a ? a.getAttribute("data-id") : null;
+        }, [box.x + box.width / 2, box.y + box.height / 2]);
+        expect(owner, "the centre of " + label + " is covered").toBe(
+          await node.getAttribute("data-id")
+        );
+        await hit.tap();
+        await page.waitForTimeout(350);
+      }
+
+      await tapNode('.g-node[data-layer="domain"]', "the first domain");
+      await expect(page.locator("#panelname")).not.toBeEmpty();
+      await tapNode(".g-node--solution.is-open", "one of its Solutions");
+      expect(await page.locator("#panelchain li").count()).toBeGreaterThan(1);
     await page.waitForTimeout(400);
     await expect(page.locator("#panelname")).toHaveText(/agenthub/);
 
@@ -345,7 +371,7 @@ test.describe("the production Content-Security-Policy", () => {
     // Exercise the parts that manipulate style at runtime, since CSSOM writes are
     // allowed but setAttribute("style", ...) is not, and only one of those is
     // visible in the source.
-    await page.locator('.g-lead[data-name="agenthub"]').click({ force: true });
+      await page.locator(".g-node--solution.is-open").first().click({ force: true });
     await page.evaluate(() => window.scrollTo(0, 1200));
     await page.waitForTimeout(900);
     await page.fill("#gsearch", "finance");

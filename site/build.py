@@ -35,6 +35,7 @@ import tempfile
 from pathlib import Path
 
 import compose
+import tree
 
 ROOT = Path(__file__).resolve().parent
 # The repository that contains this site. Its own skills are read from here.
@@ -385,200 +386,178 @@ def hue_class(name: str) -> str:
 FEATURED = 8
 
 
-def render_graph(sols: list, rows: list, lay: dict) -> "tuple[str, list]":
-    """Prerender the whole graph as inline SVG from the precomputed layout.
+def _domain_of(nodes: dict, node_id: str) -> str:
+    cur = node_id
+    while nodes[cur]["parent"] is not None:
+        cur = nodes[cur]["parent"]
+    return cur
 
-    Prerendered rather than drawn by JavaScript on load, for the same reason the
-    cards are prerendered: the graph is the opening image of the page, and a page
-    whose opening image only exists once a script has run is a page that is blank
-    for anyone the script fails for. app.js adds traversal, focus and search on top
-    of markup that is already correct and already visible.
+
+def render_tree(lay: "dict", sols: list, rows: list) -> "tuple[str, list]":
+    """Draw the four-layer tree: domains, practices, Solutions, skills.
+
+    Replaces a single-layer packing of all 540 Solutions and skills at once. That
+    view was accurate and unreadable — every node the same weight, no statement in
+    the geometry about what mattered — so this one draws the structure the library
+    actually has and reveals one branch of it at a time.
+
+    Every node is a link whose target exists, so the graph is a table of contents
+    before any script runs. Solutions and skills are drawn but held at zero opacity:
+    revealing all 490 leaves at once is what made the previous version a speckle, and
+    50 Solutions in one column would be 9 units apart. With scripting, opening a
+    domain fans its Solutions across the full height of the drawing, and opening a
+    Solution does the same for its skills.
     """
-    nodes, edges, index = lay["nodes"], lay["edges"], lay["index"]
-    # A skill can be led by more than one Solution, so ownership is a list, not a
-    # value. code-review serves both idea-to-shipped-code and hard-to-find-bug;
-    # when this held a single lead, focusing the second Solution lit only the
-    # members no other Solution had already claimed.
-    sol_of = {}
-    for s in sols:
-        for m in s["members"]:
-            sol_of.setdefault(m, []).append(s["lead"])
+    nodes = lay["nodes"]
+    domains = [n for n in nodes.values() if n["layer"] == "domain"]
+    hue_of = {d["id"]: f"h{i}" for i, d in enumerate(domains)}
+
+    def ancestor_domain(node_id: str) -> str:
+        cur = node_id
+        while nodes[cur]["parent"] is not None:
+            cur = nodes[cur]["parent"]
+        return cur
+
+    dom_of = {nid: ancestor_domain(nid) for nid in nodes}
+
+    # How many skills sit under each node, and how many Solutions. Counted by walking
+    # up from every leaf, so a node's number is the sum of its whole subtree rather
+    # than of its immediate children.
+    skills_under: dict = {}
+    sols_under: dict = {}
+    for node in nodes.values():
+        if node["layer"] not in ("skill", "solution"):
+            continue
+        cur = node["id"]
+        while cur is not None:
+            if node["layer"] == "skill":
+                skills_under[cur] = skills_under.get(cur, 0) + 1
+            else:
+                sols_under[cur] = sols_under.get(cur, 0) + 1
+            cur = nodes[cur]["parent"]
+
+    sol_by_key = {s["lead"]: s for s in sols}
+    row_by_key = {r["key"]: r for r in rows}
+
+    def href_of(node: dict) -> str:
+        if node["layer"] == "domain":
+            return "#solutions"
+        if node["layer"] == "practice":
+            return f'#cat-{node["cat"]}'
+        if node["layer"] == "solution":
+            return f'#{slug(node["key"])}'
+        return f'#skill-{slug(node["key"])}'
 
     parts = []
 
-    # Edges first so nodes always sit on top of them.
+    # ---------------------------------------------------------------- edges first
+    #
+    # SVG has no z-index, so paint order is document order: edges before nodes, and
+    # labels after everything. An earlier version drew labels inside each node's
+    # group and a later node's circle sliced an earlier node's label in half.
     parts.append('        <g class="g-edges" aria-hidden="true">')
-    for a, b in edges:
-        na, nb = nodes[a], nodes[b]
-        lead_node = na if na["kind"] == "lead" else nb
-        lead = lead_node["id"]
-        # A skill can serve more than one Solution: code-review is used by both
-        # idea-to-shipped-code and hard-to-find-bug, and agenthub shares run and
-        # status with autoresearch-agent. The skill is drawn once, so those edges
-        # cross the frame. Dashed, so a long line reads as a shared skill rather
-        # than as a rendering fault.
-        span = ((na["x"] - nb["x"]) ** 2 + (na["y"] - nb["y"]) ** 2) ** 0.5
-        cross = " g-edge--cross" if span > 90 else ""
-        parts.append(
-            f'          <line class="g-edge{cross} {hue_class(lead_node["dom"])}" '
-            f'data-sol="{esc(lead)}" '
-            f'x1="{na["x"]}" y1="{na["y"]}" x2="{nb["x"]}" y2="{nb["y"]}"/>'
-        )
+    for a, b_id, kind in tree.edges(lay):
+        na, nb = nodes[a], nodes[b_id]
+        meta = f' data-from="{esc(a)}" data-to="{esc(b_id)}"'
+        d = tree.curve(na["x"], na["y"], nb["x"], nb["y"])
+        if kind == "cross":
+            # The one edge a tree cannot hold: code-review is led by two Solutions.
+            parts.append(
+                f'          <path class="g-edge g-edge--cross" '
+                f'data-sol="{esc(a)}"{meta} d="{d}"/>'
+            )
+        elif nb["layer"] == "solution":
+            parts.append(
+                f'          <path class="g-edge g-edge--sol {hue_of[dom_of[b_id]]}" '
+                f'data-dom="{esc(dom_of[b_id])}"{meta} d="{d}"/>'
+            )
+        elif nb["layer"] == "skill":
+            parts.append(
+                f'          <path class="g-edge g-edge--leaf {hue_of[dom_of[b_id]]}" '
+                f'data-branch="{esc(a)}"{meta} d="{d}"/>'
+            )
+        else:
+            parts.append(
+                f'          <path class="g-edge g-edge--branch {hue_of[dom_of[b_id]]}" '
+                f'data-dom="{esc(dom_of[b_id])}"{meta} d="{d}"/>'
+            )
     parts.append("        </g>")
 
-    # The long tail: every skill no Solution claims. Drawn as a quiet outer band
-    # rather than hidden, because "165 skills that no Solution uses" is a fact
-    # about the library worth showing, and it is where the next Solution comes
-    # from.
-    parts.append('        <g class="g-tail" aria-hidden="true">')
-    for n in nodes:
-        if n["kind"] != "tail":
-            continue
-        parts.append(
-            f'          <circle class="g-node g-node--tail {hue_class(n["dom"])}" '
-            f'data-id="{esc(n["id"])}" data-name="{esc(n["label"])}" '
-            f'data-dom="{esc(n["dom"])}" '
-            f'cx="{n["x"]}" cy="{n["y"]}" r="{n["r"]}"/>'
-        )
+    # ---------------------------------------------------------------- then nodes
+    parts.append('        <g class="g-nodes">')
+    for layer in ("skill", "solution", "practice", "domain"):
+        for node in nodes.values():
+            if node["layer"] != layer:
+                continue
+            nid = node["id"]
+            hue = hue_of[dom_of[nid]]
+            attrs = [
+                f'class="g-node g-node--{layer} {hue}"',
+                f'href="{esc(href_of(node))}"',
+                f'data-id="{esc(nid)}"',
+                f'data-layer="{layer}"',
+                f'data-name="{esc(node["label"])}"',
+                f'data-dom="{esc(dom_of[nid])}"',
+            ]
+            if node["parent"]:
+                attrs.append(f'data-parent="{esc(node["parent"])}"')
+            if layer == "solution":
+                attrs.append(f'data-tier="{esc(node["tier"])}"')
+                attrs.append(f'data-key="{esc(node["key"])}"')
+            if layer == "skill":
+                attrs.append(f'data-key="{esc(node["key"])}"')
+                if not node["claimed"]:
+                    attrs.append('data-unclaimed="1"')
+            aria = node["label"]
+            attrs.append(f'data-skills="{skills_under.get(nid, 0)}"')
+            attrs.append(f'data-sols="{sols_under.get(nid, 0)}"')
+            if layer == "domain":
+                attrs.append(f'data-blurb="{esc(node["blurb"])}"')
+                aria = (
+                    f'{node["label"]}: {skills_under.get(nid, 0)} skills in '
+                    f'{len(node["kids"])} groups, '
+                    f'{sols_under.get(nid, 0)} Solutions'
+                )
+            attrs.append(f'aria-label="{esc(aria)}"')
+            parts.append(f'          <a {" ".join(attrs)}>')
+            # A hit target larger than the dot. The smallest node is 2.8 units
+            # across in a 1400-unit frame, which is under three rendered pixels:
+            # without this the deeper layers would be decorative.
+            parts.append(
+                f'            <circle class="g-hit" cx="{node["x"]}" '
+                f'cy="{node["y"]}" r="{round(node["r"] + 6, 1)}"/>'
+            )
+            parts.append(
+                f'            <circle class="g-dot" cx="{node["x"]}" '
+                f'cy="{node["y"]}" r="{node["r"]}"/>'
+            )
+            parts.append("          </a>")
     parts.append("        </g>")
 
-    parts.append('        <g class="g-members" aria-hidden="true">')
-    for n in nodes:
-        if n["kind"] != "member":
-            continue
-        parts.append(
-            f'          <circle class="g-node g-node--member {hue_class(n["dom"])}" '
-            f'data-id="{esc(n["id"])}" data-name="{esc(n["label"])}" '
-            f'data-dom="{esc(n["dom"])}" '
-            f'data-sol="{esc(" ".join(sol_of.get(n["id"], [])))}" '
-            f'cx="{n["x"]}" cy="{n["y"]}" r="{n["r"]}"/>'
-        )
-    parts.append("        </g>")
-
-    # Leads carry a real accessible name each, so the graph is a list of Solutions
-    # to a screen reader instead of 487 unlabelled circles.
-    label_of = {s["lead"]: s.get("label", s["name"]) for s in sols}
-    tier_of = {s["lead"]: s["tier"] for s in sols}
-    # Only the featured leads carry a label at rest. Fifty-four labels at once was
-    # unreadable overlapping text, and a graph you cannot read is a texture.
-    featured_set = {s["lead"] for s in sols[:FEATURED]}
-    # Order matters for label placement: the first Solution gets first choice.
-    featured_set_order = [s["lead"] for s in sols[:FEATURED]]
-    parts.append('        <g class="g-leads">')
-    for n in nodes:
-        if n["kind"] != "lead":
-            continue
-        label = label_of.get(n["id"], n["id"])
-        named = " is-named" if n["id"] in featured_set else ""
-        parts.append(
-            f'          <a class="g-lead {hue_class(n["dom"])}{named}" '
-            f'href="#{esc(slug(n["id"]))}" '
-            f'data-id="{esc(n["id"])}" data-name="{esc(label)}" '
-            f'data-tier="{esc(tier_of.get(n["id"], ""))}" data-dom="{esc(n["dom"])}" '
-            f'aria-label="{esc(label)}">'
-        )
-        # An invisible, larger hit target, because the lead circle is under 10
-        # units across and asking a pointer to land on that would make the graph
-        # decorative rather than usable.
-        #
-        # Sized at r+7, not r+11. The closest two leads sit 41 units apart, so an
-        # r+11 target spanned 41 units and overlapped its neighbour's: clicking
-        # agenthub lit agenthub but the pointer then entered self-improving-agent's
-        # target, and the panel described a different Solution to the one shown.
-        parts.append(
-            f'            <circle class="g-hit" cx="{n["x"]}" cy="{n["y"]}" '
-            f'r="{round(n["r"] + 7, 1)}"/>'
-        )
-        parts.append(
-            f'            <circle class="g-node g-node--lead" cx="{n["x"]}" '
-            f'cy="{n["y"]}" r="{n["r"]}"/>'
-        )
-        parts.append("          </a>")
-    parts.append("        </g>")
-
-    # Labels are a layer of their own, drawn after every node.
-    #
-    # They used to live inside each lead's group, which meant a lead placed later
-    # in the document painted its circle over an earlier lead's label: the
-    # `landing-page-that-sells` label was sliced in half by a neighbouring node.
-    # SVG has no z-index, so the only way to guarantee text sits above all geometry
-    # is to emit it last.
+    # ---------------------------------------------------------------- labels last
     parts.append('        <g class="g-labels" aria-hidden="true">')
-
-    # Where a label goes is a decision, not a constant offset.
-    #
-    # Every label was placed 12 units below its node, which is right until two
-    # neighbouring Solutions both want that space: `commercial-skills` and
-    # `idea-to-shipped-code` were drawn across each other on the live page. Only the
-    # featured labels are visible without interaction, so those are the ones that
-    # have to be de-conflicted, and they are placed first and in priority order.
-    #
-    # Each label tries below its node, then above, then to each side, and takes the
-    # first position that clears the labels already placed. Deterministic, so the
-    # reproducibility gate still compares like with like.
-    placed_boxes = []
-
-    def box_at(label, x, y, anchor):
-        # 13px in a 1400-unit frame rendered at about 1164px, so a unit is a little
-        # under a pixel. 6.1 units per character is measured from the widest label
-        # this library produces rather than guessed at from the font size.
-        w = len(label) * 6.1
-        h = 13.0
-        left = x - w / 2 if anchor == "middle" else (x if anchor == "start" else x - w)
-        return (left, y - h * 0.8, left + w, y + h * 0.2)
-
-    def clear(box):
-        return all(
-            box[2] < o[0] or o[2] < box[0] or box[3] < o[1] or o[3] < box[1]
-            for o in placed_boxes
-        )
-
-    def place(n, label):
-        r = n["r"]
-        for dx, dy, anchor in (
-            (0, r + 12, "middle"),      # below, the default and the calmest
-            (0, -(r + 7), "middle"),    # above
-            (r + 8, 4, "start"),        # right
-            (-(r + 8), 4, "end"),       # left
-            (0, r + 24, "middle"),      # below, one line further out
-        ):
-            x, y = round(n["x"] + dx, 1), round(n["y"] + dy, 1)
-            box = box_at(label, x, y, anchor)
-            if clear(box):
-                placed_boxes.append(box)
-                return x, y, anchor
-        # Nothing clear: keep the default rather than drop the label, since a hidden
-        # label on a hovered node would be worse than a crowded one.
-        x, y = round(n["x"], 1), round(n["y"] + r + 12, 1)
-        return x, y, "middle"
-
-    leads_by_id = {n["id"]: n for n in nodes if n["kind"] == "lead"}
-    # Featured first, in the order the page presents them, then the rest.
-    ordered_ids = [i for i in featured_set_order if i in leads_by_id]
-    ordered_ids += [n["id"] for n in nodes
-                    if n["kind"] == "lead" and n["id"] not in featured_set]
-
-    positions = {}
-    for lead_id in ordered_ids:
-        n = leads_by_id[lead_id]
-        positions[lead_id] = place(n, label_of.get(lead_id, lead_id))
-
-    # Emitted in node order, so the document stays stable regardless of priority.
-    for n in nodes:
-        if n["kind"] != "lead":
-            continue
-        label = label_of.get(n["id"], n["id"])
-        named = " is-named" if n["id"] in featured_set else ""
-        x, y, anchor = positions[n["id"]]
+    for node in nodes.values():
+        layer = node["layer"]
+        nid = node["id"]
+        if layer == "domain":
+            x, anchor = round(node["x"] - node["r"] - 12, 1), "end"
+            text = node["label"]
+        elif layer == "practice":
+            x, anchor = round(node["x"] + node["r"] + 11, 1), "start"
+            text = f'{node["label"]}  {skills_under.get(nid, 0)}'
+        else:
+            x, anchor = round(node["x"] + node["r"] + 9, 1), "start"
+            text = node["label"]
         parts.append(
-            f'          <text class="g-label{named}" data-id="{esc(n["id"])}" '
-            f'x="{x}" y="{y}" '
-            f'text-anchor="{anchor}">{esc(label)}</text>'
+            f'          <text class="g-label g-label--{layer} {hue_of[dom_of[nid]]}" '
+            f'data-id="{esc(nid)}" x="{x}" y="{round(node["y"] + 3.6, 1)}" '
+            f'text-anchor="{anchor}">{esc(text)}</text>'
         )
     parts.append("        </g>")
 
-    featured = [s["lead"] for s in sols[:FEATURED]]
-    return "\n".join(parts), featured
+    # The scroll traversal walks the domains, not the Solutions: seven beats instead
+    # of fifty, and each one opens a branch rather than moving a highlight.
+    return "\n".join(parts), [d["id"] for d in domains]
 
 
 def render(rows: list) -> "tuple[dict, str]":
@@ -593,8 +572,13 @@ def render(rows: list) -> "tuple[dict, str]":
         by[k].sort(key=lambda r: r["n"])
 
     sols, stats = compose.build_solutions(REPO_ROOT, rows, _solution_frontmatter, fail)
-    lay = compose.layout(sols, rows)
-    graph_svg, featured = render_graph(sols, rows, lay)
+    spec = tree.load_domains(ROOT)
+    hier = tree.build_tree(rows, sols, spec)
+    lay = tree.layout(hier)
+    tstats = tree.stats(lay)
+    graph_svg, featured = render_tree(lay, sols, rows)
+    nodes = lay["nodes"]
+    dom_nodes = [n for n in nodes.values() if n["layer"] == "domain"]
     by_lead = {s["lead"]: s for s in sols}
     key_row = {r["key"]: r for r in rows}
     claimed_keys = {m for x in sols for m in x["members"]} | set(by_lead)
@@ -654,9 +638,11 @@ def render(rows: list) -> "tuple[dict, str]":
         # flagged the aria-label on every lead as a prohibited attribute for
         # exactly this reason.
         '        <svg class="stage__svg" id="gsvg" viewBox="0 0 1400 560" '
-        'role="group" aria-label="Solution graph: every Solution in the library and '
-        'the skills each one leads. The same information is listed as text under '
-        'Solutions below.">'
+        'role="group" aria-label="The library as a four-layer tree: seven domains, '
+        'twenty-four groups, fifty Solutions and four hundred and ninety skills. '
+        'Opening a domain shows its Solutions; opening a Solution shows its skills. '
+        'The same information is listed as text under Solutions and The library '
+        'below.">'
     )
     out.append(graph_svg)
     out.append("        </svg>")
@@ -674,16 +660,17 @@ def render(rows: list) -> "tuple[dict, str]":
         f'        <h1><b>{len(sols)}</b> Solutions from <b>{total}</b> skills</h1>'
     )
     out.append(
-        '        <p class="stage__sub">A Solution is one lead skill that drives a named '
-        "subset of the rest. Scroll to travel between them, search, or click any "
-        "node.</p>"
+        f'        <p class="stage__sub">Four layers: {len(dom_nodes)} domains, '
+        f'{tstats["per_layer"]["practice"]} groups, {len(sols)} Solutions, '
+        f'{total} skills. Open a domain to see its Solutions, a Solution to see the '
+        f'skills it leads.</p>'
     )
     out.append('        <p class="cue" id="cue"><span></span>Scroll</p>')
     out.append("      </div>")
 
     # Graphify-shaped controls: search the graph, filter by how much the library
     # actually asserts about each Solution, and get back out.
-    first = sols[0]
+    first_dom = dom_nodes[0]
     # tabindex="0" because the panel is a scrollable region: c-level-agents leads
     # 21 skills and the panel has a fixed height, so its content overflows and has
     # to be reachable by keyboard. axe flags a scrollable region that cannot be
@@ -693,24 +680,42 @@ def render(rows: list) -> "tuple[dict, str]":
         '      <aside class="stage__panel" id="panel" aria-live="polite" '
         'tabindex="0" aria-label="Selected Solution">'
     )
-    out.append(f'        <p class="panel__tier" id="paneltier">{esc(first["tier"])}</p>')
-    out.append(f'        <h2 class="panel__name" id="panelname">{esc(first.get("label", first["name"]))}</h2>')
-    out.append(f'        <p class="panel__desc" id="paneldesc">{esc(first.get("problem", ""))}</p>')
+    # The panel describes whatever layer you are on, so it opens on the first
+    # domain rather than on a Solution: the graph's first statement is the shape of
+    # the library, not one composition inside it.
+    dom_sols = [
+        s
+        for prac in first_dom["kids"]
+        for s in nodes[prac]["kids"]
+        if nodes[s]["layer"] == "solution"
+    ]
+    dom_skills = sum(
+        1
+        for n in nodes.values()
+        if n["layer"] == "skill" and _domain_of(nodes, n["id"]) == first_dom["id"]
+    )
+    out.append('        <p class="panel__tier" id="paneltier">domain</p>')
+    out.append(f'        <h2 class="panel__name" id="panelname">{esc(first_dom["label"])}</h2>')
+    out.append(f'        <p class="panel__desc" id="paneldesc">{esc(first_dom["blurb"])}</p>')
     out.append('        <ol class="panel__chain" id="panelchain">')
-    for m in first["members"]:
-        out.append(f'          <li>{esc(key_row[m]["n"] if m in key_row else m)}</li>')
+    for prac in first_dom["kids"]:
+        out.append(f'          <li>{esc(nodes[prac]["label"])}</li>')
     out.append("        </ol>")
-    out.append(f'        <p class="panel__ev" id="panelev">{esc(first.get("evidence", ""))}</p>')
+    out.append(
+        f'        <p class="panel__ev" id="panelev">'
+        f'{len(first_dom["kids"])} groups, {len(dom_sols)} Solutions, '
+        f'{dom_skills} skills</p>'
+    )
     out.append("      </aside>")
 
     # One scroll beat per featured Solution. app.js turns these into the traversal;
     # without JavaScript they are a plain list of links into the Solutions section.
     out.append('      <ol class="stage__beats" id="beats">')
-    for lead in featured:
-        s = by_lead[lead]
+    for dom_id in featured:
+        node = nodes[dom_id]
         out.append(
-            f'        <li class="beat" data-sol="{esc(lead)}">'
-            f'<a href="#{esc(slug(lead))}">{esc(s.get("label", s["name"]))}</a></li>'
+            f'        <li class="beat" data-dom="{esc(dom_id)}">'
+            f'<a href="#solutions">{esc(node["label"])}</a></li>'
         )
     out.append("      </ol>")
     out.append("    </header>")
@@ -788,6 +793,7 @@ def render(rows: list) -> "tuple[dict, str]":
             in_sol = s["key"] in claimed_keys
             out.append(
                 f'          <article class="card{" card--used" if in_sol else ""}" '
+                f'id="skill-{slug(s["key"])}" '
                 f'data-id="{esc(s["key"])}" data-name="{esc(s["n"])}">'
             )
             out.append(

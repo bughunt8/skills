@@ -39,7 +39,9 @@ test.describe("prerendered content", () => {
     // The Solutions are the page's subject, so they must be present with the
     // script off too, not assembled from a data blob on load.
     await expect(page.locator(".sol")).toHaveCount(data.solutions);
-    await expect(page.locator(".g-lead")).toHaveCount(data.solutions);
+    await expect(page.locator('.g-node[data-layer="solution"]')).toHaveCount(
+      data.solutions
+    );
 
     // Substantive text, not just a shell. The JS-built version scored 858.
     //
@@ -100,7 +102,7 @@ test.describe("prerendered content", () => {
       // Nodes only. Each lead also has a <text> label carrying the same identity,
       // and counting those makes every lead look like two nodes.
       const graph = [
-        ...document.querySelectorAll(".g-lead[data-id], .g-node[data-id]")
+          ...document.querySelectorAll(".g-node[data-id]")
       ].reduce((m, el) => {
         const id = el.getAttribute("data-id");
         m[id] = (m[id] || 0) + 1;

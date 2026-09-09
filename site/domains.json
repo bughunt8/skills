@@ -1,0 +1,95 @@
+{
+  "_comment": [
+    "The top layer of the graph: what kind of work a skill is for.",
+    "",
+    "The 24 groups below it are the repository's own directory names, which is why",
+    "they read like `pstack`, `shuohao` and `ra-qm-team` — they are source layout,",
+    "not a taxonomy, and there are too many of them to be an opening view. This file",
+    "is the one place where an editorial judgement is made about the library, so it",
+    "is data rather than code: every category must appear exactly once, and the build",
+    "fails if a category is missing, duplicated, or unknown.",
+    "",
+    "`label` is what a visitor reads. `blurb` is the one line under it. Order is the",
+    "order they appear, largest first, which is also the order of the rings.",
+    "",
+    "Nothing here invents a skill or moves one between categories. It only groups",
+    "the categories that already exist."
+  ],
+  "domains": [
+    {
+      "id": "build",
+      "label": "Build and ship",
+      "blurb": "Writing, reviewing and releasing software.",
+      "categories": [
+        "engineering",
+        "engineering-team",
+        "pstack",
+        "markdown-html",
+        "start-github-repo",
+        "loop-library"
+      ]
+    },
+    {
+      "id": "lead",
+      "label": "Lead and advise",
+      "blurb": "Executive judgement, programmes and operations.",
+      "categories": ["c-level-advisor", "project-management", "business-operations"]
+    },
+    {
+      "id": "grow",
+      "label": "Grow and sell",
+      "blurb": "Demand, positioning and revenue.",
+      "categories": ["marketing-skill", "commercial", "business-growth", "marketing"]
+    },
+    {
+      "id": "make",
+      "label": "Design and write",
+      "blurb": "Interfaces, prose and screen craft.",
+      "categories": ["design", "creative-writing", "shuohao"]
+    },
+    {
+      "id": "decide",
+      "label": "Research and decide",
+      "blurb": "Evidence, product direction and numbers.",
+      "categories": ["product-team", "research", "research-ops", "finance"]
+    },
+    {
+      "id": "work",
+      "label": "Work and career",
+      "blurb": "Personal throughput and getting hired.",
+      "categories": ["productivity", "job-hunt"]
+    },
+    {
+      "id": "govern",
+      "label": "Govern and comply",
+      "blurb": "Assurance, regulation and risk.",
+      "categories": ["ra-qm-team", "compliance-os"]
+    }
+  ],
+  "categories": {
+    "engineering": "Engineering",
+    "engineering-team": "Engineering team",
+    "pstack": "Engineering rigor",
+    "markdown-html": "Markdown and HTML",
+    "start-github-repo": "Repo scaffolding",
+    "loop-library": "Agent loops",
+    "c-level-advisor": "C-level advisory",
+    "project-management": "Project management",
+    "business-operations": "Business operations",
+    "marketing-skill": "Marketing",
+    "commercial": "Commercial",
+    "business-growth": "Business growth",
+    "marketing": "Landing pages",
+    "design": "Design",
+    "creative-writing": "Creative writing",
+    "shuohao": "Short-drama production",
+    "product-team": "Product",
+    "research": "Research",
+    "research-ops": "Research ops",
+    "finance": "Finance",
+    "productivity": "Productivity",
+    "job-hunt": "Job search",
+    "ra-qm-team": "Regulatory and quality",
+    "compliance-os": "Compliance"
+  }
+}
