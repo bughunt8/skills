@@ -37,26 +37,10 @@ single place a source is declared.
 
 ## Runtime libraries
 
-**Vendored into this repository and served from our own origin**, under `site/vendor/`.
-They are no longer loaded from a CDN: a CDN sees every reader, can be blocked, and
-can disappear. The page is still fully functional if they fail to load.
-
-Because these files are now redistributed rather than linked, their licences apply
-to this repository directly.
-
-### GSAP, with ScrollTrigger
-
-- Version 3.15.0, vendored at `site/vendor/gsap.min.js` and
-  `site/vendor/ScrollTrigger.min.js`, <https://gsap.com>
-- Licence: GSAP Standard "No Charge" licence,
-  <https://gsap.com/community/standard-license/>
-- GSAP including ScrollTrigger became free for commercial use in April 2025.
-
-### Lenis
-
-- Version 1.3.11, vendored at `site/vendor/lenis.min.js`,
-  <https://github.com/darkroomengineering/lenis>
-- Licence: MIT
+The graph workspace has no runtime JavaScript dependencies. Previous releases
+included GSAP, ScrollTrigger and Lenis; those scripts have been removed from the
+site bundle and are no longer loaded or redistributed with it. Their historical
+attribution remains in repository history.
 
 ### Fonts
 

@@ -182,10 +182,14 @@ def collect(checkouts: dict) -> list:
                 {
                     "n": name,
                     "d": trim(desc),
+                    "description": desc,
                     "dom": category,
                     "repo": src["repo"],
                     "lic": src["license"],
                     "url": src["url"],
+                    "source_url": src["url"].rstrip("/") + "/blob/"
+                    + (src.get("ref") or "main") + "/"
+                    + path.relative_to(checkouts[src["id"]]).as_posix(),
                     "bundle": bundle,
                     # Identity, not display. Carried through composition, layout,
                     # every DOM node and every graph edge. Using the name here meant
@@ -468,11 +472,7 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
         return round(2.1 + 6.4 * math.sqrt(d / max_deg), 2)
 
     parts = []
-    # One group holds everything the camera moves, so framing a community is a single
-    # transform rather than 490 rewritten coordinates. Labels ride inside it and divide
-    # their font size by the same factor, which is what the first camera got wrong:
-    # SVG text is measured in user units, so zooming in made every label grow until they
-    # collided.
+    # Geometry moves with the camera; labels use a separate screen-space layer.
     parts.append('        <g id="vp" class="g-vp">')
 
     # ------------------------------------------------------------------- the edges
@@ -547,7 +547,8 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
     # Two kinds, both in their own layer so they paint above every node and every edge.
     # Community names sit above their members; individual names are only drawn for the
     # hubs, because 490 of them at this scale is a grey wash.
-    parts.append('        <g class="g-labels" aria-hidden="true">')
+    parts.append("        </g>")
+    parts.append('        <g id="graph-labels" class="g-labels" aria-hidden="true">')
     labels_by_cid = {
         cid: network.label_community(net["members"][cid], by_key, graph) for cid in order
     }
@@ -585,6 +586,23 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
                 f'x="{spot["x"]}" y="{spot["y"]}" text-anchor="middle">'
                 f'{esc(label)}</text>'
             )
+
+    # The layout's linked-community order intentionally excludes isolates. They
+    # still have stable community identities and must be reachable in the UI.
+    omitted = sorted(set(comm.values()) - set(order))
+    for cid in omitted:
+        members = sorted(key for key, value in comm.items() if value == cid)
+        hub = max(members, key=lambda key: (degree.get(key, 0), key))
+        community_meta.append(
+            {
+                "id": cid,
+                "label": network.label_community(members, by_key, graph),
+                "size": len(members),
+                "hub": by_key[hub]["n"],
+                "x": round(sum(pos[key][0] for key in members) / len(members), 1),
+                "y": round(sum(pos[key][1] for key in members) / len(members), 1),
+            }
+        )
 
     # A name for every skill, not only for the hubs. The hubs' names are visible from
     # the start; the other 464 are drawn with zero opacity and revealed when something
@@ -625,8 +643,115 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
             )
     parts.append("        </g>")
 
-    parts.append("        </g>")
     return "\n".join(parts), edge_rows, community_meta, hue_of
+
+
+def render_workspace(community_meta, order, counts, sols, graph_svg, graph_label):
+    """Prerender the task shell; the complete text library follows it."""
+    first = community_meta[0]
+    communities = "\n".join(
+        f'<option value="{c["id"]}">{esc(c["label"])} ({c["size"]})</option>'
+        for c in community_meta
+    )
+    categories = "\n".join(
+        f'<option value="{esc(c)}">{esc(LABELS.get(c, c))} ({counts[c]})</option>'
+        for c in order
+    )
+    solutions = "\n".join(
+        f'<option value="{esc(s["lead"])}">{esc(s.get("label", s["name"]))}</option>'
+        for s in sols
+    )
+    return f"""
+    <div class="workspace" id="top" data-mode="community">
+      <header id="workspace-header" class="workspace__header">
+        <form id="gform" class="toolbar" role="search" aria-label="Find skills">
+          <div class="field field--search"><label for="gsearch">Search skills</label>
+            <div class="search-input"><input id="gsearch" type="search"
+              placeholder="Name or description, e.g. NDA" autocomplete="off" spellcheck="false"
+              aria-controls="gresults"><button type="submit">Find</button>
+              <button type="button" id="gclear">Clear</button></div></div>
+          <details class="filter-disclosure" id="gfilters" open><summary>Filters</summary>
+          <div class="filter-fields"><div class="field"><label for="gcommunity">Community</label>
+            <select id="gcommunity"><option value="">All communities</option>{communities}</select></div>
+          <div class="field"><label for="gcategory">Category</label>
+            <select id="gcategory"><option value="">All categories</option>{categories}</select></div>
+          <div class="field"><label for="gsolution">Solution</label>
+            <select id="gsolution"><option value="">All Solutions</option>{solutions}</select></div>
+          <div class="field field--evidence"><label for="gstated">Relationships</label>
+            <button type="button" id="gstated" aria-pressed="false">All evidence</button></div></div></details>
+        </form>
+        <div class="context-row"><div class="context-title">
+          <span class="eyebrow" id="context-kind">Skill library / Community</span>
+          <h1 id="workspace-title">{esc(first["label"])}</h1></div>
+          <nav class="context-actions" aria-label="Workspace navigation">
+            <button type="button" id="gback" disabled>Back</button>
+            <button type="button" id="goverview">Overview</button>
+            <button type="button" id="greset">Reset</button>
+            <a href="#library" data-open="library">Text library</a>
+            <a href="#solutions" data-open="solutions">Solutions</a>
+          </nav></div>
+      </header>
+      <main id="workspace-main" class="workspace__body">
+        <section id="graph-region" class="graph-region" aria-label="Interactive skill graph">
+          <div class="graph-tools" role="group" aria-label="Graph viewport controls">
+            <button type="button" id="gzoom-out" aria-label="Zoom out">−</button>
+            <button type="button" id="gzoom-in" aria-label="Zoom in">+</button>
+            <button type="button" id="gfit">Fit view</button>
+            <button type="button" id="gpath" aria-pressed="false">Trace path</button>
+            <span id="graph-caption">Drag to pan · select a skill to explore</span>
+          </div>
+          <div class="graph-canvas" id="graph-canvas">
+            <svg class="stage__svg" id="gsvg" viewBox="0 0 {FRAME[0]:.0f} {FRAME[1]:.0f}"
+              role="group" tabindex="0" aria-label="{esc(graph_label)}">
+{graph_svg}
+            </svg>
+            <p id="graph-empty" hidden>No skills match. Clear search or change a filter.</p>
+          </div>
+        </section>
+        <aside id="inspector" class="inspector" aria-label="Skill details and results">
+          <section id="panel" class="panel" tabindex="0" aria-label="Current context">
+            <p class="panel__tier" id="paneltier">Community</p>
+            <h2 class="panel__name" id="panelname">{esc(first["label"])}</h2>
+            <a id="panelsource" hidden href="#library" rel="noopener">Open skill source</a>
+            <p class="panel__desc" id="paneldesc">{first["size"]} skills grouped by their
+              names and Solution relationships. Most connected member: {esc(first["hub"])}.</p>
+            <p id="panelmeta"></p>
+            <ol class="panel__chain" id="panelchain"></ol>
+            <p class="panel__ev" id="panelev">Choose a member to inspect its evidence.</p>
+          </section>
+          <section id="results-region" class="results-region" aria-labelledby="results-title">
+            <div class="results-heading"><h2 id="results-title">Community members</h2>
+              <span id="results-count"></span></div>
+            <p id="results-hint">Select a skill to see its description and connections.</p>
+            <ol id="gresults"></ol>
+          </section>
+        </aside>
+      </main>
+      <footer id="statusbar" class="statusbar" aria-label="Graph status">
+        <div class="status-fields" role="status" aria-live="polite" aria-atomic="true">
+          <span id="status-context"></span><span id="status-counts"></span>
+          <span id="status-selected"></span><span id="status-zoom"></span>
+          <span id="status-evidence"></span>
+        </div><a href="#workspace-help" data-open="workspace-help">Help</a>
+      </footer>
+    </div>
+    <noscript><p class="no-js">The graph needs JavaScript. The complete text library
+      and Solutions below work without it.</p></noscript>
+    <details id="workspace-help" class="reference-section"><summary>Workspace help</summary>
+      <div class="help-body"><h2>Explore without losing your place</h2>
+        <p>Search names and descriptions. Choose a result to inspect it. Pointer movement never
+          selects. Clear removes your query. Back restores the previous view.
+          Reset or Escape opens the largest community.</p>
+        <p>Drag the graph to pan. Use +, − and Fit view to zoom. With the graph focused,
+          arrow keys pan, + and − zoom, and Home fits. Use Tab and Enter on the member
+          list to select a skill.</p>
+        <p>Trace path uses the selected skill as a start, or lets you pick two results.
+          Paths are shortest by number of edges, not by weight. Solid edges are stated in
+          the repository. Dashed edges are inferred from names. Communities retain their
+          original all-evidence grouping when evidence is filtered.</p>
+        <a href="#top">Return to workspace</a>
+      </div>
+    </details>"""
 
 
 def render(rows: list) -> "tuple[dict, str]":
@@ -650,10 +775,7 @@ def render(rows: list) -> "tuple[dict, str]":
         graph, comm, {r["key"]: r for r in rows}, width=FRAME[0], height=FRAME[1]
     )
     agree = network.agreement(comm, rows, spec)
-    # How many of the drawn relationships the repository states outright, rather than this
-    # page having inferred them from names. Counted once and used everywhere it is claimed:
-    # in the intro, on the filter button, and in the audit that fails the build if the
-    # markup states a number the build does not own.
+    # Preserve the evidence classification used by generated data and audits.
     graph_svg, edge_rows, community_meta, hue_of = render_network(
         net, graph, comm, rows, sols
     )
@@ -663,13 +785,12 @@ def render(rows: list) -> "tuple[dict, str]":
     # a build after the tree was gone.
     graph_label = (
         f"The library as a graph: {len(rows)} skills, "
-        f"{len(edge_rows):,} relationships, and {len(net['communities'])} communities "
+        f"{len(edge_rows):,} relationships, and {len(community_meta)} communities "
         f"detected from what the skills reference rather than from how they are filed. "
         f"Each node is a link to that skill's own entry. The same information is listed "
         f"as text under Solutions and The library below."
     )
-    # The scroll traversal walks the largest communities, which is also the order the
-    # chapter markers use.
+    # Retain the deterministic largest-community ordering in public metadata.
     featured = [c["id"] for c in community_meta[:FEATURED]]
     by_lead = {s["lead"]: s for s in sols}
     key_row = {r["key"]: r for r in rows}
@@ -683,132 +804,11 @@ def render(rows: list) -> "tuple[dict, str]":
             fail(f"anchor collision: {sl!r} from {s['lead']!r} and {slugs[sl]!r}")
         slugs[sl] = s["lead"]
 
-    out = []
-
-    # ------------------------------------------------------------------- rail
-    out.append('    <nav class="rail" id="rail" aria-label="Categories">')
-    for cat in order:
-        out.append(
-            f'      <a href="#cat-{esc(cat)}">{esc(LABELS.get(cat, cat))}'
-            f"<span>{counts[cat]}</span></a>"
-        )
-    out.append("    </nav>")
-
-    # ------------------------------------------------------- the opening stage
-    #
-    # The graph is the first thing on the page, not a diagram buried under it. It
-    # is also the navigation: every Solution is a node you can reach by scrolling
-    # past it, searching for it, or clicking it.
-    out.append('    <header class="stage" id="top">')
-    out.append('      <div class="stage__tools">')
-    out.append('        <label class="vh" for="gsearch">Search the graph</label>')
-    out.append(
-        f'        <input class="stage__search" id="gsearch" type="search" '
-        f'placeholder="Search {total} skills" autocomplete="off" spellcheck="false">'
-    )
-    # Controls that act on the graph rather than on the Solutions list. The three
-    # provenance chips that used to sit here filtered Solution nodes, and the graph no
-    # longer draws Solutions as nodes: every node is a skill. Tier is still on every
-    # Solution card below, where it is read rather than filtered.
-    out.append(
-        '        <div class="stage__chips" id="gchips" role="group" '
-        'aria-label="Graph controls">'
-    )
-    out.append(
-        f'          <button class="chip" type="button" id="gstated" aria-pressed="false" '
-        f'title="hide the relationships this page inferred">stated only '
-        f'<span>{n_stated}</span></button>'
-    )
-    out.append(
-        '          <button class="chip" type="button" id="gpath" aria-pressed="false" '
-        'title="pick two skills and see the shortest route between them">'
-        'trace a path</button>'
-    )
-    out.append('          <button class="chip chip--reset" type="button" id="greset">Reset</button>')
-    out.append("        </div>")
-    out.append("      </div>")
-
-    # The panel is prerendered with the first Solution, so it is never an empty
-    # box waiting for a hover that never comes on a touch screen.
-    out.append('      <div class="stage__canvas">')
-    out.append(
-        # role="group", not role="img". An img role makes the whole subtree
-        # presentational, which is wrong here: the graph contains 54 controls. axe
-        # flagged the aria-label on every lead as a prohibited attribute for
-        # exactly this reason.
-        f'        <svg class="stage__svg" id="gsvg" '
-        f'viewBox="0 0 {FRAME[0]:.0f} {FRAME[1]:.0f}" '
-        f'role="group" aria-label="{esc(graph_label)}">'
-    )
-    out.append(graph_svg)
-    out.append("        </svg>")
-    out.append("      </div>")
-
-    out.append('      <div class="stage__intro">')
-    out.append('        <p class="eyebrow">Agent skill library</p>')
-    # The number is the truth from the tree, rendered at full value. It does not
-    # animate up from zero: the resting state of a headline should not be a false
-    # statement, and "0 skills" was the first thing every visitor read.
-    # Short enough to hold one line at the width the intro actually gets. The
-    # longer phrasing wrapped to two lines, and every line the text takes is a line
-    # the graph loses: the stage is exactly one screen tall.
-    out.append(
-        f'        <h1><b>{len(sols)}</b> Solutions from <b>{total}</b> skills</h1>'
-    )
-    out.append(
-        f'        <p class="stage__sub">Not a filing system: {len(net["communities"])} '
-        f'communities found from {len(edge_rows):,} relationships — {n_stated} the '
-        f'repository states outright, the rest inferred from names sharing a subject. '
-        f'Open a community, trace a path, or search.</p>'
-    )
-    out.append('        <p class="cue" id="cue"><span></span>Scroll</p>')
-    out.append("      </div>")
-
-    # tabindex="0" because the panel is a scrollable region: a hub with 23 connections
-    # overflows it, and axe is right to flag a scrollable region that cannot be focused —
-    # without this a keyboard user cannot read the bottom of the largest node's entry.
-    out.append(
-        '      <aside class="stage__panel" id="panel" aria-live="polite" '
-        'tabindex="0" aria-label="Selected node">'
-    )
-    # Opens on the largest community rather than on one skill: the first statement the
-    # page makes should be the shape it found, not one item inside it.
-    first = community_meta[0]
-    out.append('        <p class="panel__tier" id="paneltier">community</p>')
-    out.append(
-        f'        <h2 class="panel__name" id="panelname">{esc(first["label"])}</h2>'
-    )
-    out.append(
-        f'        <p class="panel__desc" id="paneldesc">'
-        f'{first["size"]} skills grouped by what their names and their Solutions say '
-        f'they have in common, not by where they are filed. Its most connected member '
-        f'is {esc(first["hub"])}.</p>'
-    )
-    out.append('        <ol class="panel__chain" id="panelchain">')
-    for key in net["members"][first["id"]][:10]:
-        out.append(f'          <li>{esc(key_row[key]["n"])}</li>')
-    out.append("        </ol>")
-    out.append(
-        f'        <p class="panel__ev" id="panelev">'
-        f'{first["size"]} skills · most connected: {esc(first["hub"])}</p>'
-    )
-    out.append("      </aside>")
-
-    # One scroll beat per featured Solution. app.js turns these into the traversal;
-    # without JavaScript they are a plain list of links into the Solutions section.
-    out.append('      <ol class="stage__beats" id="beats">')
-    meta_by_id = {c["id"]: c for c in community_meta}
-    for cid in featured:
-        c = meta_by_id[cid]
-        out.append(
-            f'        <li class="beat" data-comm="{cid}">'
-            f'<a href="#solutions">{esc(c["label"])}</a></li>'
-        )
-    out.append("      </ol>")
-    out.append("    </header>")
+    out = [render_workspace(community_meta, order, counts, sols, graph_svg, graph_label)]
 
     # --------------------------------------------------------------- solutions
-    out.append('    <section class="sols" id="solutions" aria-labelledby="solh">')
+    out.append('    <details class="reference-section" id="solutions"><summary>Browse all Solutions</summary>')
+    out.append('    <section class="sols" aria-labelledby="solh">')
     out.append('      <h2 id="solh">Every Solution the library can form</h2>')
     out.append(
         f'      <p class="sols__lede">{len(sols)} Solutions cover '
@@ -844,13 +844,16 @@ def render(rows: list) -> "tuple[dict, str]":
     out.append("      </div>")
     out.append("    </section>")
 
+    out.append("    </details>")
+
     # ----------------------------------------------------------------- library
     #
     # Every skill, in one compact pass. This replaced 24 pinned chapters that
     # scrubbed a filmstrip sideways: the effect was good once and then it was
     # 71,000 pixels of scrolling between a reader and the skill they wanted.
-    out.append('    <main class="lib" id="library">')
-    out.append('      <h2>The library</h2>')
+    out.append('    <details class="reference-section" id="library"><summary>Browse the full text library</summary>')
+    out.append('    <section class="lib" aria-labelledby="library-title">')
+    out.append('      <h2 id="library-title">The library</h2>')
     out.append(
         f'      <p class="lib__lede">All {total} skills, grouped by category. '
         "Each keeps the licence it was published under and names the repository "
@@ -875,7 +878,7 @@ def render(rows: list) -> "tuple[dict, str]":
         out.append('        <div class="lib__grid">')
         for s in by[cat]:
             n += 1
-            desc = s["d"] or "No description declared in this skill's frontmatter."
+            desc = s["description"] or "No description declared in this skill's frontmatter."
             qual = f'<span class="qual">{esc(s["qual"])}</span>' if s.get("qual") else ""
             in_sol = s["key"] in claimed_keys
             out.append(
@@ -890,16 +893,17 @@ def render(rows: list) -> "tuple[dict, str]":
             # The space before the qualifier matters: .qual is display:block so it
             # collapses visually, but without it the heading reads "runagenthub" to
             # a screen reader and to anything else consuming textContent.
-            out.append(f'            <h4>{esc(s["n"])} {qual}</h4>')
+            out.append(f'            <h3>{esc(s["n"])} {qual}</h3>')
             out.append(f"            <p>{esc(desc)}</p>")
             out.append(
-                f'            <footer><a href="{esc(s["url"])}" rel="noopener">'
+                f'            <footer><a href="{esc(s["source_url"])}" rel="noopener">'
                 f'{esc(s["repo"])}</a><span class="lic">{esc(s["lic"])}</span></footer>'
             )
             out.append("          </article>")
         out.append("        </div>")
         out.append("      </details>")
-    out.append("    </main>")
+    out.append("    </section>")
+    out.append("    </details>")
 
     # credits, generated so the per-repo counts cannot drift from the tree
     per_repo = collections.Counter(r["repo"] for r in rows)

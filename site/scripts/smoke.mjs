@@ -79,7 +79,7 @@ try {
     ok(`${cards} prerendered cards served as HTML`);
   }
 
-  if (!/<main class="lib" id="library">/.test(html)) {
+  if (!/<details[^>]*\bid="library"/.test(html)) {
     fail("served HTML has no library region");
   } else {
     ok("library region present");
@@ -101,12 +101,17 @@ try {
   }
 
   // The regression that shipped: a headline whose resting state read "0 skills".
-  const h1 = (html.match(/<h1>([\s\S]*?)<\/h1>/) || [])[1] || "";
-  if (/>\s*0\s*</.test(h1) || /\b0\s*(skills|Solutions)/i.test(h1)) {
+  const h1 = (html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/) || [])[1] || "";
+  if (!h1.trim()) {
+    fail("the workspace has no current-context title");
+  } else if (/>\s*0\s*</.test(h1) || /\b0\s*(skills|Solutions)/i.test(h1)) {
     fail(`the headline states zero: ${h1.replace(/<[^>]+>/g, " ").trim()}`);
   } else {
-    ok("headline states a real count");
+    ok("workspace has a nonempty current-context title");
   }
+  if (/<script\b[^>]*\bsrc=["'][^"']*(?:gsap|ScrollTrigger|lenis)/i.test(html)) {
+    fail("served HTML still loads a retired scroll library");
+  } else ok("no retired scroll-library scripts loaded");
   if (/BEGIN GENERATED[\s\S]{0,80}END GENERATED/.test(html)) {
     fail("the generated region is empty in the served page");
   }
@@ -134,7 +139,10 @@ try {
 
 // ---------------------------------------------------------------- 5, 6, 7
 if (html) {
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({
+    ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
+      ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH } : {})
+  });
   try {
     for (const [label, viewport] of [
       ["phone 390px", { width: 390, height: 844 }],
@@ -149,7 +157,42 @@ if (html) {
       });
 
       await page.goto(base, { waitUntil: "load", timeout: 45000 });
-      await page.waitForTimeout(2500);
+      await page.locator('#top[data-ready="true"]').waitFor();
+      await page.evaluate(() => document.fonts.ready);
+
+      const effectiveFonts = await page.locator("#graph-labels text").evaluateAll((elements) =>
+        elements.filter((element) => getComputedStyle(element).display !== "none" && element.textContent)
+          .map((element) => {
+            const m = element.getScreenCTM();
+            return parseFloat(getComputedStyle(element).fontSize) * Math.min(Math.hypot(m.a, m.b), Math.hypot(m.c, m.d));
+          }));
+      if (!effectiveFonts.length || Math.min(...effectiveFonts) < 16 - .01) {
+        fail(`${label}: graph label text is missing or smaller than 16 CSS pixels`);
+      } else ok(`${label}: ${effectiveFonts.length} graph labels at 16+ CSS pixels`);
+
+      await page.locator("#gsearch").fill("NDA");
+      await page.waitForTimeout(1200);
+      const hits = page.locator("#gresults button[data-key]");
+      const keys = await hits.evaluateAll((elements) => elements.map((element) => element.dataset.key));
+      if (!keys.length) fail(`${label}: NDA description search has no results`);
+      for (const key of keys) {
+        await page.locator(`#gresults button[data-key="${key}"]`).click();
+        const selected = await page.locator("#top").getAttribute("data-selected-key");
+        if (selected !== key) fail(`${label}: result selected a different identity`);
+      }
+      const before = await page.locator("#top").getAttribute("data-selected-key");
+      const graph = await page.locator("#gsvg").boundingBox();
+      if (graph) {
+        for (let i = 1; i < 6; i++) {
+          await page.mouse.move(graph.x + graph.width * i / 6, graph.y + graph.height * (i % 2 ? .3 : .7), { steps: 6 });
+        }
+      }
+      await page.waitForTimeout(1200);
+      if (await page.locator("#gsearch").inputValue() !== "NDA" ||
+          await page.locator("#top").getAttribute("data-selected-key") !== before ||
+          JSON.stringify(await hits.evaluateAll((elements) => elements.map((element) => element.dataset.key))) !== JSON.stringify(keys)) {
+        fail(`${label}: pointer travel changed the selected result, query or result list`);
+      } else ok(`${label}: NDA results stay available and selection survives pointer travel`);
 
       const cards = await page.locator(".card").count();
       if (cards < 400) fail(`${label}: only ${cards} cards rendered`);
@@ -173,9 +216,11 @@ if (html) {
     const ctx = await browser.newContext({ javaScriptEnabled: false });
     const page = await ctx.newPage();
     await page.goto(base, { waitUntil: "load", timeout: 45000 });
+    await page.locator("#library > summary").click();
+    await page.locator(".lib__cat > summary").first().click();
     const noJs = await page.locator(".card").count();
     const text = (await page.innerText("body")).length;
-    if (noJs < 400) fail(`JavaScript disabled: only ${noJs} cards`);
+    if (noJs < 400 || !await page.locator(".card").first().isVisible()) fail(`JavaScript disabled: incomplete or inaccessible text library (${noJs} cards)`);
     else ok(`JavaScript disabled: ${noJs} cards, ${text} characters of text`);
     await ctx.close();
   } catch (e) {

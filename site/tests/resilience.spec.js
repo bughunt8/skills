@@ -1,410 +1,167 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
+import { openWorkspace, readState, activate, assertReadableLabels, assertNoRuntimeErrors, ensureFiltersOpen } from "../scripts/workspace-test-helpers.mjs";
+test.afterEach(async ({ page }) => { await assertNoRuntimeErrors(page); });
 
-/*
- * The page must degrade to a plain, complete list rather than to a broken one.
- * Two failures found by hand are pinned here:
- *   1. With prefers-reduced-motion set, the decorative ghost wordmark
- *      (white-space: nowrap at 176px) had nothing containing it once pinning was
- *      off, and overflowed the document by 582px.
- *   2. Cards left at 0.3 opacity by the reduced-motion path would have been
- *      unreadable, so opacity is asserted, not assumed.
- */
+const data = JSON.parse(readFileSync(new URL("../data.js", import.meta.url), "utf8")
+  .replace(/^window\.SKILLDATA=/, "").replace(/;\s*$/, ""));
 
-const data = JSON.parse(
-  readFileSync(new URL("../data.js", import.meta.url), "utf8")
-    .replace("window.SKILLDATA=", "")
-    .replace(/;\s*$/, "")
-);
-
-const WIDTHS = [320, 375, 390, 768, 1024, 1280, 1440, 1920];
-
-test.describe("no horizontal overflow at any width", () => {
-  for (const width of WIDTHS) {
+test.describe("responsive resilience", () => {
+  for (const width of [320, 375, 390, 768, 1024, 1280, 1440, 1920]) {
     for (const reducedMotion of ["no-preference", "reduce"]) {
-      test(`${width}px, motion=${reducedMotion}`, async ({ browser }) => {
-        const ctx = await browser.newContext({
-          viewport: { width, height: 860 },
-          reducedMotion
-        });
-        const page = await ctx.newPage();
-        await page.goto("/index.html");
-        await page.waitForTimeout(1600);
-
-        const overflow = await page.evaluate(
-          () =>
-            document.documentElement.scrollWidth -
-            document.documentElement.clientWidth
-        );
-        expect(overflow, `overflow at ${width}px`).toBeLessThanOrEqual(0);
-
-        // Content must be reachable, so check the elements that carry meaning.
-        // A blanket scan over every element is not a valid test here: it flags
-        // the deliberately off-screen skip link, and getBoundingClientRect
-        // reports an element's untruncated box even when an ancestor clips it,
-        // so children of an overflow:hidden mask look like overflow when the
-        // reader can see nothing wrong.
-        const wide = await page.evaluate(() => {
-          const w = document.documentElement.clientWidth;
-          const clipped = (el) => {
-            for (let p = el.parentElement; p; p = p.parentElement) {
-              const o = getComputedStyle(p).overflowX;
-              if (o === "hidden" || o === "auto" || o === "scroll") return true;
-            }
-            return false;
-          };
-          return [...document.querySelectorAll(".card h3, .card p, h1, h2, .close p")]
-            .filter((el) => {
-              const b = el.getBoundingClientRect();
-              return b.width > 0 && b.right > w + 1 && !clipped(el);
-            })
-            .map((el) => el.className || el.tagName)
-            .slice(0, 5);
-        });
-        expect(wide, `content past the viewport at ${width}px`).toEqual([]);
-        await ctx.close();
+      test(`${width}px has no horizontal overflow with motion=${reducedMotion}`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 860 });
+        await page.emulateMedia({ reducedMotion });
+        await openWorkspace(page);
+        const overflow = await page.evaluate(() => ({
+          page: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          controls: [...document.querySelectorAll("#workspace-header input, #workspace-header select, #workspace-header button")]
+            .filter((e) => {
+              const b = e.getBoundingClientRect();
+              return b.width && (b.left < -1 || b.right > innerWidth + 1);
+            }).map((e) => e.id)
+        }));
+        expect(overflow.page).toBeLessThanOrEqual(1);
+        expect(overflow.controls).toEqual([]);
+        await expect(page.locator(".card")).toHaveCount(490);
+        await expect(page.locator(".sol")).toHaveCount(50);
+        await expect(page.locator("#workspace-title")).not.toBeEmpty();
+        expect((await readState(page)).matching).toBeGreaterThan(0);
       });
     }
   }
-});
 
-/*
- * These build their contexts explicitly rather than using describe-level
- * `test.use({ reducedMotion })`. The overflow sweep above proves context-level
- * emulation works, while the describe-level form was not taking effect here: the
- * page came back with 23 pin-spacers and an enhanced document, which is the
- * no-preference path. An emulation option that silently does not apply turns
- * these into tests that pass for the wrong reason, so the mechanism that
- * demonstrably works is used instead.
- */
-test.describe("prefers-reduced-motion", () => {
-  const openReduced = async (browser) => {
-    const ctx = await browser.newContext({
-      viewport: { width: 1440, height: 900 },
-      reducedMotion: "reduce"
-    });
-    const page = await ctx.newPage();
-    const errors = [];
-    page.on("pageerror", (e) => errors.push(String(e)));
-    await page.goto("/index.html");
-    await page.waitForTimeout(1800);
-    // Confirm the emulation actually applied before asserting anything on it.
-    const applied = await page.evaluate(
-      () => window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    );
-    expect(applied, "reduced-motion emulation must be in effect").toBe(true);
-    return { ctx, page, errors };
-  };
-
-  test("becomes a static, complete, readable list", async ({ browser }) => {
-    const { ctx, page, errors } = await openReduced(browser);
-
-    // No pinning at all.
-    expect(await page.locator(".pin-spacer").count()).toBe(0);
-    await expect(page.locator("html")).not.toHaveClass(/is-enhanced/);
-
-    // Every card fully opaque and untransformed, so nothing is hidden.
-    const hidden = await page.locator(".card").evaluateAll((cards) =>
-      cards.filter((c) => Number(getComputedStyle(c).opacity) < 0.95).length
-    );
-    expect(hidden).toBe(0);
-
-    // The graph is still there and still complete: reduced motion removes the traversal,
-    // not the content. Every skill is drawn, at full strength, and nothing is dimmed by a
-    // focus state the reader never triggered.
-    //
-    // Under reduced motion the dimming rules are switched off entirely, so this is a
-    // stronger check than the old one, which only looked at whichever branch of the tree
-    // happened to be open.
-    expect(await page.locator(".g-node").count()).toBe(data.total);
-    const faint = await page
-      .locator(".g-dot")
-      .evaluateAll(
-        (ns) => ns.filter((n) => Number(getComputedStyle(n).fillOpacity) < 0.4).length
-      );
-    expect(faint, "nothing may be dimmed by a state nobody triggered").toBe(0);
-    expect(errors).toEqual([]);
-    await ctx.close();
-  });
-
-  test("nothing on the page reads zero", async ({ browser }) => {
-    const { ctx, page } = await openReduced(browser);
-
-    // The old hero animated its number up from 0 as you scrolled, and the HUD
-    // started at "000 / 490". With motion off both simply sat at zero, so the page
-    // opened by understating itself by its entire contents.
-    const hud = await page.locator("#hudcount").innerText();
-    const h1 = await page.locator("h1").innerText();
-    const total = await page.evaluate(() => window.SKILLDATA.total);
-
-    expect(hud).toContain(String(total));
-    expect(hud).not.toMatch(/\b0+\s*\//);
-    expect(h1).toContain(String(total));
-    expect(h1).not.toMatch(/\b0\s*(Solutions|skills)/);
-    await ctx.close();
-  });
-});
-
-test.describe("narrow viewports", () => {
-  test("the graph stays usable by touch", async ({ browser }) => {
-    const ctx = await browser.newContext({
-      viewport: { width: 390, height: 844 },
-      hasTouch: true,
-      isMobile: true
-    });
-    const page = await ctx.newPage();
-    const errors = [];
-    page.on("pageerror", (e) => errors.push(String(e)));
-
-    await page.goto("/index.html");
-    await page.waitForTimeout(1600);
-
-    // No pinning on a touch-scrolled page.
-    expect(await page.locator(".pin-spacer").count()).toBe(0);
-
-    // The graph must still be drawn at a usable size rather than squeezed to a
-    // sliver by the desktop two-column layout.
-    const box = await page.locator("#gsvg").boundingBox();
-    expect(box.width).toBeGreaterThan(280);
-    expect(box.height).toBeGreaterThan(300);
-
-      // On a phone the graph deliberately takes no pointer input at all: a node's click
-      // target is expressed in the graph's own 1,400-unit coordinate system, so it scales
-      // with the viewport and is under three and a half CSS pixels wide here. Offering a
-      // target that small is worse than not offering it, so what must work on a phone is
-      // the community chips, the search box and the text list.
-      const inert = await page
-        .locator(".g-node")
-        .first()
-        .evaluate((n) => getComputedStyle(n).pointerEvents);
-      expect(inert, "graph nodes must not be tap targets on a phone").toBe("none");
-
-      const chip = page.locator(".beat a").first();
-      await chip.scrollIntoViewIfNeeded();
-      await chip.tap();
-      await page.waitForTimeout(400);
-      await expect(page.locator("#panelname")).not.toBeEmpty();
-      expect(await page.locator("#panelchain li").count()).toBeGreaterThan(1);
-
-    // Search is the only practical way through the whole library on a phone.
-    await page.fill("#gsearch", "resume");
-    await page.waitForTimeout(400);
-    expect(await page.locator(".card.is-hit").count()).toBeGreaterThan(0);
-
-    expect(errors).toEqual([]);
-    await ctx.close();
+  test("reduced motion keeps the complete graph usable rather than disabling controls", async ({ page }, testInfo) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await openWorkspace(page);
+    expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(true);
+    await expect(page.locator(".pin-spacer")).toHaveCount(0);
+    await expect(page.locator(".g-node")).toHaveCount(data.total);
+    await page.locator("#gsearch").fill("NDA");
+    const first = page.locator("#gresults button[data-key]").first();
+    await expect(first).toBeVisible();
+    const key = await first.getAttribute("data-key");
+    await activate(first, testInfo);
+    await expect(page.locator("#top")).toHaveAttribute("data-selected-key", key);
+    await assertReadableLabels(page, { selectedKey: key });
+    await page.locator("#library > summary").click();
+    await page.locator(".lib__cat > summary").first().click();
+    const card = page.locator(".card").first();
+    await expect(card).toBeVisible();
+    expect(await card.evaluate((e) => getComputedStyle(e).opacity)).toBe("1");
   });
 });
 
 test.describe("no third party in the request path", () => {
-  /*
-   * The motion libraries and both webfonts used to come from jsDelivr and Google
-   * Fonts. Both see every reader, both can be blocked or disappear, and jsDelivr
-   * routes through Cloudflare. They are now served from this origin, and these
-   * tests keep it that way.
-   *
-   * The font check exists because moving them in place broke them silently: CSS
-   * url() resolves against the stylesheet, not the page, so url('./fonts/x.woff2')
-   * inside fonts/fonts.css requested /fonts/fonts/x.woff2. The browser fell back
-   * to a system font and said nothing.
-   */
-
-  test("loads nothing from another origin", async ({ page }) => {
-    const external = [];
+  test("loads nothing from another origin during real interactions", async ({ page }, testInfo) => {
+    const external = [], failed = [];
     page.on("request", (r) => {
-      const url = r.url();
-      if (!url.startsWith("http://127.0.0.1") && !url.startsWith("data:")) {
-        external.push(`${r.resourceType()} ${url}`);
-      }
+      const url = new URL(r.url());
+      if (url.protocol !== "data:" && url.origin !== "http://127.0.0.1:8123") external.push(`${r.resourceType()} ${r.url()}`);
     });
-    page.on("requestfailed", (r) => external.push(`FAILED ${r.url()}`));
-
-    await page.goto("/index.html", { waitUntil: "load" });
-    await page.waitForTimeout(2500);
-
-    expect(external, "the page must be entirely self-hosted").toEqual([]);
+    page.on("requestfailed", (r) => failed.push(r.url()));
+    await openWorkspace(page);
+    await page.locator("#gsearch").fill("NDA");
+    await activate(page.locator("#gresults button[data-key]").first(), testInfo);
+    await activate(page.locator("#gzoom-in"), testInfo);
+    await activate(page.locator("#gfit"), testInfo);
+    expect(external).toEqual([]);
+    expect(failed).toEqual([]);
   });
 
-  test("the motion libraries are served from this origin", async ({ page }) => {
-    await page.goto("/index.html");
-    await page.waitForTimeout(2500);
-
-    const srcs = await page.locator("script[src]").evaluateAll((els) =>
-      els.map((e) => e.getAttribute("src"))
-    );
-    for (const src of srcs) {
-      expect(src, `script src must be relative: ${src}`).toMatch(/^\.\//);
-    }
-    // And they must actually have loaded, not merely be referenced.
-    const globals = await page.evaluate(() => ({
-      gsap: typeof window.gsap,
-      st: typeof window.ScrollTrigger,
-      lenis: typeof window.Lenis
-    }));
-    expect(globals.gsap).not.toBe("undefined");
-    expect(globals.st).not.toBe("undefined");
-    expect(globals.lenis).not.toBe("undefined");
-  });
-
-  test("the self-hosted fonts actually load", async ({ page }) => {
-    await page.goto("/index.html");
-    await page.waitForTimeout(2500);
-    await page.evaluate(() => document.fonts.ready);
-
+  test("scripts use relative same-origin paths and local fonts actually load", async ({ page }) => {
+    await openWorkspace(page);
     const state = await page.evaluate(() => ({
-      errored: [...document.fonts]
-        .filter((f) => f.status === "error")
-        .map((f) => `${f.family} ${f.weight}`),
+      scripts: [...document.querySelectorAll("script[src]")].map((e) => e.getAttribute("src")),
+      errored: [...document.fonts].filter((f) => f.status === "error").map((f) => f.family),
       loaded: [...document.fonts].filter((f) => f.status === "loaded").length,
-      served: performance
-        .getEntriesByType("resource")
-        .filter((r) => r.name.endsWith(".woff2"))
-        .map((r) => r.name),
-      display: getComputedStyle(document.querySelector(".stage h1")).fontFamily
+      served: performance.getEntriesByType("resource").filter((r) => r.name.endsWith(".woff2")).map((r) => r.name),
+      display: getComputedStyle(document.querySelector("#workspace-title")).fontFamily
     }));
-
-    expect(state.errored, "a font face failed to load").toEqual([]);
-    expect(state.loaded, "no font face loaded at all").toBeGreaterThan(0);
-    expect(state.served.length, "no woff2 was fetched").toBeGreaterThan(0);
-    for (const url of state.served) {
+    expect(state.scripts.length).toBeGreaterThanOrEqual(2);
+    state.scripts.forEach((src) => expect(src).toMatch(/^\.\//));
+    expect(state.errored).toEqual([]);
+    expect(state.loaded).toBeGreaterThan(0);
+    expect(state.served.length).toBeGreaterThan(0);
+    state.served.forEach((url) => {
       expect(url).toContain("/fonts/");
-      expect(url, "double fonts/ path regression").not.toContain("/fonts/fonts/");
-    }
-    // The display family must be the one we ship, not a system fallback.
+      expect(url).not.toContain("/fonts/fonts/");
+    });
     expect(state.display).toContain("Space Grotesk");
   });
 
-  test("no stylesheet or font is requested from a CDN", async () => {
-    const fs = await import("node:fs");
-    const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
-    const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-    const fonts = fs.readFileSync(new URL("../fonts/fonts.css", import.meta.url), "utf8");
-
-    for (const [name, text] of [["index.html", html], ["styles.css", css], ["fonts.css", fonts]]) {
-      for (const host of ["jsdelivr", "fonts.googleapis.com", "fonts.gstatic.com", "unpkg", "cdnjs"]) {
-        expect(text, `${name} references ${host}`).not.toContain(host);
-      }
+  test("no stylesheet or font references a CDN", () => {
+    for (const path of ["../index.html", "../styles.css", "../fonts/fonts.css"]) {
+      const text = readFileSync(new URL(path, import.meta.url), "utf8");
+      for (const host of ["jsdelivr", "fonts.googleapis.com", "fonts.gstatic.com", "unpkg", "cdnjs"])
+        expect(text, `${path} references ${host}`).not.toContain(host);
     }
   });
 });
 
 test.describe("graceful failure", () => {
-  test("survives the motion libraries failing to load", async ({ page }) => {
-    // The libraries are self-hosted now, so blocking jsDelivr would prove
-    // nothing: the request is never made. Block what is actually requested.
-    await page.route("**/vendor/*.js", (r) => r.abort());
-
-    const errors = [];
-    page.on("pageerror", (e) => errors.push(String(e)));
-
-    await page.goto("/index.html");
-    await page.waitForTimeout(1600);
-
-    const total = await page.evaluate(() => window.SKILLDATA.total);
-    await expect(page.locator(".card")).toHaveCount(total);
-    await expect(page.locator("html")).not.toHaveClass(/is-enhanced/);
-    expect(errors, "must bail out quietly, not throw").toEqual([]);
-  });
+  for (const missing of ["app.js", "data.js"]) {
+    test(`complete native fallback survives missing ${missing}`, async ({ page }) => {
+      await page.route(`**/${missing}`, (route) => route.abort());
+      const errors = [];
+      page.on("pageerror", (error) => errors.push(String(error)));
+      await page.goto("/index.html");
+      await expect(page.locator(".card")).toHaveCount(490);
+      await expect(page.locator(".sol")).toHaveCount(50);
+      await page.locator("#library > summary").click();
+      await page.locator(".lib__cat > summary").first().click();
+      await expect(page.locator(".card").first()).toBeVisible();
+      await expect(page.locator(".card").first().locator("p")).not.toBeEmpty();
+      expect(errors).toEqual([]);
+    });
+  }
 });
 
-test.describe("the production Content-Security-Policy", () => {
-  /*
-   * This exists because a CSP violation shipped to production and no gate saw it.
-   *
-   * The policy is set by .htaccess, which only Hostinger serves. The test server
-   * here sends no CSP at all, so every browser test passed while the live page
-   * logged "Applying inline style violates the following Content Security Policy
-   * directive: style-src 'self'" and silently dropped a style. A header that only
-   * exists in production is a header that is never tested, so these tests bring the
-   * real policy to the local page.
-   */
-
+test.describe("production Content-Security-Policy", () => {
   const htaccess = readFileSync(new URL("../.htaccess", import.meta.url), "utf8");
   const csp = (htaccess.match(/Content-Security-Policy\s+"([^"]+)"/) || [])[1];
 
-  test("is same-origin with no inline escape hatch", () => {
-    expect(csp, "no CSP found in .htaccess").toBeTruthy();
+  test("same-origin policy has no inline escape hatch", () => {
+    expect(csp).toBeTruthy();
     expect(csp).toContain("default-src 'self'");
     expect(csp).toContain("style-src 'self'");
     expect(csp).not.toContain("unsafe-inline");
     expect(csp).not.toContain("unsafe-eval");
   });
 
-  test("nothing in the built page needs an inline style", () => {
-    // Under style-src 'self' the browser refuses a style attribute outright, and
-    // hashes do not apply to them. One `style="margin-top: 28px"` survived in the
-    // hand-written part of index.html and was dropped on every page load in
-    // production.
-    const page = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-    // Matches a style attribute however it is quoted. The double-quoted-only
-    // version of this check had two bypasses, single-quoted and unquoted, and a
-    // gate with a bypass is a gate that will eventually be walked around by
-    // accident rather than on purpose.
-    expect(
-      page.match(/\sstyle\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi) || [],
-      "an inline style is blocked by the production CSP, so it silently does nothing"
-    ).toEqual([]);
-    expect(page).not.toMatch(/<style[\s>]/);
+  test("built HTML contains no inline style requiring an exception", () => {
+    const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+    expect(html.match(/\sstyle\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi) || []).toEqual([]);
+    expect(html).not.toMatch(/<style[\s>]/);
   });
 
-  test("the page loads clean with the real policy applied", async ({ page }) => {
-    const violations = [];
+  test("real policy permits search selection and camera changes without violations", async ({ page }, testInfo) => {
+    const violations = [], errors = [];
     page.on("console", (m) => {
-      if (m.type() === "error" && /Content Security Policy/i.test(m.text())) {
-        violations.push(m.text());
-      }
+      if (m.type() === "error" && /Content Security Policy/i.test(m.text())) violations.push(m.text());
     });
-
-    // Serve the local page with production's header attached.
+    page.on("pageerror", (e) => errors.push(String(e)));
     await page.route("**/index.html", async (route) => {
-      const res = await route.fetch();
-      await route.fulfill({
-        response: res,
-        headers: { ...res.headers(), "content-security-policy": csp }
-      });
+      const response = await route.fetch();
+      await route.fulfill({ response, headers: { ...response.headers(), "content-security-policy": csp } });
     });
-
-    await page.goto("/index.html");
-    await page.waitForTimeout(1800);
-
-    // Exercise the parts that manipulate style at runtime, since CSSOM writes are allowed
-    // but setAttribute("style", ...) is not, and only one of those is visible in the source.
-    //
-    // The camera is the important one: it writes a transform and a custom property on the
-    // viewport group on every selection. If the policy dropped those, communities would
-    // highlight without moving and the labels would be the wrong size, which is a page that
-    // looks merely disappointing rather than broken — exactly the failure mode that left the
-    // hero counter reading zero on the live site for a build.
-    await page.locator(".beat a").nth(1).click();
-    await page.waitForTimeout(1000);
-    const framed = await page.evaluate(() => {
-      const vp = document.getElementById("vp");
-      return {
-        wide: window.innerWidth > 1000 && window.innerHeight > 720,
-        k: Number(getComputedStyle(vp).getPropertyValue("--k")),
-        transform: vp.style.transform,
-        named: document.getElementById("panelname").textContent,
-        lit: document.querySelectorAll(".g-node.is-on").length
-      };
-    });
-    // The selection has to take effect at every width; the camera move is desktop-only,
-    // because framing a cluster is no help where nothing in it can be tapped. Asserting the
-    // zoom unconditionally is what failed here on the phone profile - the test was demanding
-    // the opposite of what the page intends at that width.
-    expect(framed.named.trim().length, "a community is named").toBeGreaterThan(2);
-    expect(framed.lit, "its members are lit").toBeGreaterThan(2);
-    if (framed.wide) {
-      expect(framed.k, "the camera must zoom under the real policy").toBeGreaterThan(1.05);
-      expect(framed.transform).toContain("scale(");
-    }
-
-    await page.locator(".g-node").nth(200).click({ force: true });
-    await page.waitForTimeout(600);
-    await page.evaluate(() => window.scrollTo(0, 1200));
-    await page.waitForTimeout(900);
-    await page.fill("#gsearch", "finance");
-    await page.waitForTimeout(500);
-
+    await openWorkspace(page);
+    const before = await readState(page);
+    await ensureFiltersOpen(page);
+    await page.locator("#gcommunity").selectOption(String(data.comms[1].id));
+    expect((await readState(page)).camera).not.toEqual(before.camera);
+    await activate(page.locator("#greset"), testInfo);
+    await page.locator("#gsearch").fill("NDA");
+    const first = page.locator("#gresults button[data-key]").first();
+    const key = await first.getAttribute("data-key");
+    await activate(first, testInfo);
+    await expect(page.locator("#top")).toHaveAttribute("data-selected-key", key);
+    const selected = await readState(page);
+    await activate(page.locator("#gzoom-in"), testInfo);
+    expect((await readState(page)).camera.scale).toBeGreaterThan(selected.camera.scale);
+    await activate(page.locator("#gfit"), testInfo);
+    await assertReadableLabels(page, { selectedKey: key });
     expect(violations).toEqual([]);
+    expect(errors).toEqual([]);
   });
 });

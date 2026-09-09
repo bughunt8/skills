@@ -103,7 +103,11 @@ jobs:
             --exclude '_site' \
             --exclude 'tests' \
             --exclude 'scripts' \
+            --exclude 'vendor' \
             --exclude 'node_modules' \
+            --exclude '.cache' \
+            --exclude '__pycache__' \
+            --exclude '*.py' \
             --exclude 'playwright-report' \
             --exclude 'test-results' \
             --exclude 'build.py' \
@@ -153,19 +157,23 @@ jobs:
       # Confirm .htaccess actually made it into the publish set. Without it the
       # site still serves, but with no security headers and no compression, and
       # that is a silent downgrade rather than a visible failure.
-      # vendor/ and fonts/ carry the self-hosted libraries and webfonts. If they
-      # were ever excluded the page would still load, with no motion and system
-      # fonts, which is a silent downgrade rather than a visible failure.
+      # Local fonts and the workspace runtime must ship. The former scroll
+      # libraries are deliberately absent: requiring them here would preserve
+      # unused motion assets after acceptance explicitly removed that layer.
       - name: Confirm the self-hosted assets are being published
         working-directory: site
         run: |
           missing=""
-          for f in vendor/gsap.min.js vendor/ScrollTrigger.min.js vendor/lenis.min.js \
+          for f in app.js data.js styles.css \
                    fonts/fonts.css fonts/inter-latin.woff2 fonts/space-grotesk-latin.woff2; do
             [ -f "_site/$f" ] || missing="$missing $f"
           done
           if [ -n "$missing" ]; then
             echo "::error::the publish set is missing:$missing"
+            exit 1
+          fi
+          if find _site -type f | grep -Ei '/(gsap|ScrollTrigger|lenis)[^/]*\.(js|mjs)$'; then
+            echo "::error::obsolete scroll-animation runtime found in the publish set"
             exit 1
           fi
           # And nothing may be FETCHED from another origin. Scoped to elements a

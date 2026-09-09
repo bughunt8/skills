@@ -1,1282 +1,751 @@
-/*
- * Behaviour layer for the skill library.
- *
- * This script attaches to markup build.py has already prerendered. It never
- * creates a node, a card or a rail link: the page must be complete for a crawler
- * and usable with JavaScript disabled, so the DOM is the source of truth and this
- * file is an enhancement over it.
- *
- * Two distinct layers, deliberately separated:
- *
- *   Graph interaction — hover, focus, search, provenance filters. This is
- *   FUNCTION, not decoration, so it runs everywhere: on mobile, under
- *   prefers-reduced-motion, and with GSAP missing. Withholding search from
- *   someone because they asked for less animation would be absurd.
- *
- *   Scroll traversal — pinning the stage and stepping the highlight from one
- *   Solution to the next. This is motion, so it is the part that bails out.
- *
- * Nothing here counts a number up from zero. The headline states the size of the
- * library, and a headline's resting state should not be a false statement.
+/* Static graph workspace. Context changes only through deliberate user actions.
+ * The build owns identity, evidence, communities and the complete text library.
+ * Geometry and screen-space labels have independent transforms. No motion layer.
  */
-(function () {
+(() => {
   "use strict";
-
-  // Matches the stylesheet's stacking breakpoint. Below it the stage is a single
-  // column with its own height, so there is nothing to pin: pinning a stage taller
-  // than the viewport hides its own controls for the length of the pin.
-  var MOBILE = 1000;
-  // The pin also needs vertical room, and must agree exactly with the media query
-  // in styles.css that stacks the stage. If these two disagree, one of them
-  // pins a layout the other has already reflowed.
-  var SHORT = 720;
-
-  function wide() {
-    return window.innerWidth > MOBILE && window.innerHeight > SHORT;
-  }
-  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var DATA = window.SKILLDATA || {};
-
-  var stage = document.getElementById("top");
-  var svg = document.getElementById("gsvg");
-  var panel = {
-    tier: document.getElementById("paneltier"),
-    name: document.getElementById("panelname"),
-    desc: document.getElementById("paneldesc"),
-    chain: document.getElementById("panelchain"),
-    ev: document.getElementById("panelev")
+  const $ = (id) => document.getElementById(id);
+  const data = window.SKILLDATA;
+  if (!data || !data.nodes || !$("top")) return;
+  const root = $("top"), svg = $("gsvg"), vp = $("vp");
+  const search = $("gsearch"), results = $("gresults");
+  const ns = "http://www.w3.org/2000/svg";
+  const nodes = new Map(), cards = new Map(), solutions = new Map();
+  const communities = new Map(data.comms.map((c) => [String(c.id), c]));
+  const labels = new Map();
+  const edgeElements = [...svg.querySelectorAll(".g-edge")];
+  const communityLabels = [...svg.querySelectorAll(".g-clabel")];
+  document.querySelectorAll(".card").forEach((el) => cards.set(el.dataset.id, el));
+  document.querySelectorAll(".sol").forEach((el) => solutions.set(el.dataset.sol, {
+    label: el.querySelector("h3").textContent,
+    tier: el.dataset.tier,
+    evidence: el.querySelector(".sol__ev").textContent,
+    members: [...el.querySelectorAll(".sol__step")].map((s) => s.dataset.id),
+  }));
+  svg.querySelectorAll(".g-nlabel").forEach((el) => labels.set(el.dataset.key, el));
+  svg.querySelectorAll(".g-node").forEach((el) => {
+    const key = el.dataset.key, card = cards.get(key);
+    const description = card.querySelector("p").textContent;
+    nodes.set(key, {
+      key, el, card, name: el.dataset.name, description,
+      text: `${el.dataset.name} ${description}`.toLocaleLowerCase(),
+      words: `${el.dataset.name} ${description}`.toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) || [],
+      community: el.dataset.comm, category: el.dataset.dom,
+      degree: Number(el.dataset.deg), x: Number(el.dataset.x), y: Number(el.dataset.y),
+      dot: el.querySelector(".g-dot"), hit: el.querySelector(".g-hit"),
+      radius: Number(el.querySelector(".g-dot").getAttribute("r")),
+      source: card.querySelector("footer a").href,
+      repo: card.querySelector("footer a").textContent,
+      licence: card.querySelector(".lic").textContent,
+    });
+    // The native member buttons are the keyboard/touch interface, not microscopic dots.
+    el.setAttribute("tabindex", "-1");
+  });
+  const adjacency = new Map(data.nodes.map((key) => [key, []]));
+  const edges = data.edges.map((e, i) => {
+    const item = {a: data.nodes[e[0]], b: data.nodes[e[1]], kind: e[3], index: i};
+    adjacency.get(item.a).push({to: item.b, edge: item});
+    adjacency.get(item.b).push({to: item.a, edge: item});
+    return item;
+  });
+  adjacency.forEach((items) => items.sort((a, b) => a.to.localeCompare(b.to)));
+  const initial = () => ({
+    mode: "community", selected: "", query: "", community: String(data.comms[0].id),
+    listKind: "community", filters: {community: "", category: "", solution: "", stated: false},
+    viewport: {k: 1, x: 0, y: 0}, pathStart: "", pathEnd: "", path: [], pathPending: false,
+    searchOrigin: null,
+  });
+  let state = initial(), history = [], size = {w: 1, h: 1};
+  let scene = new Map(), sceneKeys = [], listKeys = [], activeEdges = [];
+  let listSignature = "", suppressClick = false;
+  const clone = (value) => JSON.parse(JSON.stringify(value));
+  const text = (id, value) => { $(id).textContent = value; };
+  const allowedEdge = (edge) => !state.filters.stated || edge.kind === 0;
+  const neighbors = (key) => adjacency.get(key).filter((entry) => allowedEdge(entry.edge));
+  const save = () => {
+    history.push(clone(state));
+    if (history.length > 40) history.shift();
   };
-  var search = document.getElementById("gsearch");
-  var chips = document.getElementById("gchips");
-  // How many of the drawn relationships the repository states outright, rather than
-  // this page having derived them. Reported rather than assumed.
-  var STATED_COUNT = (DATA.edges || []).filter(function (e) {
-    return e[3] === 0;
-  }).length;
-  var resetBtn = document.getElementById("greset");
-  var beats = document.getElementById("beats");
-  var bar = document.getElementById("bar");
-  var rail = document.getElementById("rail");
-  var cue = document.getElementById("cue");
+  const ranked = (keys) => [...keys].sort((a, b) =>
+    nodes.get(b).degree - nodes.get(a).degree || nodes.get(a).name.localeCompare(nodes.get(b).name) ||
+    a.localeCompare(b));
 
-  if (!stage || !svg) return;
-
-  /* --------------------------------------------------------------- the graph
-   * 490 skills, 1,868 relationships, communities detected rather than declared.
-   *
-   * Everything is prerendered and positioned by the build. What happens here is
-   * reading: which nodes neighbour this one, which community is this, how do these two
-   * connect, and what is the evidence for each edge.
-   */
-
-  var nodes = Array.prototype.slice.call(svg.querySelectorAll(".g-node"));
-  var edges = Array.prototype.slice.call(svg.querySelectorAll(".g-edge"));
-  var cards = Array.prototype.slice.call(document.querySelectorAll(".card"));
-  var sols = Array.prototype.slice.call(document.querySelectorAll(".sol"));
-  var viewport = document.getElementById("vp");
-
-  var nodeByKey = {};
-  nodes.forEach(function (n) {
-    nodeByKey[n.getAttribute("data-key")] = n;
-  });
-
-  // Labels live in their own layer so they paint above every node and edge — SVG has no
-  // z-index — so they are keyed and toggled alongside the node they belong to.
-  var labelByKey = {};
-  Array.prototype.slice.call(svg.querySelectorAll(".g-nlabel")).forEach(function (el) {
-    labelByKey[el.getAttribute("data-key")] = el;
-  });
-  var commLabels = Array.prototype.slice.call(svg.querySelectorAll(".g-clabel"));
-
-  // How many names to reveal at once. Every skill has a label element, but 50 of them
-  // drawn at their node positions overlap into a grey wash — the fault the first version
-  // of this graph shipped with. Ten is about what fits without collisions at the zoom
-  // the camera settles on.
-  var NAME_CAP = 10;
-
-  /* The adjacency, rebuilt once from the integers in data.js.
-   *
-   * The DOM knows which two nodes an edge joins, but answering "what are this node's
-   * neighbours" from the DOM means walking 1,868 elements per hover, and answering "how
-   * do these two connect" means a search over them. The graph is small; an index is
-   * cheap and makes both immediate.
-   */
-  var GKEYS = DATA.nodes || [];
-  var GEDGES = DATA.edges || [];
-  // Why each relationship is drawn, in the same order as the edges. Shown in the panel
-  // beside each connection: "led by Idea to shipped code", "siblings in stitch", 'names
-  // share "cro"'. This was emitted and never read for one build — 52 KB of the 103 KB data
-  // file was an explanation the page had no way to show, while a comment claimed it said
-  // what an edge is when you select it.
-  var GWHY = DATA.why || [];
-  var adj = {};
-  var edgeByPair = {};
-  GKEYS.forEach(function (k) {
-    adj[k] = [];
-  });
-  GEDGES.forEach(function (e, i) {
-    var a = GKEYS[e[0]];
-    var b = GKEYS[e[1]];
-    if (a === undefined || b === undefined) return;
-    adj[a].push({ to: b, w: e[2], kind: e[3], i: i });
-    adj[b].push({ to: a, w: e[2], kind: e[3], i: i });
-    edgeByPair[a + "|" + b] = i;
-    edgeByPair[b + "|" + a] = i;
-  });
-  var edgeEl = {};
-  edges.forEach(function (el) {
-    edgeEl[el.getAttribute("data-i")] = el;
-  });
-
-  var beatItems = beats
-    ? Array.prototype.slice.call(beats.querySelectorAll(".beat"))
-    : [];
-
-  var solByKey = {};
-  sols.forEach(function (el) {
-    var key = el.getAttribute("data-sol");
-    if (!key) return;
-    solByKey[key] = {
-      el: el,
-      tier: el.getAttribute("data-tier") || "",
-      label: (el.querySelector("h3") || {}).textContent || key,
-      problem: (el.querySelector(".sol__problem") || {}).textContent || ""
-    };
-  });
-  var cardByKey = {};
-  cards.forEach(function (c) {
-    cardByKey[c.getAttribute("data-id")] = c;
-  });
-  var commByIdMeta = {};
-  (DATA.comms || []).forEach(function (c) {
-    commByIdMeta[c.id] = c;
-  });
-
-  /* ------------------------------------------------------------------ the camera
-   * A previous version of this page had no camera on purpose, because the first one
-   * caused three faults: labels grew with the zoom until they collided, a node sliding
-   * under a stationary cursor fired mouseenter and stole the selection the reader had
-   * just clicked, and anything outside the frame became unreachable.
-   *
-   * All three are fixable and worth fixing — 490 nodes in one frame is an overview, and
-   * an overview you cannot go into is a picture. So: labels divide their size by the
-   * zoom factor in CSS, hover is ignored while the camera is moving, and Escape, the
-   * Reset button and a click on the background all pull back out.
-   */
-
-  // Read from the graph itself rather than restated here. The two disagreed once —
-  // the layout used 620 where the viewBox declared 560 — and twenty-nine skills were
-  // positioned in a band the browser clips away: highlighted, labelled, counted in the
-  // panel, and invisible.
-  var VB = { w: 1400, h: 560 };
-  if (svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width) {
-    VB = { w: svg.viewBox.baseVal.width, h: svg.viewBox.baseVal.height };
-  }
-  /* The part of the frame nothing is sitting on top of.
-   *
-   * The stage carries five overlays — the headline, the panel, the category rail, the
-   * search row and the community chips — and the graph is sized to sit clear of all of
-   * them, so this is a margin rather than a cut-out. It exists because framing a
-   * community into the exact middle of the frame put its outermost nodes half off the
-   * edge, where they were highlighted, labelled, and unclickable.
-   */
-  var SAFE = {
-    x0: VB.w * 0.03,
-    y0: VB.h * 0.05,
-    x1: VB.w * 0.97,
-    y1: VB.h * 0.94
-  };
-  SAFE.w = SAFE.x1 - SAFE.x0;
-  SAFE.h = SAFE.y1 - SAFE.y0;
-  SAFE.cx = (SAFE.x0 + SAFE.x1) / 2;
-  SAFE.cy = (SAFE.y0 + SAFE.y1) / 2;
-  var cam = { k: 1, x: 0, y: 0 };
-  var camMoving = false;
-  var camTimer = null;
-
-  function applyCam() {
-    if (!viewport) return;
-    viewport.style.transform =
-      "translate(" + cam.x + "px," + cam.y + "px) scale(" + cam.k + ")";
-    // Everything measured in user units — the labels — divides by this.
-    viewport.style.setProperty("--k", String(cam.k));
-    stage.classList.toggle("is-zoomed", cam.k > 1.02);
-  }
-
-  function moveCam(k, cx, cy) {
-    k = Math.max(1, Math.min(6, k));
-    cam.k = k;
-    // Clamped so the content cannot be dragged off the edge of its own frame.
-    var maxX = VB.w * (k - 1);
-    var maxY = VB.h * (k - 1);
-    cam.x = Math.max(-maxX, Math.min(0, SAFE.cx - cx * k));
-    cam.y = Math.max(-maxY, Math.min(0, SAFE.cy - cy * k));
-    applyCam();
-
-    // Hover is suppressed until the move finishes. This is the fix for the fault that
-    // killed the first camera: while the transform eases, nodes slide under a cursor
-    // that has not moved, each firing mouseenter, and the selection the reader clicked
-    // is replaced by whatever happened to pass beneath the pointer.
-    camMoving = true;
-    clearTimeout(camTimer);
-    camTimer = setTimeout(function () {
-      camMoving = false;
-    }, reduced ? 0 : 660);
-  }
-
-  function frameNodes(list, pad) {
-    if (!list.length) {
-      moveCam(1, VB.w / 2, VB.h / 2);
-      return;
+  function matches(node) {
+    const f = state.filters;
+    if (f.community && node.community !== f.community) return false;
+    if (f.category && node.category !== f.category) return false;
+    if (f.solution) {
+      const solution = solutions.get(f.solution);
+      if (!solution.members.includes(node.key) && node.key !== f.solution) return false;
     }
-    var x0 = Infinity;
-    var y0 = Infinity;
-    var x1 = -Infinity;
-    var y1 = -Infinity;
-    list.forEach(function (n) {
-      var x = +n.getAttribute("data-x");
-      var y = +n.getAttribute("data-y");
-      if (x < x0) x0 = x;
-      if (x > x1) x1 = x;
-      if (y < y0) y0 = y;
-      if (y > y1) y1 = y;
-    });
-    pad = pad === undefined ? 46 : pad;
-    var w = Math.max(60, x1 - x0) + pad * 2;
-    var h = Math.max(60, y1 - y0) + pad * 2;
-    moveCam(Math.min(SAFE.w / w, SAFE.h / h), (x0 + x1) / 2, (y0 + y1) / 2);
-  }
-
-  function resetCam() {
-    moveCam(1, VB.w / 2, VB.h / 2);
-  }
-
-  // Clicking the empty background pulls back out, which is the gesture people try
-  // first and the answer to "anything outside the frame is unreachable".
-  svg.addEventListener("click", function (e) {
-    if (e.target.closest(".g-node") || e.target.closest(".g-clabel")) return;
-    if (cam.k > 1.02) resetCam();
-  });
-
-  /* ------------------------------------------------------------------- panel */
-
-  function setChain(items) {
-    if (!panel.chain) return;
-    // Rebuilt element by element rather than assigned as innerHTML: these strings come
-    // from skill frontmatter, and textContent cannot be talked into becoming markup.
-    while (panel.chain.firstChild) panel.chain.removeChild(panel.chain.firstChild);
-    items.forEach(function (text) {
-      var li = document.createElement("li");
-      li.textContent = text;
-      panel.chain.appendChild(li);
+    const terms = state.query.toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
+    return terms.every((term) => {
+      // Short queries use word starts: NDA must not match staNDArds or ageNDAs.
+      if (term === "nda" && /non[\s-]?disclosure/.test(node.text)) return true;
+      return term.length <= 3 ? node.words.some((word) => word.startsWith(term)) : node.text.includes(term);
     });
   }
 
-  function nameOf(key) {
-    var n = nodeByKey[key];
-    return n ? n.getAttribute("data-name") : key;
+  function getListKeys() {
+    let keys = [...nodes.keys()].filter((key) => matches(nodes.get(key)));
+    if (!state.query.trim() && state.listKind === "community") {
+      keys = keys.filter((key) => nodes.get(key).community === state.community);
+    }
+    if (state.query.trim()) {
+      const query = state.query.trim().toLocaleLowerCase();
+      const score = (key) => {
+        const name = nodes.get(key).name.toLocaleLowerCase();
+        return name === query ? 0 : name.startsWith(query) ? 1 : name.includes(query) ? 2 : 3;
+      };
+      return keys.sort((a, b) => score(a) - score(b) || nodes.get(a).name.localeCompare(nodes.get(b).name) ||
+        a.localeCompare(b));
+    }
+    return ranked(keys);
   }
 
-  function explainNode(key) {
-    var node = nodeByKey[key];
-    if (!node) return;
-    var card = cardByKey[key];
-    var desc = card ? card.querySelector("p") : null;
-    var cid = +node.getAttribute("data-comm");
-    var meta = commByIdMeta[cid];
-    var neighbours = (adj[key] || []).slice().sort(function (a, b) {
-      if (b.w !== a.w) return b.w - a.w;
-      return nameOf(a.to) < nameOf(b.to) ? -1 : 1;
-    });
-    var stated = neighbours.filter(function (e) {
-      return e.kind === 0;
-    }).length;
-
-    if (panel.tier) {
-      panel.tier.textContent = meta ? "in " + meta.label : "unconnected";
-    }
-    if (panel.name) panel.name.textContent = node.getAttribute("data-name");
-    if (panel.desc) panel.desc.textContent = desc ? desc.textContent : "";
-    // Each connection with the evidence for it, because "connected" on its own is a claim
-    // the reader cannot check. An inferred edge says which words the two names share, which
-    // is also the honest way to show how weak that kind of edge is.
-    setChain(
-      neighbours.slice(0, 12).map(function (e) {
-        var why = GWHY[e.i] && GWHY[e.i].length ? GWHY[e.i][0] : "";
-        var other = nameOf(e.to);
-        // A Solution named after its own lead otherwise reads "automate-me \u2014 led by
-        // automate-me", which is a sentence that tells the reader nothing twice.
-        if (why === "led by " + other) why = "leads it";
-        return other + (why ? " \u2014 " + why : "");
-      })
-    );
-    if (panel.ev) {
-      var domain = (DATA.domains || {})[(DATA.catDomain || {})[node.getAttribute("data-dom")]];
-      panel.ev.textContent =
-        neighbours.length +
-        " connections, " +
-        stated +
-        " stated" +
-        (domain ? " · filed under " + domain : "");
-    }
-  }
-
-  function explainCommunity(cid) {
-    var meta = commByIdMeta[cid];
-    if (!meta) return;
-    var members = nodes.filter(function (n) {
-      return +n.getAttribute("data-comm") === cid;
-    });
-    if (panel.tier) panel.tier.textContent = "community";
-    if (panel.name) panel.name.textContent = meta.label;
-    if (panel.desc) {
-      panel.desc.textContent =
-        meta.size +
-        " skills grouped by what their names and their Solutions say they have in " +
-        "common, not by where they are filed. " +
-        // "Most connected", which is what degree measures. This said "everything here runs
-        // through X", which claims betweenness or an articulation point and was not
-        // computed: in the largest community the top node has six in-community neighbours
-        // and removing it leaves the rest in one piece. The prerendered copy of this
-        // sentence in build.py was corrected and this one was missed, so the live page said
-        // both things depending on whether you had clicked anything.
-        "Its most connected member is " +
-        meta.hub +
-        ".";
-    }
-    setChain(
-      members
-        .slice()
-        .sort(function (a, b) {
-          return +b.getAttribute("data-deg") - +a.getAttribute("data-deg");
-        })
-        .slice(0, 12)
-        .map(function (n) {
-          return n.getAttribute("data-name");
-        })
-    );
-    if (panel.ev) {
-      var doms = {};
-      members.forEach(function (n) {
-        doms[(DATA.catDomain || {})[n.getAttribute("data-dom")]] = true;
-      });
-      var spread = Object.keys(doms).length;
-      panel.ev.textContent =
-        meta.size +
-        " skills · most connected: " +
-        meta.hub +
-        (spread > 1 ? " · spans " + spread + " declared domains" : "");
-    }
-  }
-
-  /* Placing the names that are revealed on demand.
-   *
-   * The build places the 26 default names so none of them collide, but it cannot place
-   * the other 464: which ones appear depends on what the reader selects. Ten names
-   * revealed at their nodes' own offsets inside one dense community landed on top of
-   * each other — six overlapping words where six readable ones were intended.
-   *
-   * So the same greedy placement the build does, done here for the handful being
-   * revealed: four candidate positions per name, first one that clears the names already
-   * placed wins, and a name with nowhere to go is not shown. Every measurement is divided
-   * by the zoom factor, because that is what the labels' own font size is divided by.
-   */
-
-  var labelHome = {};
-  Object.keys(labelByKey).forEach(function (k) {
-    var el = labelByKey[k];
-    labelHome[k] = {
-      x: el.getAttribute("x"),
-      y: el.getAttribute("y"),
-      a: el.getAttribute("text-anchor") || "start"
-    };
-  });
-
-  // Only a fallback: getComputedTextLength below measures the real advance width. Kept
-  // deliberately generous so that if it were ever used it over-reserves rather than under.
-  var CHAR_W = DATA.charw || {};
-  var CHAR_W_FALLBACK = DATA.charwFallback || 0.62;
-  var LABEL_FONT = DATA.labelFont || 9.5;
-  var LABEL_H = DATA.labelHeight || 12.4;
-
-  // The width a name will occupy, computed rather than measured.
-  //
-  // getComputedTextLength is exact but reads the current layout, and the camera has just
-  // changed the zoom factor that these labels' font size divides by. In the same tick the
-  // browser could still answer from the layout before that recalculation, which is why one
-  // pair of names overlapped at 1280 wide and not at 1440. Arithmetic on the table the build
-  // uses has no such dependence, and gives the same answer to within 0.01%.
-  function textWidth(text, font) {
-    var w = 0;
-    for (var i = 0; i < text.length; i++) {
-      var c = CHAR_W[text.charAt(i)];
-      w += c === undefined ? CHAR_W_FALLBACK : c;
-    }
-    return w * font;
-  }
-  // Labels must clear each other, not merely fail to intersect. Two names a fifth of a
-  // unit apart read as one word.
-  var LABEL_GAP = 1.8;
-
-  function homeLabels() {
-    Object.keys(labelByKey).forEach(function (k) {
-      var el = labelByKey[k];
-      var h = labelHome[k];
-      el.setAttribute("x", h.x);
-      el.setAttribute("y", h.y);
-      el.setAttribute("text-anchor", h.a);
-      // Both classes come off here. Moving a label back to where the build put it while
-      // leaving it lit is how a previous search kept its names on screen underneath the
-      // next one's: searching "review" then "agent" left eleven overlapping names, none
-      // of which matched the query being typed.
-      el.classList.remove("is-on", "is-hit");
-    });
-  }
-
-  function light(keys, cls) {
-    homeLabels();
-    var k = cam.k || 1;
-    var boxes = [];
-    // The community names stay on screen while a selection is up, dimmed but legible, so
-    // they are reserved before any skill name is offered a position.
-    // The community names stay on screen while a selection is up, dimmed but legible, so
-    // they are reserved before any skill name is offered a position. Their boxes come from
-    // the same arithmetic and their own font size, which is larger than a skill name's.
-    var commFont = (DATA.communityFont || 11.5) / k;
-    commLabels.forEach(function (cl) {
-      if (getComputedStyle(cl).opacity === "0") return;
-      var cw = textWidth(cl.textContent, commFont);
-      var ch = (LABEL_H * (DATA.communityFont || 11.5)) / LABEL_FONT / k;
-      var cxx = +cl.getAttribute("x");
-      var cyy = +cl.getAttribute("y");
-      boxes.push([cxx - cw / 2, cyy - ch * 0.78, cxx + cw / 2, cyy + ch * 0.22]);
-    });
-    keys.forEach(function (key) {
-      var el = labelByKey[key];
-      var node = nodeByKey[key];
-      if (!el || !node) return;
-      var x = +node.getAttribute("data-x");
-      var y = +node.getAttribute("data-y");
-      var dot = node.querySelector(".g-dot");
-      var r = dot ? +dot.getAttribute("r") : 3;
-      var w = textWidth(el.textContent, LABEL_FONT / k);
-      var h = LABEL_H / k;
-      var options = [
-        [x + r + 4 / k, y + (3.2 / k), "start"],
-        [x - r - 4 / k, y + (3.2 / k), "end"],
-        [x, y - r - 5 / k, "middle"],
-        [x, y + r + h, "middle"]
-      ];
-      for (var i = 0; i < options.length; i++) {
-        var ox = options[i][0];
-        var oy = options[i][1];
-        var anchor = options[i][2];
-        var x0 = anchor === "start" ? ox : anchor === "end" ? ox - w : ox - w / 2;
-        var box = [x0, oy - h * 0.78, x0 + w, oy + h * 0.22];
-        // Inside the frame the browser will actually draw. The build-time placer tests this
-        // and this one did not, so selecting a node near the right edge pushed its name out
-        // to x=1503 in a 1400-wide viewBox: no overlap, because the label was not on screen
-        // at all. Four nodes did it on selection and ten ordinary searches reproduced it.
-        if (box[0] < 2 || box[2] > VB.w - 2 || box[1] < 2 || box[3] > VB.h - 2) continue;
-        var clash = false;
-        for (var j = 0; j < boxes.length; j++) {
-          var o = boxes[j];
-          if (
-            box[0] < o[2] + LABEL_GAP &&
-            o[0] < box[2] + LABEL_GAP &&
-            box[1] < o[3] + LABEL_GAP &&
-            o[1] < box[3] + LABEL_GAP
-          ) {
-            clash = true;
-            break;
-          }
-        }
-        if (clash) continue;
-        el.setAttribute("x", ox);
-        el.setAttribute("y", oy);
-        el.setAttribute("text-anchor", anchor);
-        el.classList.add(cls);
-        boxes.push(box);
-        return;
+  function shortestPath(start, end) {
+    if (!nodes.has(start) || !nodes.has(end)) return [];
+    const queue = [start], previous = new Map([[start, null]]);
+    for (let i = 0; i < queue.length; i++) {
+      const key = queue[i];
+      if (key === end) {
+        const path = [];
+        for (let at = end; at !== null; at = previous.get(at)) path.push(at);
+        return path.reverse();
       }
-    });
-  }
-
-  /* ------------------------------------------------------------------ reading */
-
-  var focused = null;
-  var pinned = null;
-  var openComm = null;
-  var pathEnds = [];
-
-  function mark() {
-    stage.setAttribute("data-pinned", pinned || "");
-    stage.setAttribute("data-focused", focused || "");
-    stage.setAttribute("data-comm", openComm === null ? "" : String(openComm));
-    stage.setAttribute("data-path", pathEnds.join(" "));
-  }
-
-  function clearClasses() {
-    nodes.forEach(function (n) {
-      n.classList.remove("is-on", "is-self", "is-hit", "is-path", "is-path-end");
-    });
-    edges.forEach(function (e) {
-      e.classList.remove("is-on", "is-path");
-    });
-    Object.keys(labelByKey).forEach(function (k) {
-      labelByKey[k].classList.remove("is-on", "is-hit");
-    });
-    commLabels.forEach(function (l) {
-      l.classList.remove("is-on");
-    });
-  }
-
-  function focus(key, opts) {
-    opts = opts || {};
-    if (!nodeByKey[key]) return;
-    if (opts.pin) pinned = key;
-    focused = key;
-    pathEnds = [];
-
-    clearClasses();
-    stage.classList.remove("is-dim", "is-path");
-    stage.classList.add("is-focus");
-
-    var self = nodeByKey[key];
-    self.classList.add("is-on", "is-self");
-    var cid = self.getAttribute("data-comm");
-    commLabels.forEach(function (l) {
-      l.classList.toggle("is-on", l.getAttribute("data-comm") === cid);
-    });
-
-    // Every neighbour is highlighted; only the strongest few are named. A hub has 23
-    // neighbours, and 23 names at their node positions overlap into a smudge.
-    var nb_sorted = (adj[key] || []).slice().sort(function (x, y) {
-      if (y.w !== x.w) return y.w - x.w;
-      return x.to < y.to ? -1 : 1;
-    });
-    nb_sorted.forEach(function (e) {
-      var nb = nodeByKey[e.to];
-      if (nb) nb.classList.add("is-on");
-      var el = edgeEl[e.i];
-      if (el) el.classList.add("is-on");
-    });
-    // The selection first, so its own name is never the one that fails to fit.
-    light(
-      [key].concat(
-        nb_sorted.slice(0, NAME_CAP).map(function (e) {
-          return e.to;
-        })
-      ),
-      "is-on"
-    );
-
-    sols.forEach(function (s) {
-      s.classList.toggle("is-on", s.getAttribute("data-sol") === key);
-    });
-    cards.forEach(function (c) {
-      c.classList.toggle("is-on", c.getAttribute("data-id") === key);
-    });
-
-    explainNode(key);
-    mark();
-  }
-
-  function showCommunity(cid, opts) {
-    opts = opts || {};
-    openComm = cid;
-    pinned = null;
-    focused = null;
-    pathEnds = [];
-    clearClasses();
-    stage.classList.remove("is-dim", "is-path");
-    stage.classList.add("is-focus");
-
-    var mine = nodes.filter(function (n) {
-      return +n.getAttribute("data-comm") === cid;
-    });
-    nodes.forEach(function (n) {
-      n.classList.toggle("is-on", mine.indexOf(n) > -1);
-    });
-    // The strongest handful get named. The rest are readable by hovering them, which is
-    // the trade that keeps the names legible instead of a wash of overlapping text.
-    var named = mine
-      .slice()
-      .sort(function (a, b) {
-        return +b.getAttribute("data-deg") - +a.getAttribute("data-deg");
-      })
-      .slice(0, NAME_CAP)
-      .map(function (n) {
-        return n.getAttribute("data-key");
-      });
-    // The camera moves first. Label positions and widths are both measured at the
-    // current zoom — the offsets are divided by it and the font size is divided by it —
-    // so placing names and then zooming means every measurement was taken against the
-    // wrong scale, which is where the last few collisions came from.
-    // Framing is what selecting does, not what arriving does. The page's opening image is
-    // the whole library with its largest community named — zooming straight in on one
-    // cluster hides the thing the page is trying to show, and makes every node outside
-    // that cluster unclickable before the reader has done anything.
-    if (opts.frame !== false) frameNodes(mine);
-    light(named, "is-on");
-    edges.forEach(function (e) {
-      var a = nodeByKey[e.getAttribute("data-a")];
-      var b = nodeByKey[e.getAttribute("data-b")];
-      e.classList.toggle(
-        "is-on",
-        !!a && !!b &&
-          +a.getAttribute("data-comm") === cid &&
-          +b.getAttribute("data-comm") === cid
-      );
-    });
-    commLabels.forEach(function (l) {
-      l.classList.toggle("is-on", +l.getAttribute("data-comm") === cid);
-    });
-    beatItems.forEach(function (b) {
-      b.classList.toggle("is-on", +b.getAttribute("data-comm") === cid);
-    });
-    explainCommunity(cid);
-    mark();
-  }
-
-  /* --------------------------------------------------------------------- path
-   * Graphify traces how any two things connect; this does the same over the skill
-   * graph. Breadth-first and unweighted, because "how many steps from here to there"
-   * is the question, and a strong edge is not a shorter one.
-   */
-
-  function shortestPath(a, b) {
-    if (a === b) return [a];
-    var prev = {};
-    prev[a] = null;
-    var queue = [a];
-    var head = 0;
-    while (head < queue.length) {
-      var cur = queue[head++];
-      var out = (adj[cur] || []).slice().sort(function (x, y) {
-        return x.to < y.to ? -1 : 1;
-      });
-      for (var i = 0; i < out.length; i++) {
-        var nb = out[i].to;
-        if (nb in prev) continue;
-        prev[nb] = cur;
-        if (nb === b) {
-          var path = [nb];
-          while (prev[path[path.length - 1]] !== null) {
-            path.push(prev[path[path.length - 1]]);
-          }
-          return path.reverse();
-        }
-        queue.push(nb);
+      for (const item of neighbors(key)) {
+        if (previous.has(item.to)) continue;
+        previous.set(item.to, key);
+        queue.push(item.to);
       }
     }
     return [];
   }
 
-  function showPath(a, b) {
-    var path = shortestPath(a, b);
-    clearClasses();
-    stage.classList.remove("is-focus", "is-dim");
-    focused = null;
-    pinned = null;
+  function prepareScene() {
+    listKeys = getListKeys();
+    let keys = listKeys;
+    if (state.mode === "node" && state.selected) {
+      keys = [state.selected, ...neighbors(state.selected).map((item) => item.to)];
+    } else if (state.mode === "path") {
+      keys = state.path.length ? state.path : [state.pathStart, state.pathEnd].filter(Boolean);
+    }
+    sceneKeys = [...new Set(keys)];
+    const included = new Set(sceneKeys);
+    scene = new Map(sceneKeys.map((key) => [key, {x: nodes.get(key).x, y: nodes.get(key).y}]));
+    // A local neighborhood is a fresh deterministic radial layout, not a capped zoom
+    // into distant clusters. Original identity and edge evidence are untouched.
+    if (state.mode === "node") {
+      scene.set(state.selected, {x: 0, y: 0});
+      const others = ranked(sceneKeys.filter((key) => key !== state.selected));
+      others.forEach((key, i) => {
+        const ring = Math.floor(i / 12), count = Math.min(12, others.length - ring * 12);
+        const angle = -Math.PI / 2 + (i % 12) * Math.PI * 2 / count + ring * 0.16;
+        const radius = 115 + ring * 105;
+        scene.set(key, {x: Math.cos(angle) * radius, y: Math.sin(angle) * radius});
+      });
+    }
+    if (state.mode === "path" && state.path.length) {
+      state.path.forEach((key, i) => scene.set(key, {x: i * 130, y: (i % 2) * 65}));
+    }
+    const pathPairs = new Set(state.path.slice(1).map((key, i) =>
+      [state.path[i], key].sort().join("|")));
+    activeEdges = edges.filter((edge) =>
+      included.has(edge.a) && included.has(edge.b) && allowedEdge(edge) &&
+      (state.mode !== "path" || pathPairs.has([edge.a, edge.b].sort().join("|"))));
+    const edgeIds = new Set(activeEdges.map((edge) => edge.index));
+    edgeElements.forEach((el) => { el.style.display = edgeIds.has(Number(el.dataset.i)) ? "" : "none"; });
+    activeEdges.forEach((edge) => {
+      const a = scene.get(edge.a), b = scene.get(edge.b);
+      const mx = (a.x + b.x) / 2 + (b.y - a.y) * .075;
+      const my = (a.y + b.y) / 2 - (b.x - a.x) * .075;
+      edgeElements[edge.index].setAttribute("d", `M${a.x},${a.y} Q${mx},${my} ${b.x},${b.y}`);
+    });
+    nodes.forEach((node, key) => {
+      const show = included.has(key);
+      node.el.style.display = show ? "" : "none";
+      node.el.dataset.inContext = String(show);
+      node.el.classList.toggle("is-selected", key === state.selected);
+      if (!show) return;
+      const point = scene.get(key);
+      [node.dot, node.hit].forEach((el) => {
+        el.setAttribute("cx", point.x);
+        el.setAttribute("cy", point.y);
+      });
+      node.el.dataset.renderX = point.x;
+      node.el.dataset.renderY = point.y;
+    });
+    $("graph-empty").hidden = sceneKeys.length > 0;
+  }
 
-    if (!path.length) {
-      stage.classList.remove("is-path");
-      if (panel.tier) panel.tier.textContent = "no path";
-      if (panel.name) panel.name.textContent = nameOf(a) + " → " + nameOf(b);
-      if (panel.desc) {
-        panel.desc.textContent =
-          "Nothing in the library connects these two, directly or through anything " +
-          "else. One of them is on the frontier: 34 skills belong to no Solution and " +
-          "share a subject with nothing.";
-      }
-      setChain([]);
-      if (panel.ev) panel.ev.textContent = "not connected";
-      pathEnds = [a, b];
-      mark();
+  function fit() {
+    if (!sceneKeys.length) {
+      state.viewport = {k: 1, x: size.w / 2, y: size.h / 2};
       return;
     }
+    const points = [...scene.values()];
+    const xs = points.map((p) => p.x), ys = points.map((p) => p.y);
+    const left = Math.min(...xs), right = Math.max(...xs);
+    const top = Math.min(...ys), bottom = Math.max(...ys);
+    const padX = Math.min(72, size.w * .14), padY = Math.min(72, size.h * .18);
+    const k = Math.max(.08, Math.min(30,
+      (size.w - padX * 2) / Math.max(80, right - left),
+      (size.h - padY * 2) / Math.max(80, bottom - top)));
+    state.viewport = {k, x: size.w / 2 - (left + right) / 2 * k,
+      y: size.h / 2 - (top + bottom) / 2 * k};
+  }
 
-    stage.classList.add("is-path");
-    // Framing the route is the whole reason the camera exists here: two ends five hops
-    // apart can sit in opposite corners of the frame.
-    frameNodes(
-      path
-        .map(function (k) {
-          return nodeByKey[k];
-        })
-        .filter(Boolean),
-      64
-    );
-    light(path, "is-on");
-    path.forEach(function (k, i) {
-      var n = nodeByKey[k];
-      if (n) n.classList.add("is-path");
-      if (i === 0 || i === path.length - 1) {
-        if (n) n.classList.add("is-path-end");
+  const measure = document.createElement("canvas").getContext("2d");
+  function labelLines(name, maxWidth, fontSize, weight = 500) {
+    measure.font = `${weight} ${fontSize}px Inter, sans-serif`;
+    if (measure.measureText(name).width <= maxWidth) return [name];
+    // Prefer the skill's own hyphens/spaces, retaining every character. Break a
+    // word only when it cannot fit on a line by itself; never truncate a name.
+    const lines = []; let line = "";
+    for (const word of name.match(/[^-\s]+[-\s]*|[-\s]+/g) || [name]) {
+      if (line && measure.measureText(line + word).width > maxWidth) {
+        lines.push(line); line = "";
       }
-      if (i > 0) {
-        var el = edgeEl[edgeByPair[path[i - 1] + "|" + k]];
-        if (el) el.classList.add("is-path");
-      }
-    });
-
-    if (panel.tier) panel.tier.textContent = path.length - 1 + " hops";
-    if (panel.name) panel.name.textContent = nameOf(a) + " → " + nameOf(b);
-    if (panel.desc) {
-      panel.desc.textContent =
-        "The shortest route between them in the library, one relationship per step.";
-    }
-    setChain(
-      path.map(function (k) {
-        return nameOf(k);
-      })
-    );
-    if (panel.ev) {
-      var stated = 0;
-      for (var i = 1; i < path.length; i++) {
-        var idx = edgeByPair[path[i - 1] + "|" + path[i]];
-        if (GEDGES[idx] && GEDGES[idx][3] === 0) stated++;
-      }
-      panel.ev.textContent =
-        path.length - 1 + " steps, " + stated + " of them stated by the repository";
-    }
-    pathEnds = [a, b];
-    mark();
-  }
-
-  function clearFocus() {
-    focused = null;
-    pinned = null;
-    pathEnds = [];
-    clearClasses();
-    stage.classList.remove("is-focus", "is-dim", "is-path");
-    sols.forEach(function (s) {
-      s.classList.remove("is-on");
-    });
-    cards.forEach(function (c) {
-      c.classList.remove("is-hit", "is-on");
-    });
-    beatItems.forEach(function (b) {
-      b.classList.remove("is-on");
-    });
-    if (openComm !== null) {
-      explainCommunity(openComm);
-    }
-    mark();
-  }
-
-  /* ------------------------------------------------------------- node events */
-
-  var pathMode = false;
-  var pathBtn = document.getElementById("gpath");
-
-  function setPathMode(on) {
-    pathMode = on;
-    pathEnds = [];
-    if (on) {
-      // Back to the whole library, and nothing dimmed. Picking two skills means both
-      // have to be clickable, and while the camera was framing one community every node
-      // outside it was off the edge of the view: the second pick was impossible.
-      openComm = null;
-      clearClasses();
-      stage.classList.remove("is-focus", "is-dim", "is-path");
-      resetCam();
-    }
-    if (pathBtn) pathBtn.setAttribute("aria-pressed", on ? "true" : "false");
-    if (stage) stage.classList.toggle("is-picking", on);
-    // Also on the document element: the category rail sits outside the stage, so a
-    // stage-scoped rule cannot reach it.
-    document.documentElement.classList.toggle("is-picking", on);
-    if (on && panel.tier) {
-      panel.tier.textContent = "trace";
-      if (panel.name) panel.name.textContent = "Pick two skills";
-      if (panel.desc) {
-        panel.desc.textContent =
-          "Click one node, then another, and the shortest route between them lights up.";
-      }
-      setChain([]);
-      if (panel.ev) panel.ev.textContent = "waiting for the first";
-    }
-    mark();
-  }
-
-  /* One tab stop for the graph, not 490.
-   *
-   * Every node is a real link, which is what makes the graph a table of contents with
-   * JavaScript off. With JavaScript on that same fact put 490 sequential stops in the tab
-   * order — an independent review counted 1,025 focusables on the page — so reaching the
-   * Solutions section below meant pressing Tab several hundred times. The links stay in the
-   * document and stay real; they are taken out of the sequential order and the graph is
-   * entered once, then walked with the arrow keys.
-   *
-   * On a narrow screen they come out of the tab order entirely: the click target scales
-   * with the viewport and is under three pixels on a phone, so the search box and the text
-   * list below are the interface there, and offering a keyboard path into targets nobody
-   * can hit is worse than not offering one.
-   */
-  var roving = 0;
-
-  function setRoving(i, focusIt) {
-    if (!nodes.length) return;
-    roving = Math.max(0, Math.min(nodes.length - 1, i));
-    nodes.forEach(function (n, j) {
-      n.setAttribute("tabindex", j === roving && wide() ? "0" : "-1");
-    });
-    if (focusIt) nodes[roving].focus();
-  }
-
-  // Reading order for the arrow keys: by community, then by how connected each skill is,
-  // so walking the graph with a keyboard follows the same structure the colours show
-  // rather than the document order, which is smallest-degree-first for painting reasons.
-  var walkOrder = nodes
-    .slice()
-    .sort(function (a, b) {
-      var ca = +a.getAttribute("data-comm");
-      var cb = +b.getAttribute("data-comm");
-      if (ca !== cb) return ca - cb;
-      return +b.getAttribute("data-deg") - +a.getAttribute("data-deg");
-    })
-    .map(function (n) {
-      return nodes.indexOf(n);
-    });
-  var walkAt = {};
-  walkOrder.forEach(function (idx, at) {
-    walkAt[idx] = at;
-  });
-
-  function step(delta) {
-    var at = walkAt[roving] === undefined ? 0 : walkAt[roving];
-    var next = walkOrder[(at + delta + walkOrder.length) % walkOrder.length];
-    setRoving(next, true);
-  }
-
-  setRoving(0, false);
-
-  // Re-applied on resize, because whether the graph has a tab stop at all depends on the
-  // viewport. The traversal's own resize handler reloads when crossing the breakpoint, but
-  // it is only registered on desktop: growing a narrow window would otherwise leave all 490
-  // nodes at tabindex="-1" and the graph unreachable by keyboard.
-  var rovingTimer = null;
-  window.addEventListener("resize", function () {
-    clearTimeout(rovingTimer);
-    rovingTimer = setTimeout(function () {
-      setRoving(roving, false);
-    }, 200);
-  });
-
-  nodes.forEach(function (n) {
-    var key = n.getAttribute("data-key");
-    n.addEventListener("mouseenter", function () {
-      if (pinned || pathMode || camMoving) return;
-      focus(key);
-    });
-    n.addEventListener("focus", function () {
-      // Focus moves the roving stop with it, so tabbing away and back returns to the node
-      // the reader was last on rather than to the first one.
-      var at = nodes.indexOf(n);
-      if (at > -1 && at !== roving) setRoving(at, false);
-      if (pathMode) return;
-      focus(key, { pin: true });
-    });
-    // Every node is a real link to its own card in the library, so the graph is a table
-    // of contents when this script does not run. When it does run, activation means
-    // "read this here" and the jump is suppressed: following the link would scroll away
-    // from the graph being used.
-    n.addEventListener("click", function (e) {
-      if (wide()) e.preventDefault();
-      if (pathMode) {
-        pathEnds.push(key);
-        if (pathEnds.length === 1) {
-          clearClasses();
-          n.classList.add("is-path", "is-path-end");
-          if (panel.ev) panel.ev.textContent = "from " + nameOf(key) + ", now pick another";
-          mark();
-        } else {
-          var a = pathEnds[0];
-          showPath(a, key);
-          setPathModeOff();
+      for (const character of word) {
+        if (line && measure.measureText(line + character).width > maxWidth) {
+          lines.push(line); line = "";
         }
-        return;
+        line += character;
       }
-      focus(key, { pin: true });
-    });
-    n.addEventListener("keydown", function (e) {
-      // Arrow keys walk the graph; Home and End jump to its ends. This is the composite
-      // widget half of the roving tabindex: one stop to enter, then movement inside.
-      var moves = {
-        ArrowRight: 1,
-        ArrowDown: 1,
-        ArrowLeft: -1,
-        ArrowUp: -1
-      };
-      if (moves[e.key] !== undefined) {
-        e.preventDefault();
-        step(moves[e.key]);
-        return;
-      }
-      if (e.key === "Home" || e.key === "End") {
-        e.preventDefault();
-        setRoving(walkOrder[e.key === "Home" ? 0 : walkOrder.length - 1], true);
-        return;
-      }
-      if (e.key === "Enter" || e.key === " ") {
-        if (wide() || e.key === " ") e.preventDefault();
-        if (pathMode) {
-          n.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-          return;
-        }
-        focus(key, { pin: true });
-      }
-    });
-  });
-
-  function setPathModeOff() {
-    pathMode = false;
-    if (pathBtn) pathBtn.setAttribute("aria-pressed", "false");
-    if (stage) stage.classList.remove("is-picking");
-    document.documentElement.classList.remove("is-picking");
-  }
-
-  if (pathBtn) {
-    pathBtn.addEventListener("click", function () {
-      setPathMode(pathBtn.getAttribute("aria-pressed") !== "true");
-    });
-  }
-
-  /* The community names are labels, not controls.
-   *
-   * They were clickable for one build, and that cost more than it gave. A name's text box
-   * is wide, and SVG has no z-index, so twelve labels covered the centres of six nodes
-   * underneath them: those skills were drawn, coloured, sized and completely unclickable.
-   * Worse, making them clickable meant setting pointer-events as an inline style, which the
-   * page's own Content-Security-Policy drops without a word — the same class of failure
-   * that left the hero counter frozen at zero on the live site.
-   *
-   * The chip row below the graph selects communities, and it is one obvious control rather
-   * than two half-discoverable ones.
-   */
-
-  beatItems.forEach(function (b) {
-    b.addEventListener("click", function (e) {
-      e.preventDefault();
-      // Works at every width. On a phone the graph takes no pointer input — the targets are
-      // three pixels wide — so these chips ARE the way into it, and they used to fall through
-      // to a plain jump down the page. The camera stays put there: framing a cluster is no
-      // help when nothing in it can be tapped, but naming it and lighting it up is.
-      showCommunity(+b.getAttribute("data-comm"), { frame: wide() });
-    });
-  });
-
-  // Hovering a Solution card lights its lead in the graph, so the two halves of the
-  // page are visibly the same information.
-  sols.forEach(function (s) {
-    s.addEventListener("mouseenter", function () {
-      if (pinned || pathMode || camMoving) return;
-      focus(s.getAttribute("data-sol"));
-    });
-  });
-  cards.forEach(function (c) {
-    c.addEventListener("mouseenter", function () {
-      if (pinned || pathMode || camMoving) return;
-      focus(c.getAttribute("data-id"));
-    });
-  });
-
-  /* ----------------------------------------------------------------- search */
-
-  function runSearch(q) {
-    q = (q || "").trim().toLowerCase();
-    if (!q) {
-      stage.classList.remove("is-dim");
-      nodes.forEach(function (n) {
-        n.classList.remove("is-hit");
-      });
-      // Back to where the build placed them. Clearing the class without restoring the
-      // position left the default 26 names wherever the last search had moved them to,
-      // and two of them overlapped in the page's own opening state.
-      homeLabels();
-      cards.forEach(function (c) {
-        c.classList.remove("is-hit");
-      });
-      return;
     }
-    stage.classList.remove("is-focus", "is-path");
-    stage.classList.add("is-dim");
-    // A search is a question about the whole library, so it pulls the camera back out.
-    // Leaving it framed on one community showed a match count that included nodes off
-    // the edge of the view.
-    resetCam();
-
-    // Matches on the name a reader can see, not on the identity key, which carries the
-    // category and bundle and would make "engineering" match all 105 skills in it.
-    var hits = [];
-    nodes.forEach(function (n) {
-      var hit = (n.getAttribute("data-name") || "").toLowerCase().indexOf(q) > -1;
-      n.classList.toggle("is-hit", hit);
-      if (hit) hits.push(n.getAttribute("data-key"));
-    });
-    // Strongest first, so when a query matches more names than can be drawn without
-    // collisions the ones that survive are the ones worth reading.
-    hits.sort(function (a, b) {
-      return (
-        +nodeByKey[b].getAttribute("data-deg") - +nodeByKey[a].getAttribute("data-deg")
-      );
-    });
-    light(hits.slice(0, 24), "is-hit");
-    cards.forEach(function (c) {
-      c.classList.toggle(
-        "is-hit",
-        (c.getAttribute("data-name") || "").toLowerCase().indexOf(q) > -1
-      );
-    });
-    mark();
+    if (line) lines.push(line);
+    return lines;
   }
 
-  // A hit inside a closed category is a hit nobody can see, so searching opens
-  // the categories it found something in, and closes them again when cleared.
-  function revealHits(anyQuery) {
-    Array.prototype.slice
-      .call(document.querySelectorAll(".lib__cat"))
-      .forEach(function (d) {
-        if (!anyQuery) {
-          d.removeAttribute("open");
-        } else if (d.querySelector(".card.is-hit")) {
-          d.setAttribute("open", "");
-        } else {
-          d.removeAttribute("open");
-        }
-      });
-  }
+  const selectedLeader = document.createElementNS(ns, "path");
+  selectedLeader.id = "selected-label-leader";
+  $("graph-labels").prepend(selectedLeader);
 
-  if (search) {
-    search.addEventListener("input", function () {
-      runSearch(search.value);
-      revealHits(!!search.value.trim());
-    });
-  }
-
-  /* Back to the opening state, from any of them: a search, a pinned node, a traced
-   * path, an evidence filter, a community. One key, one button, and it has to release
-   * every mode — a reset that leaves a chip pressed or a path lit is the fault this
-   * page has already had once. */
-  function resetAll() {
-    if (search) search.value = "";
-    runSearch("");
-    revealHits(false);
-    setPathModeOff();
-    if (statedBtn) statedBtn.setAttribute("aria-pressed", "false");
-    stage.classList.remove("is-extracted-only", "is-picking");
-    document.documentElement.classList.remove("is-picking");
-    openComm = null;
-    clearFocus();
-    resetCam();
-    if (featured.length) showCommunity(featured[0], { frame: false });
-  }
-
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") resetAll();
-  });
-
-  // Following a rail link into a closed category should open it, otherwise the
-  // link lands on a heading and appears to do nothing.
-  function openTarget(hash) {
-    if (!hash || hash.charAt(0) !== "#") return;
-    var el = document.getElementById(hash.slice(1));
-    if (el && el.tagName === "DETAILS") el.setAttribute("open", "");
-  }
-  if (rail) {
-    rail.addEventListener("click", function (e) {
-      var a = e.target.closest("a");
-      if (a) openTarget(a.getAttribute("href"));
-    });
-  }
-  window.addEventListener("hashchange", function () {
-    openTarget(window.location.hash);
-  });
-  openTarget(window.location.hash);
-  /* --------------------------------------------------------- what is asserted
-   * The graph draws two kinds of relationship and says which is which. This lets a
-   * reader throw away the weaker kind and see what is left: 357 relationships the
-   * repository states outright, out of 1,868 drawn.
-   */
-
-  var statedBtn = document.getElementById("gstated");
-  if (statedBtn) {
-    statedBtn.addEventListener("click", function () {
-      var on = statedBtn.getAttribute("aria-pressed") !== "true";
-      statedBtn.setAttribute("aria-pressed", on ? "true" : "false");
-      stage.classList.toggle("is-extracted-only", on);
-      if (on && panel.tier) {
-        panel.tier.textContent = "stated only";
-        if (panel.name) panel.name.textContent = "Evidence filter";
-        if (panel.desc) {
-          panel.desc.textContent =
-            "Showing only relationships the repository states: a Solution leading a " +
-            "skill, or two skills packaged in the same bundle. The rest were inferred " +
-            "from names sharing a subject.";
-        }
-        setChain([]);
-        if (panel.ev) {
-          panel.ev.textContent = STATED_COUNT + " stated of " + GEDGES.length + " drawn";
-        }
-      } else if (openComm !== null) {
-        explainCommunity(openComm);
+  function drawLabels() {
+    labels.forEach((label) => { label.style.display = "none"; });
+    communityLabels.forEach((label) => { label.style.display = "none"; });
+    $("graph-labels").querySelectorAll(".g-label-leader").forEach((line) => line.remove());
+    selectedLeader.style.display = "none";
+    const reserved = [], k = state.viewport.k;
+    const dots = sceneKeys.map((key) => {
+      const point = scene.get(key), node = nodes.get(key);
+      const x = point.x * k + state.viewport.x, y = point.y * k + state.viewport.y;
+      const radius = Number(node.dot.getAttribute("r")) * k;
+      return {key, x: x - radius, y: y - radius, w: radius * 2, h: radius * 2};
+    }).filter((box) => box.x + box.w >= 0 && box.x <= size.w && box.y + box.h >= 0 && box.y <= size.h);
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const intersects = (a, b) => a.x < b.x + b.w + 8 && a.x + a.w + 8 > b.x &&
+      a.y < b.y + b.h + 6 && a.y + a.h + 6 > b.y;
+    function place(label, name, px, py, selected = false, community = false) {
+      const font = selected ? 18 : 16;
+      let lines = labelLines(name, Math.max(90, Math.min(selected ? 340 : 250, size.w - 32)),
+        font, selected ? 650 : 500);
+      let width = Math.max(...lines.map((line) => measure.measureText(line).width));
+      let height = lines.length * (font + 4);
+      const positions = community ?
+        [[px - width / 2, py - height / 2], [px - width / 2, py - height - 18]] :
+        [[px + 26, py - height / 2], [px - width - 26, py - height / 2],
+          [px - width / 2, py + 26], [px - width / 2, py - height - 26]];
+      // Try progressively offset callouts rather than painting a name over a
+      // different skill's dot. Priority comes from graph degree, not a hard cap.
+      for (const distance of [64, 112, 176, 248]) {
+        positions.push([px + distance, py - height / 2], [px - width - distance, py - height / 2],
+          [px - width / 2, py + distance], [px - width / 2, py - height - distance]);
       }
-    });
-  }
-
-  if (resetBtn) {
-    resetBtn.addEventListener("click", function () {
-      resetAll();
-    });
-  }
-
-
-  /* --------------------------------------------------- note on the camera's history
-   * There used to be a comment here saying this page had no camera, on purpose. It stayed
-   * for a build after the camera was implemented above, which is the kind of comment that
-   * is worse than none: a reviewer found it and was right to.
-   *
-   * The history it recorded is still true and still the reason the camera is built the way
-   * it is. A first attempt eased the SVG viewBox and caused three faults: labels are
-   * measured in user units so they grew with the zoom until they collided; a node sliding
-   * under a stationary cursor fired mouseenter and replaced the selection the reader had
-   * just clicked; and anything outside the frame became unclickable with no way back.
-   *
-   * All three are handled where the camera is defined — labels divide their size and their
-   * halo by the zoom factor in CSS, hover is ignored while `camMoving` is set, and Escape,
-   * the Reset button and a click on the background all pull back out. The page also opens
-   * unzoomed, so every one of the 490 nodes is clickable before the reader does anything.
-   */
-
-  /* ------------------------------------------------ the page opens on a Solution
-   * The panel and the graph should be showing something the moment the page is
-   * readable, rather than waiting for a hover that never arrives on a touch
-   * screen.
-   */
-  // DATA.featured holds the largest communities, in size order. The first is opened
-  // immediately: the panel and the graph should be showing something the moment the page
-  // is readable, rather than waiting for a hover that never arrives on a touch screen.
-  var featured = (DATA.featured || []).filter(function (id) {
-    return commByIdMeta[id] !== undefined;
-  });
-  if (featured.length) showCommunity(featured[0], { frame: false });
-
-  /* -------------------------------------------------------------- traversal */
-
-  var enhanced =
-    !reduced &&
-    wide() &&
-    typeof window.gsap !== "undefined" &&
-    typeof window.ScrollTrigger !== "undefined";
-
-  if (!enhanced) {
-    if (bar) bar.classList.add("is-full");
-    document.documentElement.classList.add("is-static");
-    return;
-  }
-
-  gsap.registerPlugin(ScrollTrigger);
-  document.documentElement.classList.add("is-enhanced");
-
-  var lenis = null;
-  if (typeof window.Lenis !== "undefined") {
-    lenis = new Lenis({ duration: 0.9, smoothWheel: true });
-    gsap.ticker.add(function (time) {
-      lenis.raf(time * 1000);
-    });
-    gsap.ticker.lagSmoothing(0);
-    lenis.on("scroll", ScrollTrigger.update);
-  }
-
-  if (rail) {
-    rail.addEventListener("click", function (e) {
-      var a = e.target.closest("a");
-      if (!a) return;
-      var target = document.querySelector(a.getAttribute("href"));
-      if (!target) return;
-      e.preventDefault();
-      if (lenis) lenis.scrollTo(target, { offset: -70 });
-      else target.scrollIntoView({ behavior: "smooth" });
-    });
-  }
-
-  // Page-wide progress. It means "how far down the page you are" and nothing
-  // else; the previous bar meant two different things in two different sections.
-  ScrollTrigger.create({
-    start: 0,
-    end: "max",
-    onUpdate: function (self) {
-      if (bar) gsap.set(bar, { scaleX: Math.max(0.02, self.progress) });
-    }
-  });
-
-  /* The opening: pin the stage and open each domain in turn.
-   *
-   * Seven beats, one per domain, where there used to be eight per Solution — and
-   * before that 24 chapters over 76,000 pixels, where scrolling was the whole
-   * interface and reaching a named skill meant travelling past hundreds of others.
-   *
-   * Scrolling now demonstrates the top layer and nothing more. Depth is reached by
-   * clicking, which is faster than scrolling for a tree and does not make the
-   * visitor pay in page height for structure they may not want.
-   */
-  if (featured.length) {
-    var PER_BEAT = 260;
-    gsap.timeline({
-      scrollTrigger: {
-        trigger: stage,
-        start: "top top",
-        end: "+=" + featured.length * PER_BEAT,
-        scrub: 0.5,
-        pin: true,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        onUpdate: function (self) {
-          // A dead zone at the very start, so the page's opening image is the whole
-          // library rather than one cluster already singled out.
-          //
-          // It must not clear a selection the reader made. This trigger updates on
-          // every tick, so while sitting at the top of the page it was calling
-          // clearFocus() immediately after any click, which released the pin and let
-          // the next hover take over: clicking a Solution appeared to work and then
-          // silently stopped holding.
-          if (self.progress < 0.06) {
-            if (openComm !== featured[0]) {
-              showCommunity(featured[0], { frame: false });
+      let box = positions.map(([x, y]) => ({x, y, w: width, h: height}))
+        .find((candidate) => candidate.x >= 12 && candidate.y >= 10 &&
+          candidate.x + candidate.w <= size.w - 12 && candidate.y + candidate.h <= size.h - 10 &&
+          !reserved.some((other) => intersects(candidate, other)) &&
+          !dots.some((dot) => intersects(candidate, dot)));
+      if (!box && selected) {
+        // Search the whole canvas at obstacle boundaries, including the outer
+        // gutters. Coarse rows can miss a valid strip just above/below the dots.
+        // Try narrower wrapping too, without shrinking type or losing text.
+        let best = null;
+        for (const limit of [...new Set([Math.min(340, size.w - 32), 240, 180, 120, 90])]) {
+          const wrapped = labelLines(name, Math.min(limit, size.w - 16), font, 650);
+          const w = Math.max(...wrapped.map((line) => measure.measureText(line).width));
+          const h = wrapped.length * (font + 4);
+          if (w > size.w - 16 || h > size.h - 12) continue;
+          const xs = [...new Set([8, size.w - w - 8, px - w / 2,
+            ...dots.flatMap((dot) => [dot.x - w - 9, dot.x + dot.w + 9])]
+            .map((x) => clamp(x, 8, size.w - w - 8)))];
+          const ys = [...new Set([6, size.h - h - 6, py - h / 2,
+            ...dots.flatMap((dot) => [dot.y - h - 7, dot.y + dot.h + 7])]
+            .map((y) => clamp(y, 6, size.h - h - 6)))];
+          for (const y of ys) {
+            for (const x of xs) {
+              const candidate = {x, y, w, h};
+              if (dots.some((dot) => intersects(candidate, dot)) ||
+                  reserved.some((other) => intersects(candidate, other))) continue;
+              const distance = Math.hypot(px - clamp(px, x, x + w), py - clamp(py, y, y + h));
+              if (!best || distance < best.distance) best = {box: candidate, lines: wrapped, distance};
             }
-            return;
           }
-          var i = Math.min(
-            featured.length - 1,
-            Math.floor(((self.progress - 0.06) / 0.94) * featured.length)
-          );
-          if (featured[i] !== openComm) {
-            showCommunity(featured[i]);
-          }
-        },
-        onLeaveBack: function () {
-          if (featured.length) showCommunity(featured[0], { frame: false });
+        }
+        if (best) {
+          box = best.box; lines = best.lines; width = box.w; height = box.h;
         }
       }
-    }).to(cue, { opacity: 0, duration: 0.3 }, 0);
+      if (!box) return false;
+      label.replaceChildren();
+      label.setAttribute("x", box.x);
+      label.setAttribute("y", box.y + font);
+      label.setAttribute("text-anchor", "start");
+      label.style.fontSize = `${font}px`;
+      label.style.display = "";
+      label.classList.toggle("is-selected", selected);
+      lines.forEach((line, i) => {
+        const span = document.createElementNS(ns, "tspan");
+        span.setAttribute("x", box.x);
+        span.setAttribute("dy", i ? font + 4 : 0);
+        span.textContent = line;
+        label.appendChild(span);
+      });
+      reserved.push(box);
+      if (!community) {
+        const offscreen = px < 0 || px > size.w || py < 0 || py > size.h;
+        Object.assign(label.dataset, {anchorX: String(px), anchorY: String(py), offscreen: String(offscreen)});
+        let sx = clamp(px, 5, size.w - 5), sy = clamp(py, 5, size.h - 5);
+        const tx = clamp(sx, box.x, box.x + width), ty = clamp(sy, box.y, box.y + height);
+        const node = nodes.get(label.dataset.key), distance = Math.hypot(tx - sx, ty - sy);
+        if (!offscreen && distance && node) {
+          const radius = Number(node.dot.getAttribute("r")) * k;
+          sx += (tx - sx) / distance * radius; sy += (ty - sy) / distance * radius;
+        }
+        const leader = selected ? selectedLeader : document.createElementNS(ns, "path");
+        if (!selected) {
+          leader.setAttribute("class", "g-label-leader");
+          $("graph-labels").prepend(leader);
+        }
+        leader.setAttribute("d", `M ${sx} ${sy} L ${tx} ${ty}`);
+        leader.style.display = "";
+        leader.dataset.offscreen = String(offscreen);
+      }
+      return true;
+    }
+    // Anchor the full selected name to its dot. If panned offscreen, keep a
+    // clamped callout connected to the relevant edge and report that in status.
+    if (state.selected && labels.has(state.selected)) {
+      const point = scene.get(state.selected);
+      if (point) place(labels.get(state.selected), nodes.get(state.selected).name,
+        point.x * k + state.viewport.x, point.y * k + state.viewport.y, true);
+    }
+    if (state.mode === "overview") {
+      for (const c of data.comms) {
+        const keys = sceneKeys.filter((key) => nodes.get(key).community === String(c.id));
+        if (!keys.length) continue;
+        let label = communityLabels.find((el) => el.dataset.comm === String(c.id));
+        if (!label) {
+          label = document.createElementNS(ns, "text");
+          label.setAttribute("class", "g-clabel");
+          label.style.display = "none";
+          label.dataset.comm = c.id;
+          $("graph-labels").appendChild(label);
+          communityLabels.push(label);
+        }
+        const x = keys.reduce((sum, key) => sum + scene.get(key).x, 0) / keys.length;
+        const y = keys.reduce((sum, key) => sum + scene.get(key).y, 0) / keys.length;
+        place(label, c.label, x * k + state.viewport.x, y * k + state.viewport.y, false, true);
+      }
+    } else {
+      for (const key of ranked(sceneKeys)) {
+        if (key === state.selected) continue;
+        const point = scene.get(key), px = point.x * k + state.viewport.x, py = point.y * k + state.viewport.y;
+        if (px < 0 || px > size.w || py < 0 || py > size.h) continue;
+        place(labels.get(key), nodes.get(key).name, px, py);
+      }
+    }
   }
 
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(function () {
-      ScrollTrigger.refresh();
+  function contextTitle() {
+    if (state.mode === "path") return state.pathEnd ?
+      `${nodes.get(state.pathStart).name} → ${nodes.get(state.pathEnd).name}` : "Trace a path";
+    if (state.selected) return nodes.get(state.selected).name;
+    if (state.mode === "search") return `Search: ${state.query}`;
+    if (state.mode === "community") return communities.get(state.community).label;
+    if (state.mode === "category") return $("gcategory").selectedOptions[0].textContent.replace(/ \(\d+\)$/, "");
+    if (state.mode === "solution") return solutions.get(state.filters.solution).label;
+    return "All communities";
+  }
+
+  function applyViewport(layoutPass = 0) {
+    const {x, y, k} = state.viewport;
+    vp.setAttribute("transform", `translate(${x} ${y}) scale(${k})`);
+    Object.assign(vp.dataset, {x: String(x), y: String(y), scale: String(k)});
+    let visible = 0;
+    nodes.forEach((node, key) => {
+      const point = scene.get(key);
+      const onScreen = !!point && point.x * k + x >= 0 && point.x * k + x <= size.w &&
+        point.y * k + y >= 0 && point.y * k + y <= size.h;
+      node.el.dataset.visible = String(onScreen);
+      if (!point) return;
+      if (onScreen) visible++;
+      // Nodes are readable marks, while the companion list guarantees 44px targets.
+      node.dot.setAttribute("r", Math.max(5, Math.min(15, node.radius * k)) / k);
+      node.hit.setAttribute("r", 22 / k);
+    });
+    drawLabels();
+    root.dataset.visibleCount = String(visible);
+    root.dataset.renderedCount = String(sceneKeys.length);
+    text("status-counts", `${visible} visible / ${sceneKeys.length} in view · ${listKeys.length} matching`);
+    text("status-zoom", `${Math.round(k * 100)}% zoom`);
+    text("status-context", state.mode === "node" ?
+      `Node · ${communities.get(nodes.get(state.selected).community).label}` :
+      state.mode === "community" ? `Community · ${communities.get(state.community).label}` :
+        state.mode === "path" ? `Path · ${state.path.length ? state.path.length - 1 : 0} steps` : contextTitle());
+    const offscreen = state.selected && nodes.get(state.selected).el.dataset.visible !== "true";
+    text("status-selected", state.selected ? `Selected: ${nodes.get(state.selected).name}${offscreen ? " · offscreen — Fit to return" : ""}` : "No node selected");
+    root.dataset.selectedOffscreen = String(!!offscreen);
+    const stated = activeEdges.filter((edge) => edge.kind === 0).length;
+    text("status-evidence", `${stated} stated · ${activeEdges.length - stated} inferred`);
+    $("gzoom-in").disabled = k >= 30;
+    $("gzoom-out").disabled = k <= .08;
+    // A long title or status can wrap during this explicit render. Settle the
+    // canvas now, not one observer frame later, so counts/callouts are truthful
+    // immediately after a click. Keep the same world point at the center.
+    const rect = $("graph-canvas").getBoundingClientRect();
+    if (layoutPass < 3 && rect.width && rect.height &&
+        (Math.abs(rect.width - size.w) > .01 || Math.abs(rect.height - size.h) > .01)) {
+      state.viewport.x += (rect.width - size.w) / 2;
+      state.viewport.y += (rect.height - size.h) / 2;
+      size = {w: rect.width, h: rect.height};
+      applyViewport(layoutPass + 1);
+    }
+  }
+
+  function renderList() {
+    const signature = JSON.stringify([listKeys, state.query, state.listKind]);
+    if (signature !== listSignature) {
+      const fragment = document.createDocumentFragment();
+      for (const key of listKeys) {
+        const node = nodes.get(key), li = document.createElement("li"), button = document.createElement("button");
+        button.type = "button";
+        button.dataset.key = key;
+        const name = document.createElement("strong"), description = document.createElement("span");
+        name.textContent = node.name;
+        const q = state.query.trim().toLocaleLowerCase();
+        const found = q ? node.description.toLocaleLowerCase().indexOf(q) : -1;
+        const start = Math.max(0, found - 40);
+        description.textContent = (start ? "…" : "") + node.description.slice(start, start + 145) +
+          (node.description.length > start + 145 ? "…" : "");
+        button.append(name, description);
+        const qualifier = node.card.querySelector(".qual");
+        if (qualifier) {
+          const detail = document.createElement("span");
+          detail.className = "result-qualifier";
+          detail.textContent = `${node.category} / ${qualifier.textContent}`;
+          button.append(detail);
+        }
+        button.setAttribute("aria-label", `${node.name}, ${node.category}${qualifier ? ", " + qualifier.textContent : ""}`);
+        li.appendChild(button);
+        fragment.appendChild(li);
+      }
+      if (!listKeys.length) {
+        const li = document.createElement("li");
+        li.className = "empty-result";
+        li.textContent = "No matching skills. Try another word or clear a filter.";
+        fragment.appendChild(li);
+      }
+      results.replaceChildren(fragment);
+      results.scrollTop = 0;
+      listSignature = signature;
+    }
+    results.querySelectorAll("button").forEach((button) =>
+      button.setAttribute("aria-pressed", String(button.dataset.key === state.selected)));
+    text("results-title", state.query.trim() ? "Search results" :
+      state.listKind === "community" ? "Community members" : "Matching skills");
+    text("results-count", String(listKeys.length));
+    text("results-hint", state.pathPending ?
+      (state.pathStart ? `Choose the end. Start: ${nodes.get(state.pathStart).name}` : "Choose a start, then an end.") :
+      state.selected ? "Selection stays put. Choose another result to compare." : "Select a skill to inspect it.");
+  }
+
+  function evidenceText(edge) {
+    const reasons = data.why[edge.index] || [];
+    return `${edge.kind === 0 ? "Stated" : "Inferred"}: ${reasons.join("; ") || "No detail supplied"}`;
+  }
+
+  function renderPanel() {
+    text("paneltier", state.mode === "node" ? "Selected skill" : state.mode);
+    text("panelname", contextTitle());
+    $("panelchain").replaceChildren();
+    $("panelsource").hidden = !state.selected;
+    text("panelmeta", "");
+    if (state.mode === "path") {
+      const count = Math.max(0, state.path.length - 1);
+      text("paneldesc", !state.pathEnd ? "Choose an end skill from the result list. Search remains available." :
+        state.path.length ? `${count} ${count === 1 ? "edge" : "edges"} in the shortest path.` :
+          "No path exists with the active evidence filter. Try all evidence or choose another end.");
+      state.path.forEach((key, i) => {
+        const li = document.createElement("li");
+        li.textContent = nodes.get(key).name;
+        if (i) {
+          const edge = adjacency.get(state.path[i - 1]).find((item) => item.to === key).edge;
+          const detail = document.createElement("p");
+          detail.textContent = evidenceText(edge);
+          li.appendChild(detail);
+        }
+        $("panelchain").appendChild(li);
+      });
+      text("panelev", "Breadth-first search. Every edge costs one step. Filters do not invent missing connections.");
+    } else if (state.selected) {
+      const node = nodes.get(state.selected), linked = neighbors(state.selected);
+      text("paneldesc", node.description);
+      $("panelsource").href = node.source;
+      text("panelmeta", `${node.repo} · ${node.licence}`);
+      linked.forEach((item) => {
+        const li = document.createElement("li"), button = document.createElement("button"), detail = document.createElement("span");
+        button.type = "button"; button.dataset.key = item.to;
+        button.textContent = nodes.get(item.to).name;
+        detail.textContent = evidenceText(item.edge);
+        li.append(button, detail);
+        $("panelchain").appendChild(li);
+      });
+      text("panelev", `${linked.length} connections in the active evidence graph. Solid = stated. Dashed = inferred.`);
+    } else {
+      const solution = solutions.get(state.filters.solution);
+      text("paneldesc", state.mode === "search" ?
+        `${listKeys.length} matches in skill names and full descriptions. Select a result; your search stays here.` :
+        state.mode === "community" ?
+          `${listKeys.length} skills in this detected community. Select any member below to expand its neighborhood.` :
+          state.mode === "solution" ? `${solution.tier} Solution. ${solution.evidence}` :
+            `${listKeys.length} skills available. Select a member or narrow the top filters.`);
+      text("panelev", state.mode === "overview" ?
+        "Labels name detected communities. All communities, including single skills, are available in the dropdown." :
+        "Solid edges are stated in the repository. Dashed edges are inferred from names.");
+    }
+    if (state.selected) $("panelsource").href = nodes.get(state.selected).source;
+  }
+
+  function render({frame = true} = {}) {
+    search.value = state.query;
+    $("gcommunity").value = state.filters.community || (state.mode === "community" ? state.community : "");
+    $("gcategory").value = state.filters.category;
+    $("gsolution").value = state.filters.solution;
+    $("gstated").setAttribute("aria-pressed", String(state.filters.stated));
+    text("gstated", state.filters.stated ? "Stated only" : "All evidence");
+    $("gpath").setAttribute("aria-pressed", String(state.pathPending || state.mode === "path"));
+    text("gpath", state.pathPending ? "Cancel path" : "Trace path");
+    $("gback").disabled = !history.length;
+    $("gclear").disabled = !state.query;
+    Object.assign(root.dataset, {mode: state.mode, query: state.query, selectedKey: state.selected,
+      community: state.community, category: state.filters.category, solution: state.filters.solution,
+      evidence: state.filters.stated ? "stated" : "all", path: JSON.stringify(state.path)});
+    text("workspace-title", contextTitle());
+    text("context-kind", `Skill library / ${state.mode === "node" ? "Selected skill" : state.mode}`);
+    text("graph-caption", state.mode === "node" ? "Selected skill + direct connections" :
+      state.mode === "path" ? "Shortest path · active evidence" : "Drag to pan · select a skill to explore");
+    prepareScene();
+    root.dataset.matchingCount = String(listKeys.length);
+    renderList();
+    renderPanel();
+    if (frame) fit();
+    applyViewport();
+  }
+
+  function selectNode(key) {
+    if (!nodes.has(key)) return;
+    save();
+    state.selected = key;
+    if (state.pathPending) {
+      if (!state.pathStart) {
+        state.pathStart = key; state.mode = "path";
+      } else {
+        state.pathEnd = key; state.path = shortestPath(state.pathStart, key);
+        state.pathPending = false; state.mode = "path";
+      }
+    } else {
+      state.mode = "node";
+    }
+    render();
+    $("panel").scrollTop = 0;
+  }
+
+  function baseMode() {
+    if (state.query.trim()) return "search";
+    if (state.filters.solution) return "solution";
+    if (state.filters.category) return "category";
+    if (state.filters.community) return "community";
+    return "overview";
+  }
+  function changeSearch() {
+    if (search.value === state.query) return;
+    if (!search.value && state.query) { clearSearch(); return; }
+    // One history entry per search session, not one per keystroke.
+    if (!state.query || state.mode === "node") save();
+    if (!state.query && !state.searchOrigin) state.searchOrigin = clone(state);
+    state.query = search.value;
+    if (state.pathPending) {
+      state.mode = "path";
+    } else {
+      state.selected = ""; state.path = []; state.pathStart = ""; state.pathEnd = "";
+      state.mode = baseMode();
+    }
+    state.listKind = "search";
+    render();
+  }
+  search.addEventListener("input", changeSearch);
+  $("gform").addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (listKeys.length) selectNode(listKeys[0]);
+  });
+  function clearSearch() {
+    const origin = state.searchOrigin, filters = clone(state.filters);
+    save();
+    if (origin && ["community", "category", "solution"].every((key) => origin.filters[key] === filters[key])) {
+      state = clone(origin); state.searchOrigin = null; state.filters.stated = filters.stated;
+      render({frame: false});
+    } else {
+      state.query = ""; state.selected = ""; state.pathPending = false; state.path = [];
+      state.pathStart = ""; state.pathEnd = ""; state.mode = baseMode(); state.searchOrigin = null;
+      state.listKind = state.mode; render();
+    }
+    search.focus();
+  }
+  $("gclear").addEventListener("click", clearSearch);
+  for (const [id, filter] of [["gcommunity", "community"], ["gcategory", "category"], ["gsolution", "solution"]]) {
+    $(id).addEventListener("change", () => {
+      save(); state.filters[filter] = $(id).value;
+      if (filter === "community") state.community = $(id).value;
+      state.selected = ""; state.path = []; state.pathPending = false;
+      state.pathStart = ""; state.pathEnd = "";
+      state.mode = baseMode(); state.listKind = state.mode; render();
     });
   }
-
-  var wasDesktop = wide();
-  var t;
-  window.addEventListener("resize", function () {
-    clearTimeout(t);
-    t = setTimeout(function () {
-      var isDesktop = wide();
-      if (isDesktop !== wasDesktop) window.location.reload();
-      else ScrollTrigger.refresh();
-    }, 250);
+  $("gstated").addEventListener("click", () => {
+    save(); state.filters.stated = !state.filters.stated;
+    if (state.pathStart && state.pathEnd) state.path = shortestPath(state.pathStart, state.pathEnd);
+    render();
   });
+  function resetWorkspace() {
+    save(); state = initial(); render();
+  }
+  $("greset").addEventListener("click", resetWorkspace);
+  root.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      // An explicit Reset shortcut, not the browser's partial search-input clear.
+      event.preventDefault(); resetWorkspace();
+    }
+  });
+  $("goverview").addEventListener("click", () => {
+    save(); state = initial(); state.mode = "overview"; state.listKind = "overview"; state.community = ""; render();
+  });
+  $("gback").addEventListener("click", () => {
+    if (!history.length) return;
+    state = history.pop(); render({frame: false});
+  });
+  $("gpath").addEventListener("click", () => {
+    save();
+    if (state.pathPending) {
+      state.pathPending = false; state.path = []; state.pathStart = ""; state.pathEnd = "";
+      state.mode = state.selected ? "node" : baseMode();
+    } else {
+      state.pathPending = true; state.pathStart = state.selected;
+      state.pathEnd = ""; state.path = []; state.mode = "path";
+    }
+    render();
+  });
+  [results, $("panelchain")].forEach((list) => list.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-key]");
+    if (button) selectNode(button.dataset.key);
+  }));
+  svg.addEventListener("click", (event) => {
+    const node = event.target.closest(".g-node");
+    if (node) event.preventDefault();
+    if (suppressClick) { suppressClick = false; return; }
+    if (node) selectNode(node.dataset.key);
+  });
+  function zoom(factor) {
+    const old = state.viewport.k, next = Math.max(.08, Math.min(30, old * factor));
+    state.viewport.x = size.w / 2 - (size.w / 2 - state.viewport.x) * next / old;
+    state.viewport.y = size.h / 2 - (size.h / 2 - state.viewport.y) * next / old;
+    state.viewport.k = next;
+    applyViewport();
+  }
+  $("gzoom-in").addEventListener("click", () => zoom(1.3));
+  $("gzoom-out").addEventListener("click", () => zoom(1 / 1.3));
+  $("gfit").addEventListener("click", () => { fit(); applyViewport(); });
+  svg.addEventListener("keydown", (event) => {
+    const moves = {ArrowLeft: [48, 0], ArrowRight: [-48, 0], ArrowUp: [0, 48], ArrowDown: [0, -48]};
+    if (moves[event.key]) {
+      event.preventDefault(); state.viewport.x += moves[event.key][0]; state.viewport.y += moves[event.key][1]; applyViewport();
+    } else if (["+", "=", "-"].includes(event.key)) {
+      event.preventDefault(); zoom(event.key === "-" ? 1 / 1.3 : 1.3);
+    } else if (event.key === "Home") {
+      event.preventDefault(); fit(); applyViewport();
+    }
+  });
+  let drag = null;
+  svg.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0) return;
+    suppressClick = false;
+    drag = {id: event.pointerId, x: event.clientX, y: event.clientY,
+      startX: state.viewport.x, startY: state.viewport.y, moved: false};
+  });
+  svg.addEventListener("pointermove", (event) => {
+    if (!drag || drag.id !== event.pointerId) return;
+    const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
+    if (!drag.moved && Math.hypot(dx, dy) < 5) return;
+    drag.moved = true;
+    svg.setPointerCapture(event.pointerId);
+    svg.classList.add("is-dragging");
+    state.viewport.x = drag.startX + dx; state.viewport.y = drag.startY + dy;
+    applyViewport();
+  });
+  function endDrag() {
+    if (!drag) return;
+    suppressClick = drag.moved;
+    if (svg.hasPointerCapture(drag.id)) svg.releasePointerCapture(drag.id);
+    drag = null; svg.classList.remove("is-dragging");
+  }
+  svg.addEventListener("pointerup", endDrag);
+  svg.addEventListener("pointercancel", endDrag);
+
+  function openReference(id) {
+    const target = $(id);
+    if (!target) return;
+    let parent = target;
+    while (parent) {
+      if (parent.tagName === "DETAILS") parent.open = true;
+      parent = parent.parentElement;
+    }
+    target.scrollIntoView({behavior: "instant", block: "start"});
+  }
+  document.querySelectorAll("[data-open]").forEach((link) => link.addEventListener("click", (event) => {
+    event.preventDefault(); openReference(link.dataset.open);
+    historyReplace(link.getAttribute("href"));
+  }));
+  function historyReplace(hash) {
+    try { window.history.replaceState(null, "", hash); } catch (_) { /* opaque previews */ }
+  }
+  function openHash() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (id) openReference(id);
+  }
+  window.addEventListener("hashchange", openHash);
+  if (window.matchMedia("(max-width: 767px)").matches) $("gfilters").open = false;
+  document.documentElement.classList.add("js");
+  function resize() {
+    const rect = $("graph-canvas").getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const old = size;
+    size = {w: rect.width, h: rect.height};
+    // With no root viewBox, SVG user units are CSS pixels even during the frame
+    // before ResizeObserver runs. Header wrapping can never briefly shrink type.
+    svg.removeAttribute("viewBox");
+    if (root.dataset.ready === "true") {
+      // Preserve zoom and the world point at viewport center, not just the title.
+      state.viewport.x += (size.w - old.w) / 2;
+      state.viewport.y += (size.h - old.h) / 2;
+      applyViewport();
+    } else {
+      render();
+      root.dataset.ready = "true";
+    }
+  }
+  resize();
+  new ResizeObserver(resize).observe($("graph-canvas"));
+  if (document.fonts) document.fonts.ready.then(drawLabels);
+  openHash();
 })();
