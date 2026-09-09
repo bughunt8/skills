@@ -52,14 +52,40 @@ from pathlib import Path
 
 # Tokens that carry no information about what a skill is for. Every skill in a library
 # of agent skills is a skill, about an agent, by an expert.
+# Words that say nothing about what a skill is about.
+#
+# The first list was function words plus a few repo conventions, and it was not enough. An
+# independent review found `customer-success-manager` joined to `env-secrets-manager`, and
+# `board-prep` joined to `gdpr-audit-prep`, on the strength of "manager" and "prep". Those
+# are job titles and generic actions: two skills sharing one is evidence of nothing.
+#
+# So the list now covers three kinds of empty word: function words, the repository's own
+# packaging conventions, and — the ones that were doing the damage — seniority, role and
+# artefact-shape nouns that describe the wrapper rather than the subject.
 STOP = {
+    # function words
     "the", "and", "for", "with", "your", "you", "from", "this", "that", "all", "new",
-    "get", "use", "using", "skill", "skills", "agent", "agents", "expert", "pro", "max",
-    "init", "run", "status", "core", "team", "auto", "full", "one", "two", "sub",
+    "get", "use", "using", "into", "via", "per", "any", "one", "two", "sub", "non",
+    # repository conventions and generic skill words
+    "skill", "skills", "agent", "agents", "init", "run", "status", "core", "team",
+    "auto", "full", "pro", "max", "mini", "basic", "advanced", "general", "custom",
+    # seniority and role: a title, not a subject
+    "senior", "junior", "staff", "principal", "chief", "head", "officer", "director",
+    "manager", "advisor", "adviser", "consultant", "specialist", "expert", "analyst",
+    "coordinator", "assistant", "associate", "partner", "executive", "operator",
+    # artefact shape: describes the wrapper, not what it is about
+    "builder", "generator", "creator", "maker", "helper", "wizard", "toolkit",
+    "template", "checklist", "guide", "playbook", "handbook", "pack", "kit", "suite",
+    "tool", "tools", "helper", "assist", "prep", "setup", "config", "util", "utils",
+    "manager", "handler", "wrapper", "engine", "service", "system",
 }
 
 # A token shared by more than this many skills is a word, not a subject.
 TOKEN_CAP = 28
+
+# A shared word this common or rarer is specific enough to imply a relationship on its own.
+# Above it, a single word in common is not evidence and the pair needs a second one.
+NARROW_TOKEN = 8
 MIN_TOKEN = 3
 
 # Weights. A lead leading a skill is the strongest statement the repository makes; a
@@ -92,11 +118,23 @@ def build_graph(rows: list, sols: list) -> dict:
             why[pair].append(reason)
 
     for s in sols:
+        label = s.get("label", s["name"])
         lead = s["lead"] if s["lead"] in by_key else None
-        if not lead:
+        if lead:
+            for member in s["members"]:
+                link(lead, member, W_LEAD, "extracted", f"led by {label}")
             continue
-        for member in s["members"]:
-            link(lead, member, W_LEAD, "extracted", f'led by {s.get("label", s["name"])}')
+        # Three of the curated Solutions are written as a document rather than led by one
+        # of the 490 skills, so there is no lead node to hang them from. Skipping them
+        # silently was wrong twice over: their relationships vanished from the graph, and
+        # five of their members were left with no edges at all and drawn on the frontier
+        # ring as though nothing in the library connected them.
+        #
+        # What the repository states about them is that these skills work together, so
+        # that is what goes in: the members joined to each other, as stated evidence.
+        members = sorted(m for m in s["members"] if m in by_key)
+        for a, b in itertools.combinations(members, 2):
+            link(a, b, W_SIBLING, "extracted", f"steps of {label}")
 
     bundles: dict = collections.defaultdict(list)
     for r in rows:
@@ -107,19 +145,63 @@ def build_graph(rows: list, sols: list) -> dict:
             for a, b in itertools.combinations(sorted(members), 2):
                 link(a, b, W_SIBLING, "extracted", f"siblings in {bundle}")
 
+    # ---------------------------------------------------------------- inferred
+    #
+    # Two skills whose names share a subject. This is the weaker half of the graph and the
+    # page says so: these edges are drawn dashed and faint, and one control throws them all
+    # away.
+    #
+    # The first version made a clique for every shared token, and an independent review was
+    # right that the result was often meaningless — `creative-research` joined to
+    # `clinical-research` because both contain "research". One word in common is not
+    # evidence, so an edge now needs one of two things:
+    #
+    #   * two or more shared subject words — `stitch-design-md` and `stitch-code-to-design`
+    #     share both "stitch" and "design", which is a real family; or
+    #   * one shared word that is specific enough to mean something, which is defined as
+    #     being used by at most NARROW_TOKEN skills. "cro" across 8 skills says something.
+    #     "research" across 12 does not.
+    #
+    # Broad words are still allowed to reinforce an edge that qualifies on other grounds;
+    # they are simply not allowed to create one on their own.
     tokens: dict = collections.defaultdict(list)
     for r in rows:
         for t in re.split(r"[^a-z0-9]+", r["n"].lower()):
             if len(t) >= MIN_TOKEN and t not in STOP:
                 tokens[t].append(r["key"])
+    # A name's first word is a family prefix in this repository: the 21 `principle-*` skills
+    # and the 15 `stitch-*` skills are deliberately named as sets. That convention is worth
+    # trusting even when the word is common, so a shared prefix qualifies on its own —
+    # otherwise the rule above would dissolve two of the library's most real families for
+    # being too large.
+    prefix_of = {}
+    for r in rows:
+        head = re.split(r"[^a-z0-9]+", r["n"].lower())
+        prefix_of[r["key"]] = head[0] if head and head[0] not in STOP else None
+
+    shared: dict = collections.defaultdict(list)
     token_used = 0
-    for token, members in sorted(tokens.items()):
-        members = sorted(set(members))
-        if 2 <= len(members) <= TOKEN_CAP:
-            token_used += 1
-            w = _token_weight(len(members))
-            for a, b in itertools.combinations(members, 2):
-                link(a, b, w, "inferred", f'both named "{token}"')
+    for token, holders in sorted(tokens.items()):
+        holders = sorted(set(holders))
+        if not 2 <= len(holders) <= TOKEN_CAP:
+            continue
+        token_used += 1
+        for a, b in itertools.combinations(holders, 2):
+            shared[(a, b)].append((token, len(holders)))
+
+    for (a, b), found in sorted(shared.items()):
+        narrow = [t for t, n in found if n <= NARROW_TOKEN]
+        family = (
+            prefix_of.get(a) is not None and prefix_of.get(a) == prefix_of.get(b)
+        )
+        if len(found) < 2 and not narrow and not family:
+            continue
+        weight = sum(_token_weight(n) for _t, n in found)
+        words = ", ".join(f'"{t}"' for t, _n in found[:3])
+        reason = f"named {prefix_of[a]}-*" if family and len(found) < 2 else (
+            f"names share {words}"
+        )
+        link(a, b, weight, "inferred", reason)
 
     degree = collections.Counter()
     strength = collections.Counter()
@@ -453,7 +535,11 @@ def _pack_discs(radii: list, edges: list, width: float, height: float) -> list:
                     dx = points[b][0] - points[a][0]
                     dy = points[b][1] - points[a][1]
                     d = math.hypot(dx, dy)
-                    want = radii[a] + radii[b] + 14.0
+                    # 24 rather than 14. Tightening the edge rules split the library into
+                    # 31 communities from 19, and at 14 units apart only 88% of skills sat
+                    # nearer their own community's centre than any other's - which makes
+                    # colouring by community say less than it claims.
+                    want = radii[a] + radii[b] + 24.0
                     if d < want:
                         if d < 1e-9:
                             dx, dy, d = 1.0 + (a % 3), 0.5 + (b % 3), 1.0
@@ -515,7 +601,7 @@ def layout(graph: dict, comm: dict, rows_by_key: dict,
     # radius by sqrt(n) alone left the big communities four times denser than the small
     # ones, and 9,462 pairs of nodes ended up closer together than a node is wide.
     frame_area = width * height
-    fill = 0.34
+    fill = 0.30
     per_node = frame_area * fill / max(1, len(nodes))
     radii = [
         max(18.0, math.sqrt(len(linked[c]) * per_node / math.pi)) for c in order
@@ -607,6 +693,20 @@ def layout(graph: dict, comm: dict, rows_by_key: dict,
     keys = sorted(out)
     pts = [out[k] for k in keys]
     _separate(pts, min_dist=MIN_GAP, passes=6)
+
+    # Rounded and clamped FIRST, then separated, then rounded again with a margin.
+    #
+    # Separating and then rounding is what the first version did, and rounding moves a
+    # point by up to 0.05 in each axis while clamping can move it much further: the closest
+    # pair came out at 14.75 units against a guarantee of 15. A review caught it, and the
+    # honest fix is to make the guarantee true of the coordinates that are actually written
+    # into the page rather than of an intermediate the page never sees.
+    for i, pt in enumerate(pts):
+        pts[i] = [
+            round(min(width - 4.0, max(4.0, pt[0])), 1),
+            round(min(height - 4.0, max(4.0, pt[1])), 1),
+        ]
+    _separate(pts, min_dist=MIN_GAP + 0.3, passes=8)
     for k, pt in zip(keys, pts):
         out[k] = (
             round(min(width - 4.0, max(4.0, pt[0])), 1),
@@ -644,28 +744,88 @@ def load_domains(site_dir: Path) -> dict:
     }
 
 
-def agreement(comm: dict, rows: list, spec: dict) -> dict:
-    """How much the detected communities and the declared domains actually agree.
+def agreement(comm: dict, rows: list, spec: dict, degree: dict = None) -> dict:
+    """Majority-label purity of the detected communities against the declared domains.
 
-    Reported on the page because it is the one number that says whether the taxonomy is
-    describing the library or just filing it.
+    Not "agreement", which is what this was called and what it is not. A detected community
+    has no domain label of its own; this assigns it whichever declared domain its members
+    are most often filed under, then counts the members in that majority. That is purity
+    measured after seeing the answer, and it can only ever flatter the clustering.
+
+    A review was right to object to the earlier framing on two counts. Calling it agreement
+    implied the two labellings were compared independently, which is impossible. And every
+    isolated skill is its own single-member community, so it scores a point automatically —
+    45 free points out of 490. Both numbers are now reported separately: `linked` excludes
+    single-member communities, and `automatic` says how many of the points were free.
+
+    Purity means nothing on its own, so `nmi` reports normalised mutual information between
+    the two labellings as well. That one is symmetric, needs no majority assignment, and is
+    0 when the two are independent and 1 when either determines the other — so it cannot be
+    inflated by having many small communities, which is exactly how purity can be.
+
+    A first attempt at a baseline here was worse than no baseline: it filled the same
+    community sizes from a domain-sorted list, which is the best case rather than the
+    uninformed one, and duly scored higher than the real clustering. It is gone.
     """
-    per_comm = collections.defaultdict(collections.Counter)
     by_key = {r["key"]: r for r in rows}
-    for key, cid in comm.items():
+    degree = degree or {}
+    per_comm = collections.defaultdict(collections.Counter)
+    for key, cid in sorted(comm.items()):
         per_comm[cid][spec["cat_to_domain"][by_key[key]["dom"]]] += 1
-    agreed = 0
-    spanning = 0
-    for cid, counts in per_comm.items():
+
+    def purity(counter: collections.Counter) -> int:
         # Sorted rather than most_common: a community split evenly between two declared
-        # domains is a tie, and a tie broken by insertion order is broken by the hash
-        # seed.
-        agreed += sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[0][1]
+        # domains is a tie, and a tie broken by insertion order is broken by the hash seed.
+        return sorted(counter.items(), key=lambda kv: (-kv[1], kv[0]))[0][1]
+
+    pure = 0
+    linked_pure = 0
+    linked_total = 0
+    spanning = 0
+    automatic = 0
+    for cid, counts in sorted(per_comm.items()):
+        size = sum(counts.values())
+        pure += purity(counts)
+        if size == 1:
+            automatic += 1
+        else:
+            linked_pure += purity(counts)
+            linked_total += size
         if len(counts) > 1:
             spanning += 1
+
+    # Normalised mutual information, symmetric, on the whole library. Zero if the detected
+    # communities say nothing about the declared domains, one if either determines the other.
+    n = len(comm) or 1
+    dom_totals = collections.Counter()
+    for counts in per_comm.values():
+        dom_totals.update(counts)
+    mutual = 0.0
+    for counts in per_comm.values():
+        csize = sum(counts.values())
+        for dom, joint in counts.items():
+            mutual += (joint / n) * math.log(
+                (joint / n) / ((csize / n) * (dom_totals[dom] / n))
+            )
+
+    def entropy(counter):
+        return -sum(
+            (v / n) * math.log(v / n) for v in counter.values() if v
+        )
+
+    h_comm = entropy(
+        collections.Counter({c: sum(v.values()) for c, v in per_comm.items()})
+    )
+    h_dom = entropy(dom_totals)
+    nmi = 0.0 if h_comm <= 0 or h_dom <= 0 else mutual / math.sqrt(h_comm * h_dom)
+
     return {
-        "agreed": agreed,
+        "pure": pure,
         "total": len(comm),
+        "linked_pure": linked_pure,
+        "linked_total": linked_total,
+        "automatic": automatic,
+        "nmi": round(nmi, 3),
         "spanning": spanning,
         "communities": len(per_comm),
     }
@@ -673,11 +833,38 @@ def agreement(comm: dict, rows: list, spec: dict) -> dict:
 
 # ---------------------------------------------------------------------- labelling
 
-# Width of one character of a skill name at the label's font size, in user units.
-# Names are lowercase letters, digits and hyphens in the body face; measured rather than
-# guessed, by rendering the longest twenty names in a browser and dividing.
-CHAR_W = 0.505
+# The advance width of each character, as a fraction of the font size, measured in a browser
+# against the page's actual body face and pasted here.
+#
+# This started as one average number, 0.505 per character. An average is fine for a long name
+# and badly wrong for a short one: measured against the real labels, the widest were
+# under-estimated by 42%, and a skill name was placed against a community-name box a fifth
+# narrower than the label actually drawn. Two names overlapped on the page's opening state.
+#
+# Raising the average to the worst case would have over-reserved every long name by 40% and
+# dropped most of them. A table costs twenty lines and predicts every label on the page to
+# within 0.01%, which was checked by comparing it with getComputedTextLength for all 508
+# labels. Regenerate it the same way if the face changes.
+CHAR_W = {
+    ' ': 0.0, '&': 0.5749, '(': 0.4312, ')': 0.4312, '+': 0.7187, ',': 0.2875,
+    '-': 0.4312, '.': 0.2875, '/': 0.4312, '0': 0.5749, '1': 0.4312, '2': 0.5749,
+    '3': 0.5749, '4': 0.5749, '5': 0.5749, '6': 0.5749, '7': 0.5749, '8': 0.5749,
+    '9': 0.5749, 'A': 0.7187, 'B': 0.7187, 'C': 0.7187, 'D': 0.7187, 'E': 0.5749,
+    'F': 0.5749, 'G': 0.7187, 'H': 0.7187, 'I': 0.2875, 'J': 0.5749, 'K': 0.7187,
+    'L': 0.5749, 'M': 0.8624, 'N': 0.7187, 'O': 0.7187, 'P': 0.5749, 'Q': 0.7187,
+    'R': 0.5749, 'S': 0.5749, 'T': 0.5749, 'U': 0.7187, 'V': 0.7187, 'W': 1.0062,
+    'X': 0.7187, 'Y': 0.7187, 'Z': 0.5749, 'a': 0.5749, 'b': 0.5749, 'c': 0.5749,
+    'd': 0.5749, 'e': 0.5749, 'f': 0.4312, 'g': 0.5749, 'h': 0.5749, 'i': 0.2875,
+    'j': 0.2875, 'k': 0.5749, 'l': 0.2875, 'm': 0.8624, 'n': 0.5749, 'o': 0.5749,
+    'p': 0.5749, 'q': 0.5749, 'r': 0.4312, 's': 0.5749, 't': 0.2875, 'u': 0.5749,
+    'v': 0.5749, 'w': 0.8624, 'x': 0.5749, 'y': 0.5749, 'z': 0.5749, '·': 0.2875,
+}
+# Anything outside the table: wider than any real character, so an unknown glyph reserves too
+# much space rather than too little.
+CHAR_W_FALLBACK = 0.62
+
 LABEL_FONT = 9.5
+COMMUNITY_FONT = 11.5
 # Measured from getBBox in a browser, not derived from the font size: a 9.5px label
 # occupies 12.4 user units vertically, 9.4 above the baseline and 2.9 below. Deriving it
 # from the font size gave 10.4, and every collision that survived the first version of
@@ -685,16 +872,23 @@ LABEL_FONT = 9.5
 LABEL_H = 12.4
 
 
-def label_box(name: str, x: float, y: float, anchor: str) -> tuple:
-    """The rectangle a label occupies, so collisions can be tested before drawing."""
-    w = len(name) * CHAR_W * LABEL_FONT
+def label_box(
+    name: str, x: float, y: float, anchor: str, font: float = LABEL_FONT
+) -> tuple:
+    """The rectangle a label occupies, so collisions can be tested before drawing.
+
+    `font` matters: the community names are drawn larger than the skill names, and computing
+    both at the smaller size reserved the community boxes a fifth too narrow.
+    """
+    w = font * sum(CHAR_W.get(c, CHAR_W_FALLBACK) for c in name)
     if anchor == "start":
         x0 = x
     elif anchor == "end":
         x0 = x - w
     else:
         x0 = x - w / 2
-    return (x0, y - LABEL_H * 0.78, x0 + w, y + LABEL_H * 0.22)
+    h = LABEL_H * font / LABEL_FONT
+    return (x0, y - h * 0.78, x0 + w, y + h * 0.22)
 
 
 def _overlaps(a: tuple, b: tuple, gap: float = 1.4) -> bool:
@@ -704,6 +898,53 @@ def _overlaps(a: tuple, b: tuple, gap: float = 1.4) -> bool:
         and a[1] < b[3] + gap
         and b[1] < a[3] + gap
     )
+
+
+def place_community_labels(
+    order: list,
+    labels: dict,
+    members: dict,
+    pos: dict,
+    want: int,
+    frame: tuple = (0.0, 0.0, FRAME[0], FRAME[1]),
+) -> dict:
+    """Place the community names so that none of them collide with each other.
+
+    These were previously written at a fixed offset above each community and merely
+    *reserved* against the skill names, which are placed afterwards. Reserved is not the
+    same as checked: the boxes were never tested against one another, and once tightening the
+    edge rules split the library into 31 communities instead of 19, two of the names
+    overlapped. Largest community first, four candidate positions each, and a name with
+    nowhere to go is not drawn rather than drawn on top of another one.
+    """
+    placed = {}
+    boxes = []
+    for cid in order:
+        if len(placed) >= want:
+            break
+        mine = members[cid]
+        label = labels[cid]
+        cx = sum(pos[m][0] for m in mine) / len(mine)
+        top = min(pos[m][1] for m in mine)
+        bottom = max(pos[m][1] for m in mine)
+        options = [
+            (cx, top - 9.0),
+            (cx, bottom + 17.0),
+            (cx, top - 21.0),
+            (cx, bottom + 29.0),
+        ]
+        for ox, oy in options:
+            box = label_box(label, ox, oy, "middle", font=COMMUNITY_FONT)
+            if box[0] < frame[0] or box[2] > frame[2]:
+                continue
+            if box[1] < frame[1] or box[3] > frame[3]:
+                continue
+            if any(_overlaps(box, other, gap=2.4) for other in boxes):
+                continue
+            placed[cid] = {"x": round(ox, 1), "y": round(oy, 1), "box": box}
+            boxes.append(box)
+            break
+    return placed
 
 
 def place_labels(

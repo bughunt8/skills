@@ -103,6 +103,11 @@
    */
   var GKEYS = DATA.nodes || [];
   var GEDGES = DATA.edges || [];
+  // Why each relationship is drawn, in the same order as the edges. Shown in the panel
+  // beside each connection: "led by Idea to shipped code", "siblings in stitch", 'names
+  // share "cro"'. This was emitted and never read for one build — 52 KB of the 103 KB data
+  // file was an explanation the page had no way to show, while a comment claimed it said
+  // what an edge is when you select it.
   var GWHY = DATA.why || [];
   var adj = {};
   var edgeByPair = {};
@@ -292,9 +297,17 @@
     }
     if (panel.name) panel.name.textContent = node.getAttribute("data-name");
     if (panel.desc) panel.desc.textContent = desc ? desc.textContent : "";
+    // Each connection with the evidence for it, because "connected" on its own is a claim
+    // the reader cannot check. An inferred edge says which words the two names share, which
+    // is also the honest way to show how weak that kind of edge is.
     setChain(
       neighbours.slice(0, 12).map(function (e) {
-        return nameOf(e.to) + (e.kind === 0 ? "" : " (inferred)");
+        var why = GWHY[e.i] && GWHY[e.i].length ? GWHY[e.i][0] : "";
+        var other = nameOf(e.to);
+        // A Solution named after its own lead otherwise reads "automate-me \u2014 led by
+        // automate-me", which is a sentence that tells the reader nothing twice.
+        if (why === "led by " + other) why = "leads it";
+        return other + (why ? " \u2014 " + why : "");
       })
     );
     if (panel.ev) {
@@ -372,9 +385,28 @@
     };
   });
 
-  var CHAR_W = 0.505;
-  var LABEL_FONT = 9.5;
-  var LABEL_H = 12.4;
+  // Only a fallback: getComputedTextLength below measures the real advance width. Kept
+  // deliberately generous so that if it were ever used it over-reserves rather than under.
+  var CHAR_W = DATA.charw || {};
+  var CHAR_W_FALLBACK = DATA.charwFallback || 0.62;
+  var LABEL_FONT = DATA.labelFont || 9.5;
+  var LABEL_H = DATA.labelHeight || 12.4;
+
+  // The width a name will occupy, computed rather than measured.
+  //
+  // getComputedTextLength is exact but reads the current layout, and the camera has just
+  // changed the zoom factor that these labels' font size divides by. In the same tick the
+  // browser could still answer from the layout before that recalculation, which is why one
+  // pair of names overlapped at 1280 wide and not at 1440. Arithmetic on the table the build
+  // uses has no such dependence, and gives the same answer to within 0.01%.
+  function textWidth(text, font) {
+    var w = 0;
+    for (var i = 0; i < text.length; i++) {
+      var c = CHAR_W[text.charAt(i)];
+      w += c === undefined ? CHAR_W_FALLBACK : c;
+    }
+    return w * font;
+  }
   // Labels must clear each other, not merely fail to intersect. Two names a fifth of a
   // unit apart read as one word.
   var LABEL_GAP = 1.8;
@@ -400,10 +432,17 @@
     var boxes = [];
     // The community names stay on screen while a selection is up, dimmed but legible, so
     // they are reserved before any skill name is offered a position.
+    // The community names stay on screen while a selection is up, dimmed but legible, so
+    // they are reserved before any skill name is offered a position. Their boxes come from
+    // the same arithmetic and their own font size, which is larger than a skill name's.
+    var commFont = (DATA.communityFont || 11.5) / k;
     commLabels.forEach(function (cl) {
-      if (!cl.getBBox) return;
-      var bb = cl.getBBox();
-      boxes.push([bb.x, bb.y, bb.x + bb.width, bb.y + bb.height]);
+      if (getComputedStyle(cl).opacity === "0") return;
+      var cw = textWidth(cl.textContent, commFont);
+      var ch = (LABEL_H * (DATA.communityFont || 11.5)) / LABEL_FONT / k;
+      var cxx = +cl.getAttribute("x");
+      var cyy = +cl.getAttribute("y");
+      boxes.push([cxx - cw / 2, cyy - ch * 0.78, cxx + cw / 2, cyy + ch * 0.22]);
     });
     keys.forEach(function (key) {
       var el = labelByKey[key];
@@ -413,13 +452,7 @@
       var y = +node.getAttribute("data-y");
       var dot = node.querySelector(".g-dot");
       var r = dot ? +dot.getAttribute("r") : 3;
-      // Measured, not estimated. Multiplying a character count by an average width is
-      // close but not exact, and "caio-review" and "md-review" overlapped by four pixels
-      // because of the difference. getComputedTextLength returns the real advance width in
-      // user units at the size the label is currently drawn.
-      var w = el.getComputedTextLength
-        ? el.getComputedTextLength()
-        : (el.textContent.length * CHAR_W * LABEL_FONT) / k;
+      var w = textWidth(el.textContent, LABEL_FONT / k);
       var h = LABEL_H / k;
       var options = [
         [x + r + 4 / k, y + (3.2 / k), "start"],
@@ -433,6 +466,11 @@
         var anchor = options[i][2];
         var x0 = anchor === "start" ? ox : anchor === "end" ? ox - w : ox - w / 2;
         var box = [x0, oy - h * 0.78, x0 + w, oy + h * 0.22];
+        // Inside the frame the browser will actually draw. The build-time placer tests this
+        // and this one did not, so selecting a node near the right edge pushed its name out
+        // to x=1503 in a 1400-wide viewBox: no overlap, because the label was not on screen
+        // at all. Four nodes did it on selection and ten ordinary searches reproduced it.
+        if (box[0] < 2 || box[2] > VB.w - 2 || box[1] < 2 || box[3] > VB.h - 2) continue;
         var clash = false;
         for (var j = 0; j < boxes.length; j++) {
           var o = boxes[j];
@@ -753,6 +791,70 @@
     mark();
   }
 
+  /* One tab stop for the graph, not 490.
+   *
+   * Every node is a real link, which is what makes the graph a table of contents with
+   * JavaScript off. With JavaScript on that same fact put 490 sequential stops in the tab
+   * order — an independent review counted 1,025 focusables on the page — so reaching the
+   * Solutions section below meant pressing Tab several hundred times. The links stay in the
+   * document and stay real; they are taken out of the sequential order and the graph is
+   * entered once, then walked with the arrow keys.
+   *
+   * On a narrow screen they come out of the tab order entirely: the click target scales
+   * with the viewport and is under three pixels on a phone, so the search box and the text
+   * list below are the interface there, and offering a keyboard path into targets nobody
+   * can hit is worse than not offering one.
+   */
+  var roving = 0;
+
+  function setRoving(i, focusIt) {
+    if (!nodes.length) return;
+    roving = Math.max(0, Math.min(nodes.length - 1, i));
+    nodes.forEach(function (n, j) {
+      n.setAttribute("tabindex", j === roving && wide() ? "0" : "-1");
+    });
+    if (focusIt) nodes[roving].focus();
+  }
+
+  // Reading order for the arrow keys: by community, then by how connected each skill is,
+  // so walking the graph with a keyboard follows the same structure the colours show
+  // rather than the document order, which is smallest-degree-first for painting reasons.
+  var walkOrder = nodes
+    .slice()
+    .sort(function (a, b) {
+      var ca = +a.getAttribute("data-comm");
+      var cb = +b.getAttribute("data-comm");
+      if (ca !== cb) return ca - cb;
+      return +b.getAttribute("data-deg") - +a.getAttribute("data-deg");
+    })
+    .map(function (n) {
+      return nodes.indexOf(n);
+    });
+  var walkAt = {};
+  walkOrder.forEach(function (idx, at) {
+    walkAt[idx] = at;
+  });
+
+  function step(delta) {
+    var at = walkAt[roving] === undefined ? 0 : walkAt[roving];
+    var next = walkOrder[(at + delta + walkOrder.length) % walkOrder.length];
+    setRoving(next, true);
+  }
+
+  setRoving(0, false);
+
+  // Re-applied on resize, because whether the graph has a tab stop at all depends on the
+  // viewport. The traversal's own resize handler reloads when crossing the breakpoint, but
+  // it is only registered on desktop: growing a narrow window would otherwise leave all 490
+  // nodes at tabindex="-1" and the graph unreachable by keyboard.
+  var rovingTimer = null;
+  window.addEventListener("resize", function () {
+    clearTimeout(rovingTimer);
+    rovingTimer = setTimeout(function () {
+      setRoving(roving, false);
+    }, 200);
+  });
+
   nodes.forEach(function (n) {
     var key = n.getAttribute("data-key");
     n.addEventListener("mouseenter", function () {
@@ -760,6 +862,10 @@
       focus(key);
     });
     n.addEventListener("focus", function () {
+      // Focus moves the roving stop with it, so tabbing away and back returns to the node
+      // the reader was last on rather than to the first one.
+      var at = nodes.indexOf(n);
+      if (at > -1 && at !== roving) setRoving(at, false);
       if (pathMode) return;
       focus(key, { pin: true });
     });
@@ -786,6 +892,24 @@
       focus(key, { pin: true });
     });
     n.addEventListener("keydown", function (e) {
+      // Arrow keys walk the graph; Home and End jump to its ends. This is the composite
+      // widget half of the roving tabindex: one stop to enter, then movement inside.
+      var moves = {
+        ArrowRight: 1,
+        ArrowDown: 1,
+        ArrowLeft: -1,
+        ArrowUp: -1
+      };
+      if (moves[e.key] !== undefined) {
+        e.preventDefault();
+        step(moves[e.key]);
+        return;
+      }
+      if (e.key === "Home" || e.key === "End") {
+        e.preventDefault();
+        setRoving(walkOrder[e.key === "Home" ? 0 : walkOrder.length - 1], true);
+        return;
+      }
       if (e.key === "Enter" || e.key === " ") {
         if (wide() || e.key === " ") e.preventDefault();
         if (pathMode) {
@@ -994,21 +1118,21 @@
   }
 
 
-  /* ------------------------------------------------------------------ camera
-   * There isn't one, and that is deliberate.
+  /* --------------------------------------------------- note on the camera's history
+   * There used to be a comment here saying this page had no camera, on purpose. It stayed
+   * for a build after the camera was implemented above, which is the kind of comment that
+   * is worse than none: a reviewer found it and was right to.
    *
-   * The first version eased the SVG viewBox to frame the focused Solution. It
-   * looked good for one beat and then caused three separate faults: SVG text is
-   * measured in user units so every label scaled with the zoom and the labels
-   * collided; a node sliding under a stationary cursor fired mouseenter and hover
-   * replaced the selection the reader had just clicked; and worst, once zoomed in,
-   * every Solution outside the frame became unclickable, so the graph's own
-   * navigation broke unless the reader knew to press Escape.
+   * The history it recorded is still true and still the reason the camera is built the way
+   * it is. A first attempt eased the SVG viewBox and caused three faults: labels are
+   * measured in user units so they grew with the zoom until they collided; a node sliding
+   * under a stationary cursor fired mouseenter and replaced the selection the reader had
+   * just clicked; and anything outside the frame became unclickable with no way back.
    *
-   * Highlighting instead of moving keeps all 54 Solutions reachable at all times,
-   * keeps labels at the size they were designed at, and makes the focused cluster
-   * clearer than a zoom did, because the contrast is against the rest of the
-   * library rather than against empty space.
+   * All three are handled where the camera is defined — labels divide their size and their
+   * halo by the zoom factor in CSS, hover is ignored while `camMoving` is set, and Escape,
+   * the Reset button and a click on the background all pull back out. The page also opens
+   * unzoomed, so every one of the 490 nodes is clickable before the reader does anything.
    */
 
   /* ------------------------------------------------ the page opens on a Solution

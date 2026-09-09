@@ -33,6 +33,7 @@ const data = JSON.parse(
 // widths: an estimate was two units short vertically, which is exactly how much the
 // collisions that survived the first placer overlapped by.
 const LABEL_OVERLAPS = `() => {
+  const vb = document.getElementById("gsvg").viewBox.baseVal;
   const els = [...document.querySelectorAll(".g-nlabel, .g-clabel")].filter(
     (e) => getComputedStyle(e).opacity !== "0" && getComputedStyle(e).visibility !== "hidden"
   );
@@ -49,7 +50,13 @@ const LABEL_OVERLAPS = `() => {
       }
     }
   }
-  return { visible: els.length, overlaps: bad };
+  // A label outside the frame is not an overlap and is not acceptable either: the runtime
+  // placer had no boundary test, so selecting a node near the right edge pushed its name to
+  // x=1503 in a 1400-wide viewBox, where it cleared every other label by being off screen.
+  const clipped = boxes
+    .filter((b) => b.x0 < -1 || b.x1 > vb.width + 1 || b.y0 < -1 || b.y1 > vb.height + 1)
+    .map((b) => b.t);
+  return { visible: els.length, overlaps: bad, clipped: clipped };
 }`;
 
 async function settle(page) {
@@ -116,7 +123,11 @@ test.describe("the graph", () => {
         ).length
     );
     expect(unassigned).toBe(0);
-    await expect(page.locator(".g-clabel")).toHaveCount(12);
+    // Every community that got a name placed. Names are cheap and colours are not, so more
+    // communities are named than are given a distinct hue.
+    const named = await page.locator(".g-clabel").count();
+    expect(named).toBeGreaterThan(10);
+    expect(named).toBeLessThanOrEqual(data.comms.length);
     // The names are generated from the tokens the members share, so an empty or
     // placeholder name means the generator fell through.
     const names = await page.locator(".g-clabel").allTextContents();
@@ -164,6 +175,10 @@ test.describe("the graph", () => {
       .filter(([, r]) => r.overlaps.length > 0)
       .map(([where, r]) => `${where}: ${r.overlaps.slice(0, 3).join(", ")}`);
     expect(failures).toEqual([]);
+    const offscreen = seen
+      .filter(([, r]) => r.clipped.length > 0)
+      .map(([where, r]) => `${where}: ${r.clipped.slice(0, 3).join(", ")}`);
+    expect(offscreen).toEqual([]);
     // Every state must actually have drawn something, or the check above passes by
     // measuring nothing.
     for (const [where, r] of seen) {
@@ -384,6 +399,89 @@ test.describe("the graph", () => {
     await expect(node).toHaveAttribute("aria-label", new RegExp(`^${name}, \\d+ connection`));
   });
 
+
+  test("the panel gives the evidence for each connection, not just the count", async ({
+    page
+  }) => {
+    // 52 KB of the data file was an explanation the page had no way to show, while a comment
+    // claimed it said what an edge is when you select it. Either surface it or drop it.
+    const hub = await page.evaluate(
+      () =>
+        [...document.querySelectorAll(".g-node")].sort(
+          (a, b) => +b.getAttribute("data-deg") - +a.getAttribute("data-deg")
+        )[0].getAttribute("data-key")
+    );
+    await page.locator(`.g-node[data-key="${hub}"]`).hover();
+    await page.waitForTimeout(350);
+    const lines = await page.locator("#panelchain li").allTextContents();
+    expect(lines.length).toBeGreaterThan(2);
+    // Every line names a skill and says why it is joined: led by a Solution, packaged
+    // together, or which words the two names share.
+    const bare = lines.filter((l) => !/ — /.test(l));
+    expect(bare).toEqual([]);
+    const reasons = lines.map((l) => l.split(" — ")[1]);
+    for (const r of reasons) {
+      expect(r).toMatch(/^(led by |leads it|steps of |siblings in |names share |named )/);
+    }
+  });
+
+  test("the graph is one tab stop, not one per skill", async ({ page }) => {
+    // Every node is a real link, which is what makes this a table of contents with
+    // JavaScript off. With JavaScript on that put 490 sequential stops in the tab order and
+    // several hundred Tab presses between the graph and the section below it.
+    const stops = await page.evaluate(
+      () => document.querySelectorAll('.g-node[tabindex="0"]').length
+    );
+    expect(stops).toBe(1);
+    const rest = await page.evaluate(
+      () => document.querySelectorAll('.g-node[tabindex="-1"]').length
+    );
+    expect(rest).toBe(data.total - 1);
+  });
+
+  test("arrow keys walk the graph from the single tab stop", async ({ page }) => {
+    await page.locator('.g-node[tabindex="0"]').focus();
+    const first = await page.evaluate(() => document.activeElement.getAttribute("data-key"));
+    await page.keyboard.press("ArrowRight");
+    await page.waitForTimeout(250);
+    const second = await page.evaluate(() =>
+      document.activeElement.getAttribute("data-key")
+    );
+    expect(second).not.toBe(first);
+    expect(second).toBeTruthy();
+    // The stop travels with the focus, so there is still exactly one way in.
+    const stops = await page.evaluate(
+      () => document.querySelectorAll('.g-node[tabindex="0"]').length
+    );
+    expect(stops).toBe(1);
+    await expect(page.locator("#panelname")).toHaveText(
+      await page.locator(`.g-node[data-key="${second}"]`).getAttribute("data-name")
+    );
+  });
+
+  test("the frontier ring is exactly the skills with no relationships", async ({
+    page
+  }) => {
+    // The styling says "nothing in the library connects this skill to anything". It was
+    // keyed on Solution membership, which drew 158 skills that way while 129 of them had
+    // edges, and left five genuine isolates out of it.
+    const wrong = await page.evaluate(() => {
+      const deg = {};
+      for (const e of document.querySelectorAll(".g-edge")) {
+        deg[e.getAttribute("data-a")] = (deg[e.getAttribute("data-a")] || 0) + 1;
+        deg[e.getAttribute("data-b")] = (deg[e.getAttribute("data-b")] || 0) + 1;
+      }
+      const bad = [];
+      for (const n of document.querySelectorAll(".g-node")) {
+        const isolated = !deg[n.getAttribute("data-key")];
+        const styled = n.classList.contains("is-loose");
+        if (isolated !== styled) bad.push(n.getAttribute("data-name"));
+      }
+      return bad;
+    });
+    expect(wrong).toEqual([]);
+  });
+
   test("the community chips walk the largest communities", async ({ page }) => {
     const chips = await page.locator(".beat a").allTextContents();
     expect(chips.length).toBe(data.featured.length);
@@ -394,10 +492,38 @@ test.describe("the graph", () => {
   });
 });
 
+test.describe("the graph on a narrow screen", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("is a picture, not a control", async ({ page }) => {
+    await page.goto("/index.html", { waitUntil: "load" });
+    await page.waitForTimeout(900);
+    // A node's click target is expressed in the graph's own 1,400-unit coordinate system, so
+    // it scales with the viewport: about 10 CSS pixels at 1440 wide and under 3.5 at 390.
+    // Offering a 3-pixel target, or 490 keyboard stops into 3-pixel targets, is worse than
+    // not offering them: the search box and the text list below carry the same information.
+    const state = await page.evaluate(() => ({
+      pointer: getComputedStyle(document.querySelector(".g-node")).pointerEvents,
+      stops: document.querySelectorAll('.g-node[tabindex="0"]').length,
+      stillLinks: [...document.querySelectorAll(".g-node")].every((n) =>
+        n.getAttribute("href")
+      )
+    }));
+    expect(state.pointer).toBe("none");
+    expect(state.stops).toBe(0);
+    // Still real links in the document, so the no-JavaScript table of contents survives.
+    expect(state.stillLinks).toBe(true);
+    await expect(page.locator("#gsearch")).toBeVisible();
+    await expect(page.locator(".beat").first()).toBeVisible();
+  });
+});
+
 test.describe("the graph as markup", () => {
   test("the community and node counts in the document match the data", () => {
     expect((html.match(/class="g-node /g) || []).length).toBe(data.total);
-    expect((html.match(/class="g-clabel /g) || []).length).toBe(12);
+    const namedInMarkup = (html.match(/class="g-clabel /g) || []).length;
+    expect(namedInMarkup).toBeGreaterThan(10);
+    expect(namedInMarkup).toBeLessThanOrEqual(data.comms.length);
     // A name for every skill, so anything can be revealed on demand. Emitting only the
     // hubs meant opening a community whose strongest member was not one of the library's
     // strongest named nothing at all.

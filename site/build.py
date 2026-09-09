@@ -390,6 +390,11 @@ FEATURED = 8
 # are drawn in grey and named in the panel rather than given a colour that means nothing.
 NAMED_COMMUNITIES = 12
 
+# Names are cheap; colours are not. Tightening the edge rules split the library into 31
+# communities rather than 19, and nineteen unnamed grey clusters is a worse page than
+# twelve coloured ones plus six more that at least say what they are.
+LABELLED_COMMUNITIES = 18
+
 # Names drawn without being asked for. The rest arrive on hover, on selection, or
 # through search: 490 names at this scale is a grey wash, not a labelling.
 HUB_LABELS = 26
@@ -503,7 +508,11 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
         classes = f"g-node {hue(key)}"
         if key in lead_of:
             classes += " is-lead"
-        if not sol_of.get(key) and key not in lead_of:
+        # The frontier: no edges at all, so nothing in the library connects this skill to
+        # anything. This was keyed on Solution membership before, which drew 158 skills as
+        # the frontier while 129 of them had edges, and left five genuine isolates out of
+        # it — a visible claim that was simply false.
+        if degree.get(key, 0) == 0:
             classes += " is-loose"
         attrs = [
             f'class="{classes}"',
@@ -539,6 +548,17 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
     # Community names sit above their members; individual names are only drawn for the
     # hubs, because 490 of them at this scale is a grey wash.
     parts.append('        <g class="g-labels" aria-hidden="true">')
+    labels_by_cid = {
+        cid: network.label_community(net["members"][cid], by_key, graph) for cid in order
+    }
+    community_spots = network.place_community_labels(
+        order,
+        labels_by_cid,
+        net["members"],
+        pos,
+        LABELLED_COMMUNITIES,
+        frame=(0.0, 0.0, network.FRAME[0], network.FRAME[1]),
+    )
     community_meta = []
     for i, cid in enumerate(order):
         members = net["members"][cid]
@@ -546,7 +566,8 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
         ys = [pos[m][1] for m in members]
         cx = round(sum(xs) / len(xs), 1)
         top = round(min(ys) - 9.0, 1)
-        label = network.label_community(members, by_key, graph)
+        label = labels_by_cid[cid]
+        spot = community_spots.get(cid)
         hub = max(members, key=lambda k: (degree.get(k, 0), k))
         community_meta.append(
             {
@@ -558,10 +579,11 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
                 "y": top,
             }
         )
-        if i < NAMED_COMMUNITIES:
+        if spot is not None:
             parts.append(
                 f'          <text class="g-clabel {hue_of[cid]}" data-comm="{cid}" '
-                f'x="{cx}" y="{top}" text-anchor="middle">{esc(label)}</text>'
+                f'x="{spot["x"]}" y="{spot["y"]}" text-anchor="middle">'
+                f'{esc(label)}</text>'
             )
 
     # A name for every skill, not only for the hubs. The hubs' names are visible from
@@ -573,9 +595,7 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
     ranked = sorted(pos, key=lambda k: (-degree.get(k, 0), k))
     # The community names are already on the page and must not be written over, so they
     # are reserved before any skill name is offered a position.
-    reserved = [
-        network.label_box(c["label"], c["x"], c["y"], "middle") for c in community_meta
-    ]
+    reserved = [spot["box"] for spot in community_spots.values()]
     hubs = network.place_labels(
         ranked,
         {k: by_key[k]["n"] for k in ranked},
@@ -630,9 +650,14 @@ def render(rows: list) -> "tuple[dict, str]":
         graph, comm, {r["key"]: r for r in rows}, width=FRAME[0], height=FRAME[1]
     )
     agree = network.agreement(comm, rows, spec)
+    # How many of the drawn relationships the repository states outright, rather than this
+    # page having inferred them from names. Counted once and used everywhere it is claimed:
+    # in the intro, on the filter button, and in the audit that fails the build if the
+    # markup states a number the build does not own.
     graph_svg, edge_rows, community_meta, hue_of = render_network(
         net, graph, comm, rows, sols
     )
+    n_stated = sum(1 for e in edge_rows if e[3] == "extracted")
     # Spoken to anyone who cannot see the graph, so it has to describe what is drawn and
     # be regenerated from the same numbers. It read "the library as a four-layer tree" for
     # a build after the tree was gone.
@@ -689,11 +714,10 @@ def render(rows: list) -> "tuple[dict, str]":
         '        <div class="stage__chips" id="gchips" role="group" '
         'aria-label="Graph controls">'
     )
-    stated_edges = sum(1 for e in edge_rows if e[3] == "extracted")
     out.append(
         f'          <button class="chip" type="button" id="gstated" aria-pressed="false" '
         f'title="hide the relationships this page inferred">stated only '
-        f'<span>{stated_edges}</span></button>'
+        f'<span>{n_stated}</span></button>'
     )
     out.append(
         '          <button class="chip" type="button" id="gpath" aria-pressed="false" '
@@ -733,9 +757,9 @@ def render(rows: list) -> "tuple[dict, str]":
     )
     out.append(
         f'        <p class="stage__sub">Not a filing system: {len(net["communities"])} '
-        f'communities found by looking at what the skills actually reference, '
-        f'{len(edge_rows):,} relationships, {len(sols)} Solutions. Open a community, '
-        f'trace a path between any two skills, or search.</p>'
+        f'communities found from {len(edge_rows):,} relationships — {n_stated} the '
+        f'repository states outright, the rest inferred from names sharing a subject. '
+        f'Open a community, trace a path, or search.</p>'
     )
     out.append('        <p class="cue" id="cue"><span></span>Scroll</p>')
     out.append("      </div>")
@@ -756,8 +780,9 @@ def render(rows: list) -> "tuple[dict, str]":
     )
     out.append(
         f'        <p class="panel__desc" id="paneldesc">'
-        f'{first["size"]} skills, held together by shared references rather than by '
-        f'where they are filed. Everything here runs through {esc(first["hub"])}.</p>'
+        f'{first["size"]} skills grouped by what their names and their Solutions say '
+        f'they have in common, not by where they are filed. Its most connected member '
+        f'is {esc(first["hub"])}.</p>'
     )
     out.append('        <ol class="panel__chain" id="panelchain">')
     for key in net["members"][first["id"]][:10]:
@@ -765,7 +790,7 @@ def render(rows: list) -> "tuple[dict, str]":
     out.append("        </ol>")
     out.append(
         f'        <p class="panel__ev" id="panelev">'
-        f'{first["size"]} skills · strongest node {esc(first["hub"])}</p>'
+        f'{first["size"]} skills · most connected: {esc(first["hub"])}</p>'
     )
     out.append("      </aside>")
 
@@ -926,6 +951,17 @@ def render(rows: list) -> "tuple[dict, str]":
                     for c in community_meta
                 ],
                 "agreement": agree,
+                # The same character-width table the build places labels with, so the
+                # browser reveals names using identical arithmetic instead of measuring.
+                # Measuring was subtly wrong: the camera sets the zoom factor that the
+                # labels' font size divides by, and reading getComputedTextLength in the
+                # same tick could return a width from the layout before that recalculation
+                # landed. One pair of names overlapped at 1280 wide and not at 1440.
+                "charw": network.CHAR_W,
+                "charwFallback": network.CHAR_W_FALLBACK,
+                "labelFont": network.LABEL_FONT,
+                "labelHeight": network.LABEL_H,
+                "communityFont": network.COMMUNITY_FONT,
                 "domains": spec["titles"],
                 "catDomain": spec["cat_to_domain"],
             },
@@ -933,12 +969,11 @@ def render(rows: list) -> "tuple[dict, str]":
         )
         + ";\n"
     )
-    stated = sum(1 for (_a, _b, _w, kind, _why) in edge_rows if kind == "extracted")
     return (
         {"main": "\n".join(out), "credits": "\n".join(cred)},
         data,
         len(sols),
-        stated,
+        n_stated,
     )
 
 

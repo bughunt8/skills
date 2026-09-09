@@ -13,10 +13,12 @@ test.describe("accessibility", () => {
 
     const { violations } = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-      // The graph is aria-hidden decoration with a text equivalent below it; its
-      // is deliberately far below AA and they carry no information.
-      .exclude(".g-tail")
-      .exclude(".g-labels")
+      // Nothing is excluded. The previous version of this test excluded the entire
+      // .g-labels layer, and an independent review was right that this hid a real
+      // failure: eleven community labels were dimmed to 1.99:1 while the README claimed
+      // an unqualified AA gate. Those labels name the detected communities, which is
+      // information, so they were fixed rather than exempted. (.g-tail was also excluded
+      // and no longer exists anywhere in the page.)
       .analyze();
 
     const summary = violations.map((v) => ({
@@ -39,8 +41,6 @@ test.describe("accessibility", () => {
 
     const { violations } = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-      .exclude(".g-tail")
-      .exclude(".g-labels")
       .analyze();
 
     expect(
