@@ -434,6 +434,12 @@ a { color: inherit; text-decoration: none; }
      for the largest Solution. */
   height: clamp(190px, 28dvh, 300px);
   overflow-y: auto;
+  /* The last visible row fades out instead of being sliced through.
+     c-level-agents leads 21 skills, so the panel's content genuinely overflows and
+     has to scroll; a hard cut through the middle of a chip reads as a rendering
+     fault rather than as "there is more below". The mask stops at the bottom edge, so
+     content scrolled into view is fully opaque. */
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent 100%);
   background: color-mix(in srgb, var(--bg-elev) 86%, transparent);
   border: 1px solid var(--line);
   border-radius: var(--radius);
