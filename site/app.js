@@ -219,6 +219,8 @@
     return lines;
   }
 
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
   const selectedLeader = document.createElementNS(ns, "path");
   selectedLeader.id = "selected-label-leader";
   $("graph-labels").prepend(selectedLeader);
@@ -235,7 +237,6 @@
       const radius = Number(node.dot.getAttribute("r")) * k;
       return {key, x: x - radius, y: y - radius, w: radius * 2, h: radius * 2};
     }).filter((box) => box.x + box.w >= 0 && box.x <= size.w && box.y + box.h >= 0 && box.y <= size.h);
-    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
     const intersects = (a, b) => a.x < b.x + b.w + 8 && a.x + a.w + 8 > b.x &&
       a.y < b.y + b.h + 6 && a.y + a.h + 6 > b.y;
     function place(label, name, px, py, selected = false, community = false) {
@@ -509,7 +510,10 @@
       if (el.style.display === "none") return;
       const sx = Number(el.dataset.sceneX), sy = Number(el.dataset.sceneY);
       if (!Number.isFinite(sx) || !Number.isFinite(sy)) return;
-      const leader = el.classList.contains("g-label-leader");
+      // The selected leader is identified by identity, not by class: it is the one
+      // leader in the layer without `.g-label-leader`, and treating it as a label
+      // is what left its path stale while its name moved.
+      const leader = el === selectedLeader || el.classList.contains("g-label-leader");
       all.push({el, sx, sy, leader, dx: 0, dy: 0, hidden: false,
         key: el.dataset.key || (leader && el === selectedLeader ? state.selected || "" : ""),
         box: leader ? null : {x: Number(el.dataset.boxX), y: Number(el.dataset.boxY),
@@ -522,6 +526,23 @@
     const weight = (item) => item.key && item.key === state.selected ? 1e9 :
       item.key && nodes.has(item.key) ? Number(nodes.get(item.key).el.dataset.deg) || 0 : 0;
     all.sort((a, b) => weight(b) - weight(a));
+    // The selected name is the one label the reader is following, so it is marked
+    // once and never culled. Its leader's settled endpoint is recorded relative to
+    // the box, because that offset is what keeps the leader attached to its dot
+    // after the box has been clamped or nudged away from the dot's own delta.
+    const chosen = state.selected || "";
+    const anchor = chosen ? all.find((item) => !item.leader && item.key === chosen) : null;
+    if (anchor) {
+      anchor.anchor = true;
+      anchor.lead = all.find((item) => item.leader && item.key === chosen) || null;
+      if (anchor.lead) {
+        anchor.lead.anchor = true;
+        const end = (anchor.lead.el.getAttribute("d") || "").match(/L\s*(-?[\d.]+)[\s,]+(-?[\d.]+)/);
+        anchor.lead.end = end
+          ? {x: Number(end[1]) - anchor.box.x, y: Number(end[2]) - anchor.box.y}
+          : {x: anchor.box.w / 2, y: anchor.box.h / 2};
+      }
+    }
     if (!coreOnly) return all.slice(0, MOTION.labels);
     // A moving scale re-spaces the labels while their text keeps one fixed size, so
     // only a small core rides a zoom: the selected name with its leader plus the few
@@ -533,6 +554,7 @@
       if (item.key) keep.add(item.key);
     }
     for (const item of all) {
+      if (item.anchor) continue;
       if (!item.key || !keep.has(item.key)) {
         item.hidden = true;
         item.el.dataset.flown = "out";
@@ -638,9 +660,13 @@
     // fields are never touched here; at idle these equal the instant render.
     Object.assign(vp.dataset, {x: String(x), y: String(y), scale: String(k)});
     let visible = 0;
-    for (const point of f.sample) {
+    for (let i = 0; i < f.sample.length; i++) {
+      const point = f.sample[i];
       const px = point.x * k + x, py = point.y * k + y;
       if (px >= 0 && px <= size.w && py >= 0 && py <= size.h) visible++;
+      // One projection pass serves the count and every clearance test on this frame.
+      const slot = f.proj[i];
+      slot.x = px; slot.y = py;
     }
     if (visible !== f.visible) {
       f.visible = visible;
@@ -650,24 +676,154 @@
     const zoomPercent = Math.round(k * 100);
     if (zoomPercent !== f.zoomPercent) { f.zoomPercent = zoomPercent; text("status-zoom", `${zoomPercent}% zoom`); }
     if (!f.labels.length) return;
+    // The selected callout is placed before anything else, so every other label is
+    // culled around it rather than the other way round.
+    const reserved = placeCallout(f, k, x, y);
     // A label is projected from its own scene anchor, so the same delta moves the
     // label, its leader and the dot underneath: the leader stays attached by
     // construction, and a translate can never change a font size.
     for (const item of f.labels) {
-      if (item.hidden) continue;
+      if (item.hidden || item.anchor) continue;
       item.dx = (item.sx * k + x) - (item.sx * f.to.k + f.to.x);
       item.dy = (item.sy * k + y) - (item.sy * f.to.k + f.to.y);
       item.el.setAttribute("transform", `translate(${item.dx.toFixed(2)} ${item.dy.toFixed(2)})`);
     }
-    cullLabels(f, k, x, y);
+    cullLabels(f, k, x, y, reserved);
+  }
+
+  // The selected name is never hidden and never clipped: it is projected with the
+  // camera, clamped whole into the canvas, and moved off a dot only as far as it
+  // must go to stay legible. Its leader is redrawn to the dot's actual interpolated
+  // rim, and the offscreen cue describes this frame rather than the destination.
+  function placeCallout(f, k, x, y) {
+    const item = f.anchor;
+    if (!item) return null;
+    const box = item.box;
+    const projected = {x: box.x + (item.sx * k + x) - (item.sx * f.to.k + f.to.x),
+      y: box.y + (item.sy * k + y) - (item.sy * f.to.k + f.to.y)};
+    const dot = f.dot ? {x: f.dot.x * k + x, y: f.dot.y * k + y, r: f.dot.r} : null;
+    const spot = calloutSpot(f, projected, box, dot);
+    f.spot = spot;
+    item.dx = spot.x - box.x; item.dy = spot.y - box.y;
+    item.el.setAttribute("transform", `translate(${item.dx.toFixed(2)} ${item.dy.toFixed(2)})`);
+    if (item.el.dataset.flown) delete item.el.dataset.flown;
+    item.el.style.removeProperty("visibility");
+    if (spot.fallback) item.el.dataset.calloutFallback = "1";
+    else if (item.el.dataset.calloutFallback) delete item.el.dataset.calloutFallback;
+    // View state, not semantic state: whether the dot is on screen on this frame.
+    const off = !dot || dot.x < 0 || dot.x > size.w || dot.y < 0 || dot.y > size.h;
+    if (off !== f.off) {
+      f.off = off;
+      root.dataset.selectedOffscreen = String(off);
+      text("status-selected", state.selected ?
+        `Selected: ${nodes.get(state.selected).name}${off ? " · offscreen — Fit to return" : ""}` :
+        "No node selected");
+    }
+    const lead = item.lead;
+    if (lead) {
+      const tx = spot.x + lead.end.x, ty = spot.y + lead.end.y;
+      let sx = tx, sy = ty;
+      if (dot) {
+        sx = clamp(dot.x, 5, size.w - 5); sy = clamp(dot.y, 5, size.h - 5);
+        const distance = Math.hypot(tx - sx, ty - sy);
+        if (!off && distance) { sx += (tx - sx) / distance * dot.r; sy += (ty - sy) / distance * dot.r; }
+      }
+      lead.el.removeAttribute("transform");
+      lead.el.setAttribute("d", `M ${sx.toFixed(2)} ${sy.toFixed(2)} L ${tx.toFixed(2)} ${ty.toFixed(2)}`);
+      lead.el.dataset.offscreen = String(off);
+      lead.el.style.removeProperty("visibility");
+      if (lead.el.dataset.flown) delete lead.el.dataset.flown;
+    }
+    return {x: spot.x, y: spot.y, w: box.w, h: box.h};
+  }
+
+  // Where the selected callout can sit on this frame: the position it held last
+  // frame if it is still clear, then the projected position, then eight positions
+  // around the dot, then a bounded coarse scan ordered by distance from the dot.
+  // Hysteresis first is what stops the callout jittering between equally valid
+  // spots on consecutive frames.
+  function calloutSpot(f, projected, box, dot) {
+    const lo = 6, hiX = size.w - 6 - box.w, hiY = size.h - 6 - box.h;
+    const fit = (spot) => ({x: hiX < lo ? lo : clamp(spot.x, lo, hiX),
+      y: hiY < lo ? lo : clamp(spot.y, lo, hiY)});
+    const clear = (spot) => !dotUnder(f, spot, box, 5);
+    const tries = [];
+    if (f.spot) tries.push({x: f.spot.x, y: f.spot.y});
+    tries.push(projected);
+    if (dot) {
+      const reach = Math.max(dot.r + 10,
+        Math.hypot(projected.x + box.w / 2 - dot.x, projected.y + box.h / 2 - dot.y));
+      for (let i = 0; i < 8; i++) {
+        const angle = Math.PI / 4 * i;
+        tries.push({x: dot.x + Math.cos(angle) * reach - box.w / 2,
+          y: dot.y + Math.sin(angle) * reach - box.h / 2});
+      }
+    }
+    for (const candidate of tries) {
+      const spot = fit(candidate);
+      if (clear(spot)) return spot;
+    }
+    const near = dot || {x: projected.x + box.w / 2, y: projected.y + box.h / 2};
+    // A fixed candidate count spread over the whole canvas, so the scan cannot run
+    // out of budget in one corner and report that no clear position exists.
+    const cols = 24, rows = 24, grid = [];
+    const stepX = Math.max(8, (Math.max(lo, hiX) - lo) / (cols - 1));
+    const stepY = Math.max(8, (Math.max(lo, hiY) - lo) / (rows - 1));
+    for (let cx = 0; cx < cols; cx++) {
+      for (let cy = 0; cy < rows; cy++) {
+        const gx = Math.min(Math.max(lo, hiX), lo + cx * stepX);
+        const gy = Math.min(Math.max(lo, hiY), lo + cy * stepY);
+        grid.push({x: gx, y: gy});
+      }
+    }
+    grid.sort((a, b) => Math.hypot(a.x + box.w / 2 - near.x, a.y + box.h / 2 - near.y) -
+      Math.hypot(b.x + box.w / 2 - near.x, b.y + box.h / 2 - near.y));
+    // Clear positions can sit at the periphery while the dot is in a crowded middle,
+    // so the scan is allowed to reach them. The budget is spent per frame against the
+    // dots actually on screen, which keeps a dense overview cheap and a sparse
+    // close-up thorough.
+    const budget = Math.max(120, Math.min(grid.length, Math.floor(30000 / Math.max(1, f.proj.length))));
+    let best = null, least = Infinity;
+    for (let i = 0; i < grid.length && i < budget; i++) {
+      const candidate = grid[i];
+      const overlap = dotOverlap(f, candidate, box, 5, false);
+      if (overlap === 0) return candidate;
+      if (overlap < least) { least = overlap; best = candidate; }
+    }
+    // Documented last resort: no position on this frame is completely clear, so the
+    // name takes the least-obstructed one it found instead of silently sitting on a
+    // dot. It stays whole, inside the canvas and readable, and says so in the DOM.
+    return {...fit(best || projected), fallback: true};
+  }
+
+  function dotUnder(f, spot, box, margin) {
+    return dotOverlap(f, spot, box, margin, true) > 0;
+  }
+
+  // How much of a box the painted dots cover. `first` stops at the first hit for the
+  // cheap yes/no question; the full count ranks candidates when none is clear.
+  function dotOverlap(f, spot, box, margin, first) {
+    let total = 0;
+    for (const point of f.proj) {
+      // The painted dot is its radius plus a stroke, so the callout keeps a wider
+      // margin than a plain label: clearance has to hold for painted pixels.
+      const pad = point.r + (margin || 2);
+      const w = Math.min(point.x + pad, spot.x + box.w) - Math.max(point.x - pad, spot.x);
+      const h = Math.min(point.y + pad, spot.y + box.h) - Math.max(point.y - pad, spot.y);
+      if (w > 0 && h > 0) {
+        total += w * h;
+        if (first) return total;
+      }
+    }
+    return total;
   }
 
   // What the eye must not see: a name outside the canvas, a name over another name,
   // or a name over a dot. Checked on the frame, for the labels actually riding it.
-  function cullLabels(f, k, x, y) {
-    const placed = [];
+  function cullLabels(f, k, x, y, reserved) {
+    const placed = reserved ? [reserved] : [];
     for (const item of f.labels) {
-      if (item.hidden || !item.box) continue;
+      if (item.hidden || item.anchor || !item.box) continue;
       // The 6px allowance is the label's own halo stroke, which paints outside the
       // measured text box.
       const bx = item.box.x + item.dx, by = item.box.y + item.dy;
@@ -677,14 +833,7 @@
           if (bx < other.x + other.w && bx + item.box.w > other.x &&
               by < other.y + other.h && by + item.box.h > other.y) { out = true; break; }
         }
-        if (!out) {
-          for (const point of f.sample) {
-            const px = point.x * k + x, py = point.y * k + y, pad = point.r + 2;
-            if (px + pad > bx && px - pad < bx + item.box.w && py + pad > by && py - pad < by + item.box.h) {
-              out = true; break;
-            }
-          }
-        }
+        if (!out && dotUnder(f, {x: bx, y: by}, item.box)) out = true;
       }
       if (!out) placed.push({x: bx, y: by, w: item.box.w, h: item.box.h});
       if (out === (item.el.dataset.flown === "out")) continue;
@@ -900,8 +1049,16 @@
     // not a curtain in front of one.
     revealLabels();
     if (moving) {
+      const labelling = liveLabels(zooming);
+      const anchor = labelling.find((item) => item.anchor && !item.leader) || null;
+      const selectedPoint = state.selected ? scene.get(state.selected) : null;
       flight = {start: performance.now(), duration, ease: beat === "context" ? EASE.enter : EASE.standard,
         from: {...from}, to: {...to}, live: {...from}, cull: zooming, visible: -1, zoomPercent: -1,
+        anchor, spot: null, off: null,
+        // The selected dot keeps one screen radius for the whole flight, because the
+        // committed r is counter-scaled per frame, so the leader's rim is exact.
+        dot: selectedPoint ? {x: selectedPoint.x, y: selectedPoint.y,
+          r: Math.max(5, Math.min(15, (nodes.get(state.selected).radius || 6) * to.k))} : null,
         // The scene is fixed, so one projected sample of it answers both the live
         // visible count and the per-frame label clearance check. A dot keeps its
         // screen radius through the flight, so the radius is sampled once too.
@@ -911,7 +1068,9 @@
           return {x: point.x, y: point.y,
             r: Math.max(5, Math.min(15, (nodes.get(key).radius || 6) * to.k))};
         }).filter(Boolean),
-        labels: liveLabels(zooming)};
+        labels: labelling};
+      // Reused per frame so a projection pass allocates nothing.
+      flight.proj = flight.sample.map((point) => ({x: 0, y: 0, r: point.r}));
       paint(flight, 0);
       raf = requestAnimationFrame(step);
     }

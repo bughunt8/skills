@@ -178,6 +178,11 @@ input::placeholder { color: var(--muted); opacity: 1; }
   transition: transform var(--motion-quick) var(--ease-standard),
     stroke-width var(--motion-quick) var(--ease-standard);
 }
+/* The counter-scale is a per-frame correction that holds a dot at the size the
+ * layout reserved for it, so easing it makes the dot lag the camera: it bulges
+ * mid-zoom and its rim stops matching the leader drawn to it. During a flight the
+ * correction applies on the frame it is written. */
+#top[data-motion="running"] .g-node .g-dot { transition: none; }
 .g-node:hover .g-dot { transform: scale(calc(var(--dot-counter-scale, 1) * 1.2)); stroke: var(--text); stroke-width: 2.5px; }
 .g-node.is-selected:hover .g-dot { stroke-width: 3.5px; }
 /* Edge geometry is never rebuilt and never hidden. The scene layout is fixed for
