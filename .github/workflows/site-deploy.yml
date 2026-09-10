@@ -59,13 +59,22 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # Fail on a missing secret rather than half-deploying. A deploy that skips
+      # Fail on a missing value rather than half-deploying. A deploy that skips
       # one of its two targets and still reports success leaves the two out of
       # sync with nothing to indicate it.
+      #
+      # The host and username read from `vars` first, falling back to `secrets`.
+      # A masked host and username make an FTP 530 undiagnosable: the log cannot
+      # show which account was rejected, so there is nothing to compare against
+      # hPanel. Only the password is a credential, and it stays a secret.
+      #
+      # This repository is public, so an environment that sets them as variables
+      # publishes them in run logs. That is the deliberate trade for a readable
+      # failure, and it means the FTP password must be long and unique.
       - name: Confirm the environment is fully configured
         env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_SERVER: ${{ vars.FTP_SERVER || secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ vars.FTP_USERNAME || secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
           missing=""
@@ -78,6 +87,25 @@ jobs:
             echo "by bughunt8/profitrise-website."
             exit 1
           fi
+
+          # A scheme, a stray space or a newline in the host or username all
+          # produce a login failure that looks identical to a wrong password.
+          # Report the shape so the next 530 is one comparison, not a guess.
+          echo "host     : $FTP_SERVER"
+          echo "username : $FTP_USERNAME"
+          echo "password : ${#FTP_PASSWORD} characters"
+          case "$FTP_SERVER" in
+            *://*)
+              echo "::error::FTP_SERVER contains a URL scheme; use the bare host"
+              exit 1 ;;
+          esac
+          for name in FTP_SERVER FTP_USERNAME FTP_PASSWORD; do
+            value="${!name}"
+            if [ "$value" != "$(printf '%s' "$value" | tr -d '[:space:]')" ]; then
+              echo "::error::$name contains whitespace; re-enter it without spaces or a trailing newline"
+              exit 1
+            fi
+          done
           echo "environment '${{ inputs.environment }}' is configured"
 
       - uses: actions/setup-python@v6
@@ -216,8 +244,10 @@ jobs:
       - name: Deploy to Hostinger over FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
+          # Same resolution order as the configuration check above, so the values
+          # the log reported are the values used to log in.
+          server: ${{ vars.FTP_SERVER || secrets.FTP_SERVER }}
+          username: ${{ vars.FTP_USERNAME || secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           port: 21
