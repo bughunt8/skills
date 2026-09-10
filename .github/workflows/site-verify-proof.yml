@@ -1,0 +1,43 @@
+name: Proof that the live verification gate can fail
+
+# THIS BRANCH IS NEVER MERGED. It exists to prove issue #38 is really closed.
+#
+# Fixing a skipped gate is only half the claim. A gate that runs but passes
+# regardless would look identical in the run list. So this calls the SAME
+# reusable verifier the staging and production deploys call, unmodified and
+# unwrapped, against the SAME live staging origin, twice:
+#
+#   correct-revision  expects the commit staging actually serves  -> must pass
+#   wrong-revision    expects a different, well-formed commit     -> must fail
+#
+# A RED RUN IS THE EXPECTED RESULT. The wrong-revision job failing is the
+# evidence. There is no continue-on-error anywhere: if that job were tolerated,
+# it would prove nothing.
+#
+# Read-only. It publishes nothing, touches no secret, and uses no FTP. It only
+# fetches a public URL over the network.
+
+on:
+  push:
+    branches: ["proof/live-gate-can-fail"]
+
+permissions:
+  contents: read
+
+jobs:
+  correct-revision:
+    name: correct revision must pass
+    uses: ./.github/workflows/site-verify.yml
+    with:
+      url: https://mediumvioletred-coyote-692292.hostingersite.com/
+      expected_sha: f41007922e6d2f2a5830e5b10b92fa5a74d1af5e
+
+  wrong-revision:
+    name: wrong revision must fail
+    uses: ./.github/workflows/site-verify.yml
+    with:
+      url: https://mediumvioletred-coyote-692292.hostingersite.com/
+      # Well-formed and forty hex characters, so it passes input validation and
+      # is rejected on the evidence rather than on its shape. This commit is not
+      # what staging serves.
+      expected_sha: "0000000000000000000000000000000000000000"
