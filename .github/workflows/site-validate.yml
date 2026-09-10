@@ -149,6 +149,12 @@ jobs:
           WORKSPACE_EVIDENCE_DIR: ${{ runner.temp }}/graph-workspace-evidence
         run: node scripts/prove-workspace-defects.mjs
 
+      - name: Prove motion gates reject broken state, invisible labels and no-op animation
+        env:
+          WORKSPACE_EVIDENCE_DIR: ${{ runner.temp }}/graph-workspace-evidence/motion
+          SITE_TEST_PORT: 8241
+        run: node scripts/prove-motion-defects.mjs
+
       - name: Smoke-test the actual publish assembly without retired scroll assets
         env:
           WORKSPACE_EVIDENCE_DIR: ${{ runner.temp }}/graph-workspace-evidence
