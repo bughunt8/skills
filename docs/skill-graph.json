@@ -1,0 +1,129 @@
+{
+  "total": 456,
+  "solutions": [
+    {
+      "name": "hard-to-find-bug",
+      "problem": "Something is broken and I can't find where.",
+      "steps": [
+        "diagnosing-bugs",
+        "tdd",
+        "code-review"
+      ]
+    },
+    {
+      "name": "idea-to-shipped-code",
+      "problem": "I have a vague idea and need shippable code.",
+      "steps": [
+        "ask-matt",
+        "to-spec",
+        "wayfinder",
+        "to-tickets",
+        "implement",
+        "code-review"
+      ]
+    },
+    {
+      "name": "landing-page-that-sells",
+      "problem": "My landing page reads as AI-slop and doesn't convert.",
+      "steps": [
+        "taste-skill",
+        "redesign-skill",
+        "image-to-code-skill",
+        "ui-ux-pro-max"
+      ]
+    }
+  ],
+  "shared": [
+    "code-review"
+  ],
+  "longtail": [
+    {
+      "domain": "engineering",
+      "count": 93
+    },
+    {
+      "domain": "c-level-advisor",
+      "count": 62
+    },
+    {
+      "domain": "engineering-team",
+      "count": 51
+    },
+    {
+      "domain": "marketing-skill",
+      "count": 48
+    },
+    {
+      "domain": "pstack",
+      "count": 40
+    },
+    {
+      "domain": "productivity",
+      "count": 22
+    },
+    {
+      "domain": "design",
+      "count": 20
+    },
+    {
+      "domain": "ra-qm-team",
+      "count": 17
+    },
+    {
+      "domain": "product-team",
+      "count": 17
+    },
+    {
+      "domain": "job-hunt",
+      "count": 11
+    },
+    {
+      "domain": "research",
+      "count": 9
+    },
+    {
+      "domain": "compliance-os",
+      "count": 9
+    },
+    {
+      "domain": "project-management",
+      "count": 9
+    },
+    {
+      "domain": "commercial",
+      "count": 8
+    },
+    {
+      "domain": "business-operations",
+      "count": 7
+    },
+    {
+      "domain": "business-growth",
+      "count": 5
+    },
+    {
+      "domain": "research-ops",
+      "count": 5
+    },
+    {
+      "domain": "finance",
+      "count": 4
+    },
+    {
+      "domain": "markdown-html",
+      "count": 4
+    },
+    {
+      "domain": "marketing",
+      "count": 1
+    },
+    {
+      "domain": "loop-library",
+      "count": 1
+    },
+    {
+      "domain": "start-github-repo",
+      "count": 1
+    }
+  ]
+}

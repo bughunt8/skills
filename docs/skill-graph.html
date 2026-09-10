@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Library — how the skills relate to the solutions</title>
+<style>
+  :root { --bg:#05070d; --cyan:#00e5ff; --magenta:#ff2ea6; --violet:#8a63ff; --gold:#ffd166;
+          --text:#e8f0ff; --dim:#8492b0; --faint:#5a6684; --line:#1a2334; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,sans-serif; }
+  body::before { content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background: radial-gradient(55% 40% at 70% 5%, #00e5ff0d, transparent 60%),
+                radial-gradient(50% 45% at 10% 95%, #ff2ea60d, transparent 60%); }
+
+  #graphwrap { position:sticky; top:0; height:100vh; width:100%; z-index:1; }
+  #graph { width:100%; height:100%; display:block; }
+  .g-edge { stroke-width:1.5; opacity:.25; }
+  .g-edge.__on { opacity:.9; stroke-width:2; filter:drop-shadow(0 0 4px currentColor); }
+  .g-node text { font:10px ui-monospace,Menlo,monospace; fill:var(--dim); }
+  .g-node.__on text { fill:var(--text); }
+  .g-node.__dim { opacity:.12; }
+  .g-hub text { font:600 13px ui-monospace,Menlo,monospace; fill:var(--text); }
+  .g-dot { opacity:.18; transition:opacity .3s; }
+  .g-dot.__on { opacity:.75; }
+
+  main { position:relative; z-index:2; }
+  section { min-height:100vh; padding:22vh 8vw 12vh; max-width:560px; margin-left:56vw; }
+  section:nth-of-type(even) { margin-left:8vw; }
+  .kicker { font:12px ui-monospace,monospace; letter-spacing:.2em; color:var(--magenta); text-transform:uppercase; margin-bottom:14px; }
+  h2 { font-size:clamp(1.5rem,3.4vw,2.3rem); letter-spacing:-.02em; margin-bottom:12px; }
+  .lede { color:var(--dim); line-height:1.65; max-width:46ch; }
+  .chain { display:flex; flex-wrap:wrap; gap:6px 8px; margin-top:18px; }
+  .chain .s { font:12px ui-monospace,monospace; padding:5px 12px; border:1px solid var(--line); border-radius:999px; }
+  .chain .arr { color:var(--faint); }
+  .stat { margin-top:22px; font:12px ui-monospace,monospace; color:var(--faint); }
+  .stat b { color:var(--dim); }
+  .legend { position:fixed; bottom:18px; left:20px; z-index:3; font:11px ui-monospace,monospace; color:var(--faint); line-height:1.9; }
+  .legend i { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:7px; vertical-align:-1px; }
+</style>
+</head>
+<body>
+
+<div id="graphwrap"><svg id="graph" viewBox="0 0 1000 900" aria-hidden="true"></svg></div>
+
+<main>
+  <section id="s-hero">
+    <div class="kicker">The solution graph</div>
+    <h2>456 skills. Three solutions compose twelve of them.</h2>
+    <p class="lede">Scroll. Each solution is a hub; its skills are the satellites around it.
+      <b>code-review</b> is the one skill shared by two solutions — the bridge. The ring is the
+      long tail: <b>444 skills not yet composed</b> into any solution, waiting to be chained.</p>
+  </section>
+
+  <section id="s-idea-to-shipped-code">
+    <div class="kicker">Solution · 6 skills</div>
+    <h2>idea-to-shipped-code</h2>
+    <p class="lede">"I have a vague idea and need shippable code." Six skills, in order:
+      route, spec, map, slice, build, review.</p>
+    <div class="chain">
+      <span class="s">ask-matt</span><span class="arr">→</span><span class="s">to-spec</span><span class="arr">→</span>
+      <span class="s">wayfinder</span><span class="arr">→</span><span class="s">to-tickets</span><span class="arr">→</span>
+      <span class="s">implement</span><span class="arr">→</span><span class="s">code-review</span>
+    </div>
+  </section>
+
+  <section id="s-landing-page-that-sells">
+    <div class="kicker">Solution · 4 skills</div>
+    <h2>landing-page-that-sells</h2>
+    <p class="lede">"My landing page reads as AI-slop." Four design skills, from language to
+      implementation to usability.</p>
+    <div class="chain">
+      <span class="s">taste-skill</span><span class="arr">→</span><span class="s">redesign-skill</span><span class="arr">→</span>
+      <span class="s">image-to-code-skill</span><span class="arr">→</span><span class="s">ui-ux-pro-max</span>
+    </div>
+  </section>
+
+  <section id="s-hard-to-find-bug">
+    <div class="kicker">Solution · 3 skills</div>
+    <h2>hard-to-find-bug</h2>
+    <p class="lede">"Something is broken and I can't find where." Diagnose, lock with a test,
+      review. Shares <b>code-review</b> with idea-to-shipped-code.</p>
+    <div class="chain">
+      <span class="s">diagnosing-bugs</span><span class="arr">→</span><span class="s">tdd</span><span class="arr">→</span>
+      <span class="s">code-review</span>
+    </div>
+  </section>
+
+  <section id="s-longtail">
+    <div class="kicker">The long tail</div>
+    <h2>444 skills, not yet composed.</h2>
+    <p class="lede">Every dot on the outer ring is a skill no solution uses yet. Grouped by
+      domain. The graph is honest about the gap: the solutions are the tip; the library is the
+      iceberg.</p>
+    <div class="stat">12 of 456 skills composed (2.6%) · <b>444</b> remain · 1 shared bridge</div>
+  </section>
+</main>
+
+<div class="legend" id="legend"></div>
+
+<script>
+const DATA = {"total": 456, "solutions": [{"name": "hard-to-find-bug", "problem": "Something is broken and I can't find where.", "steps": ["diagnosing-bugs", "tdd", "code-review"]}, {"name": "idea-to-shipped-code", "problem": "I have a vague idea and need shippable code.", "steps": ["ask-matt", "to-spec", "wayfinder", "to-tickets", "implement", "code-review"]}, {"name": "landing-page-that-sells", "problem": "My landing page reads as AI-slop and doesn't convert.", "steps": ["taste-skill", "redesign-skill", "image-to-code-skill", "ui-ux-pro-max"]}], "shared": ["code-review"], "longtail": [{"domain": "engineering", "count": 93}, {"domain": "c-level-advisor", "count": 62}, {"domain": "engineering-team", "count": 51}, {"domain": "marketing-skill", "count": 48}, {"domain": "pstack", "count": 40}, {"domain": "productivity", "count": 22}, {"domain": "design", "count": 20}, {"domain": "ra-qm-team", "count": 17}, {"domain": "product-team", "count": 17}, {"domain": "job-hunt", "count": 11}, {"domain": "research", "count": 9}, {"domain": "compliance-os", "count": 9}, {"domain": "project-management", "count": 9}, {"domain": "commercial", "count": 8}, {"domain": "business-operations", "count": 7}, {"domain": "business-growth", "count": 5}, {"domain": "research-ops", "count": 5}, {"domain": "finance", "count": 4}, {"domain": "markdown-html", "count": 4}, {"domain": "marketing", "count": 1}, {"domain": "loop-library", "count": 1}, {"domain": "start-github-repo", "count": 1}]};
+
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("graph");
+const HUE = { "idea-to-shipped-code": "#00e5ff", "landing-page-that-sells": "#ff2ea6", "hard-to-find-bug": "#8a63ff", "code-review": "#ffd166" };
+const nodes = [];   // {id, x, y, r, color, label, hub}
+const edges = [];
+
+function el(tag, attrs) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+// ---- layout ----
+const sols = DATA.solutions;
+const hubX = { 0: 250, 1: 500, 2: 750 }, hubY = 190;
+
+sols.forEach((sol, i) => {
+  const c = HUE[sol.name];
+  nodes.push({ id: sol.name, x: hubX[i], y: hubY, r: 20, color: c, label: sol.name, hub: true });
+  const n = sol.steps.length;
+  sol.steps.forEach((sk, j) => {
+    if (sk === "code-review") return; // bridge handled separately
+    const a = (Math.PI * (j + 0.5)) / n - Math.PI / 2; // arc below hub
+    const x = hubX[i] + Math.cos(a) * 130;
+    const y = hubY + 130 + Math.sin(a) * 70;
+    nodes.push({ id: sk, x, y, r: 7, color: c, label: sk, hub: false });
+    edges.push({ a: sol.name, b: sk, color: c, sol: sol.name });
+  });
+});
+
+// shared bridge: code-review, between idea-to-shipped-code and hard-to-find-bug
+const cr = { id: "code-review", x: 500, y: 380, r: 11, color: HUE["code-review"], label: "code-review", hub: false };
+nodes.push(cr);
+["idea-to-shipped-code", "hard-to-find-bug"].forEach(s => edges.push({ a: s, b: "code-review", color: HUE["code-review"], sol: s }));
+
+// long tail ring
+const LT = DATA.longtail;
+const total = LT.reduce((a, d) => a + d.count, 0);
+let acc = 0;
+const cx = 500, cy = 560, R = 260;
+LT.forEach(d => {
+  const frac = d.count / total;
+  const a0 = -Math.PI + acc * 2 * Math.PI, a1 = a0 + frac * 2 * Math.PI;
+  acc += frac;
+  const n = Math.max(1, Math.round(d.count)); // one dot per skill
+  for (let k = 0; k < n; k++) {
+    const t = k / Math.max(1, n - 1);
+    const a = a0 + (a1 - a0) * t;
+    const x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R;
+    nodes.push({ id: "lt-"+d.domain+"-"+k, x, y, r: 2, color: "#5a6684", label: "", hub: false, dot: true });
+  }
+});
+
+const byId = {}; nodes.forEach(n => byId[n.id] = n);
+
+// ---- render ----
+edges.forEach(e => {
+  const p = el("line", { x1: byId[e.a].x, y1: byId[e.a].y, x2: byId[e.b].x, y2: byId[e.b].y,
+    stroke: e.color, class: "g-edge" });
+  p.dataset.sol = e.sol; svg.appendChild(p);
+});
+nodes.forEach(n => {
+  if (n.dot) { svg.appendChild(el("circle", { cx:n.x, cy:n.y, r:n.r, fill:n.color, class:"g-dot" })); return; }
+  const g = el("g", { class: "g-node " + (n.hub ? "g-hub" : ""), transform: `translate(${n.x},${n.y})` });
+  g.dataset.id = n.id;
+  g.appendChild(el("circle", { r:n.r, fill:"#0a0e18", stroke:n.color, "stroke-width": n.hub ? 3 : 1.5,
+    style:`filter:drop-shadow(0 0 6px ${n.color}66)` }));
+  g.appendChild(el("text", { y: n.r + 14, "text-anchor":"middle", "font-size": n.hub ? 13 : 9 }));
+  g.querySelector("text").textContent = n.label;
+  svg.appendChild(g);
+});
+
+// legend
+const lg = document.getElementById("legend");
+DATA.solutions.forEach(s => lg.innerHTML += `<div><i style="background:${HUE[s.name]}"></i>${s.name}</div>`);
+lg.innerHTML += `<div><i style="background:${HUE["code-review"]}"></i>code-review · shared bridge</div>`;
+lg.innerHTML += `<div><i style="background:#5a6684"></i>444 skills · long tail</div>`;
+
+// ---- scroll-driven highlight ----
+const sections = ["s-idea-to-shipped-code","s-landing-page-that-sells","s-hard-to-find-bug","s-longtail"].map(id => document.getElementById(id));
+function solOf(sectionId){ return sectionId.replace("s-",""); }
+function tick(){
+  let active = null;
+  for (const s of sections) {
+    if (s.getBoundingClientRect().top <= window.innerHeight * 0.5) active = s.id;
+  }
+  const activeSol = active ? solOf(active) : null;
+  const isLongtail = activeSol === "longtail";
+  document.querySelectorAll(".g-edge").forEach(p => {
+    p.classList.toggle("__on", p.dataset.sol === activeSol);
+  });
+  document.querySelectorAll(".g-node").forEach(g => {
+    const id = g.dataset.id;
+    let on = false;
+    if (activeSol && !isLongtail) {
+      const sol = DATA.solutions.find(s => s.name === activeSol);
+      on = id === activeSol || (sol && sol.steps.includes(id));
+    }
+    g.classList.toggle("__on", on);
+    g.classList.toggle("__dim", activeSol !== null && !isLongtail && !on);
+  });
+  document.querySelectorAll(".g-dot").forEach(d => {
+    d.classList.toggle("__on", isLongtail);
+  });
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
