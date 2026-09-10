@@ -142,12 +142,20 @@ jobs:
         env:
           WORKSPACE_EVIDENCE_DIR: ${{ runner.temp }}/graph-workspace-evidence
           PLAYWRIGHT_JSON_OUTPUT_FILE: ${{ runner.temp }}/graph-workspace-evidence/node-suite.json
-        run: npm test -- --workers=2 --reporter=github,html,list,json
+        # Motion frame/long-task budgets are measured without a second browser
+        # competing for the runner's CPU. Parallel builds remain separate jobs.
+        run: npm test -- --workers=1 --reporter=github,html,list,json
 
       - name: Prove workspace search and readability gates reject planted defects
         env:
           WORKSPACE_EVIDENCE_DIR: ${{ runner.temp }}/graph-workspace-evidence
         run: node scripts/prove-workspace-defects.mjs
+
+      - name: Prove motion gates reject broken state, invisible labels and no-op animation
+        env:
+          WORKSPACE_EVIDENCE_DIR: ${{ runner.temp }}/graph-workspace-evidence/motion
+          SITE_TEST_PORT: 8241
+        run: node scripts/prove-motion-defects.mjs
 
       - name: Smoke-test the actual publish assembly without retired scroll assets
         env:

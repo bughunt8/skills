@@ -2,7 +2,12 @@ import { defineConfig, devices } from "@playwright/test";
 
 // The site is static with no build step for the browser, so CI serves the repo
 // directory as-is. That means the tests exercise exactly the bytes that ship.
-const PORT = 8123;
+// Each concurrent worktree must select a distinct port. Never silently attach
+// to another checkout's server or let another test run own its lifetime.
+const PORT = Number(process.env.SITE_TEST_PORT || 8123);
+if (!Number.isInteger(PORT) || PORT < 1024 || PORT > 65535) {
+  throw new Error("SITE_TEST_PORT must be an integer between 1024 and 65535");
+}
 
 export default defineConfig({
   testDir: "./tests",
@@ -29,7 +34,7 @@ export default defineConfig({
   webServer: {
     command: `python3 -m http.server ${PORT}`,
     url: `http://127.0.0.1:${PORT}/index.html`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 60_000
   },
   projects: [

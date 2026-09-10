@@ -64,6 +64,18 @@ export async function openWorkspace(page) {
   await page.waitForTimeout(1100);
 }
 
+// MOTION.md makes the settled frame observable: `#top[data-motion]` is `running`
+// while a tween is in flight and `idle` otherwise (always `idle` under reduced
+// motion). Geometry assertions measure the settled layout, so they wait on that
+// attribute rather than on a sleep. Pages without the motion layer (the missing
+// app.js fallbacks in resilience.spec.js) simply have nothing to wait for.
+export async function settleMotion(page, timeout = 5000) {
+  await page.waitForFunction(() => {
+    const top = document.getElementById("top");
+    return !top || top.dataset.motion === undefined || top.dataset.motion === "idle";
+  }, null, { timeout });
+}
+
 export async function assertNoRuntimeErrors(page) {
   expect(pageErrors.get(page) || [], "workspace must not throw during partially completed render").toEqual([]);
 }
@@ -100,7 +112,16 @@ export async function readState(page) {
   });
 }
 
+// Timing adaptation approved in MOTION.md at 18273ef: the camera is now a live
+// per-frame measurement, so a settled-geometry helper that samples immediately
+// after a camera activation reads a frame of the flight (culled core labels,
+// leaders still travelling) instead of the settled layout it asserts about.
+// These three helpers measure SETTLED geometry only, so each waits for
+// `#top[data-motion="idle"]` first. Nothing about what they assert changes, and
+// no semantic read and no in-flight floor waits: `readState`, `activate` and the
+// motion spec are untouched.
 export async function paintedGraphCount(page) {
+  await settleMotion(page);
   return page.evaluate(() => {
     const frame = document.getElementById("gsvg").getBoundingClientRect();
     return [...document.querySelectorAll(".g-node")].filter((node) => {
@@ -120,6 +141,7 @@ export async function paintedGraphCount(page) {
 }
 
 export async function measureLabels(page) {
+  await settleMotion(page);
   return page.evaluate(() => {
     const frame = document.getElementById("gsvg").getBoundingClientRect();
     function painted(el) {
@@ -209,6 +231,7 @@ export async function assertReadableLabels(page, { selectedKey } = {}) {
 }
 
 export async function assertLayout(page) {
+  await settleMotion(page);
   const initialRegions = await page.evaluate(() => Object.fromEntries(
     ["workspace-header", "workspace-title", "graph-region", "inspector", "statusbar"]
       .map((id) => [id, document.getElementById(id).getBoundingClientRect().toJSON()])));
@@ -259,15 +282,26 @@ export async function assertLayout(page) {
 }
 
 export async function sweepUnrelatedNodes(page, selectedKey = "") {
+  // This proves a SETTLED pointer crossing. Dot positions are only stable once
+  // motion is idle, so sample after settling and re-sample under a bounded retry
+  // rather than trusting one reading of a moving scene. Nothing about what this
+  // asserts changes: the crossing still uses real coordinates of real dots.
+  await settleMotion(page);
   const graph = await page.locator("#gsvg").boundingBox();
-  const points = await page.locator(".g-node").evaluateAll((nodes, key) => nodes.flatMap((n) => {
+  const sample = () => page.locator(".g-node").evaluateAll((nodes, key) => nodes.flatMap((n) => {
     const b = n.getBoundingClientRect(), s = getComputedStyle(n);
     if (n.dataset.key === key || n.dataset.visible !== "true" || !b.width || !b.height ||
       s.display === "none" || s.visibility === "hidden") return [];
     return [{ x: b.x + b.width / 2, y: b.y + b.height / 2, key: n.dataset.key }];
   }), selectedKey);
-  const reachable = points.filter((p) => p.x > graph.x && p.x < graph.x + graph.width &&
+  const inside = (points) => points.filter((p) => p.x > graph.x && p.x < graph.x + graph.width &&
     p.y > graph.y && p.y < graph.y + graph.height).slice(0, 8);
+  let reachable = inside(await sample());
+  for (const deadline = Date.now() + 3000; !reachable.length && Date.now() < deadline;) {
+    await settleMotion(page);
+    await page.waitForTimeout(100);
+    reachable = inside(await sample());
+  }
   expect(reachable.length, "search hover proof must cross actual unrelated visible nodes").toBeGreaterThan(0);
   await page.waitForTimeout(1100);
   for (const p of reachable) {

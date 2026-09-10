@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
-import { openWorkspace, readState, activate, assertReadableLabels, assertNoRuntimeErrors, ensureFiltersOpen } from "../scripts/workspace-test-helpers.mjs";
+import { openWorkspace, readState, activate, assertReadableLabels, assertNoRuntimeErrors, ensureFiltersOpen, settleMotion } from "../scripts/workspace-test-helpers.mjs";
 test.afterEach(async ({ page }) => { await assertNoRuntimeErrors(page); });
 
 const data = JSON.parse(readFileSync(new URL("../data.js", import.meta.url), "utf8")
@@ -53,11 +53,16 @@ test.describe("responsive resilience", () => {
 });
 
 test.describe("no third party in the request path", () => {
-  test("loads nothing from another origin during real interactions", async ({ page }, testInfo) => {
+  test("loads nothing from another origin during real interactions", async ({ page, baseURL }, testInfo) => {
+    // The served port is per worktree (SITE_TEST_PORT), so the one legitimate
+    // origin comes from the configured baseURL and is resolved BEFORE the first
+    // request is observed. The comparison itself is unchanged: exact origin
+    // equality, anything else is a third party.
+    const ownOrigin = new URL(baseURL).origin;
     const external = [], failed = [];
     page.on("request", (r) => {
       const url = new URL(r.url());
-      if (url.protocol !== "data:" && url.origin !== "http://127.0.0.1:8123") external.push(`${r.resourceType()} ${r.url()}`);
+      if (url.protocol !== "data:" && url.origin !== ownOrigin) external.push(`${r.resourceType()} ${r.url()}`);
     });
     page.on("requestfailed", (r) => failed.push(r.url()));
     await openWorkspace(page);
@@ -155,6 +160,7 @@ test.describe("production Content-Security-Policy", () => {
     const before = await readState(page);
     await ensureFiltersOpen(page);
     await page.locator("#gcommunity").selectOption(String(data.comms[1].id));
+    await settleMotion(page);
     expect((await readState(page)).camera).not.toEqual(before.camera);
     await activate(page.locator("#greset"), testInfo);
     await page.locator("#gsearch").fill("NDA");
@@ -162,8 +168,12 @@ test.describe("production Content-Security-Policy", () => {
     const key = await first.getAttribute("data-key");
     await activate(first, testInfo);
     await expect(page.locator("#top")).toHaveAttribute("data-selected-key", key);
+    // Same 18273ef timing adaptation as workspace.spec.js: the scale comparison
+    // is a settled-camera read, so it waits for idle. Nothing else is delayed.
+    await settleMotion(page);
     const selected = await readState(page);
     await activate(page.locator("#gzoom-in"), testInfo);
+    await settleMotion(page);
     expect((await readState(page)).camera.scale).toBeGreaterThan(selected.camera.scale);
     await activate(page.locator("#gfit"), testInfo);
     await assertReadableLabels(page, { selectedKey: key });
