@@ -53,11 +53,16 @@ test.describe("responsive resilience", () => {
 });
 
 test.describe("no third party in the request path", () => {
-  test("loads nothing from another origin during real interactions", async ({ page }, testInfo) => {
+  test("loads nothing from another origin during real interactions", async ({ page, baseURL }, testInfo) => {
+    // The served port is per worktree (SITE_TEST_PORT), so the one legitimate
+    // origin comes from the configured baseURL and is resolved BEFORE the first
+    // request is observed. The comparison itself is unchanged: exact origin
+    // equality, anything else is a third party.
+    const ownOrigin = new URL(baseURL).origin;
     const external = [], failed = [];
     page.on("request", (r) => {
       const url = new URL(r.url());
-      if (url.protocol !== "data:" && url.origin !== "http://127.0.0.1:8123") external.push(`${r.resourceType()} ${r.url()}`);
+      if (url.protocol !== "data:" && url.origin !== ownOrigin) external.push(`${r.resourceType()} ${r.url()}`);
     });
     page.on("requestfailed", (r) => failed.push(r.url()));
     await openWorkspace(page);
