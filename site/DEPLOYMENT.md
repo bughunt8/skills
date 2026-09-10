@@ -20,7 +20,7 @@ The only difference is which **GitHub Environment** supplies the secrets.
 
 | | Branch | Environment | Public URL |
 | --- | --- | --- | --- |
-| Staging | `staging` | `staging` | whatever you set `SITE_URL` to |
+| Staging | `staging` | `staging` | `https://mediumvioletred-coyote-692292.hostingersite.com/` |
 | Production | `main` | `production` | `https://skills.ronald.ng` |
 
 ```
@@ -83,6 +83,7 @@ itself to HTTPS you cannot yet serve.
 | `site-validate.yml` | called | secret scan, gitleaks, build reproducibility, HTML validity, browser suite |
 | `site-ci.yml` | push/PR touching `site/**`, `skills/**` | calls validate. Exposes the required check `site gates passed` |
 | `site-deploy.yml` | called | the single deploy path: build, assemble, publish to Hostinger, smoke-test |
+| `site-verify.yml` | called | read-only live verification, fails on missing content or the wrong revision |
 | `site-deploy-staging.yml` | push to `staging` | validate, then deploy to the `staging` environment |
 | `site-deploy-production.yml` | push to `main` | validate, then deploy to `production` |
 | `site-promote.yml` | manual, typed confirmation | open or update the promotion pull request from `staging` into `main` |
@@ -115,8 +116,13 @@ Optional **variables** (`vars`, not secrets), per environment:
 
 | Name | Default | Use |
 | --- | --- | --- |
-| `SITE_URL` | empty | Enables the post-deploy smoke test. Empty skips it rather than guessing. |
 | `SITE_FTP_REMOTE_DIR` | `./` | The Hostinger directory for this environment |
+
+The two caller workflows pass literal public URLs. `SITE_URL` is not an
+environment configuration input anymore. Environment-scoped variables are not
+available at the reusable-workflow call site, which caused issue #38.
+The shared deployment requires a URL and rejects empty or mismatched targets
+before upload. After a successful upload, verification always runs.
 
 `site-deploy.yml` fails in its first step listing every missing secret, rather
 than skipping the upload and reporting success.
@@ -211,7 +217,8 @@ The workflow reports which of these is missing rather than failing opaquely.
 
 ## What a deploy verifies
 
-Publishing is not the same as succeeding. When `SITE_URL` is set, CI then checks
+Publishing is not the same as succeeding. After every successful upload, CI calls
+`site-verify.yml` with the target URL and the full deployed commit SHA. It checks
 the live origin and fails the deploy unless:
 
 - it returns 200 with `text/html`

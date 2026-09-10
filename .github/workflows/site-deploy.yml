@@ -28,16 +28,30 @@ on:
         type: string
       url:
         description: "Public URL to smoke-test after deploying"
-        required: false
-        default: ""
+        required: true
         type: string
 
 permissions:
   contents: read
 
 jobs:
+  target:
+    name: validate the deployment target before uploading
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+      - name: Reject missing or mismatched verification targets
+        env:
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+          SITE_URL: ${{ inputs.url }}
+        run: node site/scripts/check-deploy-target.mjs "$DEPLOY_ENVIRONMENT" "$SITE_URL"
+
   deploy:
     name: publish to Hostinger
+    needs: target
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.environment }}
@@ -230,26 +244,7 @@ jobs:
   verify:
     name: verify the deployment is live and correct
     needs: deploy
-    if: inputs.url != ''
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: site/package-lock.json
-      - name: Install test dependencies
-        working-directory: site
-        run: npm ci
-      - name: Install browsers
-        working-directory: site
-        run: npx playwright install --with-deps chromium
-
-      # A deploy step that succeeds while serving a stale or broken page is a
-      # failed deploy. This checks the real origin over the real network, and
-      # confirms BUILD-INFO names this commit so a cached previous deploy is
-      # detected rather than mistaken for success.
-      - name: Smoke-test the live URL
-        working-directory: site
-        run: node scripts/smoke.mjs "${{ inputs.url }}" "$GITHUB_SHA"
+    uses: ./.github/workflows/site-verify.yml
+    with:
+      url: ${{ inputs.url }}
+      expected_sha: ${{ github.sha }}
