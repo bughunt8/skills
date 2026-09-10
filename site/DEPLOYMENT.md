@@ -97,11 +97,20 @@ result.
 
 Three, and they are the same three already held by `bughunt8/profitrise-website`:
 
-| Name | Notes |
-| --- | --- |
-| `FTP_SERVER` | Hostinger FTP host |
-| `FTP_USERNAME` | |
-| `FTP_PASSWORD` | |
+| Name | Kind | Notes |
+| --- | --- | --- |
+| `FTP_SERVER` | variable, or secret | Hostinger FTP host, bare, no `ftp://` |
+| `FTP_USERNAME` | variable, or secret | The site's FTP account name |
+| `FTP_PASSWORD` | **secret, always** | The only real credential here |
+
+The host and username resolve from `vars` first and fall back to `secrets`, so an
+environment can use either. Prefer variables. A masked host and username make an
+FTP `530 Login incorrect` undiagnosable, because the log cannot show which account
+the server rejected and there is nothing to compare against hPanel.
+
+This repository is public, so variables appear in run logs. That is the deliberate
+trade for a readable failure, and it is why the FTP password must be long and
+unique. Never make `FTP_PASSWORD` a variable.
 
 Set them on the repository's **Environments** (`Settings → Environments`), not as
 plain repository secrets. Environment scoping is what lets staging and production
