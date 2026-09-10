@@ -487,7 +487,11 @@ export async function sampleSelectedLabel(page) {
       status: (document.getElementById("status-selected")?.textContent ?? "").trim(),
       paintedLabelCount: painted,
       dot: dotBox && dotBox.width
-        ? { x: dotBox.x + dotBox.width / 2, y: dotBox.y + dotBox.height / 2 } : null,
+        ? { x: dotBox.x + dotBox.width / 2, y: dotBox.y + dotBox.height / 2,
+            // The leader begins at the dot's RIM, which is what the settled
+            // geometry helper asserts too, so the anchor tolerance is measured
+            // against this radius rather than against the centre.
+            radius: Math.min(dotBox.width, dotBox.height) / 2 } : null,
       label: label
         ? { present: true, opacity: effective(label), cssPx: cssPx(label),
             text: (label.textContent || "").trim() }

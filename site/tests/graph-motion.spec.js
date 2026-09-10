@@ -290,8 +290,14 @@ test.describe("graph motion acceptance", () => {
         return Math.min(Math.hypot(from.x - s.dot.x, from.y - s.dot.y),
           Math.hypot(to.x - s.dot.x, to.y - s.dot.y));
       };
-      const adrift = onScreen.filter((s) => !(s.leader.opacity > 0.05) || leaderGap(s) > 6)
-        .map((s) => ({ beat: beat.name, opacity: s.leader.opacity, gapPx: leaderGap(s) }));
+      // Anchored means "starts at the rim of its own dot": allow the dot radius
+      // plus 2px of stroke and rounding, exactly the geometry the settled
+      // helper checks with |startDistance - radius| <= 1.
+      const anchorLimit = (s) => (s.dot?.radius ?? 0) + 2;
+      const adrift = onScreen
+        .filter((s) => !(s.leader.opacity > 0.05) || leaderGap(s) > anchorLimit(s))
+        .map((s) => ({ beat: beat.name, opacity: s.leader.opacity, gapPx: leaderGap(s),
+          limitPx: anchorLimit(s) }));
       expect(adrift,
         "MOTION_SELECTED_ANCHOR: the leader must stay visible and anchored to the selected dot")
         .toEqual([]);
@@ -314,7 +320,7 @@ test.describe("graph motion acceptance", () => {
           .toBeGreaterThanOrEqual(15.99);
         expect(leaderGap(settled),
           `MOTION_SELECTED_ANCHOR: the settled leader must touch the selected dot after ${beat.name}`)
-          .toBeLessThanOrEqual(6);
+          .toBeLessThanOrEqual((settled.dot?.radius ?? 0) + 2);
       } else {
         expect(settled.status,
           `MOTION_SELECTED_ANCHOR: an offscreen selection must be reported after ${beat.name}`)
@@ -324,6 +330,7 @@ test.describe("graph motion acceptance", () => {
         minCssPx: onScreen.length ? Math.min(...onScreen.map((s) => s.label.cssPx ?? 0)) : null,
         minPainted: Math.min(...during.map((s) => s.paintedLabelCount)),
         maxLeaderGap: onScreen.length ? Math.max(...onScreen.map(leaderGap)) : null,
+        dotRadius: during[0]?.dot?.radius ?? null,
         offscreenFrames: offScreen.length, settled });
     }
     await saveEvidence(page, testInfo, "motion-selected-anchor", { key, beats });
