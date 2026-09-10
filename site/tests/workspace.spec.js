@@ -2,7 +2,8 @@ import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import {
   openWorkspace, readState, activate, measureLabels, assertReadableLabels,
-  assertLayout, sweepUnrelatedNodes, saveEvidence, assertNoRuntimeErrors, ensureFiltersOpen, paintedGraphCount
+  assertLayout, sweepUnrelatedNodes, saveEvidence, assertNoRuntimeErrors, ensureFiltersOpen, paintedGraphCount,
+  settleMotion
 } from "../scripts/workspace-test-helpers.mjs";
 
 const data = JSON.parse(readFileSync(new URL("../data.js", import.meta.url), "utf8")
@@ -422,21 +423,33 @@ test.describe("workspace acceptance", () => {
     await typeQuery(page, "NDA");
     const key = (await resultKeys(page))[0];
     await activate(resultFor(page, key), testInfo);
+    // Camera reads only: MOTION.md at 18273ef makes the camera a live per-frame
+    // measurement, so the first frame after a zoom still carries the old scale
+    // and a mid-flight scale is not the value this test reasons about. The
+    // semantic read stays immediate and unwaited; only the scale comparisons
+    // settle first.
+    await settleMotion(page);
     const selected = await readState(page);
     await activate(page.locator("#gzoom-in"), testInfo);
+    expect((await readState(page)).context,
+      "a zoom must not touch semantic state, with no wait").toEqual(selected.context);
+    await settleMotion(page);
     const zoomed = await readState(page);
     expect(zoomed.camera.scale).toBeGreaterThan(selected.camera.scale);
     expect(zoomed.context).toEqual(selected.context);
     await activate(page.locator("#gzoom-out"), testInfo);
+    await settleMotion(page);
     expect((await readState(page)).camera.scale).toBeLessThan(zoomed.camera.scale);
     const graph = await page.locator("#gsvg").boundingBox();
     // Start in an empty edge of the canvas, not on a potentially selected node.
     const p = { x: graph.x + 14, y: graph.y + graph.height - 18 };
+    await settleMotion(page);
     const beforePan = await readState(page);
     await page.mouse.move(p.x, p.y);
     await page.mouse.down();
     await page.mouse.move(p.x + 95, p.y - 48, { steps: 12 });
     await page.mouse.up();
+    await settleMotion(page);
     const panned = await readState(page);
     expect(panned.camera).not.toEqual(beforePan.camera);
     expect(panned.context).toEqual(selected.context);

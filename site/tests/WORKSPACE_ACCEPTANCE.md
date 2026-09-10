@@ -25,6 +25,29 @@ scroll presentation; `MOTION.md` adds interaction motion on top of it.
 
 ## Execution and evidence
 
+## Timing adaptation for a live camera (approved at MOTION.md 18273ef)
+
+Before the camera moved, every camera change was instant, so the pre-motion
+specs could read geometry and camera scale on the frame after a click. Under the
+corrected contract the camera is a live per-frame measurement: the first frame
+after a zoom still carries the old scale, a mid-flight scale is not the value
+those tests reason about, and mid-flight label geometry is the culled core with
+leaders still travelling. Three narrow changes, all in test-owned files:
+
+1. `measureLabels`, `paintedGraphCount` and `assertLayout` wait for
+   `#top[data-motion="idle"]` before sampling. They only ever asserted about
+   settled geometry; what they assert is unchanged.
+2. In `workspace.spec.js` ("overview fit zoom pan Back and reset") and the
+   production-CSP test in `resilience.spec.js`, each camera-scale or camera-value
+   comparison waits for idle after the activation that causes it. The semantic
+   read after a zoom stays immediate and unwaited — in fact the workspace test
+   now asserts explicitly, with no wait, that a zoom does not touch semantic
+   state.
+3. Nothing else waits. `readState` and `activate` are untouched, no semantic
+   assertion waits, and no in-flight floor waits: the motion spec observes the
+   flight directly and `MOTION_SELECTED_ANCHOR` exists precisely to catch a
+   mid-flight blackout. The 16 CSS px floor is not relaxed anywhere.
+
 Inventory: **150 Node Playwright checks** across eight spec files and two browser
 profiles (desktop Chromium and touch-enabled mobile Chromium), with no skips.
 That is 75 distinct tests run at desktop 1440x900 and phone 390x844; the eleven

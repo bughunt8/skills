@@ -112,7 +112,16 @@ export async function readState(page) {
   });
 }
 
+// Timing adaptation approved in MOTION.md at 18273ef: the camera is now a live
+// per-frame measurement, so a settled-geometry helper that samples immediately
+// after a camera activation reads a frame of the flight (culled core labels,
+// leaders still travelling) instead of the settled layout it asserts about.
+// These three helpers measure SETTLED geometry only, so each waits for
+// `#top[data-motion="idle"]` first. Nothing about what they assert changes, and
+// no semantic read and no in-flight floor waits: `readState`, `activate` and the
+// motion spec are untouched.
 export async function paintedGraphCount(page) {
+  await settleMotion(page);
   return page.evaluate(() => {
     const frame = document.getElementById("gsvg").getBoundingClientRect();
     return [...document.querySelectorAll(".g-node")].filter((node) => {
@@ -132,6 +141,7 @@ export async function paintedGraphCount(page) {
 }
 
 export async function measureLabels(page) {
+  await settleMotion(page);
   return page.evaluate(() => {
     const frame = document.getElementById("gsvg").getBoundingClientRect();
     function painted(el) {
@@ -221,6 +231,7 @@ export async function assertReadableLabels(page, { selectedKey } = {}) {
 }
 
 export async function assertLayout(page) {
+  await settleMotion(page);
   const initialRegions = await page.evaluate(() => Object.fromEntries(
     ["workspace-header", "workspace-title", "graph-region", "inspector", "statusbar"]
       .map((id) => [id, document.getElementById(id).getBoundingClientRect().toJSON()])));
