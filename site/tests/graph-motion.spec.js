@@ -3,6 +3,7 @@ import { assertNoRuntimeErrors, saveEvidence } from "../scripts/workspace-test-h
 import {
   openMotionWorkspace, openMotionPage, expectMotionIdle, resetProbe, readProbe,
   motionEpisodes, sampleMotionFrame, motionSnapshot, comparableSnapshot,
+  semanticTop, viewTop, sampleViewTruth,
   resultKeys, resultFor, tapOrClick, ensureVisible, sampleCamera, cameraDisplacement
 } from "../scripts/motion-test-helpers.mjs";
 
@@ -90,22 +91,51 @@ test.describe("graph motion acceptance", () => {
     expect(Number(immediateSnapshot.top.matchingCount),
       "MOTION_COMMIT_SYNC: counts are committed immediately").toBeGreaterThan(0);
     expect(Number(immediateSnapshot.top.visibleCount),
-      "MOTION_COMMIT_SYNC: counts are committed immediately").toBeGreaterThan(0);
+      "non-vacuity: something must be on screen on the committing frame").toBeGreaterThan(0);
     expect(immediate.labelCount,
       "MOTION_COMMIT_SYNC: labels for the final layout exist on the committing frame").toBeGreaterThan(0);
     expect(immediate.tiny,
       "MOTION_COMMIT_SYNC: every visible label is >=16 CSS px (font size x screen CTM) with no wait").toEqual([]);
+    // Semantic state only. Per 18273ef the visible count and the selected-offscreen
+    // flag are measurements of the live view: they may truthfully change while the
+    // camera moves, so comparing them against an in-flight reading would assert an
+    // accident, not the contract. They are asserted at idle instead, below.
+    const inFlightView = [];
+    for (let i = 0; i < 40; i++) {
+      const truth = await sampleViewTruth(page);
+      inFlightView.push(truth);
+      if (truth.motion !== "running" && inFlightView.some((t) => t.motion === "running")) break;
+    }
+    const during = inFlightView.filter((t) => t.motion === "running");
+    expect(during.length,
+      "non-vacuity: the view-truth sampler must catch in-flight frames").toBeGreaterThan(0);
+    const lying = during.filter((t) => t.reported !== t.painted);
+    expect(lying,
+      "MOTION_COMMIT_SYNC: the reported visible count must match the painted dots on every in-flight frame")
+      .toEqual([]);
     await expectMotionIdle(page);
     const settled = await motionSnapshot(page);
-    expect(settled.top, "MOTION_COMMIT_SYNC: the settled datasets equal the immediate ones")
-      .toEqual(immediateSnapshot.top);
+    expect(semanticTop(settled),
+      "MOTION_COMMIT_SYNC: semantic state must be identical on the committing frame and at idle")
+      .toEqual(semanticTop(immediateSnapshot));
     expect(settled.title).toEqual(immediateSnapshot.title);
+    // View state at idle: the datasets must agree with the pixels, and the camera
+    // must sit exactly on the committed target.
+    const settledTruth = await sampleViewTruth(page);
+    expect(settledTruth.reported,
+      "MOTION_COMMIT_SYNC: at idle the reported visible count must equal the painted dots")
+      .toBe(settledTruth.painted);
+    expect(settledTruth.transform,
+      "MOTION_COMMIT_SYNC: at idle the camera must sit on the committed target")
+      .toBe(`translate(${settledTruth.target.x} ${settledTruth.target.y}) scale(${settledTruth.target.scale})`);
+    expect(viewTop(settled).visibleCount,
+      "non-vacuity: the settled view must actually show dots").not.toBe("0");
     const probe = await readProbe(page);
     expect(motionEpisodes(probe.motionLog).length,
       "non-vacuity: this beat must actually have animated, otherwise nothing was raced")
       .toBeGreaterThan(0);
     await saveEvidence(page, testInfo, "motion-commit-sync",
-      { key, immediate, immediateSnapshot, settled, motionLog: probe.motionLog });
+      { key, immediate, immediateSnapshot, inFlightView, settledTruth, settled, motionLog: probe.motionLog });
   });
 
   test("MOTION_LABEL_FLOOR labels never drop below 16 CSS px across a whole transition", async ({ page }, testInfo) => {

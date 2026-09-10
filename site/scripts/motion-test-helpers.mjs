@@ -393,6 +393,51 @@ export async function motionSnapshot(page) {
   });
 }
 
+// 18273ef splits the contract in two. These commit instantly on the acting frame
+// and must never mutate from a tween:
+export const SEMANTIC_TOP_KEYS = ["mode", "query", "selectedKey", "community",
+  "category", "solution", "evidence", "matchingCount", "path"];
+// These are measurements of the live view. They may truthfully change per frame
+// while the camera moves, and equal the instant render once idle:
+export const VIEW_TOP_KEYS = ["visibleCount", "selectedOffscreen"];
+
+export function semanticTop(snapshot) {
+  return Object.fromEntries(SEMANTIC_TOP_KEYS.map((k) => [k, snapshot.top[k]]));
+}
+
+export function viewTop(snapshot) {
+  return Object.fromEntries(VIEW_TOP_KEYS.map((k) => [k, snapshot.top[k]]));
+}
+
+// Is the view dataset telling the truth about the pixels right now? Counts the
+// dots actually painted inside the SVG frame and compares with
+// `#top[data-visible-count]`. No waiting: it is called mid-flight.
+export async function sampleViewTruth(page) {
+  return page.evaluate(() => {
+    const top = document.getElementById("top");
+    const frame = document.getElementById("gsvg").getBoundingClientRect();
+    let onScreen = 0;
+    for (const node of document.querySelectorAll(".g-node")) {
+      const dot = node.querySelector(".g-dot");
+      if (!dot) continue;
+      const style = getComputedStyle(node);
+      if (style.display === "none" || style.visibility === "hidden") continue;
+      const box = dot.getBoundingClientRect();
+      const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
+      if (!box.width || !box.height) continue;
+      if (cx >= frame.x && cx <= frame.x + frame.width &&
+          cy >= frame.y && cy <= frame.y + frame.height) onScreen++;
+    }
+    return { motion: top.dataset.motion ?? null,
+      reported: Number(top.dataset.visibleCount),
+      painted: onScreen,
+      transform: document.getElementById("vp").getAttribute("transform"),
+      target: { x: Number(document.getElementById("vp").dataset.x),
+        y: Number(document.getElementById("vp").dataset.y),
+        scale: Number(document.getElementById("vp").dataset.scale) } };
+  });
+}
+
 export function comparableSnapshot(snapshot) {
   return { top: snapshot.top, title: snapshot.title, vp: snapshot.vp, nodes: snapshot.nodes };
 }
