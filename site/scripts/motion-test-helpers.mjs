@@ -50,30 +50,42 @@ const DEFECTS = {
 #top[data-motion="running"] #graph-labels .g-clabel { font-size: 9px !important; }
 `
   },
-  // (g) The camera stops interpolating: every transform write is replaced by the
-  // committed target, so the view jumps instantly while the animation clock and
-  // every other tween keep running. rAF counts alone cannot see this.
+  // (g) The camera stops interpolating. The revised contract lets the camera
+  // dataset update live per frame, so replaying "the current target" would still
+  // be motion. This mutant HOLDS the pre-flight transform constant for the whole
+  // flight and releases it only when `data-motion` returns to idle, writing the
+  // committed camera once. Every other tween and the animation clock keep
+  // running, so rAF counts cannot see it.
   "camera-interpolation-disabled": {
     url: /\/app\.js(?:\?.*)?$/,
     patch: (source) => `/* Isolated acceptance defect: do not ship. */
 (function () {
   var apply = function () {
-    var vp = document.getElementById("vp");
-    if (!vp) { setTimeout(apply, 0); return; }
+    var vp = document.getElementById("vp"), top = document.getElementById("top");
+    if (!vp || !top) { setTimeout(apply, 0); return; }
     var set = Element.prototype.setAttribute.bind(vp);
+    var held = null;
+    var running = function () { return top.dataset.motion === "running"; };
     vp.setAttribute = function (name, value) {
-      if (name === "transform") {
-        var x = Number(vp.dataset.x), y = Number(vp.dataset.y), s = Number(vp.dataset.scale);
-        if (isFinite(x) && isFinite(y) && isFinite(s)) {
-          return set("transform", "translate(" + x + " " + y + ") scale(" + s + ")");
-        }
+      if (name !== "transform") return set(name, value);
+      if (running()) {
+        if (held === null) held = vp.getAttribute("transform") || value;
+        return set("transform", held);
       }
-      return set(name, value);
+      held = null;
+      return set("transform", value);
     };
+    new MutationObserver(function () {
+      if (running()) return;
+      held = null;
+      var x = Number(vp.dataset.x), y = Number(vp.dataset.y), s = Number(vp.dataset.scale);
+      if (isFinite(x) && isFinite(y) && isFinite(s)) {
+        set("transform", "translate(" + x + " " + y + ") scale(" + s + ")");
+      }
+    }).observe(top, { attributes: true, attributeFilter: ["data-motion"] });
   };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", apply);
   else apply();
-  apply();
 })();
 ` + source
   },

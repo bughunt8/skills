@@ -154,15 +154,12 @@ test.describe("graph motion acceptance", () => {
       minPaintedCountInFlight: Math.min(...during.map((s) => s.paintedLabelCount)), samples });
   });
 
-  test("MOTION_CAMERA_TRAVEL the camera actually travels and lands on the committed view", async ({ page }, testInfo) => {
-    test.setTimeout(60_000);
-    // View state may move per frame; semantic state may not. This watches the
-    // pixels: successive in-flight readings of the viewport's screen CTM must
-    // differ by more than a pixel of real displacement (or a real scale change),
-    // and the last reading must equal the committed camera on `#vp`.
-    const [key] = await firstResults(page, 1);
+  // One camera beat, watched frame by frame. No idle wait before or during the
+  // sampling: the point is to observe the flight. `expect` messages carry the
+  // MOTION_CAMERA_TRAVEL tag so the planted-defect proof can match them.
+  async function proveCameraTravel(page, label, trigger) {
     await resetProbe(page);
-    await tapOrClick(resultFor(page, key), testInfo);
+    await trigger();
     const samples = [];
     const deadline = Date.now() + 5000;
     let sawRunning = false, settled = 0;
@@ -170,30 +167,46 @@ test.describe("graph motion acceptance", () => {
       const sample = await sampleCamera(page);
       samples.push(sample);
       if (sample.motion === "running") sawRunning = true;
-      if (sample.motion === "idle" && sawRunning) settled++;
+      if (sample.motion !== "running" && sawRunning) settled++;
       if (settled >= 2) break;
     }
     const during = samples.filter((s) => s.motion === "running");
-    expect(sawRunning, "non-vacuity: the context change must animate").toBe(true);
+    expect(sawRunning, `non-vacuity: the ${label} beat must animate`).toBe(true);
     expect(during.length,
-      "non-vacuity: the sampler must catch several in-flight camera frames").toBeGreaterThanOrEqual(3);
+      `non-vacuity: the sampler must catch several in-flight camera frames for ${label}`)
+      .toBeGreaterThanOrEqual(3);
     const steps = during.slice(1).map((sample, index) => ({
-      at: sample.t, ...cameraDisplacement(during[index], sample) }));
+      at: Math.round(sample.t), ...cameraDisplacement(during[index], sample) }));
     const moved = steps.filter((step) => step.distance > 1 || Math.abs(step.dScale) > 0.002);
     expect(moved.length,
-      "MOTION_CAMERA_TRAVEL: successive in-flight camera readings must differ by real displacement")
+      `MOTION_CAMERA_TRAVEL: successive in-flight camera readings must differ by real displacement (${label})`)
       .toBeGreaterThan(0);
     const travel = cameraDisplacement(during[0], during[during.length - 1]);
     expect(travel.distance > 1 || Math.abs(travel.dScale) > 0.002,
-      "MOTION_CAMERA_TRAVEL: the camera must visibly move across the flight, not jump instantly").toBe(true);
+      `MOTION_CAMERA_TRAVEL: the camera must visibly move across the ${label} flight, not jump instantly`)
+      .toBe(true);
     await expectMotionIdle(page);
     const end = await sampleCamera(page);
-    const expected = `translate(${end.target.x} ${end.target.y}) scale(${end.target.scale})`;
     expect(end.transform,
-      "MOTION_CAMERA_TRAVEL: the settled camera must equal the committed target exactly").toBe(expected);
-    const drift = cameraDisplacement(during[during.length - 1], end);
-    await saveEvidence(page, testInfo, "motion-camera-travel", { key, samples: samples.length,
-      inFlight: during.length, steps, travel, drift, end });
+      `MOTION_CAMERA_TRAVEL: the settled camera must equal the committed target exactly (${label})`)
+      .toBe(`translate(${end.target.x} ${end.target.y}) scale(${end.target.scale})`);
+    return { label, samples: samples.length, inFlight: during.length, steps, travel, end };
+  }
+
+  test("MOTION_CAMERA_TRAVEL the camera actually travels on context, zoom and fit", async ({ page }, testInfo) => {
+    test.setTimeout(90_000);
+    // View state may move per frame; semantic state may not. This watches the
+    // pixels through the viewport's screen CTM across all three camera beats the
+    // contract animates, and requires each to land on the committed camera.
+    const [key] = await firstResults(page, 1);
+    const beats = [];
+    beats.push(await proveCameraTravel(page, "context", async () =>
+      tapOrClick(resultFor(page, key), testInfo)));
+    beats.push(await proveCameraTravel(page, "zoom", async () =>
+      tapOrClick(await ensureVisible(page, "#gzoom-in"), testInfo)));
+    beats.push(await proveCameraTravel(page, "fit", async () =>
+      tapOrClick(await ensureVisible(page, "#gfit"), testInfo)));
+    await saveEvidence(page, testInfo, "motion-camera-travel", { key, beats });
   });
 
   test("MOTION_EDGE_CONTINUITY the network never disappears mid-transition", async ({ page }, testInfo) => {
