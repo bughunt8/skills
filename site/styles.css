@@ -174,10 +174,11 @@ input::placeholder { color: var(--muted); opacity: 1; }
 .g-node .g-dot {
   transform-box: fill-box;
   transform-origin: 50% 50%;
+  transform: scale(var(--dot-counter-scale, 1));
   transition: transform var(--motion-quick) var(--ease-standard),
     stroke-width var(--motion-quick) var(--ease-standard);
 }
-.g-node:hover .g-dot { transform: scale(1.2); stroke: var(--text); stroke-width: 2.5px; }
+.g-node:hover .g-dot { transform: scale(calc(var(--dot-counter-scale, 1) * 1.2)); stroke: var(--text); stroke-width: 2.5px; }
 .g-node.is-selected:hover .g-dot { stroke-width: 3.5px; }
 /* Curved edge geometry is never rebuilt mid-flight. It hands over to one straight
  * ghost path that follows the travelling dots, then crossfades back at settle, so
@@ -197,6 +198,17 @@ input::placeholder { color: var(--muted); opacity: 1; }
   transition: opacity var(--motion-quick) var(--ease-standard);
 }
 #top[data-motion-flight] .g-flight-edges { opacity: .45; }
+/* The receding set: decoration only, so it is not a .g-node and takes no pointer. */
+.g-exit-dot {
+  fill: var(--c, var(--accent));
+  stroke: var(--bg);
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: dot-leave calc(var(--motion-slow) * .65) var(--ease-exit) both;
+}
 /* Labels are placed for the final layout immediately, so their computed size is
  * always measurable, and they stay on screen and travel with their own dot. Only
  * the opening reveals from nothing, because nothing is on screen yet to keep. */
@@ -204,9 +216,6 @@ input::placeholder { color: var(--muted); opacity: 1; }
 #graph-labels[data-revealed="false"] { opacity: 0; }
 /* A label carried past the canvas edge would paint outside the graph frame. */
 .g-nlabel[data-flown="out"], .g-clabel[data-flown="out"] { opacity: 0; }
-.g-nlabel[data-entering], .g-clabel[data-entering] {
-  animation: label-in var(--motion-quick) var(--ease-enter) both;
-}
 .g-node[data-entering] .g-dot {
   animation: dot-enter var(--motion-wave) var(--ease-enter) var(--enter-delay, 0ms) both;
 }
@@ -214,8 +223,13 @@ input::placeholder { color: var(--muted); opacity: 1; }
 .g-node[data-leaving] .g-dot {
   animation: dot-leave calc(var(--motion-slow) * .65) var(--ease-exit) both;
 }
-#top[data-pulse] .g-node[data-in-context="true"] .g-dot {
+/* The selected dot pulses in brightness, not in size: its leader line is drawn to
+   the rim, so growing the dot would leave the line starting inside it. */
+#top[data-pulse] .g-node[data-in-context="true"]:not(.is-selected) .g-dot {
   animation: dot-pulse 320ms var(--ease-standard) 2;
+}
+#top[data-pulse] .g-node[data-in-context="true"].is-selected .g-dot {
+  animation: dot-flash 320ms var(--ease-standard) 2;
 }
 #top[data-pulse] .g-node[data-in-context="false"] .g-dot { opacity: .35; }
 .g-halo {
@@ -227,14 +241,17 @@ input::placeholder { color: var(--muted); opacity: 1; }
   animation: halo-in var(--motion-standard) var(--ease-standard) both,
     halo-breath var(--motion-breath) var(--ease-standard) var(--motion-standard) infinite;
 }
-@keyframes dot-enter { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
-@keyframes dot-leave { from { opacity: .85; transform: scale(1); } to { opacity: 0; transform: scale(.6); } }
-@keyframes label-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes dot-pulse {
-  0% { transform: scale(1); }
-  45% { transform: scale(1.18); opacity: .78; }
-  100% { transform: scale(1); }
+@keyframes dot-enter {
+  from { opacity: 0; transform: scale(calc(var(--dot-counter-scale, 1) * .9)); }
+  to { opacity: 1; transform: scale(var(--dot-counter-scale, 1)); }
 }
+@keyframes dot-leave { from { opacity: .85; transform: scale(1); } to { opacity: 0; transform: scale(.5); } }
+@keyframes dot-pulse {
+  0% { transform: scale(var(--dot-counter-scale, 1)); }
+  45% { transform: scale(calc(var(--dot-counter-scale, 1) * 1.18)); opacity: .78; }
+  100% { transform: scale(var(--dot-counter-scale, 1)); }
+}
+@keyframes dot-flash { 0%, 100% { opacity: 1; } 45% { opacity: .6; } }
 @keyframes halo-in { from { opacity: 0; transform: scale(.6); } to { opacity: .18; transform: scale(1); } }
 @keyframes halo-breath {
   0%, 100% { opacity: .12; transform: scale(.94); }

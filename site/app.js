@@ -433,7 +433,7 @@
   // Only transform, opacity and stroke-dashoffset move. One rAF loop, self-stopping.
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const MOTION = {quick: 160, standard: 260, slow: 460, ceiling: 600,
-    wave: 200, step: 40, buckets: 10, pulse: 640, hop: 120, draw: 380, roles: 60, labels: 80,
+    wave: 200, step: 40, buckets: 10, pulse: 640, hop: 120, draw: 380, roles: 60, labels: 240,
     // Bounds. Ghost segments and exits are pure decoration, so they are capped by
     // count and never allowed to turn one frame into a long task.
     ghost: 200, exits: 40};
@@ -459,7 +459,7 @@
   const halo = document.createElementNS(ns, "circle");
   halo.setAttribute("class", "g-halo");
   let flight = null, raf = 0, settleTimer = 0, revealTimer = 0, idleTimer = 0, drawTimer = 0;
-  let edgesTimer = 0, opening = false;
+  let edgesTimer = 0, opening = false, clock = 0;
   const roleNodes = [], exitNodes = [];
   // One path carries every in-flight relationship as a straight segment, so the
   // network re-forms in view instead of blacking out. One string, one write, per
@@ -470,6 +470,13 @@
   ghostEdges.setAttribute("aria-hidden", "true");
   ghostEdges.style.display = "none";
   (svg.querySelector(".g-edges") || vp).after(ghostEdges);
+  // Receding dots are decoration, not nodes: they are drawn in their own layer so
+  // they never masquerade as a node in context, carry a label or take a click.
+  const exitLayer = document.createElementNS(ns, "g");
+  exitLayer.setAttribute("id", "flight-exits");
+  exitLayer.setAttribute("class", "g-flight-exits");
+  exitLayer.setAttribute("aria-hidden", "true");
+  ghostEdges.after(exitLayer);
 
   // The one ambient element: a halo on the selected dot, never under reduced motion.
   function placeHalo() {
@@ -544,6 +551,7 @@
   }
 
   function clearTimers() {
+    if (clock) { cancelAnimationFrame(clock); clock = 0; }
     if (edgesTimer) { clearTimeout(edgesTimer); edgesTimer = 0; }
     if (settleTimer) { clearTimeout(settleTimer); settleTimer = 0; }
     if (revealTimer) { clearTimeout(revealTimer); revealTimer = 0; }
@@ -573,6 +581,7 @@
     ghostEdges.style.display = "none";
     ghostEdges.removeAttribute("d");
     vp.setAttribute("transform", cameraTransform(state.viewport));
+    root.style.removeProperty("--dot-counter-scale");
     delete root.dataset.motionFlight;
   }
 
@@ -581,10 +590,7 @@
   // Exits are the only place motion re-shows a dot render() had hidden. It is
   // presentational: they carry no label, no hit target and no context.
   function clearExits() {
-    exitNodes.forEach((el) => {
-      if (!scene.has(el.dataset.key)) el.style.display = "none";
-      el.removeAttribute("transform");
-    });
+    if (exitLayer.firstChild) exitLayer.replaceChildren();
     exitNodes.length = 0;
   }
 
@@ -617,6 +623,10 @@
       const y = f.from.y + (f.to.y - f.from.y) * eased;
       f.live = {x, y, k};
       vp.setAttribute("transform", cameraTransform(f.live));
+      // r is committed for the final camera, so a glide would paint dots at the
+      // wrong size. One custom property, not 490 attribute writes, holds them at
+      // the size the settled layout reserved for them.
+      root.style.setProperty("--dot-counter-scale", String(f.to.k / k));
     }
     for (const item of f.travel) {
       const dx = item.dx * (1 - eased), dy = item.dy * (1 - eased);
@@ -733,9 +743,24 @@
     const from = previous.viewport, to = state.viewport;
     const span = Math.hypot(from.x - to.x, from.y - to.y);
     const zoomSpan = Math.abs(Math.log((to.k || 1) / (from.k || 1)));
+    // Every context change arrives in place. A label keeps one fixed screen size
+    // (the 16 CSS px floor forbids scaling it), so the moment dots re-space under
+    // an interpolated layout or camera the label layer sits over dots it cleared
+    // at settle. Rather than hide the labels for the flight, the layout and camera
+    // commit at once and the change is carried by what can move without lying:
+    // the leaving dots recede, the arriving dots wave in from the anchor, the
+    // edges draw back in, and the selection pulses. Only a pure camera move
+    // interpolates position, because there the whole scene moves as one piece.
+    const morph = beat === "camera";
+    if (!morph) travel.length = 0;
     const wave = beat === "first-paint";
     // A first paint has nothing to travel from; it reveals outward instead.
-    const camera = !wave && (span > .5 || zoomSpan > .001);
+    // Only a pan glides. A zoom re-spaces every dot against label text that keeps
+    // one fixed size, so an interpolated scale would slide labels over dots and
+    // over each other for the length of the glide; a pan moves the whole frame by
+    // one delta, which preserves every relationship the settled layout resolved.
+    const camera = !wave && morph && zoomSpan <= .001 && span > .5;
+    const regime = entering.length > 0;
     if (beat === "context" && !camera && !travel.length && !entering.length && !leaving.length) {
       beat = "selection";
     }
@@ -770,20 +795,27 @@
       exiting.push(node);
     }
     exiting.forEach((node) => {
-      node.el.style.display = "";
+      const point = previous.points.get(node.key);
+      const dot = document.createElementNS(ns, "circle");
+      const hue = [...node.el.classList].find((name) => /^h(\d+|x)$/.test(name)) || "hx";
+      dot.setAttribute("class", `g-exit-dot ${hue}`);
+      dot.setAttribute("cx", point.x);
+      dot.setAttribute("cy", point.y);
+      dot.setAttribute("r", node.dot.getAttribute("r") || 6);
+      exitLayer.appendChild(dot);
       node.el.dataset.leaving = "true";
       roleNodes.push(node.el);
-      exitNodes.push(node.el);
+      exitNodes.push(dot);
     });
     leaving.slice(0, MOTION.roles).forEach((node) => {
       if (node.el.dataset.leaving) return;
       node.el.dataset.leaving = "true";
       roleNodes.push(node.el);
     });
-    const waveLongest = wave && entered.length ? waveDelays(entered) : 0;
+    const waveLongest = (wave || regime) && entered.length ? waveDelays(entered) : 0;
     const moving = camera || travel.length > 0;
     let settleAt = wave ? waveLongest + MOTION.wave : moving || entering.length || leaving.length ?
-      duration : beat === "selection" ? MOTION.standard : 0;
+      Math.max(duration, waveLongest + MOTION.wave) : beat === "selection" ? MOTION.standard : 0;
     if (beat === "search") settleAt = Math.max(settleAt, MOTION.standard);
     if (!settleAt && beat !== "search") {
       revealLabels(true);
@@ -809,19 +841,17 @@
     } else {
       revealLabels(true);
     }
-    // Entering labels have no previous position to travel from, so they fade in.
-    // The selected name is the one label a reader is looking for, so it never
-    // fades: it is readable from the commit frame.
-    if (!wave) entered.forEach((node) => {
-      const label = node.key === state.selected ? null : labels.get(node.key);
-      if (label) { label.dataset.entering = "true"; roleNodes.push(label); }
-    });
+    // Labels do not fade in on a context change. The layout commits at once, so a
+    // name is readable from the first frame after the click; fading it would mean
+    // the reader waits on the one thing they clicked for.
     if (moving || wave) {
       // The real curved edges cannot follow travelling dots without a per-frame
       // rebuild of every path, so they hand over to one ghost path and fade back in
       // at settle. On the opening they simply arrive after the dots.
+      // Only travelling dots make the real curved edges wrong. When nothing travels
+      // the edges are already final and simply glide with the camera.
       const ghost = [];
-      if (travel.length || (!wave && entering.length)) {
+      if (travel.length) {
         root.dataset.motionFlight = "true";
         const deg = (key) => Number(nodes.get(key).el.dataset.deg) || 0;
         activeEdges.slice()
@@ -844,7 +874,7 @@
       }, edgesBackAt);
       flight = {start: performance.now(), duration, ease: EASE.standard, camera,
         from: {...from}, to: {...to}, live: {...from}, travel, ghost,
-        labels: moving ? liveLabels(previous, !!(entering.length || leaving.length)) : [],
+        labels: moving ? liveLabels(previous, travel.length > 0) : [],
         offsets: new Map()};
       travel.forEach((item) => flight.offsets.set(item.node.key, {dx: item.dx, dy: item.dy}));
       paint(flight, 0);
@@ -869,6 +899,16 @@
     idleTimer = setTimeout(() => {
       idleTimer = 0; opening = false; root.dataset.motion = "idle";
     }, total);
+    // A beat runs on the frame clock even when nothing interpolates. That is what
+    // makes it interruptible on the frame the next input lands rather than at the
+    // end of a timer, and the loop stops itself the moment the beat is over.
+    if (total > 0) {
+      const until = performance.now() + total;
+      const tickBeat = (now) => {
+        clock = now < until && root.dataset.motion === "running" ? requestAnimationFrame(tickBeat) : 0;
+      };
+      clock = requestAnimationFrame(tickBeat);
+    }
   }
 
   function renderList() {
