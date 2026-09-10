@@ -30,7 +30,7 @@ jobs:
     uses: ./.github/workflows/site-deploy.yml
     with:
       environment: staging
-      # Set the SITE_URL variable on the staging environment to enable the
-      # post-deploy smoke test. Left empty it is skipped rather than guessed.
-      url: ${{ vars.SITE_URL }}
+      # Environment variables are unavailable at this reusable-workflow call
+      # site. Keep the public target explicit, just as production does.
+      url: https://mediumvioletred-coyote-692292.hostingersite.com/
     secrets: inherit

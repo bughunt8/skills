@@ -68,6 +68,13 @@ existing staging and production environments, not a new hosting service.
 Run the site HTML validation and browser suite as well as the repository checks.
 See `site/README.md` for commands and `site/DEPLOYMENT.md` for deployment.
 
+Live deployment verification is mandatory. The staging and production callers
+pass explicit URLs, and `site-deploy.yml` rejects empty or mismatched targets
+before upload. Never restore a `vars.SITE_URL` expression at the caller or an
+optional skip on verification. Both deployments call `site-verify.yml` with the
+full deployed commit SHA. Run `python3 site/tests/test_deploy_workflows.py` and,
+from `site/`, `node scripts/prove-deploy-gate.mjs` when changing this path.
+
 ## Adding a skill
 
 ```

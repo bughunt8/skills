@@ -6,7 +6,7 @@ largest detected community. There is no scroll animation or pinning.
 
 - Production: <https://skills.ronald.ng>
 - Staging: the `staging` branch deploys to Hostinger through GitHub Actions.
-  The staging GitHub Environment supplies its `SITE_URL`.
+  Its caller workflow supplies the explicit staging URL for mandatory live verification.
 
 ## Use the workspace
 
@@ -127,7 +127,7 @@ continues to hold DNS; CI does not change it.
 
 | Branch | GitHub Environment | Destination |
 | --- | --- | --- |
-| `staging` | `staging` | Hostinger staging, from `SITE_URL` |
+| `staging` | `staging` | `https://mediumvioletred-coyote-692292.hostingersite.com/` |
 | `main` | `production` | <https://skills.ronald.ng> |
 
 Promotion remains the manual **Site promote staging to main** workflow with
