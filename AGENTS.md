@@ -6,8 +6,9 @@ anything here.
 ## What this repository is
 
 A library of 470 skill files across 22 directories, 469 of which are linted; the difference is
-one deliberate test fixture. There is no application, no build, no
-tests to run against behaviour. Every file is an instruction to some other agent, in a
+one deliberate test fixture. The skill files are instructions to another agent. The
+`site/` directory also contains a static graph workspace with a deterministic build
+and browser tests. Every skill file is an instruction to some other agent, in a
 future session, with credentials you do not have. Write accordingly.
 
 ## The five rules
@@ -47,6 +48,32 @@ report "should pass".
 `scripts/lint_skills.py --strict` shows the 68 findings the baseline currently accepts. Do not add
 to that number. `--write-baseline` exists, and using it to silence a violation you introduced is
 the wrong move.
+
+## The graph workspace
+
+Read `site/UI_NAVIGATION.md` before changing the browser interface. There is no
+scroll animation, pinning, GSAP or Lenis loading. Selection changes only through
+explicit activation, never hover, focus passage, pan, resize or scroll. Keep the
+header filters, docked inspector, persistent result buttons and bottom status.
+Graph labels use screen-space coordinates and must measure at least 16 CSS pixels
+after the SVG screen transform. The selected name is never truncated.
+
+Edit `site/build.py`, `site/app.js` and `site/styles.css`. Regenerate `site/index.html`
+and `site/data.js` with `python3 site/build.py --write`, then run `--check`.
+Keep `network.py` and `compose.py` identity/evidence semantics intact. Full skill
+and Solution HTML must remain usable without JavaScript. Fonts and dependencies
+stay self-hosted. Deployment stays in GitHub Actions to Hostinger using the
+existing staging and production environments, not a new hosting service.
+
+Run the site HTML validation and browser suite as well as the repository checks.
+See `site/README.md` for commands and `site/DEPLOYMENT.md` for deployment.
+
+Live deployment verification is mandatory. The staging and production callers
+pass explicit URLs, and `site-deploy.yml` rejects empty or mismatched targets
+before upload. Never restore a `vars.SITE_URL` expression at the caller or an
+optional skip on verification. Both deployments call `site-verify.yml` with the
+full deployed commit SHA. Run `python3 site/tests/test_deploy_workflows.py` and,
+from `site/`, `node scripts/prove-deploy-gate.mjs` when changing this path.
 
 ## Adding a skill
 

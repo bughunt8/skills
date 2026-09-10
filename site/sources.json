@@ -1,0 +1,34 @@
+{
+  "$comment": "Repositories this page indexes. The host repository is read from the working tree ('local': true), so the page cannot disagree with the commit it ships from. External repositories are pinned to a commit so a build is reproducible: CI and a laptop generate byte-identical output. build.py --refresh moves those pins to the current upstream tips and rewrites this file, which is what the fortnightly workflow does. build.py walks each source for SKILL.md files, dedupes by skill name (shallowest path wins, so a repo that mirrors a skill into two directories contributes it once), and prerenders a card for each.",
+  "sources": [
+    {
+      "id": "bughunt8-skills",
+      "repo": "bughunt8/skills",
+      "url": "https://github.com/bughunt8/skills",
+      "subpath": "skills",
+      "license": "MIT + per-import",
+      "note": "The host repository. Read from the working tree, not cloned, so the page always reflects the commit it is built from.",
+      "local": true
+    },
+    {
+      "id": "creative-writing-skills",
+      "repo": "haowjy/creative-writing-skills",
+      "url": "https://github.com/haowjy/creative-writing-skills",
+      "subpath": "cw/skills",
+      "flat_category": "creative-writing",
+      "license": "Apache-2.0",
+      "note": "Indexed at cw/skills, which its own .claude-plugin/marketplace.json declares as the plugin source ('source': './cw'). That tree holds the complete set of 24. A top-level skills/ tree also exists with 11 of them in a different frontmatter format; indexing the repository root picked up both, and 'shallowest path wins' then preferred the 11-file partial copy over the canonical one. Naming the canonical subtree removes the ambiguity instead of guessing at it.",
+      "ref": "fd7a3ad9cd7697a0645ff6ff4bd5e809cf7673a3"
+    },
+    {
+      "id": "shuohao-skills",
+      "repo": "eternityspring/shuohao-skills",
+      "url": "https://github.com/eternityspring/shuohao-skills",
+      "subpath": "skills",
+      "flat_category": "shuohao",
+      "license": "Apache-2.0",
+      "note": "AI short-drama production pipeline.",
+      "ref": "4322897e6d2bdaf66365534fd40194360c75a85f"
+    }
+  ]
+}

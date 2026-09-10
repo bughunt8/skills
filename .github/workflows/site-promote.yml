@@ -1,0 +1,178 @@
+name: Site promote staging to main
+
+# Opens a promotion pull request from staging into main. It does not write to
+# main itself.
+#
+# The previous version ran `git push origin main`. That cannot work here: main
+# requires a pull request with a code-owner approving review, so a direct push
+# from a workflow is rejected by branch protection. The promotion therefore has
+# to travel the same reviewed path as any other change.
+#
+#   staging --(this workflow, manual, typed confirmation)--> promotion PR
+#   promotion PR --(human approves and merges)-------------> main
+#   main --(site-deploy-production.yml, on push)-----------> skills.ronald.ng
+#
+# The production deploy is no longer dispatched from here. Merging the promotion
+# PR is itself a push to main made by a person, so `on: push` fires normally.
+# The old explicit dispatch existed only because a GITHUB_TOKEN push does not
+# trigger other workflows, and this workflow no longer pushes.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "promote" to open the promotion pull request.'
+        required: true
+        default: ""
+      update_staging_if_behind:
+        description: "Merge main into staging when staging is behind, so the strict required check can pass."
+        type: boolean
+        required: false
+        default: true
+
+permissions:
+  contents: write # only ever writes to staging, never to main
+  pull-requests: write
+
+concurrency:
+  group: site-promote
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    name: open the promotion pull request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "promote" ]; then
+            echo "::error::confirmation failed; type 'promote' to run this workflow"
+            exit 1
+          fi
+          echo "confirmation accepted"
+
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: staging
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Show what is being promoted
+        id: diff
+        run: |
+          git fetch origin main:main staging:staging
+          echo "=== commits on staging not yet on main ==="
+          git log --oneline main..staging
+          echo "=== files ==="
+          git diff --stat main..staging
+          count="$(git rev-list --count main..staging)"
+          if [ "$count" -eq 0 ]; then
+            echo "::error::staging has nothing main does not already have; there is nothing to promote"
+            exit 1
+          fi
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse staging)" >> "$GITHUB_OUTPUT"
+          echo "short=$(git rev-parse --short staging)" >> "$GITHUB_OUTPUT"
+
+      # Promoting a revision whose own checks failed would put a known-bad commit
+      # in front of a reviewer with a green-looking PR, because the required
+      # context is reported per commit.
+      - name: Require the staging revision to be green
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          required="validate skills and provenance"
+          gh api "repos/${{ github.repository }}/commits/${{ steps.diff.outputs.sha }}/check-runs" \
+            --paginate > check-runs.json
+          conclusion="$(jq -r --arg name "$required" \
+            '[.check_runs[] | select(.name == $name)] | sort_by(.completed_at) | last | .conclusion // "missing"' \
+            check-runs.json)"
+          echo "required check '$required' on ${{ steps.diff.outputs.short }}: $conclusion"
+          if [ "$conclusion" != "success" ]; then
+            echo "::error::the required check is '$conclusion' on the staging head; fix staging before promoting"
+            exit 1
+          fi
+
+      # main requires the head branch to be up to date, so a promotion PR whose
+      # base has moved ahead can never satisfy the check on its own.
+      - name: Update staging when it is behind main
+        run: |
+          behind="$(git rev-list --count staging..main)"
+          echo "commits on main that staging lacks: $behind"
+          if [ "$behind" -eq 0 ]; then
+            echo "staging already contains main"
+            exit 0
+          fi
+          if [ "${{ github.event.inputs.update_staging_if_behind }}" != "true" ]; then
+            echo "::warning::staging is $behind commit(s) behind main; the promotion PR will report as out of date until it is updated"
+            exit 0
+          fi
+          git merge --no-ff --no-edit main \
+            -m "Merge main into staging before promotion (automated by site-promote)"
+          git push origin staging
+          echo "merged main into staging and pushed"
+
+      - name: Compose the promotion pull request body
+        run: |
+          {
+            echo "Promotion of the staging revision \`${{ steps.diff.outputs.short }}\` into \`main\`."
+            echo
+            echo "Opened by the **Site promote staging to main** workflow. This workflow does not write to \`main\`."
+            echo
+            echo "## Commits being promoted (${{ steps.diff.outputs.count }})"
+            echo
+            echo '```'
+            git log --oneline main..staging
+            echo '```'
+            echo
+            echo "## Files"
+            echo
+            echo '```'
+            git diff --stat main..staging
+            echo '```'
+            echo
+            echo "## Before merging"
+            echo
+            echo "- \`main\` requires one code-owner approving review. That approval is deliberate and is not automated."
+            echo "- Merging this pull request is a push to \`main\`, which triggers **Site deploy production**."
+            echo "- That deploy revalidates this commit, then waits for the \`production\` environment reviewer before publishing."
+            echo "- It fails closed if the \`production\` environment is missing its FTP credentials, rather than publishing a partial release."
+            echo "- After publishing it smoke-tests <https://skills.ronald.ng> and fails the deploy unless that origin serves this commit."
+          } > pr-body.md
+          cat pr-body.md
+
+      - name: Open or update the promotion pull request
+        env:
+          # A fine-grained PAT in PROMOTE_TOKEN is optional. It is only needed if
+          # "Allow GitHub Actions to create and approve pull requests" is off, and
+          # it also lets the PR trigger pull_request-scoped checks.
+          GH_TOKEN: ${{ secrets.PROMOTE_TOKEN || github.token }}
+        run: |
+          title="Promote staging to main: ${{ steps.diff.outputs.short }}"
+          existing="$(gh pr list --base main --head staging --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "$title" --body-file pr-body.md
+            url="$(gh pr view "$existing" --json url --jq '.url')"
+            echo "updated existing promotion pull request: $url"
+          else
+            if ! gh pr create --base main --head staging --title "$title" --body-file pr-body.md > created.txt 2>&1; then
+              cat created.txt
+              if grep -qi "not permitted to create or approve pull requests" created.txt; then
+                echo "::error::GitHub Actions is not allowed to create pull requests in this repository. Either enable Settings → Actions → General → Allow GitHub Actions to create and approve pull requests, or add a fine-grained PAT as the PROMOTE_TOKEN secret with Contents and Pull requests write access."
+              fi
+              exit 1
+            fi
+            url="$(tail -n1 created.txt)"
+            echo "opened promotion pull request: $url"
+          fi
+          {
+            echo "### Promotion pull request ready"
+            echo
+            echo "$url"
+            echo
+            echo "Approve and merge it to release \`${{ steps.diff.outputs.short }}\` to production."
+          } >> "$GITHUB_STEP_SUMMARY"

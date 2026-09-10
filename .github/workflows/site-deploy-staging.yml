@@ -1,0 +1,36 @@
+name: Site deploy staging
+
+# staging branch -> staging environment, deployed to Hostinger.
+#
+# Identical to production in every respect except which GitHub Environment
+# supplies the secrets. Mirrors the www-resume branch model: work lands on
+# staging, is verified on the staging URL, then is promoted to main by hand.
+
+on:
+  push:
+    branches: [staging]
+    paths: ["site/**", "skills/**", ".github/workflows/site-*.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    name: validate
+    uses: ./.github/workflows/site-validate.yml
+
+  deploy:
+    name: deploy
+    needs: gate
+    uses: ./.github/workflows/site-deploy.yml
+    with:
+      environment: staging
+      # Environment variables are unavailable at this reusable-workflow call
+      # site. Keep the public target explicit, just as production does.
+      url: https://mediumvioletred-coyote-692292.hostingersite.com/
+    secrets: inherit

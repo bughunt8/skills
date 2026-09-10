@@ -1,0 +1,250 @@
+name: Site deploy
+
+# One deploy path, used unchanged by both staging and production.
+#
+# Hostinger is the only host. No S3, no CloudFront, no ACM: the site is static
+# files over FTP, TLS is Hostinger's free certificate, and caching, compression
+# and security headers come from site/.htaccess, which ships with the site so the
+# posture is reviewable in a diff rather than clicked into hPanel.
+#
+# The only AWS service involved anywhere is Route 53, which holds the DNS record,
+# and that is not touched here. As in bughunt8/www-resume, DNS is created once by
+# hand. See site/DEPLOYMENT.md.
+#
+# Staging and production are the SAME setup: same workflow, same steps, same
+# secret names. The only difference is which values those names carry, which comes
+# from the GitHub Environment named by the `environment` input. There is no second
+# code path that can drift, so a staging deploy exercises exactly the mechanism
+# production will use.
+#
+# The FTP step follows bughunt8/profitrise-website deploy-production.yml.
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "GitHub Environment supplying the deploy secrets"
+        required: true
+        type: string
+      url:
+        description: "Public URL to smoke-test after deploying"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  target:
+    name: validate the deployment target before uploading
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+      - name: Reject missing or mismatched verification targets
+        env:
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+          SITE_URL: ${{ inputs.url }}
+        run: node site/scripts/check-deploy-target.mjs "$DEPLOY_ENVIRONMENT" "$SITE_URL"
+
+  deploy:
+    name: publish to Hostinger
+    needs: target
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ inputs.url }}
+    steps:
+      - uses: actions/checkout@v5
+
+      # Fail on a missing secret rather than half-deploying. A deploy that skips
+      # one of its two targets and still reports success leaves the two out of
+      # sync with nothing to indicate it.
+      - name: Confirm the environment is fully configured
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          missing=""
+          for name in FTP_SERVER FTP_USERNAME FTP_PASSWORD; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::environment '${{ inputs.environment }}' is missing:$missing"
+            echo "See site/DEPLOYMENT.md. These are the same three values already held"
+            echo "by bughunt8/profitrise-website."
+            exit 1
+          fi
+          echo "environment '${{ inputs.environment }}' is configured"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      # Rebuild rather than trusting the committed page, then refuse to ship if
+      # the result differs from what was reviewed. What goes live is what CI
+      # produced from the sources.
+      - name: Build from source
+        working-directory: site
+        run: python3 build.py --write
+
+      - name: Refuse to ship a page that is not what the sources produce
+        working-directory: site
+        run: |
+          if ! git diff --quiet -- index.html data.js; then
+            echo "::error::site/index.html or site/data.js differs from a clean build."
+            echo "Run: cd site && python3 build.py --write"
+            git --no-pager diff --stat -- index.html data.js
+            exit 1
+          fi
+          echo "committed page matches a clean build"
+
+      # Stage only publishable files. Keeping tests, the build script, the
+      # source manifest and node tooling out of a public bucket is the whole
+      # point of assembling a directory rather than syncing the folder.
+      - name: Assemble the publish directory
+        working-directory: site
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+        run: |
+          mkdir -p _site
+          # .htaccess is intentionally NOT excluded: it carries the security
+          # headers, caching and compression that CloudFront used to provide.
+          rsync -a \
+            --exclude '_site' \
+            --exclude 'tests' \
+            --exclude 'scripts' \
+            --exclude 'vendor' \
+            --exclude 'node_modules' \
+            --exclude '.cache' \
+            --exclude '__pycache__' \
+            --exclude '*.py' \
+            --exclude 'playwright-report' \
+            --exclude 'test-results' \
+            --exclude 'build.py' \
+            --exclude 'generate_schema.py' \
+            --exclude 'sources.json' \
+            --exclude 'package.json' \
+            --exclude 'package-lock.json' \
+            --exclude 'playwright.config.js' \
+            --exclude '.htmlvalidate.json' \
+            --exclude '*.md' \
+            ./ _site/
+
+          printf '%s\n' \
+            "$ENVIRONMENT" \
+            "commit: ${GITHUB_SHA}" \
+            "built: $(date -u +%Y-%m-%dT%H:%M:%SZ)" > _site/BUILD-INFO.txt
+
+          # Staging must never compete with production in search results.
+          if [ "$ENVIRONMENT" = "production" ]; then
+            printf 'User-agent: *\nAllow: /\nSitemap: https://skills.ronald.ng/sitemap.xml\n' > _site/robots.txt
+            printf '%s\n' \
+              '<?xml version="1.0" encoding="UTF-8"?>' \
+              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' \
+              '  <url><loc>https://skills.ronald.ng/</loc>' \
+              "    <lastmod>$(date -u +%Y-%m-%d)</lastmod>" \
+              '    <changefreq>weekly</changefreq></url>' \
+              '</urlset>' > _site/sitemap.xml
+          else
+            printf 'User-agent: *\nDisallow: /\n' > _site/robots.txt
+          fi
+
+          echo "publishing:"
+          find _site -type f | sort | sed 's/^/  /'
+
+      # Absolute asset paths work locally and 404 under a subpath, so catch them
+      # before they are the live site.
+      - name: Reject absolute asset paths
+        working-directory: site
+        run: |
+          if grep -nE '(src|href)="/(styles|app|data)' _site/index.html; then
+            echo "::error::absolute asset path found; use ./ instead"
+            exit 1
+          fi
+          echo "asset paths are relative"
+
+      # ---------------------------------------------------------- Hostinger
+      # Confirm .htaccess actually made it into the publish set. Without it the
+      # site still serves, but with no security headers and no compression, and
+      # that is a silent downgrade rather than a visible failure.
+      # Local fonts and the workspace runtime must ship. The former scroll
+      # libraries are deliberately absent: requiring them here would preserve
+      # unused motion assets after acceptance explicitly removed that layer.
+      - name: Confirm the self-hosted assets are being published
+        working-directory: site
+        run: |
+          missing=""
+          for f in app.js data.js styles.css \
+                   fonts/fonts.css fonts/inter-latin.woff2 fonts/space-grotesk-latin.woff2; do
+            [ -f "_site/$f" ] || missing="$missing $f"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::the publish set is missing:$missing"
+            exit 1
+          fi
+          if find _site -type f | grep -Ei '/(gsap|ScrollTrigger|lenis)[^/]*\.(js|mjs)$'; then
+            echo "::error::obsolete scroll-animation runtime found in the publish set"
+            exit 1
+          fi
+          # And nothing may be FETCHED from another origin. Scoped to elements a
+          # browser actually loads: the page links out to github.com on every card,
+          # and an <a href> is not a request.
+          if grep -oE '<(link|script|img|use|iframe|source)[^>]*>' _site/index.html \
+             | grep -E '(src|href)="https?://' \
+             | grep -v 'rel="canonical"'; then
+            echo "::error::index.html loads a resource from another origin"
+            exit 1
+          fi
+          echo "self-hosted assets present, no external resource loads"
+
+      - name: Confirm .htaccess is being published
+        working-directory: site
+        run: |
+          if [ ! -f _site/.htaccess ]; then
+            echo "::error::_site/.htaccess is missing; the site would deploy with no"
+            echo "security headers, no caching rules and no compression."
+            exit 1
+          fi
+          echo ".htaccess present ($(wc -c < _site/.htaccess) bytes)"
+
+      # dangerous-clean-slate stays false: it wipes the remote directory, and this
+      # Hostinger account serves other sites.
+      - name: Deploy to Hostinger over FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          local-dir: ./site/_site/
+          server-dir: ${{ vars.SITE_FTP_REMOTE_DIR || './' }}
+          dangerous-clean-slate: false
+          # Do not attempt remote cleanup of historical build/cache folders.
+          # An older sync record can name a cache directory that no longer
+          # exists, causing FTP 550 after all public UI files were uploaded.
+          # These paths are already excluded from the local publish assembly.
+          # Preserve the action's default exclusions when adding our own.
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/*.py
+            **/__pycache__
+            **/__pycache__/**
+            **/.cache
+            **/.cache/**
+            **/vendor
+            **/vendor/**
+
+  verify:
+    name: verify the deployment is live and correct
+    needs: deploy
+    uses: ./.github/workflows/site-verify.yml
+    with:
+      url: ${{ inputs.url }}
+      expected_sha: ${{ github.sha }}

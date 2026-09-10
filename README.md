@@ -14,6 +14,24 @@ resolves to a real skill.
 
 Credit is precise: **skills © their authors, under their own licences · solutions composed by
 Ronald Ng**. A solution references skills by name and never copies their text.
+## Browse it
+
+[**skills.ronald.ng**](https://skills.ronald.ng) — a scroll-driven browser for this
+library. You travel through one category at a time, and every skill arrives with
+what it does, where it came from, and how it is licensed.
+
+The page lives in [`site/`](./site/) and is **generated from this repository's own
+`skills/` directory**, so it cannot disagree with the commit it ships from. Adding
+a skill updates the page in the same commit.
+
+If CI tells you the page is stale after you add a skill, regenerate it:
+
+```bash
+cd site && python3 build.py --write
+```
+
+That is the whole workflow; there is no build toolchain and no dependencies. See
+[`site/README.md`](./site/README.md) for the rest.
 
 ## Engineering Skills
 

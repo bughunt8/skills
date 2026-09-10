@@ -1,0 +1,38 @@
+name: Site deploy production
+
+# main branch -> production environment, deployed to Hostinger, serving
+# https://skills.ronald.ng
+#
+# Same workflow, same steps and same secret names as staging; only the
+# environment differs. Production revalidates the exact commit it is about to
+# ship rather than trusting that an earlier run passed.
+#
+# Reached either by a push to main or, as in www-resume, by the promote workflow
+# dispatching this one after merging staging into main.
+
+on:
+  push:
+    branches: [main]
+    paths: ["site/**", "skills/**", ".github/workflows/site-*.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-deploy-production
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    name: validate
+    uses: ./.github/workflows/site-validate.yml
+
+  deploy:
+    name: deploy
+    needs: gate
+    uses: ./.github/workflows/site-deploy.yml
+    with:
+      environment: production
+      url: https://skills.ronald.ng
+    secrets: inherit
