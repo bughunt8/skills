@@ -29,13 +29,21 @@ work ──▶ staging branch ──▶ staging env (Hostinger)
                  └── site-promote.yml, manual, type "promote"
                               │
                               ▼
+                     promotion pull request ──▶ code-owner approval
+                              │
+                              ▼
                           main branch ──▶ production env (Hostinger)
 ```
 
+Promotion goes through a reviewed pull request. `main` requires a code-owner
+approving review, so nothing, including a workflow, writes to `main` directly.
+
 ## Nothing is served by a third party
 
-The page loads no external resource. The motion libraries live in `site/vendor/`
-and the two webfonts in `site/fonts/`, both served from the site's own origin.
+The page loads no external resource. It loads only `data.js` and `app.js` from
+its own origin, and the webfonts in `site/fonts/`. There is no `site/vendor/`
+any more: the scroll libraries that used to live there were deleted with the
+scroll presentation, and motion is now plain CSS and one animation loop.
 
 That is deliberate rather than tidy-mindedness. A CDN and a font service each see
 every reader, each can be blocked by a network or an extension, and each is a
@@ -76,8 +84,8 @@ itself to HTTPS you cannot yet serve.
 | `site-ci.yml` | push/PR touching `site/**`, `skills/**` | calls validate. Exposes the required check `site gates passed` |
 | `site-deploy.yml` | called | the single deploy path: build, assemble, publish to Hostinger, smoke-test |
 | `site-deploy-staging.yml` | push to `staging` | validate, then deploy to the `staging` environment |
-| `site-deploy-production.yml` | push to `main`, or dispatched by promote | validate, then deploy to `production` |
-| `site-promote.yml` | manual, typed confirmation | merge `staging` into `main`, then dispatch the production deploy |
+| `site-deploy-production.yml` | push to `main` | validate, then deploy to `production` |
+| `site-promote.yml` | manual, typed confirmation | open or update the promotion pull request from `staging` into `main` |
 | `site-refresh-sources.yml` | 1st and 15th | re-pin the external sources, open a PR against `staging` |
 
 Validation is a reusable workflow called by every deploy path, so no deploy can
@@ -176,11 +184,30 @@ job is added or renamed.
 ## Shipping
 
 Push to `staging`, look at the staging URL, then run **Site promote staging to
-main** and type `promote`. It shows what is being promoted, merges, and dispatches
-the production deploy.
+main** and type `promote`. It shows what is being promoted, refuses to promote a
+revision whose required check is not green, merges `main` into `staging` when
+`staging` has fallen behind, and opens or updates the promotion pull request.
 
-A push straight to `main` also deploys production, which is why `main` should be
-protected.
+Approve and merge that pull request to release. The merge is a push to `main`, so
+**Site deploy production** runs on it, revalidates the commit, waits for the
+`production` environment reviewer, then publishes and smoke-tests the live URL.
+The workflow no longer dispatches the production deploy, because it no longer
+pushes; the old dispatch existed only to work around a `GITHUB_TOKEN` push not
+triggering `on: push`.
+
+Any push to `main` deploys production, which is why `main` is protected and the
+promotion travels the same reviewed path as any other change.
+
+Opening the pull request needs one of these, because a workflow cannot open a
+pull request by default:
+
+- **Settings → Actions → General → Allow GitHub Actions to create and approve
+  pull requests**, enabled; or
+- a fine-grained PAT in the `PROMOTE_TOKEN` secret with Contents and Pull
+  requests write access. This option also lets the pull request trigger
+  `pull_request`-scoped checks, which a `GITHUB_TOKEN`-opened one does not.
+
+The workflow reports which of these is missing rather than failing opaquely.
 
 ## What a deploy verifies
 
