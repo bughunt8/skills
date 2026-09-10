@@ -14,7 +14,7 @@
   /* Motion tokens. One signature curve; see MOTION.md for the binding table. */
   --motion-quick: 160ms;
   --motion-standard: 260ms;
-  --motion-slow: 460ms;
+  --motion-slow: 420ms;
   --motion-wave: 220ms;
   --motion-breath: 3200ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -180,24 +180,10 @@ input::placeholder { color: var(--muted); opacity: 1; }
 }
 .g-node:hover .g-dot { transform: scale(calc(var(--dot-counter-scale, 1) * 1.2)); stroke: var(--text); stroke-width: 2.5px; }
 .g-node.is-selected:hover .g-dot { stroke-width: 3.5px; }
-/* Curved edge geometry is never rebuilt mid-flight. It hands over to one straight
- * ghost path that follows the travelling dots, then crossfades back at settle, so
- * the network re-forms in view and no frame ever shows an empty canvas. */
+/* Edge geometry is never rebuilt and never hidden. The scene layout is fixed for
+ * the whole flight, so the real curved edges move with their dots through the one
+ * parent transform: the network is drawn on every frame, including the opening. */
 .g-edges { transition: opacity var(--motion-standard) var(--ease-standard); }
-#top[data-motion-flight] .g-edges { opacity: 0; }
-/* The opening has no ghost to hand over to: the network is simply not drawn yet,
- * so it is hidden without a fade-down and arrives once the dots have. */
-#top[data-motion-beat="first-paint"][data-motion-flight] .g-edges { transition: none; }
-.g-flight-edges {
-  fill: none;
-  stroke: var(--muted);
-  stroke-width: 1px;
-  opacity: 0;
-  vector-effect: non-scaling-stroke;
-  pointer-events: none;
-  transition: opacity var(--motion-quick) var(--ease-standard);
-}
-#top[data-motion-flight] .g-flight-edges { opacity: .45; }
 /* The receding set: decoration only, so it is not a .g-node and takes no pointer. */
 .g-exit-dot {
   fill: var(--c, var(--accent));
@@ -209,12 +195,12 @@ input::placeholder { color: var(--muted); opacity: 1; }
   transform-origin: 50% 50%;
   animation: dot-leave calc(var(--motion-slow) * .65) var(--ease-exit) both;
 }
-/* Labels are placed for the final layout immediately, so their computed size is
- * always measurable, and they stay on screen and travel with their own dot. Only
- * the opening reveals from nothing, because nothing is on screen yet to keep. */
+/* Labels are placed for the committed layout immediately, so their size is always
+ * measurable and readable, and they are projected with their own dot for the
+ * flight. Nothing readable is withheld on any beat, including the opening. */
 #graph-labels[data-revealed="true"] { transition: opacity var(--motion-standard) var(--ease-standard); }
-#graph-labels[data-revealed="false"] { opacity: 0; }
-/* A label carried past the canvas edge would paint outside the graph frame. */
+/* A projected label that would leave the canvas, cross another name or cross a dot
+ * steps aside for those frames only, and returns as the camera settles. */
 .g-nlabel[data-flown="out"], .g-clabel[data-flown="out"] { opacity: 0; }
 .g-node[data-entering] .g-dot {
   animation: dot-enter var(--motion-wave) var(--ease-enter) var(--enter-delay, 0ms) both;

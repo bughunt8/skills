@@ -41,11 +41,23 @@ Only clicks, Enter/Space activation, form submission and deliberate input change
 may do so. There are no hover handlers: pointer passage over a dot may give
 purely presentational CSS feedback, and still never changes context.
 
-Interaction motion is specified in `MOTION.md`. State commits synchronously on
-the interaction; only pixels interpolate afterwards, so every dataset, status
-field, list, panel and label is already final before the first animation frame.
-Browser checks that read painted pixels wait for `#top[data-motion]="idle"`
-rather than sleeping; at idle the label layer is fully revealed. Reduced motion
+Interaction motion is specified in `MOTION.md`. Semantic state commits
+synchronously on the interaction: mode, selection, query, matching count, the
+result list, the panels and the label text are all final before the first
+animation frame, and no animation callback ever writes them. Scene layout commits
+with them, so dot positions and the real curved edges never interpolate.
+
+What does move is the camera. `#vp` interpolates its transform, and the view
+measurements that describe it — `#vp[data-x|data-y|data-scale]`,
+`#top[data-visible-count]`, the status counts and zoom readout, and label and
+leader positions — describe the frame currently on screen rather than the
+destination. At `idle` they equal what an instant render of the same state would
+produce, so browser checks that read painted pixels wait for
+`#top[data-motion]="idle"` instead of sleeping. A zoom or Fit interpolates the
+camera itself; a context change commits the destination layout and then pans a
+bounded entry offset into it. While a scale is moving only the selected name and
+a few collision-checked labels ride the frame, and the full settled label layout
+returns at idle; the label layer as a whole is never hidden. Reduced motion
 schedules no animation frames at all and leaves `data-motion` at `idle`.
 
 Search indexes complete skill names and frontmatter descriptions, independent
@@ -86,9 +98,10 @@ library still works. Actual skill-file links retain source and licence credit.
   Nodes expose `data-visible` and `data-in-context`.
 - Motion state: `#top[data-motion]` is `running` or `idle`,
   `#top[data-motion-beat]` names the beat (`first-paint`, `context`, `camera`,
-  `search`, `path`, `selection`), and `#top[data-motion-flight]` is present only
-  while dots travel. `#top[data-pulse]` marks a search pulse.
-  `#graph-labels[data-revealed]` is `false` only while the scene is in flight.
+  `search`, `path`, `selection`). `#top[data-pulse]` marks a search pulse, and
+  `#graph-labels[data-revealed]` is always `true`: no state hides the layer.
+  A label that would leave the canvas or collide during a flight carries
+  `data-flown="out"` for those frames only.
   `.g-node` carries `data-entering`, `data-leaving` or `data-ambient` for the
   duration of its role; `.g-edge[data-draw]` marks a drawing path hop, and
   `.g-halo` is the single ambient element on the selected dot.
