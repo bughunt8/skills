@@ -3,7 +3,7 @@ import { assertNoRuntimeErrors, saveEvidence } from "../scripts/workspace-test-h
 import {
   openMotionWorkspace, openMotionPage, expectMotionIdle, resetProbe, readProbe,
   motionEpisodes, sampleMotionFrame, motionSnapshot, comparableSnapshot,
-  semanticTop, viewTop, sampleViewTruth,
+  semanticTop, viewTop, sampleViewTruth, sampleSelectedLabel,
   resultKeys, resultFor, tapOrClick, ensureVisible, sampleCamera, cameraDisplacement
 } from "../scripts/motion-test-helpers.mjs";
 
@@ -237,6 +237,96 @@ test.describe("graph motion acceptance", () => {
     beats.push(await proveCameraTravel(page, "fit", async () =>
       tapOrClick(await ensureVisible(page, "#gfit"), testInfo)));
     await saveEvidence(page, testInfo, "motion-camera-travel", { key, beats });
+  });
+
+  test("MOTION_SELECTED_ANCHOR the selected label and its leader survive zoom out and Fit", async ({ page }, testInfo) => {
+    test.setTimeout(90_000);
+    // The context-entry floor missed this: zooming out and Fit shrink the scene,
+    // and a culling pass can drop the selected member's own name (or blank the
+    // whole label layer for a frame). Watched live, with no idle wait, because
+    // the defect only exists mid-flight.
+    const [key] = await firstResults(page, 1);
+    await tapOrClick(resultFor(page, key), testInfo);
+    await expectMotionIdle(page);
+    const beats = [];
+    for (const beat of [{ name: "zoom-out", selector: "#gzoom-out" },
+                        { name: "zoom-out-again", selector: "#gzoom-out" },
+                        { name: "fit", selector: "#gfit" }]) {
+      await tapOrClick(await ensureVisible(page, beat.selector), testInfo);
+      const samples = [];
+      const deadline = Date.now() + 5000;
+      let sawRunning = false, after = 0;
+      while (Date.now() < deadline) {
+        const sample = await sampleSelectedLabel(page);
+        samples.push(sample);
+        if (sample.motion === "running") sawRunning = true;
+        if (sawRunning && sample.motion !== "running" && ++after >= 2) break;
+      }
+      const during = samples.filter((s) => s.motion === "running");
+      expect(during.length,
+        `non-vacuity: the ${beat.name} beat must animate and be sampled in flight`)
+        .toBeGreaterThanOrEqual(3);
+      // Every in-flight frame must paint something.
+      const blank = during.filter((s) => s.paintedLabelCount === 0)
+        .map((s) => ({ beat: beat.name, painted: s.paintedLabelCount }));
+      expect(blank,
+        "MOTION_SELECTED_ANCHOR: no in-flight frame may paint zero labels").toEqual([]);
+      // While the selection is on screen its own name must stay painted, at or
+      // above the 16 CSS px floor, with its leader anchored to its dot.
+      const onScreen = during.filter((s) => s.offscreenFlag === "false");
+      const culled = onScreen.filter((s) => !s.label.present || s.label.opacity <= 0.05)
+        .map((s) => ({ beat: beat.name, present: s.label.present, opacity: s.label.opacity }));
+      expect(culled,
+        "MOTION_SELECTED_ANCHOR: the selected label must stay painted while its dot is on screen")
+        .toEqual([]);
+      const shrunk = onScreen.filter((s) => !(s.label.cssPx >= 15.99))
+        .map((s) => ({ beat: beat.name, cssPx: s.label.cssPx }));
+      expect(shrunk,
+        "MOTION_SELECTED_ANCHOR: the selected label must never fall under 16 CSS px in flight")
+        .toEqual([]);
+      const leaderGap = (s) => {
+        if (!s.leader.present || !s.leader.ends || !s.dot) return Infinity;
+        const { from, to } = s.leader.ends;
+        return Math.min(Math.hypot(from.x - s.dot.x, from.y - s.dot.y),
+          Math.hypot(to.x - s.dot.x, to.y - s.dot.y));
+      };
+      const adrift = onScreen.filter((s) => !(s.leader.opacity > 0.05) || leaderGap(s) > 6)
+        .map((s) => ({ beat: beat.name, opacity: s.leader.opacity, gapPx: leaderGap(s) }));
+      expect(adrift,
+        "MOTION_SELECTED_ANCHOR: the leader must stay visible and anchored to the selected dot")
+        .toEqual([]);
+      // View truth for the offscreen frames: the status line must say so.
+      const offScreen = during.filter((s) => s.offscreenFlag === "true");
+      const silent = offScreen.filter((s) => !/offscreen/i.test(s.status))
+        .map((s) => ({ beat: beat.name, status: s.status }));
+      expect(silent,
+        "MOTION_SELECTED_ANCHOR: an offscreen selection must be reported by the status cue")
+        .toEqual([]);
+      await expectMotionIdle(page);
+      const settled = await sampleSelectedLabel(page);
+      expect(settled.paintedLabelCount,
+        `MOTION_SELECTED_ANCHOR: the settled ${beat.name} view must paint labels`).toBeGreaterThan(0);
+      if (settled.offscreenFlag === "false") {
+        expect(settled.label.present && settled.label.opacity > 0.05,
+          `MOTION_SELECTED_ANCHOR: the selected label must be painted after ${beat.name} settles`).toBe(true);
+        expect(settled.label.cssPx,
+          `MOTION_SELECTED_ANCHOR: the settled selected label must be at least 16 CSS px after ${beat.name}`)
+          .toBeGreaterThanOrEqual(15.99);
+        expect(leaderGap(settled),
+          `MOTION_SELECTED_ANCHOR: the settled leader must touch the selected dot after ${beat.name}`)
+          .toBeLessThanOrEqual(6);
+      } else {
+        expect(settled.status,
+          `MOTION_SELECTED_ANCHOR: an offscreen selection must be reported after ${beat.name}`)
+          .toMatch(/offscreen/i);
+      }
+      beats.push({ beat: beat.name, samples: samples.length, inFlight: during.length,
+        minCssPx: onScreen.length ? Math.min(...onScreen.map((s) => s.label.cssPx ?? 0)) : null,
+        minPainted: Math.min(...during.map((s) => s.paintedLabelCount)),
+        maxLeaderGap: onScreen.length ? Math.max(...onScreen.map(leaderGap)) : null,
+        offscreenFrames: offScreen.length, settled });
+    }
+    await saveEvidence(page, testInfo, "motion-selected-anchor", { key, beats });
   });
 
   test("MOTION_EDGE_CONTINUITY the network never disappears mid-transition", async ({ page }, testInfo) => {

@@ -397,6 +397,8 @@ export async function motionSnapshot(page) {
 // and must never mutate from a tween:
 export const SEMANTIC_TOP_KEYS = ["mode", "query", "selectedKey", "community",
   "category", "solution", "evidence", "matchingCount", "path"];
+// (`visibleCount`, `selectedOffscreen`, the `#vp` camera values and the offscreen
+// suffix on the selected status line are all view measurements, never frozen.)
 // These are measurements of the live view. They may truthfully change per frame
 // while the camera moves, and equal the instant render once idle:
 export const VIEW_TOP_KEYS = ["visibleCount", "selectedOffscreen"];
@@ -435,6 +437,65 @@ export async function sampleViewTruth(page) {
       target: { x: Number(document.getElementById("vp").dataset.x),
         y: Number(document.getElementById("vp").dataset.y),
         scale: Number(document.getElementById("vp").dataset.scale) } };
+  });
+}
+
+// The selected member's own label and its leader line, read live. Used by the
+// zoom/Fit regression, so it never waits for anything. Effective visibility walks
+// ancestors: a culled or blanked label must not count as painted.
+export async function sampleSelectedLabel(page) {
+  return page.evaluate(() => {
+    const top = document.getElementById("top");
+    const key = top.dataset.selectedKey || "";
+    const effective = (el) => {
+      let opacity = 1;
+      for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+        const s = getComputedStyle(n);
+        if (s.display === "none" || s.visibility === "hidden") return 0;
+        opacity *= Number(s.opacity === "" ? 1 : s.opacity);
+      }
+      return opacity;
+    };
+    const node = key ? document.querySelector(`.g-node[data-key="${CSS.escape(key)}"]`) : null;
+    const dot = node ? node.querySelector(".g-dot") : null;
+    const dotBox = dot ? dot.getBoundingClientRect() : null;
+    const label = key
+      ? document.querySelector(`#graph-labels .g-nlabel[data-key="${CSS.escape(key)}"]`)
+      : null;
+    const leader = document.getElementById("selected-label-leader");
+    const cssPx = (el) => {
+      const ctm = el.getScreenCTM();
+      const size = Number(getComputedStyle(el).fontSize.replace("px", ""));
+      return ctm ? size * Math.hypot(ctm.a, ctm.b) : null;
+    };
+    const leaderEnd = () => {
+      if (!leader) return null;
+      const d = leader.getAttribute("d") || "";
+      const m = /M\s*([-0-9.]+)\s+([-0-9.]+)\s*L\s*([-0-9.]+)\s+([-0-9.]+)/.exec(d);
+      if (!m) return null;
+      const ctm = leader.getScreenCTM();
+      if (!ctm) return null;
+      const pt = (x, y) => ({ x: ctm.a * x + ctm.c * y + ctm.e, y: ctm.b * x + ctm.d * y + ctm.f });
+      return { from: pt(+m[1], +m[2]), to: pt(+m[3], +m[4]) };
+    };
+    const painted = [...document.querySelectorAll("#graph-labels .g-nlabel, #graph-labels .g-clabel")]
+      .filter((el) => effective(el) > 0.05).length;
+    return {
+      motion: top.dataset.motion ?? null,
+      key,
+      offscreenFlag: top.dataset.selectedOffscreen ?? null,
+      status: (document.getElementById("status-selected")?.textContent ?? "").trim(),
+      paintedLabelCount: painted,
+      dot: dotBox && dotBox.width
+        ? { x: dotBox.x + dotBox.width / 2, y: dotBox.y + dotBox.height / 2 } : null,
+      label: label
+        ? { present: true, opacity: effective(label), cssPx: cssPx(label),
+            text: (label.textContent || "").trim() }
+        : { present: false, opacity: 0, cssPx: null, text: "" },
+      leader: leader
+        ? { present: true, opacity: effective(leader), ends: leaderEnd() }
+        : { present: false, opacity: 0, ends: null }
+    };
   });
 }
 
