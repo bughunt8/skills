@@ -426,5 +426,99 @@ class DeployTargetCliTests(unittest.TestCase):
         self.assertNotIn(credential_url, result.stdout + result.stderr)
 
 
+class PromoteWorkflowGitTests(unittest.TestCase):
+    """Git semantics the YAML contract cannot see.
+
+    site-promote.yml checks out `staging`, so `git fetch origin staging:staging`
+    aborts with "refusing to fetch into branch ... checked out" and the promotion
+    never reaches its pull request. That shipped and failed in CI. The contract
+    tests parse structure, so only an assertion about the commands catches it.
+    """
+
+    @staticmethod
+    def promote_job():
+        workflow = yaml.load(
+            (ROOT / ".github" / "workflows" / "site-promote.yml").read_text(),
+            Loader=WorkflowLoader,
+        )
+        return workflow, get_job(workflow, "promote", "site-promote.yml")
+
+    @classmethod
+    def checked_out_ref(cls, job):
+        for step in job["steps"]:
+            if "checkout" in str(step.get("uses", "")):
+                return str((step.get("with") or {}).get("ref", "")).strip()
+        raise AssertionError("site-promote.yml has no checkout step")
+
+    @staticmethod
+    def lines_starting(job, prefix):
+        return [
+            (step.get("name", "<unnamed>"), line.strip())
+            for step in job["steps"]
+            for line in str(step.get("run") or "").splitlines()
+            if line.strip().startswith(prefix)
+        ]
+
+    def test_never_fetches_into_the_checked_out_branch(self):
+        _, job = self.promote_job()
+        branch = self.checked_out_ref(job)
+        self.assertTrue(branch, "the checkout step must pin an explicit ref")
+        commands = self.lines_starting(job, "git fetch")
+        self.assertTrue(commands, "expected the promotion to fetch its base branch")
+        for name, command in commands:
+            for refspec in command.split():
+                if ":" not in refspec or refspec.startswith("-"):
+                    continue
+                destination = refspec.rsplit(":", 1)[1]
+                self.assertNotIn(
+                    destination,
+                    (branch, "refs/heads/" + branch),
+                    "step %r fetches into the checked-out branch %r, which git refuses. "
+                    "Fetch into refs/remotes/origin/* instead: %s" % (name, branch, command),
+                )
+
+    def test_revisions_are_remote_tracking_or_head(self):
+        """A bare local branch name only resolves if something created that ref.
+
+        The failing version compared main..staging after a fetch meant to create
+        both local branches. With that fetch corrected, those names no longer
+        resolve, so the comparisons must name origin/main and HEAD.
+        """
+        _, job = self.promote_job()
+        branch = self.checked_out_ref(job)
+        pattern = re.compile(r"\bgit (?:log|diff|rev-list|merge)\b[^\n]*")
+        offenders = []
+        for step in job["steps"]:
+            for command in pattern.findall(str(step.get("run") or "")):
+                bare = ("main.." + branch, branch + "..main")
+                if any(token in command for token in bare) and "origin/" not in command:
+                    offenders.append((step.get("name", "<unnamed>"), command.strip()))
+        self.assertEqual(
+            offenders,
+            [],
+            "these commands use bare branch names that do not exist locally; "
+            "use origin/main and HEAD instead: %s" % (offenders,),
+        )
+
+    def test_pushes_head_to_an_explicit_ref_and_never_to_main(self):
+        _, job = self.promote_job()
+        branch = self.checked_out_ref(job)
+        pushes = self.lines_starting(job, "git push")
+        self.assertTrue(pushes, "expected the promotion to push the updated branch")
+        for name, command in pushes:
+            self.assertNotIn(
+                "main",
+                command,
+                "step %r must never push to main; promotion goes through a pull "
+                "request: %s" % (name, command),
+            )
+            self.assertIn(
+                "HEAD:refs/heads/" + branch,
+                command,
+                "step %r should push HEAD to an explicit ref so it works when no "
+                "local branch exists: %s" % (name, command),
+            )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
