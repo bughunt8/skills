@@ -371,3 +371,15 @@ html:not(.js) .context-row { align-items: start; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+
+/* Cinematic intro entry point (hand-written; survives build.py --write) */
+.intro-link {
+  position: fixed; right: 18px; bottom: 16px; z-index: 40;
+  font: 600 11px ui-monospace, Menlo, monospace; letter-spacing: 0.08em;
+  color: #8492b0; text-decoration: none;
+  padding: 8px 14px; border: 1px solid #1a2334; border-radius: 999px;
+  background: #05070dcc; backdrop-filter: blur(6px);
+  transition: color 0.25s, border-color 0.25s;
+}
+.intro-link:hover { color: #00e5ff; border-color: #00e5ff66; }
