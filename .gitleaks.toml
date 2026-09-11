@@ -25,5 +25,6 @@ paths = [
   # high-entropy identifiers that trip the generic-api-key rule. These files
   # are byte-for-byte public releases (pinned upstream), not credentials.
   '''site/vendor/vis-network\.min\.js''',
+  '''site/lib/vis-network\.min\.js''',
   '''docs/vendor/vis-network\.min\.js''',
 ]

@@ -37,7 +37,15 @@ single place a source is declared.
 
 ## Runtime libraries
 
-The graph workspace has no runtime JavaScript dependencies. Previous releases
+### vis-network
+
+- Source: <https://github.com/visjs/vis-network>
+- Version: 9.1.6
+- Licence: MIT and Apache-2.0 (dual-licensed)
+- Path: `site/lib/vis-network.min.js`
+- Use: Self-hosted graph visualization engine powering the standalone constellation intro at `site/intro.html`.
+
+The graph workspace itself has no runtime JavaScript dependencies. Previous releases
 included GSAP, ScrollTrigger and Lenis; those scripts have been removed from the
 site bundle and are no longer loaded or redistributed with it. Their historical
 attribution remains in repository history.
