@@ -1,7 +1,7 @@
-name: Site CI
+name: A1 site checks
 
 # Validates every push and pull request. Deployment lives in
-# site-deploy-staging.yml and site-deploy-production.yml, which call the same
+# a2-site-deploy-staging.yml and b2-site-deploy-production.yml, which call the same
 # reusable validate and deploy workflows, so no deploy path can skip these gates
 # and none of them poll across a workflow boundary for another run's result.
 
@@ -14,10 +14,10 @@ name: Site CI
 on:
   push:
     branches: [main, staging]
-    paths: ["site/**", "skills/**", ".github/workflows/site-*.yml"]
+    paths: ["site/**", "skills/**", ".github/workflows/*-site-*.yml"]
   pull_request:
     branches: [main, staging]
-    paths: ["site/**", "skills/**", ".github/workflows/site-*.yml"]
+    paths: ["site/**", "skills/**", ".github/workflows/*-site-*.yml"]
   workflow_dispatch:
 
 permissions:
@@ -30,7 +30,7 @@ concurrency:
 jobs:
   validate:
     name: validate
-    uses: ./.github/workflows/site-validate.yml
+    uses: ./.github/workflows/s1-site-validate.yml
 
   # Stable single name for branch protection to require, so the required check
   # does not need changing when a job inside validate.yml is added or renamed.

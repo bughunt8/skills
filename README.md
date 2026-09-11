@@ -224,7 +224,7 @@ scripts/sync_due.py            whether a refresh is due, measured in elapsed day
 docs/ARCHITECTURE_REVIEW.md    the audit this came out of, with the open backlog
 docs/third-party-inventory.json every pre-manifest import, with author and licence
 docs/adversarial-review-2026-08-25.md  an independent review of this work, findings and all
-.github/workflows/             ci.yml on every push, sync-vendored-skills.yml on a schedule
+.github/workflows/             a0/a1 checks, a2 staging deploy, b1 promote, b2 production deploy
 ```
 
 ## Contributing

@@ -1,4 +1,4 @@
-name: Site promote staging to main
+name: B1 site promote staging to main
 
 # Opens a promotion pull request from staging into main. It does not write to
 # main itself.
@@ -10,7 +10,7 @@ name: Site promote staging to main
 #
 #   staging --(this workflow, manual, typed confirmation)--> promotion PR
 #   promotion PR --(human approves and merges)-------------> main
-#   main --(site-deploy-production.yml, on push)-----------> skills.ronald.ng
+#   main --(b2-site-deploy-production.yml, on push)-----------> skills.ronald.ng
 #
 # The production deploy is no longer dispatched from here. Merging the promotion
 # PR is itself a push to main made by a person, so `on: push` fires normally.

@@ -1,4 +1,4 @@
-name: Site deploy
+name: S2 site deploy (reusable)
 
 # One deploy path, used unchanged by both staging and production.
 #
@@ -274,7 +274,7 @@ jobs:
   verify:
     name: verify the deployment is live and correct
     needs: deploy
-    uses: ./.github/workflows/site-verify.yml
+    uses: ./.github/workflows/s3-site-verify.yml
     with:
       url: ${{ inputs.url }}
       expected_sha: ${{ github.sha }}

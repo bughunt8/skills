@@ -1,13 +1,13 @@
-name: Site validate
+name: S1 site validate (reusable)
 
 # Every gate that decides whether the skill-browser site is fit to publish.
-# Defined once and called by site-ci.yml and site-deploy-production.yml, so a
+# Defined once and called by a1-site-checks.yml and b2-site-deploy-production.yml, so a
 # production deploy validates the exact commit it is about to ship rather than
 # trusting that some earlier run passed.
 #
 # The site lives in site/ and is generated from this repository's own skills/
 # directory, so a change under skills/ can make the committed page stale. That is
-# why site-ci.yml watches skills/** as well as site/**.
+# why a1-site-checks.yml watches skills/** as well as site/**.
 #
 # Uses no secrets and is read-only against the repository, so the full suite runs
 # on fork pull requests.

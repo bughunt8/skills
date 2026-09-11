@@ -42,7 +42,7 @@ python3 scripts/check_solutions.py                 # every solution step resolve
 ```
 
 All offline. Standard library plus PyYAML, which CI installs. These are exactly the steps in
-`.github/workflows/ci.yml`, so a green local run means a green pull request. Run them. Do not
+`.github/workflows/a0-skills-checks.yml`, so a green local run means a green pull request. Run them. Do not
 report "should pass".
 
 `scripts/lint_skills.py --strict` shows the 68 findings the baseline currently accepts. Do not add
@@ -69,9 +69,9 @@ Run the site HTML validation and browser suite as well as the repository checks.
 See `site/README.md` for commands and `site/DEPLOYMENT.md` for deployment.
 
 Live deployment verification is mandatory. The staging and production callers
-pass explicit URLs, and `site-deploy.yml` rejects empty or mismatched targets
+pass explicit URLs, and `s2-site-deploy.yml` rejects empty or mismatched targets
 before upload. Never restore a `vars.SITE_URL` expression at the caller or an
-optional skip on verification. Both deployments call `site-verify.yml` with the
+optional skip on verification. Both deployments call `s3-site-verify.yml` with the
 full deployed commit SHA. Run `python3 site/tests/test_deploy_workflows.py` and,
 from `site/`, `node scripts/prove-deploy-gate.mjs` when changing this path.
 
@@ -140,7 +140,7 @@ docs/ARCHITECTURE_REVIEW.md    the audit this structure came from, and the open 
 docs/domain-descriptions.json  human prose for the generated index
 docs/SKILL-SOLUTIONS.md        the problem-first paradigm spec
 docs/skill-library.html        static prototype rendering the solutions
-.github/workflows/ci.yml       the three checks, on every push and pull request
+.github/workflows/a0-skills-checks.yml       the three checks, on every push and pull request
 .github/workflows/sync-vendored-skills.yml  fortnightly upstream refresh, opens a pull request
 ```
 

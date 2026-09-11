@@ -1,4 +1,4 @@
-name: ci
+name: A0 skills checks
 
 # A skills library has no build and no runtime, so its correctness lives entirely
 # in metadata, provenance and links. That is what this workflow tests.

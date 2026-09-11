@@ -1,4 +1,4 @@
-name: Site verify
+name: S3 site verify live (reusable)
 
 # One read-only verifier for normal deployments and isolated failure proofs.
 # No upload credentials, environment approval, bypass flag or optional skip.
