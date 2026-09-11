@@ -23,7 +23,7 @@ test.describe("no scroll choreography", () => {
     expect(app).not.toMatch(/ScrollTrigger|gsap\.|new\s+Lenis/);
     // Historical licence copies may remain in the repository, but the actual
     // production assembly must exclude the retired vendor directory completely.
-    const deploy = readFileSync(new URL("../../.github/workflows/site-deploy.yml", import.meta.url), "utf8");
+    const deploy = readFileSync(new URL("../../.github/workflows/s2-site-deploy.yml", import.meta.url), "utf8");
     expect(deploy, "legacy vendor bytes must never enter the deployed site").toContain("--exclude 'vendor'");
     const assets = readdirSync(new URL("../", import.meta.url), { recursive: true })
       .filter((p) => !/^(node_modules|test-results|playwright-report|tests|scripts|vendor)\//.test(p));

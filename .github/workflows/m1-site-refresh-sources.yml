@@ -1,4 +1,4 @@
-name: Site refresh from upstream sources
+name: M1 site refresh upstream sources
 
 # The library indexes three repositories that keep changing. This rebuilds the
 # page from them on a schedule and opens a pull request when the result differs,

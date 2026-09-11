@@ -1,4 +1,4 @@
-name: Site deploy staging
+name: A2 site deploy staging
 
 # staging branch -> staging environment, deployed to Hostinger.
 #
@@ -9,7 +9,7 @@ name: Site deploy staging
 on:
   push:
     branches: [staging]
-    paths: ["site/**", "skills/**", ".github/workflows/site-*.yml"]
+    paths: ["site/**", "skills/**", ".github/workflows/*-site-*.yml"]
   workflow_dispatch:
 
 permissions:
@@ -22,12 +22,12 @@ concurrency:
 jobs:
   gate:
     name: validate
-    uses: ./.github/workflows/site-validate.yml
+    uses: ./.github/workflows/s1-site-validate.yml
 
   deploy:
     name: deploy
     needs: gate
-    uses: ./.github/workflows/site-deploy.yml
+    uses: ./.github/workflows/s2-site-deploy.yml
     with:
       environment: staging
       # Environment variables are unavailable at this reusable-workflow call

@@ -19,9 +19,10 @@ ROOT = Path(__file__).resolve().parents[2]
 STAGING = "https://mediumvioletred-coyote-692292.hostingersite.com/"
 PRODUCTION = "https://skills.ronald.ng"
 WORKFLOW_NAMES = (
-    "site-deploy-staging", "site-deploy-production", "site-deploy",
-    "site-verify", "site-validate",
+    "a2-site-deploy-staging", "b2-site-deploy-production", "s2-site-deploy",
+    "s3-site-verify", "s1-site-validate",
 )
+CALLERS = {"staging": "a2-site-deploy-staging", "production": "b2-site-deploy-production"}
 SMOKE_COMMAND = 'node scripts/smoke.mjs "$SITE_URL" "$EXPECTED_SHA"'
 TARGET_COMMAND = (
     'node site/scripts/check-deploy-target.mjs "$DEPLOY_ENVIRONMENT" "$SITE_URL"'
@@ -117,22 +118,22 @@ def check_env(workflow, job, step, expected, label):
 
 def check_contract(workflows):
     for environment, url in (("staging", STAGING), ("production", PRODUCTION)):
-        workflow = workflows[f"site-deploy-{environment}"]
+        workflow = workflows[CALLERS[environment]]
         caller = get_job(workflow, "deploy", environment)
         gate = get_job(workflow, "gate", environment)
         blocking(caller, f"{environment} deploy")
         blocking(gate, f"{environment} gate")
-        require(gate.get("uses") == "./.github/workflows/site-validate.yml",
+        require(gate.get("uses") == "./.github/workflows/s1-site-validate.yml",
                 f"{environment}: must call site-validate")
         require("gate" in needs(caller), f"{environment}: deploy must need gate")
-        require(caller.get("uses") == "./.github/workflows/site-deploy.yml",
+        require(caller.get("uses") == "./.github/workflows/s2-site-deploy.yml",
                 f"{environment}: must call shared deploy")
         require(caller.get("with", {}).get("environment") == environment,
                 f"{environment}: wrong deployment environment")
         require(caller.get("with", {}).get("url") == url,
                 f"{environment}: URL must be the approved literal")
 
-    deploy = workflows["site-deploy"]
+    deploy = workflows["s2-site-deploy"]
     required_input(deploy, "url", "shared deploy")
     target = get_job(deploy, "target", "shared deploy")
     publish = get_job(deploy, "deploy", "shared deploy")
@@ -151,29 +152,29 @@ def check_contract(workflows):
     verifier = get_job(deploy, "verify", "shared deploy")
     blocking(verifier, "deploy verifier")
     require("deploy" in needs(verifier), "verifier must need deploy")
-    require(verifier.get("uses") == "./.github/workflows/site-verify.yml",
+    require(verifier.get("uses") == "./.github/workflows/s3-site-verify.yml",
             "deploy verifier must call site-verify")
     require(verifier.get("with", {}).get("url") == "${{ inputs.url }}",
             "deploy verifier URL must come from inputs.url")
     require(verifier.get("with", {}).get("expected_sha") == "${{ github.sha }}",
             "deploy verifier SHA must be github.sha")
 
-    verify = workflows["site-verify"]
+    verify = workflows["s3-site-verify"]
     for name in ("url", "expected_sha"):
-        required_input(verify, name, "site-verify")
-    job = get_job(verify, "verify", "site-verify")
+        required_input(verify, name, "s3-site-verify")
+    job = get_job(verify, "verify", "s3-site-verify")
     blocking(job, "site-verify job")
     for step in job.get("steps", []):
         blocking(step, "site-verify step")
-    smoke = find_step(job, "scripts/smoke.mjs", "site-verify")
+    smoke = find_step(job, "scripts/smoke.mjs", "s3-site-verify")
     check_command(verify, job, smoke, {("site", SMOKE_COMMAND)}, "smoke")
     check_env(verify, job, smoke, {
         "SITE_URL": "${{ inputs.url }}",
         "EXPECTED_SHA": "${{ inputs.expected_sha }}",
     }, "smoke")
 
-    validate = workflows["site-validate"]
-    contract = get_job(validate, "deployment_contract", "site-validate")
+    validate = workflows["s1-site-validate"]
+    contract = get_job(validate, "deployment_contract", "s1-site-validate")
     blocking(contract, "deployment_contract")
     for step in contract.get("steps", []):
         blocking(step, "deployment_contract step")
@@ -189,7 +190,7 @@ def check_contract(workflows):
     ):
         step = find_step(contract, script, "deployment_contract")
         check_command(validate, contract, step, commands, f"deployment_contract {script}")
-    aggregate = get_job(validate, "gate", "site-validate")
+    aggregate = get_job(validate, "gate", "s1-site-validate")
     blocking(aggregate, "aggregate gate", allow_if=True)
     require("deployment_contract" in needs(aggregate),
             "aggregate gate must need deployment_contract")
@@ -244,13 +245,13 @@ class WorkflowContractTests(unittest.TestCase):
                 with self.subTest(environment=environment, defect=label):
                     self.prove_mutation(
                         f"{environment} {label}",
-                        (f"site-deploy-{environment}", "jobs", "deploy", "with", "url"),
+                        (CALLERS[environment], "jobs", "deploy", "with", "url"),
                         value, "URL must be the approved literal",
                     )
 
     def test_required_input_regressions_are_detected(self):
-        for workflow, name in (("site-deploy", "url"), ("site-verify", "url"),
-                               ("site-verify", "expected_sha")):
+        for workflow, name in (("s2-site-deploy", "url"), ("s3-site-verify", "url"),
+                               ("s3-site-verify", "expected_sha")):
             path = (workflow, "on", "workflow_call", "inputs", name)
             for key, value, message in (
                 ("required", False, "must be required"),
@@ -265,21 +266,21 @@ class WorkflowContractTests(unittest.TestCase):
 
     def test_removed_jobs_and_dependencies_are_detected(self):
         mutations = (
-            ("site-deploy", "verify", "shared deploy: missing verify job"),
-            ("site-deploy", "target", "shared deploy: missing target job"),
-            ("site-verify", "verify", "site-verify: missing verify job"),
-            ("site-validate", "deployment_contract", "missing deployment_contract job"),
+            ("s2-site-deploy", "verify", "shared deploy: missing verify job"),
+            ("s2-site-deploy", "target", "shared deploy: missing target job"),
+            ("s3-site-verify", "verify", "site-verify: missing verify job"),
+            ("s1-site-validate", "deployment_contract", "missing deployment_contract job"),
         )
         for workflow, job, message in mutations:
             with self.subTest(workflow=workflow, job=job):
                 self.prove_mutation(f"removed {workflow}/{job}",
                                     (workflow, "jobs", job), DELETE, message)
         for workflow, job, message in (
-            ("site-deploy", "verify", "verifier must need deploy"),
-            ("site-deploy", "deploy", "publish must need target"),
-            ("site-deploy-staging", "deploy", "deploy must need gate"),
-            ("site-deploy-production", "deploy", "deploy must need gate"),
-            ("site-validate", "gate", "aggregate gate must need deployment_contract"),
+            ("s2-site-deploy", "verify", "verifier must need deploy"),
+            ("s2-site-deploy", "deploy", "publish must need target"),
+            ("a2-site-deploy-staging", "deploy", "deploy must need gate"),
+            ("b2-site-deploy-production", "deploy", "deploy must need gate"),
+            ("s1-site-validate", "gate", "aggregate gate must need deployment_contract"),
         ):
             with self.subTest(workflow=workflow, dependency=job):
                 self.prove_mutation(f"omitted {workflow}/{job} dependency",
@@ -287,10 +288,10 @@ class WorkflowContractTests(unittest.TestCase):
 
     def test_empty_skip_and_tolerated_job_failures_are_detected(self):
         for workflow, job in (
-            ("site-deploy-staging", "deploy"), ("site-deploy-production", "deploy"),
-            ("site-deploy", "target"), ("site-deploy", "deploy"),
-            ("site-deploy", "verify"), ("site-verify", "verify"),
-            ("site-validate", "deployment_contract"),
+            ("a2-site-deploy-staging", "deploy"), ("b2-site-deploy-production", "deploy"),
+            ("s2-site-deploy", "target"), ("s2-site-deploy", "deploy"),
+            ("s2-site-deploy", "verify"), ("s3-site-verify", "verify"),
+            ("s1-site-validate", "deployment_contract"),
         ):
             for key, value, message in (
                 ("if", "inputs.url != ''", "conditional skips are forbidden"),
@@ -301,9 +302,9 @@ class WorkflowContractTests(unittest.TestCase):
                                         (workflow, "jobs", job, key), value, message)
 
     def test_verifier_wiring_regressions_are_detected(self):
-        path = ("site-deploy", "jobs", "verify")
+        path = ("s2-site-deploy", "jobs", "verify")
         for suffix, value, message in (
-            (("uses",), "./.github/workflows/site-validate.yml", "must call site-verify"),
+            (("uses",), "./.github/workflows/s1-site-validate.yml", "must call site-verify"),
             (("with", "url"), "${{ vars.SITE_URL }}", "URL must come from inputs.url"),
             (("with", "expected_sha"), "${{ github.event.before }}", "SHA must be github.sha"),
             (("with", "expected_sha"), DELETE, "SHA must be github.sha"),
@@ -312,7 +313,7 @@ class WorkflowContractTests(unittest.TestCase):
                 self.prove_mutation(f"verifier {suffix}", (*path, *suffix), value, message)
 
     def test_smoke_command_cannot_skip_or_swallow_failure(self):
-        path = self.step_path("site-verify", "verify", "scripts/smoke.mjs")
+        path = self.step_path("s3-site-verify", "verify", "scripts/smoke.mjs")
         for key, value, message in (
             ("run", SMOKE_COMMAND + " || true", "without tolerated failure"),
             ("run", "set +e\n" + SMOKE_COMMAND + "\nexit 0", "without tolerated failure"),
@@ -333,8 +334,8 @@ class WorkflowContractTests(unittest.TestCase):
 
     def test_validation_proofs_cannot_be_omitted_or_tolerated(self):
         for script in ("test_deploy_workflows.py", "prove-deploy-gate.mjs"):
-            path = self.step_path("site-validate", "deployment_contract", script)
-            original = self.workflows["site-validate"]["jobs"]["deployment_contract"]["steps"][path[-1]]
+            path = self.step_path("s1-site-validate", "deployment_contract", script)
+            original = self.workflows["s1-site-validate"]["jobs"]["deployment_contract"]["steps"][path[-1]]
             for key, value, message in (
                 ("run", "echo skipped", f"must run {re.escape(script)} exactly once"),
                 ("run", original["run"] + " || true", "without tolerated failure"),
@@ -345,7 +346,7 @@ class WorkflowContractTests(unittest.TestCase):
                     self.prove_mutation(f"{script} {key}", (*path, key), value, message)
 
     def test_target_preflight_cannot_be_bypassed(self):
-        path = self.step_path("site-deploy", "target", "check-deploy-target.mjs")
+        path = self.step_path("s2-site-deploy", "target", "check-deploy-target.mjs")
         for key, value, message in (
             ("run", "echo skipped", "must run check-deploy-target.mjs exactly once"),
             ("run", TARGET_COMMAND + " || true", "without tolerated failure"),
@@ -366,12 +367,12 @@ class WorkflowContractTests(unittest.TestCase):
         ):
             with self.subTest(defect=key):
                 self.prove_mutation(f"aggregate gate {key}",
-                                    ("site-validate", "jobs", "gate", key), value, message)
+                                    ("s1-site-validate", "jobs", "gate", key), value, message)
 
     def test_additional_jobs_do_not_overconstrain_the_contract(self):
         changed = deepcopy(self.workflows)
-        changed["site-deploy"]["jobs"]["extra"] = {"runs-on": "ubuntu-latest", "steps": []}
-        changed["site-deploy"]["jobs"]["verify"]["needs"] = ["deploy", "extra"]
+        changed["s2-site-deploy"]["jobs"]["extra"] = {"runs-on": "ubuntu-latest", "steps": []}
+        changed["s2-site-deploy"]["jobs"]["verify"]["needs"] = ["deploy", "extra"]
         check_contract(changed)
 
 
@@ -424,6 +425,100 @@ class DeployTargetCliTests(unittest.TestCase):
         for part in userinfo_parts:
             self.assertNotIn(part, result.stdout + result.stderr)
         self.assertNotIn(credential_url, result.stdout + result.stderr)
+
+
+class PromoteWorkflowGitTests(unittest.TestCase):
+    """Git semantics the YAML contract cannot see.
+
+    b1-site-promote-to-main.yml checks out `staging`, so `git fetch origin staging:staging`
+    aborts with "refusing to fetch into branch ... checked out" and the promotion
+    never reaches its pull request. That shipped and failed in CI. The contract
+    tests parse structure, so only an assertion about the commands catches it.
+    """
+
+    @staticmethod
+    def promote_job():
+        workflow = yaml.load(
+            (ROOT / ".github" / "workflows" / "b1-site-promote-to-main.yml").read_text(),
+            Loader=WorkflowLoader,
+        )
+        return workflow, get_job(workflow, "promote", "b1-site-promote-to-main.yml")
+
+    @classmethod
+    def checked_out_ref(cls, job):
+        for step in job["steps"]:
+            if "checkout" in str(step.get("uses", "")):
+                return str((step.get("with") or {}).get("ref", "")).strip()
+        raise AssertionError("b1-site-promote-to-main.yml has no checkout step")
+
+    @staticmethod
+    def lines_starting(job, prefix):
+        return [
+            (step.get("name", "<unnamed>"), line.strip())
+            for step in job["steps"]
+            for line in str(step.get("run") or "").splitlines()
+            if line.strip().startswith(prefix)
+        ]
+
+    def test_never_fetches_into_the_checked_out_branch(self):
+        _, job = self.promote_job()
+        branch = self.checked_out_ref(job)
+        self.assertTrue(branch, "the checkout step must pin an explicit ref")
+        commands = self.lines_starting(job, "git fetch")
+        self.assertTrue(commands, "expected the promotion to fetch its base branch")
+        for name, command in commands:
+            for refspec in command.split():
+                if ":" not in refspec or refspec.startswith("-"):
+                    continue
+                destination = refspec.rsplit(":", 1)[1]
+                self.assertNotIn(
+                    destination,
+                    (branch, "refs/heads/" + branch),
+                    "step %r fetches into the checked-out branch %r, which git refuses. "
+                    "Fetch into refs/remotes/origin/* instead: %s" % (name, branch, command),
+                )
+
+    def test_revisions_are_remote_tracking_or_head(self):
+        """A bare local branch name only resolves if something created that ref.
+
+        The failing version compared main..staging after a fetch meant to create
+        both local branches. With that fetch corrected, those names no longer
+        resolve, so the comparisons must name origin/main and HEAD.
+        """
+        _, job = self.promote_job()
+        branch = self.checked_out_ref(job)
+        pattern = re.compile(r"\bgit (?:log|diff|rev-list|merge)\b[^\n]*")
+        offenders = []
+        for step in job["steps"]:
+            for command in pattern.findall(str(step.get("run") or "")):
+                bare = ("main.." + branch, branch + "..main")
+                if any(token in command for token in bare) and "origin/" not in command:
+                    offenders.append((step.get("name", "<unnamed>"), command.strip()))
+        self.assertEqual(
+            offenders,
+            [],
+            "these commands use bare branch names that do not exist locally; "
+            "use origin/main and HEAD instead: %s" % (offenders,),
+        )
+
+    def test_pushes_head_to_an_explicit_ref_and_never_to_main(self):
+        _, job = self.promote_job()
+        branch = self.checked_out_ref(job)
+        pushes = self.lines_starting(job, "git push")
+        self.assertTrue(pushes, "expected the promotion to push the updated branch")
+        for name, command in pushes:
+            self.assertNotIn(
+                "main",
+                command,
+                "step %r must never push to main; promotion goes through a pull "
+                "request: %s" % (name, command),
+            )
+            self.assertIn(
+                "HEAD:refs/heads/" + branch,
+                command,
+                "step %r should push HEAD to an explicit ref so it works when no "
+                "local branch exists: %s" % (name, command),
+            )
 
 
 if __name__ == "__main__":

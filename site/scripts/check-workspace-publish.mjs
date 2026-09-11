@@ -11,7 +11,7 @@ const evidence = resolve(process.env.WORKSPACE_EVIDENCE_DIR || join(root, "..", 
 // A fresh snapshot per invocation avoids stale files without deleting evidence.
 const publish = join(evidence, `publish-fixture-${new Date().toISOString().replace(/[:.]/g, "-")}`);
 mkdirSync(publish, { recursive: true });
-const workflow = readFileSync(join(root, "..", ".github", "workflows", "site-deploy.yml"), "utf8");
+const workflow = readFileSync(join(root, "..", ".github", "workflows", "s2-site-deploy.yml"), "utf8");
 const assembly = workflow.split("- name: Assemble the publish directory")[1]?.split("- name: Reject absolute asset paths")[0];
 if (!assembly) throw new Error("Could not find reviewed deploy assembly");
 const exclusions = [...assembly.matchAll(/--exclude '([^']+)'/g)].map((m) => m[1]);

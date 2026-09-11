@@ -1,4 +1,4 @@
-name: Site promote staging to main
+name: B1 site promote staging to main
 
 # Opens a promotion pull request from staging into main. It does not write to
 # main itself.
@@ -10,7 +10,7 @@ name: Site promote staging to main
 #
 #   staging --(this workflow, manual, typed confirmation)--> promotion PR
 #   promotion PR --(human approves and merges)-------------> main
-#   main --(site-deploy-production.yml, on push)-----------> skills.ronald.ng
+#   main --(b2-site-deploy-production.yml, on push)-----------> skills.ronald.ng
 #
 # The production deploy is no longer dispatched from here. Merging the promotion
 # PR is itself a push to main made by a person, so `on: push` fires normally.
@@ -61,22 +61,26 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      # `staging` is the checked-out branch, so it must never be a fetch
+      # destination: `git fetch origin staging:staging` fails outright with
+      # "refusing to fetch into branch ... checked out". Work from the
+      # remote-tracking ref for the base and from HEAD for the head instead.
       - name: Show what is being promoted
         id: diff
         run: |
-          git fetch origin main:main staging:staging
+          git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
           echo "=== commits on staging not yet on main ==="
-          git log --oneline main..staging
+          git log --oneline origin/main..HEAD
           echo "=== files ==="
-          git diff --stat main..staging
-          count="$(git rev-list --count main..staging)"
+          git diff --stat origin/main..HEAD
+          count="$(git rev-list --count origin/main..HEAD)"
           if [ "$count" -eq 0 ]; then
             echo "::error::staging has nothing main does not already have; there is nothing to promote"
             exit 1
           fi
           echo "count=$count" >> "$GITHUB_OUTPUT"
-          echo "sha=$(git rev-parse staging)" >> "$GITHUB_OUTPUT"
-          echo "short=$(git rev-parse --short staging)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
       # Promoting a revision whose own checks failed would put a known-bad commit
       # in front of a reviewer with a green-looking PR, because the required
@@ -101,7 +105,7 @@ jobs:
       # base has moved ahead can never satisfy the check on its own.
       - name: Update staging when it is behind main
         run: |
-          behind="$(git rev-list --count staging..main)"
+          behind="$(git rev-list --count HEAD..origin/main)"
           echo "commits on main that staging lacks: $behind"
           if [ "$behind" -eq 0 ]; then
             echo "staging already contains main"
@@ -111,9 +115,9 @@ jobs:
             echo "::warning::staging is $behind commit(s) behind main; the promotion PR will report as out of date until it is updated"
             exit 0
           fi
-          git merge --no-ff --no-edit main \
+          git merge --no-ff --no-edit origin/main \
             -m "Merge main into staging before promotion (automated by site-promote)"
-          git push origin staging
+          git push origin HEAD:refs/heads/staging
           echo "merged main into staging and pushed"
 
       - name: Compose the promotion pull request body
@@ -126,13 +130,13 @@ jobs:
             echo "## Commits being promoted (${{ steps.diff.outputs.count }})"
             echo
             echo '```'
-            git log --oneline main..staging
+            git log --oneline origin/main..HEAD
             echo '```'
             echo
             echo "## Files"
             echo
             echo '```'
-            git diff --stat main..staging
+            git diff --stat origin/main..HEAD
             echo '```'
             echo
             echo "## Before merging"

@@ -21,4 +21,9 @@ paths = [
   '''skills/engineering/skills/tech-debt-tracker/assets/sample_codebase/src/frontend\.js''',
   '''skills/engineering/skills/tech-debt-tracker/assets/sample_codebase/src/user_service\.py''',
   '''skills/engineering/skills/skill-tester/tests/test_security_scorer\.py''',
+  # Vendored third-party libraries: minified open-source bundles contain
+  # high-entropy identifiers that trip the generic-api-key rule. These files
+  # are byte-for-byte public releases (pinned upstream), not credentials.
+  '''site/vendor/vis-network\.min\.js''',
+  '''docs/vendor/vis-network\.min\.js''',
 ]

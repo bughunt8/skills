@@ -197,7 +197,7 @@ whatever state it was copied in.
 
 Fixed:
 
-- [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs the three checks on every
+- [`.github/workflows/a0-skills-checks.yml`](../.github/workflows/a0-skills-checks.yml) runs the three checks on every
   push and pull request.
 - [`.github/workflows/sync-vendored-skills.yml`](../.github/workflows/sync-vendored-skills.yml)
   refreshes every declared upstream on a fortnightly cadence and opens a pull request.
