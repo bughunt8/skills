@@ -14,7 +14,7 @@ branch model and typed-confirmation promotion follow `bughunt8/www-resume`
 ## Staging and production are the same setup
 
 Both publish the same artifact the same way, through one reusable workflow,
-`site-deploy.yml`. There is no second code path, so staging cannot drift from
+`s2-site-deploy.yml`. There is no second code path, so staging cannot drift from
 production, and a staging deploy exercises the exact mechanism production uses.
 The only difference is which **GitHub Environment** supplies the secrets.
 
@@ -26,7 +26,7 @@ The only difference is which **GitHub Environment** supplies the secrets.
 ```
 work ──▶ staging branch ──▶ staging env (Hostinger)
                  │
-                 └── site-promote.yml, manual, type "promote"
+                 └── b1-site-promote-to-main.yml, manual, type "promote"
                               │
                               ▼
                      promotion pull request ──▶ code-owner approval
@@ -78,16 +78,43 @@ itself to HTTPS you cannot yet serve.
 
 ## Workflows
 
+Filenames carry a prefix so the two flows read in order rather than
+alphabetically. `A` is the everyday path, `B` is the release, `S` is shared and
+called by both, `M` is scheduled maintenance. The prefix is in the filename and
+in the workflow name, so the Actions sidebar lists them in flow order.
+
+**Flow A, every change.** Open a pull request against `staging`.
+
 | Workflow | Trigger | Does |
 | --- | --- | --- |
-| `site-validate.yml` | called | secret scan, gitleaks, build reproducibility, HTML validity, browser suite |
-| `site-ci.yml` | push/PR touching `site/**`, `skills/**` | calls validate. Exposes the required check `site gates passed` |
-| `site-deploy.yml` | called | the single deploy path: build, assemble, publish to Hostinger, smoke-test |
-| `site-verify.yml` | called | read-only live verification, fails on missing content or the wrong revision |
-| `site-deploy-staging.yml` | push to `staging` | validate, then deploy to the `staging` environment |
-| `site-deploy-production.yml` | push to `main` | validate, then deploy to `production` |
-| `site-promote.yml` | manual, typed confirmation | open or update the promotion pull request from `staging` into `main` |
-| `site-refresh-sources.yml` | 1st and 15th | re-pin the external sources, open a PR against `staging` |
+| `a0-skills-checks.yml` | push, PR | the repository checks. Exposes the required check `validate skills and provenance` |
+| `a1-site-checks.yml` | push/PR touching `site/**`, `skills/**` | calls S1. Exposes the required check `site gates passed` |
+| `a2-site-deploy-staging.yml` | push to `staging` | validate, deploy to `staging`, verify the live staging origin |
+
+Merging a green pull request into `staging` deploys and verifies automatically.
+There is no approval gate on staging, deliberately: it is the rehearsal.
+
+**Flow B, release.** Manual, and gated twice.
+
+| Workflow | Trigger | Does |
+| --- | --- | --- |
+| `b1-site-promote-to-main.yml` | manual, type `promote` | refuses a revision whose required check is not green, then opens or updates the promotion pull request from `staging` into `main` |
+| `b2-site-deploy-production.yml` | push to `main` | validate, wait for the `production` environment reviewer, deploy, verify `https://skills.ronald.ng` |
+
+**Shared, called by both flows.** These have no triggers of their own.
+
+| Workflow | Does |
+| --- | --- |
+| `s1-site-validate.yml` | secret scan, gitleaks, build reproducibility, HTML validity, browser suite, deploy-contract tests |
+| `s2-site-deploy.yml` | the single deploy path: validate the target, build, assemble, publish over FTP |
+| `s3-site-verify.yml` | read-only live verification. Fails on missing content or the wrong revision |
+
+**Maintenance.**
+
+| Workflow | Trigger | Does |
+| --- | --- | --- |
+| `m1-site-refresh-sources.yml` | 1st and 15th | re-pin the external sources, open a PR against `staging` |
+| `sync-vendored-skills.yml` | fortnightly | refresh vendored skills. Deliberately unprefixed: generated `PROVENANCE.md` files across the vendored trees link to it by path, and those trees must not be hand-edited |
 
 Validation is a reusable workflow called by every deploy path, so no deploy can
 skip the gates, and nothing polls across a workflow boundary for another run's
@@ -133,7 +160,7 @@ available at the reusable-workflow call site, which caused issue #38.
 The shared deployment requires a URL and rejects empty or mismatched targets
 before upload. After a successful upload, verification always runs.
 
-`site-deploy.yml` fails in its first step listing every missing secret, rather
+`s2-site-deploy.yml` fails in its first step listing every missing secret, rather
 than skipping the upload and reporting success.
 
 **Point the two environments at different directories.** Set
@@ -227,7 +254,7 @@ The workflow reports which of these is missing rather than failing opaquely.
 ## What a deploy verifies
 
 Publishing is not the same as succeeding. After every successful upload, CI calls
-`site-verify.yml` with the target URL and the full deployed commit SHA. It checks
+`s3-site-verify.yml` with the target URL and the full deployed commit SHA. It checks
 the live origin and fails the deploy unless:
 
 - it returns 200 with `text/html`
