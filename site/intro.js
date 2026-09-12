@@ -72,7 +72,7 @@
   // domain legend
   var lg = document.getElementById("domlegend");
   domains.forEach(function (d, i) {
-    lg.innerHTML += '<div><i style="background:' + PALETTE[i % PALETTE.length] + '"></i>' + d + "</div>";
+    lg.innerHTML += '<div><i class="domain-swatch domain-swatch--' + (i % PALETTE.length) + '"></i>' + d + "</div>";
   });
 
   // scroll-driven camera

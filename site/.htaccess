@@ -1,3 +1,10 @@
+
+  # vis-network renders its canvas interaction layer with runtime style attributes.
+  # Keep that exception on the standalone intro; the workspace remains strict.
+  <FilesMatch "^intro\.html$">
+    Header always unset Content-Security-Policy
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"
+  </FilesMatch>
 # Apache / LiteSpeed configuration for the skill-browser site on Hostinger.
 #
 # Replaces what CloudFront and a Cloudflare Pages _headers file used to do. It is

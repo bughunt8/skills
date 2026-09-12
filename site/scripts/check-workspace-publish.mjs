@@ -1,3 +1,7 @@
+if (!policy?.includes("style-src 'self'")) throw new Error("Publish fixture must retain a same-origin style policy");
+if (!readFileSync(join(publish, ".htaccess"), "utf8").includes('FilesMatch "^intro\\.html$"')) {
+  throw new Error("Publish fixture must scope the intro style exception");
+}
 import { createServer } from "node:http";
 import { spawn, spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
