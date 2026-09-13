@@ -489,7 +489,10 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
             continue
         cx = sum(pos[k][0] for k in members) / len(members)
         cy = sum(pos[k][1] for k in members) / len(members)
-        reach = max(math.hypot(pos[k][0] - cx, pos[k][1] - cy) for k in members)
+        # sqrt of summed squares, not math.hypot: hypot's result can differ in the
+        # last ulp between CPython versions, and the reproducible-build gate runs
+        # on whatever Python the runner installs. Same inputs, same output, everywhere.
+        reach = max(math.sqrt((pos[k][0] - cx) ** 2 + (pos[k][1] - cy) ** 2) for k in members)
         parts.append(
             f'          <circle class="g-commring" data-comm="{cid}" '
             f'cx="{round(cx, 1)}" cy="{round(cy, 1)}" r="{round(reach + 16, 1)}"/>'
