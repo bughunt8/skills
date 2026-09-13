@@ -768,7 +768,9 @@ def render_workspace(community_meta, order, counts, sols, graph_svg, graph_label
       and Solutions below work without it.</p></noscript>
     <details id="workspace-help" class="reference-section"><summary>Workspace help</summary>
       <div class="help-body"><h2>Explore without losing your place</h2>
-        <p>Search names and descriptions. Choose a result to inspect it. Pointer movement never
+        <p>Search names and descriptions, including every skill's trigger phrases.
+          Type it like a prompt: when no skill matches every word, the best
+          keyword matches surface instead. Choose a result to inspect it. Pointer movement never
           selects. Clear removes your query. Back restores the previous view.
           Reset or Escape returns to all communities.</p>
         <p>Dot colour is a skill's category — where it is filed in the library, one per

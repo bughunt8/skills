@@ -288,6 +288,7 @@ input::placeholder { color: var(--muted); opacity: 1; }
 #gresults button { display: flex; flex-direction: column; align-items: flex-start; width: 100%; text-align: left; min-height: 64px; gap: var(--space-1); border-color: transparent; border-radius: 4px; padding: var(--space-3) var(--space-2); overflow-wrap: anywhere; }
 #gresults button strong { font-weight: 600; }
 #gresults button span { color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+#gresults button span mark { background: none; color: var(--accent); font-weight: 600; }
 #gresults button[aria-pressed="true"] { border-color: var(--accent); }
 .result-qualifier { font-weight: 600; }
 .empty-result { padding: var(--space-4); color: var(--muted); }

@@ -162,6 +162,28 @@ test.describe("workspace acceptance", () => {
     await saveEvidence(page, testInfo, "search-nda", { before, selected, final: await readState(page), crossed, selectedCrossed });
   });
 
+  test("SEARCH_PROMPT_KEYWORDS a prompt-like query routes on trigger keywords", async ({ page }, testInfo) => {
+    // No description contains all of "how do I plan team capacity"; the
+    // filler is ignored and the keyword matches rank, the way a harness
+    // routes a prompt to a skill whose trigger phrase shares its keywords.
+    await typeQuery(page, "how do I plan team capacity");
+    const keys = await resultKeys(page);
+    expect(keys.length).toBeGreaterThan(0);
+    expect(keys.length, "filler words must not flood the fallback").toBeLessThan(50);
+    const first = page.locator("#gresults button[data-key]").first();
+    await expect(first.locator("strong")).toHaveText("capacity-planner");
+    const marked = await first.locator("span mark").textContent();
+    expect(["plan", "planner", "team", "capacity"]).toContain(marked.toLocaleLowerCase());
+    // The snippet shows why: the marked keyword sits inside the description,
+    // so the trigger phrase explains its own hit.
+    const snippet = await first.locator("span").textContent();
+    expect(snippet.toLocaleLowerCase()).toContain(marked.toLocaleLowerCase());
+    // A query nothing answers stays an honest empty list.
+    await typeQuery(page, "zzzz-no-skill-98765");
+    await expect(page.locator("#gresults button[data-key]")).toHaveCount(0);
+    await saveEvidence(page, testInfo, "prompt-keywords", { keys, marked });
+  });
+
   test("search supports editing, multi-results, empty query, no results and Escape reset", async ({ page }, testInfo) => {
     const nodes = await catalog(page);
     const origin = await readState(page);
