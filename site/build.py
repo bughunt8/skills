@@ -487,11 +487,15 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
         members = [k for k in pos if comm[k] == cid]
         if len(members) < 2:
             continue
-        cx = sum(pos[k][0] for k in members) / len(members)
-        cy = sum(pos[k][1] for k in members) / len(members)
-        # sqrt of summed squares, not math.hypot: hypot's result can differ in the
-        # last ulp between CPython versions, and the reproducible-build gate runs
-        # on whatever Python the runner installs. Same inputs, same output, everywhere.
+        # math.fsum, not builtin sum(): 3.12 sums floats with Neumaier
+        # compensation and can differ from 3.10's naive addition in the last
+        # ulp — enough to flip a x.x5 rounding and fail the reproducibility
+        # gate on whatever Python the runner installs. fsum is exactly
+        # rounded, so every version computes the same centroid.
+        cx = math.fsum(pos[k][0] for k in members) / len(members)
+        cy = math.fsum(pos[k][1] for k in members) / len(members)
+        # sqrt of summed squares, not math.hypot: hypot's result can differ in
+        # the last ulp between CPython versions. Same inputs, same output.
         reach = max(math.sqrt((pos[k][0] - cx) ** 2 + (pos[k][1] - cy) ** 2) for k in members)
         parts.append(
             f'          <circle class="g-commring" data-comm="{cid}" '
