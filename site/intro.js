@@ -59,7 +59,7 @@
     sec.setAttribute("data-view", "comm:" + c.hub);
     var card = document.createElement("div");
     card.className = "card" + (idx % 2 ? " right" : "");
-    card.innerHTML = '<div class="kicker">community · ' + c.size + ' skills</div>' +
+    card.innerHTML = '<div class="kicker">detected community · ' + c.size + ' skills</div>' +
       '<h2>' + c.label + '</h2>' +
       '<p class="lede">Its hub is <b>' + c.hub + '</b> — the skill the rest of this community connects through. Scroll on.</p>';
     sec.appendChild(card);

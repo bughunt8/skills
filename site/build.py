@@ -445,15 +445,16 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
     by_key = {r["key"]: r for r in rows}
     order = net["communities"]
 
-    # Twelve distinct hues, then a neutral. Nineteen communities have real structure and
-    # twelve is as many colours as anyone can hold apart; the smaller ones are drawn in
-    # grey and named in the panel instead of being given a colour that means nothing.
+    # Dots are coloured by category — where a skill is filed — via the deterministic
+    # hash in hue_class(). Communities are marked instead by the dashed rings drawn
+    # around them in overview and by their labels, so the two concepts never share a
+    # visual channel. hue_of stays community-keyed for any caller that still wants it.
     hue_of = {}
     for i, cid in enumerate(order):
         hue_of[cid] = f"h{i}" if i < NAMED_COMMUNITIES else "hx"
 
     def hue(key):
-        return hue_of.get(comm[key], "hx")
+        return hue_class(by_key[key]["dom"])
 
     sol_of = collections.defaultdict(list)
     lead_of = {}
@@ -474,6 +475,26 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
     parts = []
     # Geometry moves with the camera; labels use a separate screen-space layer.
     parts.append('        <g id="vp" class="g-vp">')
+
+    # ------------------------------------------------------- the community rings
+    #
+    # A dashed neutral ring around every detected community of two or more skills.
+    # Rings carry community identity; dot colour carries category. Two concepts,
+    # two separate visual channels, because sharing one made them indistinguishable.
+    # CSS shows the rings only in overview mode, where clusters are the story.
+    parts.append('        <g class="g-rings" aria-hidden="true">')
+    for cid in order:
+        members = [k for k in pos if comm[k] == cid]
+        if len(members) < 2:
+            continue
+        cx = sum(pos[k][0] for k in members) / len(members)
+        cy = sum(pos[k][1] for k in members) / len(members)
+        reach = max(math.hypot(pos[k][0] - cx, pos[k][1] - cy) for k in members)
+        parts.append(
+            f'          <circle class="g-commring" data-comm="{cid}" '
+            f'cx="{round(cx, 1)}" cy="{round(cy, 1)}" r="{round(reach + 16, 1)}"/>'
+        )
+    parts.append("        </g>")
 
     # ------------------------------------------------------------------- the edges
     #
@@ -582,7 +603,7 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
         )
         if spot is not None:
             parts.append(
-                f'          <text class="g-clabel {hue_of[cid]}" data-comm="{cid}" '
+                f'          <text class="g-clabel" data-comm="{cid}" '
                 f'x="{spot["x"]}" y="{spot["y"]}" text-anchor="middle">'
                 f'{esc(label)}</text>'
             )
@@ -662,7 +683,7 @@ def render_workspace(community_meta, order, counts, sols, graph_svg, graph_label
         for s in sols
     )
     return f"""
-    <div class="workspace" id="top" data-mode="community">
+    <div class="workspace" id="top" data-mode="overview">
       <header id="workspace-header" class="workspace__header">
         <form id="gform" class="toolbar" role="search" aria-label="Find skills">
           <div class="field field--search"><label for="gsearch">Search skills</label>
@@ -681,8 +702,8 @@ def render_workspace(community_meta, order, counts, sols, graph_svg, graph_label
             <button type="button" id="gstated" aria-pressed="false">All evidence</button></div></div></details>
         </form>
         <div class="context-row"><div class="context-title">
-          <span class="eyebrow" id="context-kind">Skill library / Community</span>
-          <h1 id="workspace-title">{esc(first["label"])}</h1></div>
+          <span class="eyebrow" id="context-kind">Skill library / All communities</span>
+          <h1 id="workspace-title">All communities</h1></div>
           <nav class="context-actions" aria-label="Workspace navigation">
             <button type="button" id="gback" disabled>Back</button>
             <button type="button" id="goverview">Overview</button>
@@ -710,17 +731,18 @@ def render_workspace(community_meta, order, counts, sols, graph_svg, graph_label
         </section>
         <aside id="inspector" class="inspector" aria-label="Skill details and results">
           <section id="panel" class="panel" tabindex="0" aria-label="Current context">
-            <p class="panel__tier" id="paneltier">Community</p>
-            <h2 class="panel__name" id="panelname">{esc(first["label"])}</h2>
+            <p class="panel__tier" id="paneltier">Overview</p>
+            <h2 class="panel__name" id="panelname">The whole library</h2>
             <a id="panelsource" hidden href="#library" rel="noopener">Open skill source</a>
-            <p class="panel__desc" id="paneldesc">{first["size"]} skills grouped by their
-              names and Solution relationships. Most connected member: {esc(first["hub"])}.</p>
+            <p class="panel__desc" id="paneldesc">Every skill at once. Dot colour is the
+              skill's category — how it is filed. Dashed rings mark detected communities —
+              clusters formed by what the skills reference.</p>
             <p id="panelmeta"></p>
             <ol class="panel__chain" id="panelchain"></ol>
             <p class="panel__ev" id="panelev">Choose a member to inspect its evidence.</p>
           </section>
           <section id="results-region" class="results-region" aria-labelledby="results-title">
-            <div class="results-heading"><h2 id="results-title">Community members</h2>
+            <div class="results-heading"><h2 id="results-title">All skills</h2>
               <span id="results-count"></span></div>
             <p id="results-hint">Select a skill to see its description and connections.</p>
             <ol id="gresults"></ol>
@@ -741,7 +763,10 @@ def render_workspace(community_meta, order, counts, sols, graph_svg, graph_label
       <div class="help-body"><h2>Explore without losing your place</h2>
         <p>Search names and descriptions. Choose a result to inspect it. Pointer movement never
           selects. Clear removes your query. Back restores the previous view.
-          Reset or Escape opens the largest community.</p>
+          Reset or Escape returns to all communities.</p>
+        <p>Dot colour is a skill's category — where it is filed in the library, one per
+          skill. A community is a cluster detected from what the skills reference, and can
+          mix categories; dashed rings and the white labels mark them in overview.</p>
         <p>Drag the graph to pan. Use +, − and Fit view to zoom. With the graph focused,
           arrow keys pan, + and − zoom, and Home fits. Use Tab and Enter on the member
           list to select a skill.</p>
@@ -787,6 +812,7 @@ def render(rows: list) -> "tuple[dict, str]":
         f"The library as a graph: {len(rows)} skills, "
         f"{len(edge_rows):,} relationships, and {len(community_meta)} communities "
         f"detected from what the skills reference rather than from how they are filed. "
+        f"Dot colour is the skill's category; dashed rings mark the detected communities. "
         f"Each node is a link to that skill's own entry. The same information is listed "
         f"as text under Solutions and The library below."
     )

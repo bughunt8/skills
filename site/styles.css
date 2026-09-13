@@ -161,6 +161,17 @@ input::placeholder { color: var(--muted); opacity: 1; }
   pointer-events: none;
 }
 .g-clabel { fill: var(--c, var(--text)); }
+.g-commring {
+  fill: none;
+  stroke: var(--text);
+  stroke-opacity: .16;
+  stroke-width: 1px;
+  stroke-dasharray: 2 6;
+  vector-effect: non-scaling-stroke;
+  display: none;
+  pointer-events: none;
+}
+#top[data-mode="overview"] .g-commring { display: block; }
 .g-nlabel.is-selected { fill: var(--text); font-weight: 650; }
 #selected-label-leader { fill: none; stroke: var(--accent); stroke-width: 1.5px; }
 #selected-label-leader[data-offscreen="true"] { stroke-dasharray: 4 3; }

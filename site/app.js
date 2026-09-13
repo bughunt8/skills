@@ -52,8 +52,8 @@
   });
   adjacency.forEach((items) => items.sort((a, b) => a.to.localeCompare(b.to)));
   const initial = () => ({
-    mode: "community", selected: "", query: "", community: String(data.comms[0].id),
-    listKind: "community", filters: {community: "", category: "", solution: "", stated: false},
+    mode: "overview", selected: "", query: "", community: "",
+    listKind: "overview", filters: {community: "", category: "", solution: "", stated: false},
     viewport: {k: 1, x: 0, y: 0}, pathStart: "", pathEnd: "", path: [], pathPending: false,
     searchOrigin: null,
   });
@@ -1138,7 +1138,8 @@
     results.querySelectorAll("button").forEach((button) =>
       button.setAttribute("aria-pressed", String(button.dataset.key === state.selected)));
     text("results-title", state.query.trim() ? "Search results" :
-      state.listKind === "community" ? "Community members" : "Matching skills");
+      state.listKind === "community" ? "Community members" :
+      state.listKind === "overview" && !state.filters.community ? "All skills" : "Matching skills");
     text("results-count", String(listKeys.length));
     text("results-hint", state.pathPending ?
       (state.pathStart ? `Choose the end. Start: ${nodes.get(state.pathStart).name}` : "Choose a start, then an end.") :
@@ -1223,7 +1224,8 @@
       community: state.community, category: state.filters.category, solution: state.filters.solution,
       evidence: state.filters.stated ? "stated" : "all", path: JSON.stringify(state.path)});
     text("workspace-title", contextTitle());
-    text("context-kind", `Skill library / ${state.mode === "node" ? "Selected skill" : state.mode}`);
+    text("context-kind", `Skill library / ${state.mode === "node" ? "Selected skill" :
+      state.mode === "overview" ? "All communities" : state.mode}`);
     text("graph-caption", state.mode === "node" ? "Selected skill + direct connections" :
       state.mode === "path" ? "Shortest path · active evidence" : "Drag to pan · select a skill to explore");
     prepareScene();
