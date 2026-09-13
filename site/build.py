@@ -1165,6 +1165,26 @@ def main(argv: list) -> int:
                 f"Run: python3 build.py --write",
                 file=sys.stderr,
             )
+            # The gate runs on whatever Python the runner installs, so a
+            # version-sensitive computation shows up here, far from the machine
+            # that wrote the file. Name the first differing lines instead of
+            # making someone guess across environments.
+            if current != updated:
+                committed_lines = current.splitlines()
+                regenerated_lines = updated.splitlines()
+                shown = 0
+                for i, (a, b) in enumerate(zip(committed_lines, regenerated_lines)):
+                    if a != b:
+                        print(f"  first difference at line {i + 1}:",
+                              file=sys.stderr)
+                        print(f"    committed   : {a[:160]}", file=sys.stderr)
+                        print(f"    regenerated : {b[:160]}", file=sys.stderr)
+                        shown += 1
+                        if shown == 5:
+                            break
+                if not shown and len(committed_lines) != len(regenerated_lines):
+                    print(f"  line count: committed {len(committed_lines)}, "
+                          f"regenerated {len(regenerated_lines)}", file=sys.stderr)
             return 1
         print(f"up to date: {len(rows)} skills across {len(counts)} categories")
         return 0
