@@ -179,6 +179,20 @@ docs/skill-library.html        static prototype rendering the solutions
   DOCX and PDF output. Markdown workflows are unaffected. Do not vendor the scripts without
   adding Node CI to keep them honest.
 
+## Agent skills
+
+### Issue tracker
+
+GitHub issues in `bughunt8/skills`, via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five canonical roles, each label string equal to its name: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `CONTEXT.md` and one `docs/adr/` at the root. See `docs/agents/domain.md`.
+
 ## Commit convention
 
 Conventional Commits. `feat(skills):`, `chore(vendor):`, `docs(readme):`, `fix(scripts):`.
