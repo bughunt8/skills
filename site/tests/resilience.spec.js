@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { openWorkspace, readState, activate, assertReadableLabels, assertNoRuntimeErrors, ensureFiltersOpen, settleMotion } from "../scripts/workspace-test-helpers.mjs";
+import { EXPECTED_TOTAL, EXPECTED_SOLUTIONS } from "./library-size.mjs";
 test.afterEach(async ({ page }) => { await assertNoRuntimeErrors(page); });
 
 const data = JSON.parse(readFileSync(new URL("../data.js", import.meta.url), "utf8")
@@ -23,8 +24,8 @@ test.describe("responsive resilience", () => {
         }));
         expect(overflow.page).toBeLessThanOrEqual(1);
         expect(overflow.controls).toEqual([]);
-        await expect(page.locator(".card")).toHaveCount(490);
-        await expect(page.locator(".sol")).toHaveCount(50);
+        await expect(page.locator(".card")).toHaveCount(EXPECTED_TOTAL);
+        await expect(page.locator(".sol")).toHaveCount(EXPECTED_SOLUTIONS);
         await expect(page.locator("#workspace-title")).not.toBeEmpty();
         expect((await readState(page)).matching).toBeGreaterThan(0);
       });
@@ -117,8 +118,8 @@ test.describe("graceful failure", () => {
       await page.goto("/index.html");
       expect(blocked, "fallback proof must actually block the versioned runtime asset").toHaveLength(1);
       await expect(page.locator("#top")).not.toHaveAttribute("data-ready", "true");
-      await expect(page.locator(".card")).toHaveCount(490);
-      await expect(page.locator(".sol")).toHaveCount(50);
+      await expect(page.locator(".card")).toHaveCount(EXPECTED_TOTAL);
+      await expect(page.locator(".sol")).toHaveCount(EXPECTED_SOLUTIONS);
       await page.locator("#library > summary").click();
       await page.locator(".lib__cat > summary").first().click();
       await expect(page.locator(".card").first()).toBeVisible();

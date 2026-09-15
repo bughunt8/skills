@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
+import { EXPECTED_TOTAL } from "./library-size.mjs";
 
 // Identity/topology stay separate from interaction acceptance so a usable-looking
 // subset cannot quietly replace the complete source graph.
@@ -10,8 +11,8 @@ const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 test.describe("complete graph identity and evidence", () => {
   test.beforeEach(async ({ page }) => { await page.goto("/index.html"); });
 
-  test("all 490 distinct skills link to exactly their own library cards", async ({ page }) => {
-    expect(data.total).toBe(490);
+  test("every distinct skill links to exactly its own library card", async ({ page }) => {
+    expect(data.total).toBe(EXPECTED_TOTAL);
     await expect(page.locator(".g-node")).toHaveCount(data.total);
     const result = await page.locator(".g-node").evaluateAll((nodes) => ({
       keys: nodes.map((n) => n.dataset.key),
@@ -22,7 +23,7 @@ test.describe("complete graph identity and evidence", () => {
       }),
       unnamed: nodes.filter((n) => !n.getAttribute("aria-label")?.trim()).map((n) => n.dataset.key)
     }));
-    expect(new Set(result.keys).size).toBe(490);
+    expect(new Set(result.keys).size).toBe(EXPECTED_TOTAL);
     expect(result.keys.slice().sort()).toEqual(data.nodes.slice().sort());
     expect(result.broken).toEqual([]);
     expect(result.unnamed).toEqual([]);
