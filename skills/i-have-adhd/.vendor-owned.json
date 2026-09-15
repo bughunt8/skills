@@ -1,0 +1,7 @@
+{
+  "$comment": "Written by scripts/sync_vendor.py. Lists exactly what the last sync placed in this directory, so the next sync can delete what it no longer owns without inferring ownership from whatever happens to be here. Do not edit.",
+  "source": "i-have-adhd",
+  "paths": [
+    "i-have-adhd"
+  ]
+}

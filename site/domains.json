@@ -2,7 +2,7 @@
   "_comment": [
     "The top layer of the graph: what kind of work a skill is for.",
     "",
-    "The 24 groups below it are the repository's own directory names, which is why",
+    "The 25 groups below it are the repository's own directory names, which is why",
     "they read like `pstack`, `shuohao` and `ra-qm-team` — they are source layout,",
     "not a taxonomy, and there are too many of them to be an opening view. This file",
     "is the one place where an editorial judgement is made about the library, so it",
@@ -57,7 +57,7 @@
       "id": "work",
       "label": "Work and career",
       "blurb": "Personal throughput and getting hired.",
-      "categories": ["productivity", "job-hunt"]
+      "categories": ["productivity", "job-hunt", "i-have-adhd"]
     },
     {
       "id": "govern",
@@ -89,6 +89,7 @@
     "finance": "Finance",
     "productivity": "Productivity",
     "job-hunt": "Job search",
+    "i-have-adhd": "ADHD-friendly output",
     "ra-qm-team": "Regulatory and quality",
     "compliance-os": "Compliance"
   }

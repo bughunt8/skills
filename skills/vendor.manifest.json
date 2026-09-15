@@ -113,6 +113,36 @@
           "note": "Four Gelasio TrueType fonts under the SIL Open Font License 1.1. The import's primary MIT licence does not cover them."
         }
       ]
+    },
+    {
+      "id": "i-have-adhd",
+      "name": "i-have-adhd",
+      "repo": "https://github.com/ayghri/i-have-adhd",
+      "homepage": "https://github.com/ayghri/i-have-adhd#readme",
+      "author": "Ayoub Ghriss (@ayghri)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "main",
+      "pinned_commit": "4092de07ce3ed88389d77c0d623b7af89b40ac0e",
+      "pinned_at": "2026-09-15",
+      "dest": "skills/i-have-adhd",
+      "paths": [
+        {
+          "from": ".cursor/skills",
+          "to": "",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        }
+      ],
+      "mandatory": [],
+      "limitations": [
+        "Only the skill is vendored. Upstream also ships tool-specific integrations this library does not use: Claude, Codex, Cursor and Gemini plugin manifests, an OpenCode command and JS plugin, TypeScript extensions under extensions/, and an eval harness under evals/. None are needed to load the skill, and several would require a Node or TypeScript toolchain this repository does not run.",
+        "Upstream keeps the skill under .cursor/skills/, so it vendors to skills/i-have-adhd/i-have-adhd/. The inner directory name is the skill's frontmatter name, which SK004 requires them to match."
+      ]
     }
   ]
 }

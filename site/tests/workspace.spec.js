@@ -223,7 +223,7 @@ test.describe("workspace acceptance", () => {
     const keys = await resultKeys(page);
     const before = await readState(page);
     // Navigate, never programmatically focus or synthesize selection. Bounded to
-    // avoid passing a 490-tab traversal disguised as accessibility.
+    // avoid passing a one-tab-per-skill traversal disguised as accessibility.
     let focused = "";
     for (let i = 0; i < 35; i++) {
       await page.keyboard.press("Tab");
@@ -238,7 +238,7 @@ test.describe("workspace acceptance", () => {
     await expectSelected(page, focused, node.name);
   });
 
-  test("Clear restores the search origin rather than silently opening all 490 skills", async ({ page }, testInfo) => {
+  test("Clear restores the search origin rather than silently opening the whole library", async ({ page }, testInfo) => {
     const origins = [];
     async function roundtrip(phase) {
       const before = await readState(page);
