@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
+import { EXPECTED_TOTAL, EXPECTED_SOLUTIONS } from "./library-size.mjs";
 
 /*
  * The page is prerendered by build.py. These tests guard the property that makes
@@ -22,8 +23,8 @@ test.describe("prerendered content", () => {
   test("every card is in the shipped HTML, not created by script", () => {
     const cards = html.match(/<article class="card[^"]*"/g) || [];
     expect(cards.length).toBe(data.total);
-    expect(cards.length).toBe(490);
-    expect(data.solutions).toBe(50);
+    expect(cards.length).toBe(EXPECTED_TOTAL);
+    expect(data.solutions).toBe(EXPECTED_SOLUTIONS);
 
     // Workspace chrome can be dynamic; library cards must remain prerendered.
     const app = readFileSync(new URL("../app.js", import.meta.url), "utf8");

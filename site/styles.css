@@ -161,6 +161,17 @@ input::placeholder { color: var(--muted); opacity: 1; }
   pointer-events: none;
 }
 .g-clabel { fill: var(--c, var(--text)); }
+.g-commring {
+  fill: none;
+  stroke: var(--text);
+  stroke-opacity: .16;
+  stroke-width: 1px;
+  stroke-dasharray: 2 6;
+  vector-effect: non-scaling-stroke;
+  display: none;
+  pointer-events: none;
+}
+#top[data-mode="overview"] .g-commring { display: block; }
 .g-nlabel.is-selected { fill: var(--text); font-weight: 650; }
 #selected-label-leader { fill: none; stroke: var(--accent); stroke-width: 1.5px; }
 #selected-label-leader[data-offscreen="true"] { stroke-dasharray: 4 3; }
@@ -277,6 +288,7 @@ input::placeholder { color: var(--muted); opacity: 1; }
 #gresults button { display: flex; flex-direction: column; align-items: flex-start; width: 100%; text-align: left; min-height: 64px; gap: var(--space-1); border-color: transparent; border-radius: 4px; padding: var(--space-3) var(--space-2); overflow-wrap: anywhere; }
 #gresults button strong { font-weight: 600; }
 #gresults button span { color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+#gresults button span mark { background: none; color: var(--accent); font-weight: 600; }
 #gresults button[aria-pressed="true"] { border-color: var(--accent); }
 .result-qualifier { font-weight: 600; }
 .empty-result { padding: var(--space-4); color: var(--muted); }

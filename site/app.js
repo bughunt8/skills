@@ -52,8 +52,8 @@
   });
   adjacency.forEach((items) => items.sort((a, b) => a.to.localeCompare(b.to)));
   const initial = () => ({
-    mode: "community", selected: "", query: "", community: String(data.comms[0].id),
-    listKind: "community", filters: {community: "", category: "", solution: "", stated: false},
+    mode: "overview", selected: "", query: "", community: "",
+    listKind: "overview", filters: {community: "", category: "", solution: "", stated: false},
     viewport: {k: 1, x: 0, y: 0}, pathStart: "", pathEnd: "", path: [], pathPending: false,
     searchOrigin: null,
   });
@@ -72,7 +72,7 @@
     nodes.get(b).degree - nodes.get(a).degree || nodes.get(a).name.localeCompare(nodes.get(b).name) ||
     a.localeCompare(b));
 
-  function matches(node) {
+  function passesFilters(node) {
     const f = state.filters;
     if (f.community && node.community !== f.community) return false;
     if (f.category && node.category !== f.category) return false;
@@ -80,21 +80,60 @@
       const solution = solutions.get(f.solution);
       if (!solution.members.includes(node.key) && node.key !== f.solution) return false;
     }
-    const terms = state.query.toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
-    return terms.every((term) => {
-      // Short queries use word starts: NDA must not match staNDArds or ageNDAs.
-      if (term === "nda" && /non[\s-]?disclosure/.test(node.text)) return true;
-      return term.length <= 3 ? node.words.some((word) => word.startsWith(term)) : node.text.includes(term);
-    });
+    return true;
+  }
+
+  // Prompt filler. A harness ignores these when routing a prompt to a skill;
+  // matching them here is how "how do I plan capacity" returned nothing while
+  // the skill sat there with "capacity planning" in its trigger phrase.
+  const STOPWORDS = new Set(("a an the i me my we our you your do does did how what when where " +
+    "which who why can could should would will with without for from to of in on at by and or is are " +
+    "be been was were it its this that these those no not help need want use used using skill skills").split(" "));
+
+  function terms() {
+    const raw = state.query.toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
+    const meaningful = raw.filter((term) => !STOPWORDS.has(term));
+    return meaningful.length ? meaningful : raw;
+  }
+
+  function termMatch(node, term) {
+    // Short queries use word starts: NDA must not match staNDArds or ageNDAs.
+    if (term === "nda" && /non[\s-]?disclosure/.test(node.text)) return true;
+    return term.length <= 3 ? node.words.some((word) => word.startsWith(term)) : node.text.includes(term);
+  }
+
+  function matches(node) {
+    if (!passesFilters(node)) return false;
+    return terms().every((term) => termMatch(node, term));
   }
 
   function getListKeys() {
+    const query = state.query.trim().toLocaleLowerCase();
     let keys = [...nodes.keys()].filter((key) => matches(nodes.get(key)));
     if (!state.query.trim() && state.listKind === "community") {
       keys = keys.filter((key) => nodes.get(key).community === state.community);
     }
-    if (state.query.trim()) {
-      const query = state.query.trim().toLocaleLowerCase();
+    if (query) {
+      const currentTerms = terms();
+      // A prompt is not a query. Someone typing "how do I plan capacity" is
+      // describing a job the way a harness prompt would, and requiring every
+      // word to appear in one description returns nothing. Strict all-terms
+      // matching stays primary; when it finds nothing, rank by how many
+      // keywords hit, so trigger phrases still surface their skills.
+      if (!keys.length && currentTerms.length > 1) {
+        const any = [];
+        for (const key of [...nodes.keys()]) {
+          const node = nodes.get(key);
+          if (!passesFilters(node)) continue;
+          const hits = currentTerms.reduce((n, term) => n + (termMatch(node, term) ? 1 : 0), 0);
+          // Two keyword hits minimum, so one coincidental word ("skill") cannot
+          // rescue a query nothing answers. Zero results stays an honest answer.
+          if (hits >= 2) any.push({ key, hits });
+        }
+        return any.sort((a, b) => b.hits - a.hits ||
+          nodes.get(a.key).name.localeCompare(nodes.get(b.key).name) || a.key.localeCompare(b.key))
+          .map((item) => item.key);
+      }
       const score = (key) => {
         const name = nodes.get(key).name.toLocaleLowerCase();
         return name === query ? 0 : name.startsWith(query) ? 1 : name.includes(query) ? 2 : 3;
@@ -1108,11 +1147,33 @@
         button.dataset.key = key;
         const name = document.createElement("strong"), description = document.createElement("span");
         name.textContent = node.name;
-        const q = state.query.trim().toLocaleLowerCase();
-        const found = q ? node.description.toLocaleLowerCase().indexOf(q) : -1;
-        const start = Math.max(0, found - 40);
-        description.textContent = (start ? "…" : "") + node.description.slice(start, start + 145) +
-          (node.description.length > start + 145 ? "…" : "");
+        // The snippet must show why this skill answered the query: clip around
+        // the first keyword the description actually contains, and mark it,
+        // so a trigger phrase explains its own hit instead of being cut in half
+        // by an arbitrary 145-character window.
+        let found = -1, hit = "";
+        const snippetTerms = [...terms()].sort((a, b) => b.length - a.length);
+        for (const term of snippetTerms) {
+          found = node.description.toLocaleLowerCase().indexOf(term);
+          if (found !== -1) { hit = term; break; }
+        }
+        if (found === -1) {
+          const q = state.query.trim().toLocaleLowerCase();
+          found = q ? node.description.toLocaleLowerCase().indexOf(q) : -1;
+          hit = q;
+        }
+        if (found !== -1) {
+          const start = Math.max(0, found - 40);
+          const before = (start ? "…" : "") + node.description.slice(start, found);
+          const end = node.description.slice(found + hit.length, found + hit.length + 105);
+          description.append(before);
+          const mark = document.createElement("mark");
+          mark.textContent = node.description.slice(found, found + hit.length);
+          description.append(mark, end + (node.description.length > found + hit.length + 105 ? "…" : ""));
+        } else {
+          description.textContent = node.description.slice(0, 145) +
+            (node.description.length > 145 ? "…" : "");
+        }
         button.append(name, description);
         const qualifier = node.card.querySelector(".qual");
         if (qualifier) {
@@ -1138,7 +1199,8 @@
     results.querySelectorAll("button").forEach((button) =>
       button.setAttribute("aria-pressed", String(button.dataset.key === state.selected)));
     text("results-title", state.query.trim() ? "Search results" :
-      state.listKind === "community" ? "Community members" : "Matching skills");
+      state.listKind === "community" ? "Community members" :
+      state.listKind === "overview" && !state.filters.community ? "All skills" : "Matching skills");
     text("results-count", String(listKeys.length));
     text("results-hint", state.pathPending ?
       (state.pathStart ? `Choose the end. Start: ${nodes.get(state.pathStart).name}` : "Choose a start, then an end.") :
@@ -1223,7 +1285,8 @@
       community: state.community, category: state.filters.category, solution: state.filters.solution,
       evidence: state.filters.stated ? "stated" : "all", path: JSON.stringify(state.path)});
     text("workspace-title", contextTitle());
-    text("context-kind", `Skill library / ${state.mode === "node" ? "Selected skill" : state.mode}`);
+    text("context-kind", `Skill library / ${state.mode === "node" ? "Selected skill" :
+      state.mode === "overview" ? "All communities" : state.mode}`);
     text("graph-caption", state.mode === "node" ? "Selected skill + direct connections" :
       state.mode === "path" ? "Shortest path · active evidence" : "Drag to pan · select a skill to explore");
     prepareScene();

@@ -47,15 +47,18 @@ async function typeQuery(page, text) {
 test.describe("workspace acceptance", () => {
   test.beforeEach(async ({ page }) => { await openWorkspace(page); });
 
-  test("first viewport opens a populated expanded cluster with docked regions", async ({ page }, testInfo) => {
+  test("first viewport opens all communities in overview with docked regions", async ({ page }, testInfo) => {
     const state = await readState(page);
-    expect(state.context.mode).toBe("community");
+    expect(state.context.mode).toBe("overview");
     expect(state.context.selected).toBe("");
-    await expect(page.locator("#workspace-title")).toHaveText(data.comms[0].label);
-    expect(state.matching).toBe(data.comms[0].size);
+    await expect(page.locator("#workspace-title")).toHaveText("All communities");
+    expect(state.matching).toBe(data.nodes.length);
     expect(state.visible).toBeGreaterThan(0);
     expect(state.visible).toBe(await paintedGraphCount(page));
-    expect((await resultKeys(page)).length).toBe(data.comms[0].size);
+    expect((await resultKeys(page)).length).toBe(data.nodes.length);
+    const rings = await page.locator(".g-commring").evaluateAll((els) =>
+      els.length && getComputedStyle(els[0]).display !== "none" ? els.length : 0);
+    expect(rings, "overview marks detected communities with rings").toBeGreaterThan(1);
     const layout = await assertLayout(page);
     const graph = await page.locator("#gsvg").boundingBox();
     expect(graph.width).toBeGreaterThan(layout.regions["graph-region"].width * 0.85);
@@ -65,11 +68,15 @@ test.describe("workspace acceptance", () => {
       expect(graph.height).toBeGreaterThan(page.viewportSize().height * 0.50);
       expect(layout.regions["statusbar"].bottom).toBeLessThanOrEqual(page.viewportSize().height + 1);
     }
-    const initialScale = state.camera.scale;
+    const overviewScale = state.camera.scale;
+    const key = (await resultKeys(page))[0];
+    await activate(resultFor(page, key), testInfo);
+    await expect(page.locator("#top")).toHaveAttribute("data-mode", "node");
+    const focused = await readState(page);
+    expect(focused.camera.scale, "selecting a skill magnifies it beyond the overview").toBeGreaterThan(overviewScale);
     await activate(page.locator("#goverview"), testInfo);
     await expect(page.locator("#top")).toHaveAttribute("data-mode", "overview");
     const overview = await readState(page);
-    expect(initialScale, "default should magnify a populated cluster, not show a tiny overview").toBeGreaterThan(overview.camera.scale);
     await activate(page.locator("#greset"), testInfo);
     await saveEvidence(page, testInfo, "first-viewport", { state, overview, layout,
       labels: await measureLabels(page) });
@@ -155,6 +162,28 @@ test.describe("workspace acceptance", () => {
     await saveEvidence(page, testInfo, "search-nda", { before, selected, final: await readState(page), crossed, selectedCrossed });
   });
 
+  test("SEARCH_PROMPT_KEYWORDS a prompt-like query routes on trigger keywords", async ({ page }, testInfo) => {
+    // No description contains all of "how do I plan team capacity"; the
+    // filler is ignored and the keyword matches rank, the way a harness
+    // routes a prompt to a skill whose trigger phrase shares its keywords.
+    await typeQuery(page, "how do I plan team capacity");
+    const keys = await resultKeys(page);
+    expect(keys.length).toBeGreaterThan(0);
+    expect(keys.length, "filler words must not flood the fallback").toBeLessThan(50);
+    const first = page.locator("#gresults button[data-key]").first();
+    await expect(first.locator("strong")).toHaveText("capacity-planner");
+    const marked = await first.locator("span mark").textContent();
+    expect(["plan", "planner", "team", "capacity"]).toContain(marked.toLocaleLowerCase());
+    // The snippet shows why: the marked keyword sits inside the description,
+    // so the trigger phrase explains its own hit.
+    const snippet = await first.locator("span").textContent();
+    expect(snippet.toLocaleLowerCase()).toContain(marked.toLocaleLowerCase());
+    // A query nothing answers stays an honest empty list.
+    await typeQuery(page, "zzzz-no-skill-98765");
+    await expect(page.locator("#gresults button[data-key]")).toHaveCount(0);
+    await saveEvidence(page, testInfo, "prompt-keywords", { keys, marked });
+  });
+
   test("search supports editing, multi-results, empty query, no results and Escape reset", async ({ page }, testInfo) => {
     const nodes = await catalog(page);
     const origin = await readState(page);
@@ -183,10 +212,10 @@ test.describe("workspace acceptance", () => {
     await expect(page.locator("#status-counts")).toContainText("0");
     await page.keyboard.press("Escape");
     const reset = await readState(page);
-    expect(reset.context.mode).toBe("community");
+    expect(reset.context.mode).toBe("overview");
     expect(reset.context.query).toBe("");
     expect(reset.context.selected).toBe("");
-    await expect(page.locator("#workspace-title")).toHaveText(data.comms[0].label);
+    await expect(page.locator("#workspace-title")).toHaveText("All communities");
   });
 
   test("search result list uses real keyboard activation and stable identity", async ({ page }) => {
@@ -194,7 +223,7 @@ test.describe("workspace acceptance", () => {
     const keys = await resultKeys(page);
     const before = await readState(page);
     // Navigate, never programmatically focus or synthesize selection. Bounded to
-    // avoid passing a 490-tab traversal disguised as accessibility.
+    // avoid passing a one-tab-per-skill traversal disguised as accessibility.
     let focused = "";
     for (let i = 0; i < 35; i++) {
       await page.keyboard.press("Tab");
@@ -209,7 +238,7 @@ test.describe("workspace acceptance", () => {
     await expectSelected(page, focused, node.name);
   });
 
-  test("Clear restores the search origin rather than silently opening all 490 skills", async ({ page }, testInfo) => {
+  test("Clear restores the search origin rather than silently opening the whole library", async ({ page }, testInfo) => {
     const origins = [];
     async function roundtrip(phase) {
       const before = await readState(page);
@@ -233,7 +262,7 @@ test.describe("workspace acceptance", () => {
 
   test("LABEL_NODE_CLEARANCE contextual labels avoid other painted nodes", async ({ page }, testInfo) => {
     const opening = await assertReadableLabels(page);
-    expect(opening.paintedNodes).toBe(data.comms[0].size);
+    expect(opening.paintedNodes).toBe(data.nodes.length);
     expect(opening.labels.length, "a populated opening needs multiple actual labels").toBeGreaterThan(1);
     const key = await page.locator('#gresults button[data-key]').first().getAttribute("data-key");
     await activate(resultFor(page, key), testInfo);
@@ -461,7 +490,7 @@ test.describe("workspace acceptance", () => {
     expect((await readState(page)).context).toEqual(selected.context);
     await activate(page.locator("#greset"), testInfo);
     const reset = await readState(page);
-    expect(reset.context.mode).toBe("community");
+    expect(reset.context.mode).toBe("overview");
     expect(reset.context.query).toBe("");
     expect(reset.context.selected).toBe("");
     expect(reset.context.category).toBe("");

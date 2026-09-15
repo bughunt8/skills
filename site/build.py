@@ -43,6 +43,9 @@ ROOT = Path(__file__).resolve().parent
 REPO_ROOT = ROOT.parent
 INDEX = ROOT / "index.html"
 DATA = ROOT / "data.js"
+# Hand-written, shipped, and previously unaudited. It states library counts in its
+# headline, so it is checked against the data even though the build does not write it.
+INTRO = ROOT / "intro.html"
 SOURCES = ROOT / "sources.json"
 
 MARKERS = {
@@ -70,6 +73,7 @@ LABELS = {
     "product-team": "Product",
     "ra-qm-team": "Regulatory and quality",
     "job-hunt": "Job search",
+    "i-have-adhd": "ADHD-friendly output",
     "compliance-os": "Compliance",
     "project-management": "Project management",
     "commercial": "Commercial",
@@ -445,15 +449,16 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
     by_key = {r["key"]: r for r in rows}
     order = net["communities"]
 
-    # Twelve distinct hues, then a neutral. Nineteen communities have real structure and
-    # twelve is as many colours as anyone can hold apart; the smaller ones are drawn in
-    # grey and named in the panel instead of being given a colour that means nothing.
+    # Dots are coloured by category — where a skill is filed — via the deterministic
+    # hash in hue_class(). Communities are marked instead by the dashed rings drawn
+    # around them in overview and by their labels, so the two concepts never share a
+    # visual channel. hue_of stays community-keyed for any caller that still wants it.
     hue_of = {}
     for i, cid in enumerate(order):
         hue_of[cid] = f"h{i}" if i < NAMED_COMMUNITIES else "hx"
 
     def hue(key):
-        return hue_of.get(comm[key], "hx")
+        return hue_class(by_key[key]["dom"])
 
     sol_of = collections.defaultdict(list)
     lead_of = {}
@@ -474,6 +479,33 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
     parts = []
     # Geometry moves with the camera; labels use a separate screen-space layer.
     parts.append('        <g id="vp" class="g-vp">')
+
+    # ------------------------------------------------------- the community rings
+    #
+    # A dashed neutral ring around every detected community of two or more skills.
+    # Rings carry community identity; dot colour carries category. Two concepts,
+    # two separate visual channels, because sharing one made them indistinguishable.
+    # CSS shows the rings only in overview mode, where clusters are the story.
+    parts.append('        <g class="g-rings" aria-hidden="true">')
+    for cid in order:
+        members = [k for k in pos if comm[k] == cid]
+        if len(members) < 2:
+            continue
+        # math.fsum, not builtin sum(): 3.12 sums floats with Neumaier
+        # compensation and can differ from 3.10's naive addition in the last
+        # ulp — enough to flip a x.x5 rounding and fail the reproducibility
+        # gate on whatever Python the runner installs. fsum is exactly
+        # rounded, so every version computes the same centroid.
+        cx = math.fsum(pos[k][0] for k in members) / len(members)
+        cy = math.fsum(pos[k][1] for k in members) / len(members)
+        # sqrt of summed squares, not math.hypot: hypot's result can differ in
+        # the last ulp between CPython versions. Same inputs, same output.
+        reach = max(math.sqrt((pos[k][0] - cx) ** 2 + (pos[k][1] - cy) ** 2) for k in members)
+        parts.append(
+            f'          <circle class="g-commring" data-comm="{cid}" '
+            f'cx="{round(cx, 1)}" cy="{round(cy, 1)}" r="{round(reach + 16, 1)}"/>'
+        )
+    parts.append("        </g>")
 
     # ------------------------------------------------------------------- the edges
     #
@@ -582,7 +614,7 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
         )
         if spot is not None:
             parts.append(
-                f'          <text class="g-clabel {hue_of[cid]}" data-comm="{cid}" '
+                f'          <text class="g-clabel" data-comm="{cid}" '
                 f'x="{spot["x"]}" y="{spot["y"]}" text-anchor="middle">'
                 f'{esc(label)}</text>'
             )
@@ -662,7 +694,7 @@ def render_workspace(community_meta, order, counts, sols, graph_svg, graph_label
         for s in sols
     )
     return f"""
-    <div class="workspace" id="top" data-mode="community">
+    <div class="workspace" id="top" data-mode="overview">
       <header id="workspace-header" class="workspace__header">
         <form id="gform" class="toolbar" role="search" aria-label="Find skills">
           <div class="field field--search"><label for="gsearch">Search skills</label>
@@ -681,8 +713,8 @@ def render_workspace(community_meta, order, counts, sols, graph_svg, graph_label
             <button type="button" id="gstated" aria-pressed="false">All evidence</button></div></div></details>
         </form>
         <div class="context-row"><div class="context-title">
-          <span class="eyebrow" id="context-kind">Skill library / Community</span>
-          <h1 id="workspace-title">{esc(first["label"])}</h1></div>
+          <span class="eyebrow" id="context-kind">Skill library / All communities</span>
+          <h1 id="workspace-title">All communities</h1></div>
           <nav class="context-actions" aria-label="Workspace navigation">
             <button type="button" id="gback" disabled>Back</button>
             <button type="button" id="goverview">Overview</button>
@@ -710,17 +742,18 @@ def render_workspace(community_meta, order, counts, sols, graph_svg, graph_label
         </section>
         <aside id="inspector" class="inspector" aria-label="Skill details and results">
           <section id="panel" class="panel" tabindex="0" aria-label="Current context">
-            <p class="panel__tier" id="paneltier">Community</p>
-            <h2 class="panel__name" id="panelname">{esc(first["label"])}</h2>
+            <p class="panel__tier" id="paneltier">Overview</p>
+            <h2 class="panel__name" id="panelname">The whole library</h2>
             <a id="panelsource" hidden href="#library" rel="noopener">Open skill source</a>
-            <p class="panel__desc" id="paneldesc">{first["size"]} skills grouped by their
-              names and Solution relationships. Most connected member: {esc(first["hub"])}.</p>
+            <p class="panel__desc" id="paneldesc">Every skill at once. Dot colour is the
+              skill's category — how it is filed. Dashed rings mark detected communities —
+              clusters formed by what the skills reference.</p>
             <p id="panelmeta"></p>
             <ol class="panel__chain" id="panelchain"></ol>
             <p class="panel__ev" id="panelev">Choose a member to inspect its evidence.</p>
           </section>
           <section id="results-region" class="results-region" aria-labelledby="results-title">
-            <div class="results-heading"><h2 id="results-title">Community members</h2>
+            <div class="results-heading"><h2 id="results-title">All skills</h2>
               <span id="results-count"></span></div>
             <p id="results-hint">Select a skill to see its description and connections.</p>
             <ol id="gresults"></ol>
@@ -739,9 +772,14 @@ def render_workspace(community_meta, order, counts, sols, graph_svg, graph_label
       and Solutions below work without it.</p></noscript>
     <details id="workspace-help" class="reference-section"><summary>Workspace help</summary>
       <div class="help-body"><h2>Explore without losing your place</h2>
-        <p>Search names and descriptions. Choose a result to inspect it. Pointer movement never
+        <p>Search names and descriptions, including every skill's trigger phrases.
+          Type it like a prompt: when no skill matches every word, the best
+          keyword matches surface instead. Choose a result to inspect it. Pointer movement never
           selects. Clear removes your query. Back restores the previous view.
-          Reset or Escape opens the largest community.</p>
+          Reset or Escape returns to all communities.</p>
+        <p>Dot colour is a skill's category — where it is filed in the library, one per
+          skill. A community is a cluster detected from what the skills reference, and can
+          mix categories; dashed rings and the white labels mark them in overview.</p>
         <p>Drag the graph to pan. Use +, − and Fit view to zoom. With the graph focused,
           arrow keys pan, + and − zoom, and Home fits. Use Tab and Enter on the member
           list to select a skill.</p>
@@ -787,6 +825,7 @@ def render(rows: list) -> "tuple[dict, str]":
         f"The library as a graph: {len(rows)} skills, "
         f"{len(edge_rows):,} relationships, and {len(community_meta)} communities "
         f"detected from what the skills reference rather than from how they are filed. "
+        f"Dot colour is the skill's category; dashed rings mark the detected communities. "
         f"Each node is a link to that skill's own entry. The same information is listed "
         f"as text under Solutions and The library below."
     )
@@ -1000,7 +1039,9 @@ CLAIMS = [
 
 # Any surviving number attached to these nouns outside the generated region is a
 # claim the build does not own, and is therefore drift waiting to happen.
-AUDIT = re.compile(r"\b(\d+)\s+(?:AI\s+)?(?:agent\s+)?(?:skills|categories)\b")
+AUDIT = re.compile(
+    r"\b(\d+)\s+(?:AI\s+)?(?:agent\s+)?(?:skills|categories|communities)\b"
+)
 
 
 def splice(
@@ -1061,23 +1102,37 @@ def version_assets(page: str, data: str) -> str:
     return page
 
 
-def audit_claims(page: str, total: int, cats: int) -> list:
-    """Find count claims in the hand-written region that the build does not own."""
-    begin, end = MARKERS["main"]
-    cbegin, cend = MARKERS["credits"]
-    # Blank out both generated regions; their numbers are generated by definition.
-    stripped = re.sub(
-        re.escape(begin) + r".*?" + re.escape(end), "", page, flags=re.S
-    )
-    stripped = re.sub(
-        re.escape(cbegin) + r".*?" + re.escape(cend), "", stripped, flags=re.S
-    )
+def audit_claims(
+    page: str,
+    total: int,
+    cats: int,
+    comms: int | None = None,
+    strip_generated: bool = True,
+) -> list:
+    """Find count claims in hand-written copy that the build does not own.
+
+    `strip_generated` is for `index.html`, where the generated regions state
+    these numbers by definition. Pages with no generated region, such as
+    `intro.html`, are audited whole: every number in them was typed by hand,
+    which is exactly why they drift. `intro.html` claimed "490 skills. 76
+    communities." for one commit after a skill was added, on the live site,
+    because nothing here looked at it.
+    """
+    stripped = page
+    if strip_generated:
+        for begin, end in (MARKERS["main"], MARKERS["credits"]):
+            stripped = re.sub(
+                re.escape(begin) + r".*?" + re.escape(end), "", stripped, flags=re.S
+            )
+    allowed = {total, cats} | ({comms} if comms is not None else set())
+    known = f"data says {total} skills, {cats} categories"
+    if comms is not None:
+        known += f", {comms} communities"
     bad = []
     for m in AUDIT.finditer(stripped):
-        n = int(m.group(1))
-        if n not in (total, cats):
+        if int(m.group(1)) not in allowed:
             line = stripped[: m.start()].count("\n") + 1
-            bad.append(f"line {line}: \"{m.group(0)}\" (data says {total} skills, {cats} categories)")
+            bad.append(f"line {line}: \"{m.group(0)}\" ({known})")
     return bad
 
 
@@ -1113,7 +1168,15 @@ def main(argv: list) -> int:
     updated = version_assets(updated, data)
 
     audit_svg(updated)
-    drift = audit_claims(updated, len(rows), len(counts))
+    # The community count is only known after the graph is laid out, so read it back
+    # from the payload that is about to be written rather than recomputing it.
+    comms = (
+        json.loads(data[data.index("{") :].rstrip().rstrip(";"))
+        .get("agreement", {})
+        .get("communities")
+    )
+
+    drift = audit_claims(updated, len(rows), len(counts), comms)
     if drift:
         print(
             "error: index.html states counts the build does not own:\n  "
@@ -1123,6 +1186,24 @@ def main(argv: list) -> int:
             file=sys.stderr,
         )
         return 1
+
+    if INTRO.exists():
+        intro_drift = audit_claims(
+            INTRO.read_text(encoding="utf-8"),
+            len(rows),
+            len(counts),
+            comms,
+            strip_generated=False,
+        )
+        if intro_drift:
+            print(
+                f"error: {INTRO.name} states counts that contradict the library:\n  "
+                + "\n  ".join(intro_drift)
+                + f"\n\n{INTRO.name} is hand-written and shipped, so a stale number "
+                "here is a false claim on the live site. Correct the copy.",
+                file=sys.stderr,
+            )
+            return 1
 
     if args.check:
         stale = []
@@ -1136,6 +1217,26 @@ def main(argv: list) -> int:
                 f"Run: python3 build.py --write",
                 file=sys.stderr,
             )
+            # The gate runs on whatever Python the runner installs, so a
+            # version-sensitive computation shows up here, far from the machine
+            # that wrote the file. Name the first differing lines instead of
+            # making someone guess across environments.
+            if current != updated:
+                committed_lines = current.splitlines()
+                regenerated_lines = updated.splitlines()
+                shown = 0
+                for i, (a, b) in enumerate(zip(committed_lines, regenerated_lines)):
+                    if a != b:
+                        print(f"  first difference at line {i + 1}:",
+                              file=sys.stderr)
+                        print(f"    committed   : {a[:160]}", file=sys.stderr)
+                        print(f"    regenerated : {b[:160]}", file=sys.stderr)
+                        shown += 1
+                        if shown == 5:
+                            break
+                if not shown and len(committed_lines) != len(regenerated_lines):
+                    print(f"  line count: committed {len(committed_lines)}, "
+                          f"regenerated {len(regenerated_lines)}", file=sys.stderr)
             return 1
         print(f"up to date: {len(rows)} skills across {len(counts)} categories")
         return 0
