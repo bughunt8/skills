@@ -521,5 +521,87 @@ class PromoteWorkflowGitTests(unittest.TestCase):
             )
 
 
+def load_workflow(name):
+    return yaml.load(
+        (ROOT / ".github" / "workflows" / f"{name}.yml").read_text(),
+        Loader=WorkflowLoader,
+    )
+
+
+def promotion_required_check(promote):
+    """The check name B1 refuses to promote without."""
+    for job in promote.get("jobs", {}).values():
+        for step in job.get("steps", []):
+            found = re.search(r'required="([^"]+)"', step.get("run", "") or "")
+            if found:
+                return found.group(1)
+    raise AssertionError("b1 no longer names a required check; the gate is gone")
+
+
+def check_promotion_gate(promote, producers):
+    """Whatever B1 demands on the staging head must actually run on staging pushes.
+
+    This is the contract that broke. B1 read the check named below off the staging
+    head and got `missing`, not because staging was bad but because the workflow
+    producing that check triggered on `push: [main]` and on pull requests only. The
+    pull request head carried it; the merge commit that becomes the staging head
+    never did, so flow B refused every promotion.
+    """
+    required = promotion_required_check(promote)
+    for name, workflow in producers.items():
+        job_names = {
+            job.get("name", key)
+            for key, job in (workflow.get("jobs", {}) or {}).items()
+        }
+        if required not in job_names:
+            continue
+        branches = ((workflow.get("on", {}) or {}).get("push", {}) or {}).get(
+            "branches", []
+        )
+        require(
+            "staging" in branches,
+            f"{name} produces the check b1 requires ({required!r}) but does not run "
+            f"on pushes to staging, so the staging head can never carry it; "
+            f"push branches are {branches}",
+        )
+        return name
+    raise AssertionError(
+        f"no inspected workflow produces the check b1 requires ({required!r}); "
+        "the gate can only ever report 'missing'"
+    )
+
+
+class PromotionGateReachabilityTests(unittest.TestCase):
+    """Flow B is only usable if its gate can be satisfied by a healthy staging."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.promote = load_workflow("b1-site-promote-to-main")
+        cls.producers = {
+            name: load_workflow(name)
+            for name in ("a0-skills-checks", "a1-site-checks")
+        }
+
+    def test_required_check_runs_on_staging_pushes(self):
+        producer = check_promotion_gate(self.promote, self.producers)
+        self.assertEqual(producer, "a0-skills-checks")
+
+    def test_gate_is_unreachable_without_the_staging_trigger(self):
+        check_promotion_gate(self.promote, self.producers)  # baseline must pass
+        broken = deepcopy(self.producers)
+        broken["a0-skills-checks"]["on"]["push"]["branches"] = ["main"]
+        with self.assertRaisesRegex(AssertionError, "does not run on pushes to staging"):
+            check_promotion_gate(self.promote, broken)
+        print("PROVED promotion gate unreachable without the staging trigger", flush=True)
+
+    def test_gate_detects_a_check_nothing_produces(self):
+        renamed = deepcopy(self.producers)
+        jobs = renamed["a0-skills-checks"]["jobs"]
+        jobs[next(iter(jobs))]["name"] = "something else entirely"
+        with self.assertRaisesRegex(AssertionError, "no inspected workflow produces"):
+            check_promotion_gate(self.promote, renamed)
+        print("PROVED promotion gate detects an unproduced check", flush=True)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
