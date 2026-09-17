@@ -1,7 +1,7 @@
 """Compose Solutions from the skill library.
 
 A Solution is a LEAD skill plus the subset of skills it leads. That is the whole
-model: the library is 490 skills, and a Solution is the one skill you invoke that
+model: the library is 491 skills, and a Solution is the one skill you invoke that
 knows how to drive a named handful of the others.
 
 The point of this module is to answer "which combinations of these skills actually
@@ -24,10 +24,10 @@ asserts rather than how much this code inferred:
             lead. These are labelled as candidates on the page, because that is
             what they are.
 
-On "every possible combination": the library has 490 skills, so the number of
-subsets is 2**490, which is not a number anyone can enumerate or use. Asking for
+On "every possible combination": the library has 491 skills, so the number of
+subsets is 2**491, which is not a number anyone can enumerate or use. Asking for
 every combination is really asking which combinations cohere. This module states
-its coherence rules, applies them to all 490 skills, and reports what it found and
+its coherence rules, applies them to all 491 skills, and reports what it found and
 what it left out, so the claim is checkable rather than impressive.
 
 Layout is computed here, in Python, rather than in the browser. A seeded force
@@ -514,7 +514,7 @@ def layout(sols: list, rows: list, width: float = 1400.0, height: float = 560.0)
     """Place every Solution as its own legible cluster, then the long tail around them.
 
     This is composed, not simulated. A force simulation was the first attempt and
-    it produced an even speckle of 490 dots: mathematically settled, and unreadable.
+    it produced an even speckle of 491 dots: mathematically settled, and unreadable.
     Nothing in it said "these 54 things are the point and these 165 are context",
     because a force simulation optimises for spacing, not for meaning.
 

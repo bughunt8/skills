@@ -22,6 +22,7 @@ const files = readdirSync(publish, { recursive: true }).filter((path) => statSyn
 const legacy = files.filter((path) => /(?:gsap|scrolltrigger|lenis).*\.(?:js|mjs)$/i.test(path));
 if (legacy.length) throw new Error(`Retired assets in publish set: ${legacy.join(", ")}`);
 for (const file of ["index.html", "app.js", "data.js", "styles.css", ".htaccess",
+  "intro.html", "intro.js", "intro.css", "lib/vis-network.min.js",
   "fonts/fonts.css", "fonts/inter-latin.woff2", "fonts/space-grotesk-latin.woff2"]) {
   if (!files.includes(file)) throw new Error(`Required publish asset missing: ${file}`);
 }

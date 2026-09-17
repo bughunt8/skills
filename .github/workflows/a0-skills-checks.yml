@@ -5,7 +5,13 @@ name: A0 skills checks
 
 on:
   push:
-    branches: [main]
+    # staging belongs here as much as main. B1 refuses to promote a staging head whose
+    # `validate skills and provenance` check is not green, and a check that never runs
+    # on staging pushes is not green, it is absent. Without this line the promotion
+    # workflow reports `missing` on a perfectly good revision and flow B cannot run at
+    # all. It also means the validation covers the merge commit being promoted rather
+    # than only the pull request head that preceded it.
+    branches: [main, staging]
   pull_request:
   workflow_dispatch:
 

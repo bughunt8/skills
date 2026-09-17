@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { openWorkspace, readState, activate, assertNoRuntimeErrors } from "../scripts/workspace-test-helpers.mjs";
+import { EXPECTED_TOTAL, EXPECTED_CATEGORIES } from "./library-size.mjs";
 test.afterEach(async ({ page }) => { await assertNoRuntimeErrors(page); });
 
 async function scan(page) {
@@ -48,13 +49,13 @@ test.describe("accessible workspace", () => {
     await expect(page.locator(".lib__cat").first()).not.toHaveAttribute("open", "");
   });
 
-  test("graph has one roving entry, never 490 Tab stops or focus-driven selection", async ({ page }) => {
+  test("graph has one roving entry, never one Tab stop per skill or focus-driven selection", async ({ page }) => {
     await openWorkspace(page);
     const named = await page.locator(".g-node").evaluateAll((nodes) => ({
       count: nodes.length, unnamed: nodes.filter((n) => !n.getAttribute("aria-label")?.trim()).length,
       tabStops: nodes.filter((n) => n.tabIndex >= 0).length
     }));
-    expect(named.count).toBe(490);
+    expect(named.count).toBe(EXPECTED_TOTAL);
     expect(named.unnamed).toBe(0);
     expect(named.tabStops).toBeLessThanOrEqual(1);
     const graphEntries = await page.locator("#gsvg, .g-node").evaluateAll((els) =>
@@ -87,7 +88,7 @@ test.describe("accessible workspace", () => {
     expect((await page.locator("#gsvg").getAttribute("aria-label")).length).toBeGreaterThan(20);
     const categories = await page.locator(".lib__cat").evaluateAll((els) =>
       els.map((e) => e.querySelector("summary")?.textContent.trim()));
-    expect(categories).toHaveLength(24);
+    expect(categories).toHaveLength(EXPECTED_CATEGORIES);
     expect(categories.every(Boolean)).toBe(true);
   });
 });
