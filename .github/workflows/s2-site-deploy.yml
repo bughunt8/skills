@@ -39,8 +39,8 @@ jobs:
     name: validate the deployment target before uploading
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
       - name: Reject missing or mismatched verification targets
@@ -57,7 +57,7 @@ jobs:
       name: ${{ inputs.environment }}
       url: ${{ inputs.url }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # Fail on a missing value rather than half-deploying. A deploy that skips
       # one of its two targets and still reports success leaves the two out of
@@ -108,7 +108,7 @@ jobs:
           done
           echo "environment '${{ inputs.environment }}' is configured"
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -242,7 +242,7 @@ jobs:
       # dangerous-clean-slate stays false: it wipes the remote directory, and this
       # Hostinger account serves other sites.
       - name: Deploy to Hostinger over FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           # Same resolution order as the configuration check above, so the values
           # the log reported are the values used to log in.
