@@ -40,7 +40,8 @@
       repo: card.querySelector("footer a").textContent,
       licence: card.querySelector(".lic").textContent,
     });
-    // The native member buttons are the keyboard/touch interface, not microscopic dots.
+    // Dots are marks, not targets: the result buttons are the list interface, and
+    // the lead links get the graph's one composite entry (see the roving block).
     el.setAttribute("tabindex", "-1");
   });
   const adjacency = new Map(data.nodes.map((key) => [key, []]));
@@ -217,6 +218,7 @@
       node.el.dataset.renderY = point.y;
     });
     $("graph-empty").hidden = sceneKeys.length > 0;
+    refreshLeadRoving();
   }
 
   function fit() {
@@ -1430,7 +1432,98 @@
   $("gzoom-in").addEventListener("click", () => zoom(1.3));
   $("gzoom-out").addEventListener("click", () => zoom(1 / 1.3));
   $("gfit").addEventListener("click", () => cameraBeat(fit));
+
+  // ---------------------------------------------- the lead links as one entry
+  // Every lead is a real link in the build, so with scripting off each one is an
+  // ordinary Tab stop and the graph doubles as a table of contents. Scripting
+  // turns the same links into a composite widget instead: exactly one lead in
+  // the current scene stays tabbable, arrows move focus by the positions the
+  // scene actually paints rather than by document order, Home/End jump to the
+  // reading-order ends, and activation keeps flowing through the link's own
+  // click path. Every tabindex write happens here at runtime, never in the
+  // generated markup, which is what keeps the scriptless page reachable.
+  const leadLinks = [...svg.querySelectorAll(".g-node[data-leads]")];
+  let rovingLead = null;
+  const leadPoint = (el) => ({
+    x: Number(el.dataset.renderX ?? el.dataset.x),
+    y: Number(el.dataset.renderY ?? el.dataset.y),
+  });
+  const leadReadingOrder = (a, b) => {
+    const p = leadPoint(a), q = leadPoint(b);
+    return p.y - q.y || p.x - q.x || a.dataset.key.localeCompare(b.dataset.key);
+  };
+  const sceneLeads = () => leadLinks.filter((el) => el.dataset.inContext !== "false");
+
+  function setRovingLead(el) {
+    if (rovingLead === el) return;
+    if (rovingLead) rovingLead.tabIndex = -1;
+    rovingLead = el;
+    if (el) el.tabIndex = 0;
+  }
+
+  // The tab stop follows the scene. It stays on the lead the user reached while
+  // that lead is still in context, otherwise it moves to the first lead in
+  // reading order. When no lead is on screen the canvas itself becomes the
+  // entry again, so the graph never loses its one keyboard way in.
+  function refreshLeadRoving() {
+    const visible = sceneLeads();
+    const keep = rovingLead && visible.includes(rovingLead);
+    setRovingLead(keep ? rovingLead : (visible.length ? visible.sort(leadReadingOrder)[0] : null));
+    svg.tabIndex = rovingLead ? -1 : 0;
+  }
+
+  // Nearest lead in the pressed direction: distance along the arrow wins and
+  // sideways offset is penalised, so Right means the closest lead roughly to
+  // the right, not whichever node the build happened to emit first.
+  function stepLead(from, key) {
+    const unit = {ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1]}[key];
+    if (!unit) return null;
+    const origin = leadPoint(from);
+    let best = null, bestScore = Infinity;
+    for (const el of sceneLeads()) {
+      if (el === from) continue;
+      const point = leadPoint(el);
+      const along = (point.x - origin.x) * unit[0] + (point.y - origin.y) * unit[1];
+      if (along <= 0) continue;
+      const across = Math.abs((point.x - origin.x) * unit[1] - (point.y - origin.y) * unit[0]);
+      const score = along + across * 2.5;
+      if (score < bestScore) { bestScore = score; best = el; }
+    }
+    return best;
+  }
+
+  // A pointer click focuses a lead too, so the roving stop follows real focus,
+  // not only the composite's own key handling.
+  svg.addEventListener("focusin", (event) => {
+    const lead = event.target.closest(".g-node[data-leads]");
+    if (lead) setRovingLead(lead);
+  });
+
   svg.addEventListener("keydown", (event) => {
+    const lead = event.target.closest(".g-node[data-leads]");
+    if (lead) {
+      // Composite keys on a lead. Enter is left native: the link's own
+      // activation fires the click the shared graph handler already turns into
+      // a selection. Space activates no link in any browser, and SVG anchors
+      // have no click() method here, so the same click is dispatched.
+      if (event.key === " ") {
+        event.preventDefault();
+        lead.dispatchEvent(new MouseEvent("click", {bubbles: true, cancelable: true}));
+        return;
+      }
+      const target = stepLead(lead, event.key);
+      if (target) {
+        event.preventDefault(); setRovingLead(target); target.focus(); return;
+      }
+      if (event.key === "Home" || event.key === "End") {
+        event.preventDefault();
+        const visible = sceneLeads().sort(leadReadingOrder);
+        const end = visible[event.key === "Home" ? 0 : visible.length - 1];
+        if (end && end !== lead) { setRovingLead(end); end.focus(); }
+        return;
+      }
+      return;
+    }
     const moves = {ArrowLeft: [48, 0], ArrowRight: [-48, 0], ArrowUp: [0, 48], ArrowDown: [0, -48]};
     if (moves[event.key]) {
       // A held arrow key is a direct manipulation: it tracks the key, never lags.
