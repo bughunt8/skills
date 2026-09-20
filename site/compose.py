@@ -578,10 +578,30 @@ def layout(sols: list, rows: list, width: float = 1400.0, height: float = 560.0)
         if 6 < x < width - 6 and 6 < y < height - 6:
             candidates.append((x, y))
 
+    # The conflict scan is indexed, not exhaustive. Testing one candidate used to
+    # walk every cluster already placed, so placement cost grew with the square
+    # of the Solution count: 300 Solutions was half a minute of build time spent
+    # re-checking clusters on the far side of the frame that could never
+    # conflict.
+    #
+    # A conflict at slack s needs dist < (want + pr) * s, and every s is at most
+    # 1, so any cluster that can fail a candidate lies within want + pr of it —
+    # and therefore within want + the largest radius placed so far. Placed
+    # clusters go into a uniform grid; a candidate reads the cells its reach
+    # touches and runs the same exact comparison on what comes back. A cluster
+    # outside those cells is more than want + pr away, which passes the test at
+    # every slack, so the verdict is the one the full scan would have returned.
+    # Cell size is twice the largest disc a cluster can need (27.5 + 11.0), so
+    # the touched neighbourhood is at most 3x3 cells at any slack.
+    CELL = 77.0
+    grid = {}
+    max_pr = 0.0
+
     placed = []
     for s in ordered:
         fr = fan_radius(len(s["members"]))
         want = fr + 11.0
+        reach = want + max_pr
         spot = None
         # Try at full spacing, then relax. A cluster placed slightly tight is a
         # better outcome than a cluster dropped or thrown outside the frame.
@@ -591,8 +611,22 @@ def layout(sols: list, rows: list, width: float = 1400.0, height: float = 560.0)
                     continue
                 if y - want < 4 or y + want > height - 4:
                     continue
-                if all(math.dist((x, y), (px, py)) >= (want + pr) * slack
-                       for px, py, pr in placed):
+                x0 = math.floor((x - reach) / CELL)
+                x1 = math.floor((x + reach) / CELL)
+                y0 = math.floor((y - reach) / CELL)
+                y1 = math.floor((y + reach) / CELL)
+                clear = True
+                for gx in range(x0, x1 + 1):
+                    for gy in range(y0, y1 + 1):
+                        for (px, py, pr) in grid.get((gx, gy), ()):
+                            if math.dist((x, y), (px, py)) < (want + pr) * slack:
+                                clear = False
+                                break
+                        if not clear:
+                            break
+                    if not clear:
+                        break
+                if clear:
                     spot = (x, y)
                     break
             if spot:
@@ -614,6 +648,10 @@ def layout(sols: list, rows: list, width: float = 1400.0, height: float = 560.0)
                 f"{width:.0f}x{height:.0f} frame. Increase the frame in layout()."
             )
         placed.append((spot[0], spot[1], want))
+        cell = (math.floor(spot[0] / CELL), math.floor(spot[1] / CELL))
+        grid.setdefault(cell, []).append((spot[0], spot[1], want))
+        if want > max_pr:
+            max_pr = want
         s["_pos"] = (spot[0], spot[1], fr)
 
     nodes, index = [], {}

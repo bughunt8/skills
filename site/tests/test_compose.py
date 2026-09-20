@@ -19,6 +19,7 @@ import importlib.util
 import io
 import re
 import sys
+import time
 from pathlib import Path
 
 SITE = Path(__file__).resolve().parent.parent
@@ -246,6 +247,59 @@ def test_determinism(rows, sols):
     )
 
 
+def _synthetic_library(n: int) -> tuple:
+    """n Solutions of 2..21 members each, cycling fan sizes so both the
+    single-ring and two-ring geometry get exercised at scale."""
+    sols, rows = [], []
+    for i in range(n):
+        nm = 2 + (i * 7) % 20
+        lead = f"synth~{i}~lead{i}"
+        members = [f"synth~{i}~m{j}" for j in range(nm)]
+        sols.append({
+            "name": f"lead{i}", "lead": lead, "lead_is_skill": True,
+            "members": members, "tier": "composed", "dom": "synth",
+            "bundle": "", "problem": "", "evidence": "",
+        })
+        rows.append({"key": lead, "n": f"lead{i}", "d": "", "dom": "synth",
+                     "bundle": ""})
+        for j, m in enumerate(members):
+            rows.append({"key": m, "n": f"m{i}x{j}", "d": "", "dom": "synth",
+                         "bundle": ""})
+    return sols, rows
+
+
+def test_growth():
+    """Placement must stay usable as the library grows (issue #24).
+
+    The conflict scan tested every placed cluster for every candidate at every
+    slack level, so the cost grew with the square of the Solution count: about
+    0.2s at 51 Solutions, 3.5s at 150, 30s at 300, 278s at 600. The scan now
+    reads a uniform grid of placed clusters instead, so a candidate only tests
+    its neighbourhood.
+
+    The assertions are the two properties that quadratic decay destroyed: the
+    layout still completes (LayoutTooTight is a raise, so completing at all is
+    the assertion), and no two leads land on one position — two leads at one
+    point means one of them cannot be clicked. The wall-clock ceiling is a
+    tripwire with an order of magnitude of headroom, not a performance budget:
+    it exists so a return to the full scan fails here in minutes rather than
+    passing after a coffee break.
+    """
+    for n, ceiling in ((300, 60.0), (600, 120.0)):
+        sols, rows = _synthetic_library(n)
+        t0 = time.perf_counter()
+        lay = compose.layout(sols, rows)
+        took = time.perf_counter() - t0
+        leads = [(nd["x"], nd["y"]) for nd in lay["nodes"] if nd["kind"] == "lead"]
+        dupes = len(leads) - len(set(leads))
+        check(f"{n} Solutions place without LayoutTooTight", len(leads) == n,
+              f"{len(leads)} leads placed")
+        check(f"{n} Solutions produce zero duplicate lead positions",
+              dupes == 0, f"{dupes} duplicated")
+        check(f"{n} Solutions place inside the {ceiling:.0f}s tripwire",
+              took < ceiling, f"took {took:.1f}s")
+
+
 def test_tiers(sols):
     """A weaker tier must never take a lead a stronger one already holds."""
     seen = {}
@@ -288,6 +342,8 @@ def main():
     print("tiers and stability")
     test_tiers(sols)
     test_determinism(rows, sols)
+    print("growth")
+    test_growth()
 
     print()
     if FAILURES:
