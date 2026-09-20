@@ -18,9 +18,10 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 STAGING = "https://mediumvioletred-coyote-692292.hostingersite.com/"
 PRODUCTION = "https://skills.ronald.ng"
+REFRESH = "m1-site-refresh-sources"
 WORKFLOW_NAMES = (
     "a2-site-deploy-staging", "b2-site-deploy-production", "s2-site-deploy",
-    "s3-site-verify", "s1-site-validate",
+    "s3-site-verify", "s1-site-validate", REFRESH,
 )
 CALLERS = {"staging": "a2-site-deploy-staging", "production": "b2-site-deploy-production"}
 SMOKE_COMMAND = 'node scripts/smoke.mjs "$SITE_URL" "$EXPECTED_SHA"'
@@ -28,6 +29,25 @@ TARGET_COMMAND = (
     'node site/scripts/check-deploy-target.mjs "$DEPLOY_ENVIRONMENT" "$SITE_URL"'
 )
 DELETE = object()
+
+# The scheduled site refresh. `build.py --refresh` moves the pins in
+# site/sources.json before later collection steps can fail, so the rebuild is
+# only trustworthy behind a pipefail guard and change detection that includes
+# the pins; and its GITHUB_TOKEN pull request only carries validation that ran
+# in the job itself, because such a pull request cannot trigger ci.
+CHANGED_GATE = "steps.rebuild.outputs.changed == 'true'"
+REBUILD_COMMAND = "python3 build.py --refresh --write | tee /tmp/build.log"
+CHANGE_DETECT = "git diff --quiet -- index.html data.js sources.json"
+REPOSITORY_CHECKS = (
+    "python3 scripts/lint_skills.py --self-test",
+    "python3 scripts/lint_skills.py",
+    "python3 scripts/generate_index.py --check",
+    "python3 scripts/sync_vendor.py --validate-manifest",
+    "python3 scripts/audit_third_party.py",
+    "python3 scripts/check_links.py",
+    "python3 scripts/check_solutions.py",
+)
+SITE_REPRODUCIBILITY_CHECK = "python3 site/build.py --check"
 
 
 class WorkflowLoader(yaml.SafeLoader):
@@ -116,6 +136,73 @@ def check_env(workflow, job, step, expected, label):
         require(env.get(name) == value, f"{label}: {name} must come from the input")
 
 
+def check_refresh_contract(workflow):
+    """Issues #54 and #55.
+
+    #54: `build.py --refresh` moves the pins in sources.json before later
+    collection steps can fail. Without pipefail, `build.py | tee` reports
+    tee's success, and change detection that ignores sources.json then ends
+    the run green with changed=false, discarding the re-pin with the runner.
+    #55: the pull request is opened by GITHUB_TOKEN, which cannot trigger the
+    ci workflow, so the gates a pull request to staging would run have to run
+    in this job, before the pull request is opened.
+    """
+    label = REFRESH
+    job = get_job(workflow, "refresh", label)
+    steps = job.get("steps", [])
+
+    rebuild = find_step(job, REBUILD_COMMAND, label)
+    blocking(rebuild, f"{label} rebuild")
+    lines = [line.strip() for line in rebuild.get("run", "").splitlines() if line.strip()]
+    require(lines and lines[0].startswith("set ") and "pipefail" in lines[0],
+            f"{label}: the rebuild must open with a pipefail guard, "
+            "or tee masks a failed build")
+    build_lines = [line for line in lines if REBUILD_COMMAND in line]
+    require(len(build_lines) == 1 and "|| true" not in build_lines[0],
+            f"{label}: the rebuild must run once and its failure must not be tolerated")
+    diff_lines = [line for line in lines if "git diff --quiet" in line]
+    require(len(diff_lines) == 1, f"{label}: expected exactly one change-detection diff")
+    for name in ("index.html", "data.js", "sources.json"):
+        require(re.search(rf"\b{re.escape(name)}\b", diff_lines[0]),
+                f"{label}: change detection must include {name}, or a moved pin "
+                "reports no upstream changes and is discarded")
+
+    pulls = [step for step in steps if "create-pull-request" in str(step.get("uses", ""))]
+    require(len(pulls) == 1, f"{label}: expected exactly one create-pull-request step")
+    pull_index = steps.index(pulls[0])
+    for gate_name, marker, commands in (
+        ("repository checks", "scripts/lint_skills.py --self-test", REPOSITORY_CHECKS),
+        ("site build reproducibility", SITE_REPRODUCIBILITY_CHECK,
+         (SITE_REPRODUCIBILITY_CHECK,)),
+    ):
+        step = find_step(job, marker, label)
+        require("continue-on-error" not in step,
+                f"{label} {gate_name}: continue-on-error is forbidden")
+        require(step.get("if", CHANGED_GATE) == CHANGED_GATE,
+                f"{label} {gate_name}: may only be skipped when nothing changed")
+        require(step.get("working-directory") == ".",
+                f"{label} {gate_name}: must run from the repository root; "
+                "the job default working-directory is site")
+        script = [line.strip() for line in step.get("run", "").splitlines()]
+        for command in commands:
+            require(command in script,
+                    f"{label} {gate_name}: must run {command} exactly as the "
+                    "existing workflows invoke it")
+        require(steps.index(step) < pull_index,
+                f"{label} {gate_name} must run before the pull request is opened")
+
+    with_block = pulls[0].get("with", {})
+    require(with_block.get("base") == "staging",
+            f"{label}: the pull request must keep targeting staging")
+    add_paths = with_block.get("add-paths", "")
+    if isinstance(add_paths, list):
+        add_paths = "\n".join(add_paths)
+    for path in ("site/index.html", "site/data.js", "site/sources.json"):
+        require(path in add_paths.split(), f"{label}: add-paths must keep {path}")
+    require(pulls[0].get("if", CHANGED_GATE) == CHANGED_GATE,
+            f"{label}: the pull request step may only be skipped when nothing changed")
+
+
 def check_contract(workflows):
     for environment, url in (("staging", STAGING), ("production", PRODUCTION)):
         workflow = workflows[CALLERS[environment]]
@@ -196,6 +283,8 @@ def check_contract(workflows):
             "aggregate gate must need deployment_contract")
     require(aggregate.get("if") in ("always()", "${{ always() }}"),
             "aggregate gate must run even when a required job fails")
+
+    check_refresh_contract(workflows[REFRESH])
 
 
 class WorkflowContractTests(unittest.TestCase):
@@ -368,6 +457,117 @@ class WorkflowContractTests(unittest.TestCase):
             with self.subTest(defect=key):
                 self.prove_mutation(f"aggregate gate {key}",
                                     ("s1-site-validate", "jobs", "gate", key), value, message)
+
+    def test_refresh_rebuild_cannot_swallow_a_build_failure(self):
+        path = self.step_path(REFRESH, "refresh", REBUILD_COMMAND)
+        original = self.workflows[REFRESH]["jobs"]["refresh"]["steps"][path[-1]]["run"]
+        lines = original.splitlines()
+        for defect, value, message in (
+            ("no shell guard", "\n".join(lines[1:]) + "\n", "pipefail guard"),
+            ("guard without pipefail", "\n".join(["set -eu", *lines[1:]]) + "\n",
+             "pipefail guard"),
+            ("tolerated failure",
+             original.replace(REBUILD_COMMAND, REBUILD_COMMAND + " || true"),
+             "failure must not be tolerated"),
+            ("build removed", "echo skipped",
+             f"must run {re.escape(REBUILD_COMMAND)} exactly once"),
+        ):
+            with self.subTest(defect=defect):
+                self.prove_mutation(f"rebuild {defect}", (*path, "run"), value, message)
+        for key, value, message in (
+            ("if", "false", "conditional skips are forbidden"),
+            ("continue-on-error", True, "continue-on-error is forbidden"),
+        ):
+            with self.subTest(defect=key):
+                self.prove_mutation(f"rebuild {key}", (*path, key), value, message)
+
+    def test_refresh_change_detection_covers_the_pins(self):
+        path = self.step_path(REFRESH, "refresh", REBUILD_COMMAND)
+        original = self.workflows[REFRESH]["jobs"]["refresh"]["steps"][path[-1]]["run"]
+        pin_blind = original.replace(CHANGE_DETECT,
+                                     "git diff --quiet -- index.html data.js")
+        self.prove_mutation(
+            "change detection drops sources.json", (*path, "run"), pin_blind,
+            r"change detection must include sources\.json",
+        )
+
+    def test_refresh_repository_checks_run_in_job_and_cannot_be_skipped(self):
+        path = self.step_path(REFRESH, "refresh", "scripts/lint_skills.py --self-test")
+        original = self.workflows[REFRESH]["jobs"]["refresh"]["steps"][path[-1]]["run"]
+        dropped = original.replace("python3 scripts/check_solutions.py\n", "")
+        tolerated = original.replace(
+            "python3 scripts/audit_third_party.py\n",
+            "python3 scripts/audit_third_party.py || true\n")
+        for defect, value, message in (
+            ("check dropped", dropped, r"must run python3 scripts/check_solutions\.py"),
+            ("check tolerated", tolerated, r"must run python3 scripts/audit_third_party\.py"),
+            ("step removed", "echo skipped",
+             r"must run scripts/lint_skills\.py --self-test exactly once"),
+        ):
+            with self.subTest(defect=defect):
+                self.prove_mutation(f"repository checks {defect}",
+                                    (*path, "run"), value, message)
+        for key, value, message in (
+            ("if", "false", "may only be skipped when nothing changed"),
+            ("continue-on-error", True, "continue-on-error is forbidden"),
+            ("working-directory", "site", "must run from the repository root"),
+            ("working-directory", DELETE, "must run from the repository root"),
+        ):
+            with self.subTest(defect=key):
+                self.prove_mutation(f"repository checks {key}",
+                                    (*path, key), value, message)
+
+    def test_refresh_reproducibility_gate_runs_in_job_and_cannot_be_skipped(self):
+        path = self.step_path(REFRESH, "refresh", "site/build.py --check")
+        original = self.workflows[REFRESH]["jobs"]["refresh"]["steps"][path[-1]]["run"]
+        for defect, value, message in (
+            ("invoked from the wrong directory",
+             original.replace(SITE_REPRODUCIBILITY_CHECK, "python3 build.py --check"),
+             r"must run python3 site/build\.py --check exactly once"),
+            ("tolerated failure",
+             original.replace(SITE_REPRODUCIBILITY_CHECK,
+                              SITE_REPRODUCIBILITY_CHECK + " || true"),
+             r"must run python3 site/build\.py --check exactly as"),
+            ("step removed", "echo skipped",
+             r"must run python3 site/build\.py --check exactly once"),
+        ):
+            with self.subTest(defect=defect):
+                self.prove_mutation(f"reproducibility gate {defect}",
+                                    (*path, "run"), value, message)
+        for key, value, message in (
+            ("if", "false", "may only be skipped when nothing changed"),
+            ("continue-on-error", True, "continue-on-error is forbidden"),
+            ("working-directory", "site", "must run from the repository root"),
+            ("working-directory", DELETE, "must run from the repository root"),
+        ):
+            with self.subTest(defect=key):
+                self.prove_mutation(f"reproducibility gate {key}",
+                                    (*path, key), value, message)
+
+    def test_refresh_pull_request_keeps_targeting_staging_and_the_pins(self):
+        steps = self.workflows[REFRESH]["jobs"]["refresh"]["steps"]
+        index = next(i for i, step in enumerate(steps)
+                     if "create-pull-request" in str(step.get("uses", "")))
+        path = (REFRESH, "jobs", "refresh", "steps", index)
+        self.prove_mutation("pull request targets main", (*path, "with", "base"),
+                            "main", "must keep targeting staging")
+        self.prove_mutation("add-paths drops sources.json", (*path, "with", "add-paths"),
+                            ["site/index.html", "site/data.js"],
+                            r"add-paths must keep site/sources\.json")
+        self.prove_mutation("pull request skip gate", (*path, "if"), "false",
+                            "may only be skipped when nothing changed")
+
+    def test_refresh_gates_run_before_the_pull_request_is_opened(self):
+        check_contract(self.workflows)  # the baseline must pass
+        changed = deepcopy(self.workflows)
+        steps = changed[REFRESH]["jobs"]["refresh"]["steps"]
+        pull = next(step for step in steps
+                    if "create-pull-request" in str(step.get("uses", "")))
+        steps.remove(pull)
+        steps.insert(0, pull)
+        with self.assertRaisesRegex(AssertionError, "before the pull request is opened"):
+            check_contract(changed)
+        print("PROVED refresh gates must precede the pull request", flush=True)
 
     def test_additional_jobs_do_not_overconstrain_the_contract(self):
         changed = deepcopy(self.workflows)
