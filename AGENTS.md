@@ -5,8 +5,10 @@ anything here.
 
 ## What this repository is
 
-A library of 470 skill files across 22 directories, 469 of which are linted; the difference is
-one deliberate test fixture. The skill files are instructions to another agent. The
+A library of 475 skill files across 23 directories, 474 of which are linted; the difference is
+one deliberate test fixture. The skill index in `README.md` is the authoritative count.
+`scripts/generate_index.py` regenerates it and CI checks it, so refresh these numbers there
+when the tree changes. The skill files are instructions to another agent. The
 `site/` directory also contains a static graph workspace with a deterministic build
 and browser tests. Every skill file is an instruction to some other agent, in a
 future session, with credentials you do not have. Write accordingly.
