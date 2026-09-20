@@ -1,0 +1,69 @@
+name: Agent task
+description: A scoped implementation ticket with acceptance and verification evidence
+title: "[Task] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A maintainer must triage this issue before an agent starts work.
+        Do not include credentials or confidential customer data.
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal and context
+      description: Describe the problem, observed behavior, and desired outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: traceability
+    attributes:
+      label: Requirements and decisions
+      description: Cite FR/NFR IDs, Epic/Feature/Story IDs, and TRD/ADR references. For UI work include UI/UX flow, wireframe screen and design-system component IDs; explain any not-applicable entries.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and boundaries
+      description: List allowed modules, non-goals, and changes requiring human approval.
+    validations:
+      required: true
+  - type: textarea
+    id: relationships
+    attributes:
+      label: Parent and blockers
+      description: Link the parent and blocking issues, or write None. Also set native relationships where available.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Use checkboxes with observable pass/fail outcomes, including relevant failure cases.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification and evidence
+      description: Give exact commands, test expectations, and required evidence or runtime checks.
+    validations:
+      required: true
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk
+      options:
+        - "Needs assessment"
+        - "Low"
+        - "Medium"
+        - "High: human-led review required"
+    validations:
+      required: true
+  - type: textarea
+    id: handoff
+    attributes:
+      label: Ownership and escalation
+      description: Name the responsible maintainer, escalation conditions, and known gaps. The dispatcher records the worker claim later.
+    validations:
+      required: true

@@ -1,223 +1,71 @@
 ---
 name: github-repository-setup
-description: "Audit and incrementally set up a GitHub repository with documented governance, quality gates, CI, releases, security, and deployment templates. Use when asked to bootstrap, standardize, or assess repository automation."
-disable-model-invocation: true
-argument-hint: "[checklist | preset | search query]"
+description: "Audit and configure GitHub repository governance, CI, security, and agentic development through Issues and PRs, integrating setup-matt-pocock-skills. Use for repository setup or standardization, including requests for setup-github-repository. For a new bundled project skeleton, use start-github-repo instead."
+metadata:
+  disable-model-invocation: true
+  argument-hint: "[plan | checklist | agentic | preset | search query]"
 ---
 
-# GitHub Repository Setup
+# GitHub repository setup
 
-> Adapted from [domelic/github-repository-setup](https://github.com/domelic/github-repository-setup).
-> See [ATTRIBUTION.md](ATTRIBUTION.md) for the pinned upstream snapshot and license.
+Adapted from [domelic/github-repository-setup](https://github.com/domelic/github-repository-setup).
+Preserve [ATTRIBUTION.md](ATTRIBUTION.md) and [LICENSE](LICENSE).
+Treat `setup-github-repository` as request wording, not a second skill.
 
-Use this skill to assess or improve a repository's GitHub configuration. It
-turns the upstream template catalog into a safe, incremental setup process:
-inspect first, recommend a small set of compatible changes, apply only after
-confirmation, and validate the result.
+## Modes and resources
 
-The upstream project provides templates and workflows as starting points, not
-drop-in production guarantees. Review every generated or imported workflow for
-the repository's language, permissions, secrets, deployment target, and
-compliance requirements before enabling it.
+- No argument or `plan`: inspect and draft the final repository plan first.
+- `checklist`: report gaps and settings evidence without writing.
+- `agentic`: configure GitHub Issues as tickets and PRs as delivery records.
+- `<preset>` or `search <query>`: use the upstream catalog.
 
-## Commands
+Read [references/planning.md](references/planning.md) first. Complex setup
+stops at the consolidated REPOSITORY-PLAN.md until approved.
+Read [references/catalog-setup.md](references/catalog-setup.md) for catalog
+presets, search, checksums, approvals and validation. For agentic setup, read
+[references/agentic-development.md](references/agentic-development.md) and
+[references/document-contract.md](references/document-contract.md) before
+planning documents and Epic/Feature/Story tickets. Before selecting MCP, LSP
+or skills, read [references/tooling.md](references/tooling.md). For unresolved
+setup decisions, use its conditional `grilling` process.
+Read [references/research.md](references/research.md) when comparing source
+behavior with this profile's safeguards.
 
-| Invocation | Purpose |
-| --- | --- |
-| `/github-repository-setup` | Assess the project and guide an incremental setup. |
-| `/github-repository-setup checklist` | Report missing setup elements by priority without changing files. |
-| `/github-repository-setup <preset>` | Plan or apply one named preset after confirmation. |
-| `/github-repository-setup search <query>` | Find upstream templates by metadata and keywords. |
+## Setup sequence
 
-Presets are composable. Do not assume that a broad preset bundle is appropriate:
-select the smallest set that meets the repository's current needs.
+1. Inspect remote, branches, instructions, docs, workflows, settings, installed
+   skills and actual test commands. Reuse existing document equivalents.
+2. Resolve scope. Keep GitHub Issues authoritative in the agentic profile.
+   Do not add Plane.so, tracker mirrors, sync credentials, or mandatory
+   GitHub Projects. Preserve existing branch and release conventions.
+3. Consolidate the final repository design and phased setup in REPOSITORY-PLAN.md.
+   Confirm changes; reuse approval for that exact scope, not unresolved choices.
+   `checklist` and `search` remain read-only.
+4. For agentic setup, run the installed `setup-matt-pocock-skills` first.
+   Apply the AGENTS.md-only override, preserve triage mappings, and follow the
+   missing-seed fallback. Do not duplicate its `## Agent skills` block.
+5. Apply documentation, issue/PR contracts, checks, and approved settings in
+   dependency order. Use [templates/agent-task.yml](templates/agent-task.yml)
+   for an agent issue form, [templates/pull-request.md](templates/pull-request.md)
+   for the PR contract, and [templates/agent-docs.md](templates/agent-docs.md)
+   for agent configuration. Merge existing files and resolve template values.
+   Create the Agent.md roles contract and Agent-Protocol.md execution entry.
+   Do not create Claude instruction files or configure Claude integrations.
+   For CodeGraph setup, read [references/codegraph.md](references/codegraph.md);
+   verify its pinned install, exclusions, freshness and client queries.
+6. Validate using [references/validation.md](references/validation.md).
+   Before copying templates, run `python3 scripts/test_bundle.py` from this
+   skill directory with PyYAML installed to check the package.
+   Record commands, results and checked commit; distinguish local and live tests.
+7. Hand off files, issue/PR URLs, effective settings, checks, deferred work,
+   and remaining approvals. Written policy is not proof of enforcement.
 
-## Operating principles
+## Example
 
-- Inspect the repository and existing settings before proposing changes.
-- Preserve existing configuration. Merge deliberately; never overwrite a
-  workflow, ignore file, package manifest, or policy document without explicit
-  approval and a clear diff.
-- Ask before enabling repository settings, adding GitHub Actions workflows,
-  creating labels, configuring branch protection, or introducing any service
-  integration.
-- Use least-privileged workflow permissions and GitHub-native OIDC where a
-  cloud provider supports it. Do not place credentials in repository files.
-- Prefer established project commands for build, lint, test, and release
-  validation. Do not invent commands only to satisfy a template.
-- Pin every downloaded upstream template to an immutable release tag or commit,
-  fetch its matching checksum manifest, and verify the digest before use.
-- Explain required repository secrets and variables by name, purpose, scope,
-  and where to configure them. Never request or expose secret values.
+Input: "Set up this repo for agents like AI-CMO, without Plane."
 
-## Guided setup
-
-### 1. Inspect and classify
-
-Identify the primary project type from its files and existing automation:
-
-| Signals | Likely project type |
-| --- | --- |
-| `package.json` | Node.js or JavaScript/TypeScript |
-| `pyproject.toml`, `requirements.txt` | Python |
-| `go.mod` | Go |
-| `Cargo.toml` | Rust |
-| `pom.xml`, `build.gradle` | Java/JVM |
-| `Gemfile` | Ruby |
-| `composer.json` | PHP |
-| `*.csproj`, `*.sln` | .NET |
-| `pubspec.yaml` | Flutter |
-| `main.tf` | Terraform |
-
-Also inventory documentation, issue and pull-request templates, existing
-workflows, dependency update tooling, release configuration, deployment
-targets, branch rules, package registries, and the project's actual validation
-commands. Treat the existing repository as the source of truth.
-
-### 2. Establish requirements
-
-Confirm only the decisions that affect the proposed files:
-
-1. Project type and supported runtime or platform versions.
-2. Whether the repository is a library, application, service, documentation
-   site, internal tool, or infrastructure project.
-3. Release strategy: no automation, Release Please, or a separately approved
-   release process.
-4. Deployment and publishing targets, if any.
-5. Security baseline: GitHub-native scanning only, extra scanners, or no new
-   scanners.
-6. Required integrations such as notifications, observability, code coverage,
-   documentation publishing, or a package registry.
-
-Ask follow-up questions only when inspection cannot answer them. Present the
-candidate files, permissions, triggers, and required secrets before applying
-anything.
-
-### 3. Select a minimal preset set
-
-Use language presets for language-specific CI and package publishing:
-`nodejs`, `python`, `go`, `rust`, `java`, `ruby`, `php`, `dotnet`, `android`,
-`ios`, `flutter`, `react-native`, or `terraform`.
-
-Add category presets only when required:
-
-| Category | Typical coverage |
-| --- | --- |
-| `docs` | Contribution, security, release, ownership, and citation documents |
-| `editor` | Editor settings, formatting, and development container configuration |
-| `protection` | Branch protection guidance and CODEOWNERS |
-| `issues` | Issue forms, pull-request templates, labels, and discussions |
-| `quality` | Commit, spelling, link, Markdown, and pre-commit checks |
-| `releases` | Conventional commits and Release Please |
-| `security` | Dependency review, CodeQL, SBOM, and supply-chain checks |
-| `deploy` | Deployment workflow for an approved platform |
-| `testing` | E2E, accessibility, visual, load, or contract testing |
-| `bots` | Stale, welcome, or auto-label workflows |
-| `notifications` | Slack, Discord, Teams, or other approved notifications |
-| `monorepo` | Workspace-aware CI and release configuration |
-
-Specialized upstream presets cover areas such as Kubernetes, cloud deployment,
-OpenAPI, Storybook, ML, games, Web3, browser extensions, desktop software,
-embedded software, DAST, and mobile publishing. Search the upstream metadata
-before selecting one instead of guessing its template names or requirements.
-
-### 4. Retrieve and review templates
-
-For a selected upstream version:
-
-1. Retrieve `templates/presets.yaml` to confirm destination mappings,
-   compatibility constraints, and required secrets.
-2. Search `templates/template-index.yaml` and workflow metadata when the user
-   requests a capability rather than a known preset.
-3. Retrieve only the selected templates and the matching
-   `templates/checksums.json`.
-4. Verify SHA-256 checksums before copying a template into the repository.
-5. Diff each template against the destination and adapt it to the detected
-   language, package manager, branch names, and deployment model.
-6. Review action versions, workflow `permissions`, trigger scope, untrusted
-   pull-request behavior, and all references to secrets or repository
-   variables.
-
-Never install a template merely because it appears in a preset. Omit optional
-workflows that the project cannot run or maintain.
-
-### 5. Apply in dependency order
-
-After approval, work in small, reviewable groups:
-
-1. Documentation and ownership
-2. Editor and repository hygiene configuration
-3. Issue and pull-request collaboration files
-4. Quality checks and language-specific CI
-5. Dependency maintenance and security checks
-6. Release automation
-7. Deployment, publishing, bots, and integrations
-
-For each group, identify required manual GitHub settings separately from
-versioned repository files. Before enabling a workflow, confirm that any
-referenced environment, branch protection rule, variable, secret, permission,
-or external account already exists or has a documented owner.
-
-### 6. Validate and hand off
-
-Run the repository's existing formatter, linter, build, and test commands that
-the changes affect. Validate workflow YAML and configuration syntax where
-project tooling supports it. Check that:
-
-- workflow triggers do not create loops or run privileged operations from
-  untrusted code;
-- the CI matrix matches supported versions;
-- publishing and deployment steps are gated to the intended branch, tag, or
-  environment;
-- security scanners have the permissions and event coverage they require;
-- all documented secrets are configured outside version control; and
-- manual GitHub settings have an explicit owner and verification step.
-
-Summarize the applied files, pending manual actions, required secrets and
-variables, validation performed, and intentionally deferred presets.
-
-## Checklist mode
-
-Report findings under these headings without changing repository settings:
-
-1. **Essential:** a clear README, license, contribution and security guidance,
-   working CI, and a dependency-update strategy.
-2. **Recommended:** ownership and review rules, issue and pull-request
-   templates, formatting and quality checks, release documentation, and
-   appropriate security scanning.
-3. **Optional:** automated releases, deployment, publishing, notifications,
-   observability, advanced testing, documentation publishing, and specialized
-   integrations.
-
-For each missing item, state why it matters, whether it is already covered by
-an equivalent local solution, the smallest appropriate upstream preset, and
-any manual configuration it would require.
-
-## Search mode
-
-Search the upstream template metadata with these filters, combining filters
-with a quoted or unquoted text query when useful:
-
-| Filter | Example |
-| --- | --- |
-| `language:<name>` | `language:python` |
-| `type:<name>` | `type:workflow` |
-| `category:<name>` | `category:security` |
-| `complexity:<level>` | `complexity:starter` |
-| `platform:<name>` | `platform:docker` |
-| text query | `"bundle size"` |
-
-Group results by workflow, configuration, devcontainer, gitignore,
-documentation template, or hook. Include each candidate's source path,
-destination, trigger, permissions, external integrations, and required
-secrets before recommending it.
-
-## Upstream resources
-
-- [Repository and guide](https://github.com/domelic/github-repository-setup)
-- [Template directory](https://github.com/domelic/github-repository-setup/tree/main/templates)
-- [Preset definitions](https://github.com/domelic/github-repository-setup/blob/main/templates/presets.yaml)
-- [Template index](https://github.com/domelic/github-repository-setup/blob/main/templates/template-index.yaml)
-- [Workflow metadata](https://github.com/domelic/github-repository-setup/blob/main/templates/workflows/workflow-metadata.yaml)
-- [Compatibility matrix](https://github.com/domelic/github-repository-setup/blob/main/docs/reference/COMPATIBILITY_MATRIX.md)
-- [Template customization guide](https://github.com/domelic/github-repository-setup/blob/main/docs/guides/TEMPLATE_CUSTOMIZATION.md)
+Output: an approved setup PR containing the PRD/TRD, TOGAF ADM, TDD, design
+system, UI/UX and wireframe contracts, Epic/Feature/Story hierarchy, agent
+roles/protocol, CodeGraph/tooling decisions, issue/PR templates and settings
+evidence. No tracker mirror, Claude configuration, agent runtime or production
+deployment is enabled by this request alone.

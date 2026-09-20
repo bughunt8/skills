@@ -57,6 +57,9 @@ jobs:
       - name: Lint every SKILL.md
         run: python3 scripts/lint_skills.py
 
+      - name: Test GitHub setup skill contracts and templates
+        run: python3 skills/engineering/github-repository-setup/scripts/test_bundle.py
+
       # The README used to carry hand-counted totals; three of them were wrong.
       # The counts are generated now, and this step proves nobody bypassed it.
       - name: Check the generated skill index is current
