@@ -11,7 +11,9 @@ name: M1 site refresh upstream sources
 # Credentials: none beyond the automatic GITHUB_TOKEN, which is scoped to this
 # repository and cannot deploy anything. The PR targets staging, not main, so an
 # upstream change reaches production only through the normal promotion, and it
-# still has to pass CI and be reviewed like any other change.
+# still has to be reviewed like any other change. A pull request opened by
+# GITHUB_TOKEN cannot trigger the ci workflow, so this job runs the same gates
+# itself, before the pull request is opened, as sync-vendored-skills.yml does.
 
 on:
   schedule:
@@ -40,19 +42,55 @@ jobs:
         with:
           python-version: "3.12"
 
+      # The repository checks below need PyYAML, exactly as a0-skills-checks
+      # installs it, so lint_skills.py parses real YAML instead of refusing it.
+      - name: Install PyYAML
+        run: python3 -m pip install --quiet 'PyYAML==6.0.2'
+
       # --refresh clones each source in sources.json at its current tip rather
       # than reusing anything cached, so the rebuild reflects upstream today.
+      # pipefail is load-bearing: --refresh moves the pins in sources.json
+      # before later collection steps can fail, and without it tee's exit
+      # status masks the failure and a half-refreshed tree reports "no changes".
       - name: Rebuild from the upstream repositories
         id: rebuild
         run: |
+          set -euo pipefail
           python3 build.py --refresh --write | tee /tmp/build.log
-          if git diff --quiet -- index.html data.js; then
+          if git diff --quiet -- index.html data.js sources.json; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "no upstream changes"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            git --no-pager diff --stat -- index.html data.js
+            git --no-pager diff --stat -- index.html data.js sources.json
           fi
+
+      # The same gates a pull request to staging would run. They run here
+      # because a pull request opened by GITHUB_TOKEN cannot start ci, so this
+      # is the only place the result is real. A failure here stops the pull
+      # request being opened.
+      - name: Run the repository checks
+        if: steps.rebuild.outputs.changed == 'true'
+        working-directory: .
+        run: |
+          set -euo pipefail
+          python3 scripts/lint_skills.py --self-test
+          python3 scripts/lint_skills.py
+          python3 scripts/generate_index.py --check
+          python3 scripts/sync_vendor.py --validate-manifest
+          python3 scripts/audit_third_party.py
+          python3 scripts/check_links.py
+          python3 scripts/check_solutions.py
+
+      # The reproducibility gate from s1-site-validate, against the new pins:
+      # it re-clones every source at the pin --refresh just wrote and proves
+      # the committed page is the one those pins produce.
+      - name: Verify the build is reproducible from the new pins
+        if: steps.rebuild.outputs.changed == 'true'
+        working-directory: .
+        run: |
+          set -euo pipefail
+          python3 site/build.py --check
 
       - name: Record what moved
         if: steps.rebuild.outputs.changed == 'true'
@@ -73,8 +111,9 @@ jobs:
             echo "Counts, attribution and licences are regenerated from the source trees, so"
             echo "the figures on the page cannot drift from what is actually in them."
             echo
-            echo "CI must pass before this merges: build reproducibility, HTML validity,"
-            echo "secret scan, and the browser suite."
+            echo "A pull request opened by \`GITHUB_TOKEN\` cannot trigger the \`ci\`"
+            echo "workflow, so these ran in this job and passed before it was opened:"
+            echo "the repository checks, and build reproducibility against the new pins."
           } > /tmp/pr-body.md
           cat /tmp/pr-body.md
 

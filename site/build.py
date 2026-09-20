@@ -597,7 +597,9 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
         members = net["members"][cid]
         xs = [pos[m][0] for m in members]
         ys = [pos[m][1] for m in members]
-        cx = round(sum(xs) / len(xs), 1)
+        # fsum for the same reason as the rings above: the centroid must not
+        # depend on the Python version that built the page.
+        cx = round(math.fsum(xs) / len(xs), 1)
         top = round(min(ys) - 9.0, 1)
         label = labels_by_cid[cid]
         spot = community_spots.get(cid)
@@ -631,8 +633,10 @@ def render_network(net: dict, graph: dict, comm: dict, rows: list, sols: list) -
                 "label": network.label_community(members, by_key, graph),
                 "size": len(members),
                 "hub": by_key[hub]["n"],
-                "x": round(sum(pos[key][0] for key in members) / len(members), 1),
-                "y": round(sum(pos[key][1] for key in members) / len(members), 1),
+                # fsum, as above: these centroids ship in data.js and must
+                # not depend on the Python version that built the page.
+                "x": round(math.fsum(pos[key][0] for key in members) / len(members), 1),
+                "y": round(math.fsum(pos[key][1] for key in members) / len(members), 1),
             }
         )
 

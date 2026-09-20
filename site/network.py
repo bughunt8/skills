@@ -924,7 +924,12 @@ def place_community_labels(
             break
         mine = members[cid]
         label = labels[cid]
-        cx = sum(pos[m][0] for m in mine) / len(mine)
+        # math.fsum, not builtin sum(): 3.12 sums floats with Neumaier
+        # compensation and can differ from 3.10's naive addition in the last
+        # ulp — enough to flip a x.x5 rounding in the emitted label and fail
+        # the reproducibility gate on whatever Python the runner installs.
+        # fsum is exactly rounded, so every version computes the same centre.
+        cx = math.fsum(pos[m][0] for m in mine) / len(mine)
         top = min(pos[m][1] for m in mine)
         bottom = max(pos[m][1] for m in mine)
         options = [
