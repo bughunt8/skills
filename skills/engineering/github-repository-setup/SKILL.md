@@ -21,6 +21,8 @@ Treat `setup-github-repository` as request wording, not a second skill.
 
 Read [references/planning.md](references/planning.md) first. Complex setup
 stops at the consolidated REPOSITORY-PLAN.md until approved.
+Before designing the tree, read [references/repository-structure.md](references/repository-structure.md).
+Draft the plan with [templates/repository-plan.md](templates/repository-plan.md).
 Read [references/catalog-setup.md](references/catalog-setup.md) for catalog
 presets, search, checksums, approvals and validation. For agentic setup, read
 [references/agentic-development.md](references/agentic-development.md) and
@@ -62,10 +64,6 @@ behavior with this profile's safeguards.
 
 ## Example
 
-Input: "Set up this repo for agents like AI-CMO, without Plane."
-
-Output: an approved setup PR containing the PRD/TRD, TOGAF ADM, TDD, design
-system, UI/UX and wireframe contracts, Epic/Feature/Story hierarchy, agent
-roles/protocol, CodeGraph/tooling decisions, issue/PR templates and settings
-evidence. No tracker mirror, Claude configuration, agent runtime or production
-deployment is enabled by this request alone.
+"Set up this repo like AI-CMO, without Plane" produces a consolidated plan,
+then an approved setup PR. No Claude configuration, tracker mirror, agent
+runtime or production deployment is implicitly enabled.

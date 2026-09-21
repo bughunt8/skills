@@ -117,5 +117,34 @@ class SetupSkillPackage(unittest.TestCase):
                        "Final target tree", "authorized phases"):
             self.assertIn(phrase, text)
 
+    def test_repository_structure_baseline(self):
+        text = " ".join(self.text("references/repository-structure.md").split())
+        for item in (".editorconfig", ".gitattributes", ".gitignore", ".env.example",
+                     "CONTRIBUTING.md", "SECURITY.md", "CODEOWNERS", "CHANGELOG.md",
+                     "dependabot.yml", "getting-started/", "guides/", "reference/",
+                     "runbooks/", "config.yml", "generated", "not applicable"):
+            self.assertIn(item, text)
+        self.assertIn("Existing equivalent files satisfy", text)
+        self.assertIn("No placeholder URLs", text)
+
+    def test_template_adoption_safety(self):
+        text = " ".join(self.text("references/repository-structure.md").split())
+        for rule in ("disabled by default", "continue-on-error", "read-only checks",
+                     "not a security boundary", "does not auto-commit",
+                     "do not generate npm, pnpm and Yarn locks",
+                     "never replace authorship", "synthetic detector fixtures",
+                     "does not vendor"):
+            self.assertIn(rule.lower(), text.lower())
+
+    def test_repository_plan_template(self):
+        text = " ".join(self.text("templates/repository-plan.md").split())
+        for item in ("Status: draft", "Final target structure", "Phased setup",
+                     "Epic", "Feature", "Story", "TOGAF", "TDD", "UI-UX.md",
+                     "Agent-Protocol.md", "CodeGraph", "Penpot", "Rollback",
+                     "Secret", "Approval record", "stop here", "delta approval"):
+            self.assertIn(item.lower(), text.lower())
+        self.assertIn("no CLAUDE.md/Claude.md".lower(), text.lower())
+        self.assertIn("No Plane.so", text)
+
 
 unittest.main(verbosity=2)

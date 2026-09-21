@@ -22,6 +22,10 @@ can guide checks but does not itself implement locks, rulesets, or CI.
    Do not add successful placeholder checks when a runtime is absent.
 6. Review the full diff for overwritten files, unapproved integrations,
    copied product assumptions, credentials, and unintended release changes.
+7. Check the repository-structure inventory and generated plan against actual
+   files. Verify canonical docs are linked rather than copied, safe issue
+   intake routes resolve, generated outputs remain regenerable, and required
+   security checks do not pass vacuously.
 
 ## Behavioral test cases
 
@@ -63,6 +67,13 @@ record them as walkthroughs, not as executed integration tests.
 | Companion spec skill auto-labels readiness | Override shortcut; require maintainer-approved Story readiness |
 | Complex setup has no approved final repository plan | Stop after drafting REPOSITORY-PLAN.md; no scaffolding, installs or remote changes |
 | An approved phase reveals new permissions or integration | Amend the plan and obtain delta approval before proceeding |
+| Template ignores an existing source directory such as site/ | Retain source tracking; tailor generated-output rules |
+| Secret scanner ignores all Markdown or tests | Reject broad exception; prove detector coverage with synthetic fixtures |
+| Required scanner fails under continue-on-error | Gate is not enforced; fail required scan errors |
+| Bot branch name requests auto-merge | No implicit merge authority |
+| Documentation deploy wants to rewrite and push source | Move edits to a reviewed PR; deploy built artifacts only |
+| Template sync overwrites agent policy or project requirements | Refuse overwrite; explicit diff and approval required |
+| Issue chooser has placeholder or disabled support destinations | Setup incomplete until verified or omitted |
 
 ## Live verification and handoff
 

@@ -32,12 +32,17 @@ into a large interview or demand enterprise documents full of filler.
 ## REPOSITORY-PLAN.md contract
 
 Include all of the following, tailored to the actual repository:
+Use `templates/repository-plan.md` as the drafting seed and
+`references/repository-structure.md` to classify baseline and optional files.
 
 1. Goal, scope/non-goals, project type, current-state findings and constraints.
    Record no Plane.so and no Claude files/configuration.
 2. Final target tree with purpose, owner and status for every planned file
    group. Map existing paths to required contracts; show create, merge,
    retain, move or defer. No silent destructive replacements.
+   Include repository hygiene, contributor intake, documentation navigation,
+   language-specific layout and maintenance ownership. Do not create empty
+   directories merely to match a template.
 3. Document plan: PRD, TRD, TOGAF ADM, TDD, Epic/Feature/Story hierarchy,
    DESIGN.md, DESIGN-SYSTEM.md, UI-UX.md, WIREFRAME.md, ADRs and traceability.
    Record approved not-applicable entries with reasons, not omissions.
@@ -62,6 +67,8 @@ Include all of the following, tailored to the actual repository:
     Mark estimates and unverified capabilities as such.
 11. Approval record: plan revision, agreed scope, exclusions, authorized
     phases and decisions. Leave approver/date pending until actually approved.
+    List optional bots, sync, release and documentation publishing separately;
+    none is implicitly enabled by selecting the baseline structure.
 
 The plan describes the final repository, including setup work not performed
 in the first phase. It is not a substitute for the eventual PRD/TRD or proof

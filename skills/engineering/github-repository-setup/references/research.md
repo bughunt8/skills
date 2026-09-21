@@ -72,3 +72,37 @@ CodeGraph guidance uses the
 The installer configures agent clients separately from per-project indexing
 and can modify client permissions, so this profile requires a scoped,
 non-Claude configuration review rather than unrestricted auto-install.
+
+## ops4life repository structure
+
+Reviewed 2026-09-21 at upstream commit
+`b4d6af17afe592eeffb7364fa9d155690fabe60d`. The
+[repository-structure reference](https://ops4life.github.io/github-repo-template/reference/repository-structure/)
+adds a useful inventory of editor/Git hygiene, contributor intake, documentation
+navigation, hooks, maintenance and language-specific configuration. Adopt these
+as explicit plan decisions in `repository-structure.md`, not as an unconditional
+file bundle. The new `templates/repository-plan.md` records the tailored result.
+
+The implementation snapshot warrants stricter defaults:
+
+- Its [Gitleaks configuration](https://github.com/ops4life/github-repo-template/blob/b4d6af17afe592eeffb7364fa9d155690fabe60d/.gitleaks.toml)
+  excludes Markdown/text/reStructuredText paths and common credential patterns.
+  Do not copy these broad exemptions; documentation is part of the secret-scan scope.
+- Its [CodeQL workflow](https://github.com/ops4life/github-repo-template/blob/b4d6af17afe592eeffb7364fa9d155690fabe60d/.github/workflows/codeql.yaml)
+  sets `continue-on-error` on initialization, autobuild and analysis. This is
+  not an acceptable enforced security gate for the target profile.
+- Its [auto-merge workflow](https://github.com/ops4life/github-repo-template/blob/b4d6af17afe592eeffb7364fa9d155690fabe60d/.github/workflows/automerge.yml)
+  enables auto-merge for branch-name patterns or Dependabot. Its
+  [stale workflow](https://github.com/ops4life/github-repo-template/blob/b4d6af17afe592eeffb7364fa9d155690fabe60d/.github/workflows/stale.yaml)
+  uses seven days to stale and three more to close, with branch deletion.
+  Neither is adopted as a default in this issue-evidence workflow.
+- Its [template-sync workflow](https://github.com/ops4life/github-repo-template/blob/b4d6af17afe592eeffb7364fa9d155690fabe60d/.github/workflows/template-repo-sync.yaml)
+  tracks upstream main, uses a workflow token and force-pushes its PR branch.
+  Adopt only opt-in, pinned, reviewed updates through the target's existing
+  provenance mechanism, protecting project-specific contracts.
+
+The repository clone was used to inspect file bodies where GitHub web
+extraction omitted them. These are snapshot findings, not claims about an
+exploited vulnerability or every future upstream revision. The new instructions
+and plan template are original synthesis; no upstream files are copied,
+vendored or activated by this change.
