@@ -143,6 +143,9 @@ Completion boundary: REPLACE_WITH_INTEGRATED_STAGING_VERIFIED_OR_RELEASED
 
 1. Read the ticket, requirements, context, and cited ADRs. Start only when
    triaged for agents, unblocked, and granted by the dispatcher.
+   Review affected architecture coverage IDs and quantitative NFR acceptance.
+   Unresolved/deferred implementation prerequisites block pickup. Discovery
+   work needs its own approved scope, not a false implementation-ready label.
 2. The single dispatcher records issue, worker/session, timestamp, branch,
    and base SHA before handing off. An assignee is not an atomic lock.
    Do not allow competing dispatchers without a tested atomic lease.

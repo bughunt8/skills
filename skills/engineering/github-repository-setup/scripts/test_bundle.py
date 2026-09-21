@@ -2,6 +2,7 @@
 import pathlib
 import re
 import sys
+import subprocess
 import unittest
 
 import yaml
@@ -35,10 +36,29 @@ class SetupSkillPackage(unittest.TestCase):
         self.assertGreater(count, 10)
 
     def test_hub_routes_every_runtime_resource(self):
-        hub = self.text("SKILL.md")
+        # Progressive disclosure: every resource must be reachable from the hub.
+        visited = set()
+        pending = [ROOT / "SKILL.md"]
+        while pending:
+            path = pending.pop().resolve()
+            if path in visited:
+                continue
+            visited.add(path)
+            if path.suffix != ".md":
+                continue
+            for target in re.findall(r"\[[^\]]+\]\(([^)\s]+)\)", path.read_text()):
+                if not target.startswith(("https://", "http://", "#")):
+                    pending.append(path.parent / target.split("#")[0])
         for directory in ("references", "templates"):
             for path in (ROOT / directory).iterdir():
-                self.assertIn(str(path.relative_to(ROOT)), hub)
+                self.assertIn(path.resolve(), visited, str(path))
+
+    def test_architecture_register_behavior(self):
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "scripts/test_architecture_register.py")],
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_original_attribution_and_license(self):
         self.assertIn("Damir Omelic", self.text("ATTRIBUTION.md"))

@@ -18,7 +18,7 @@ body:
     id: traceability
     attributes:
       label: Requirements and decisions
-      description: Cite FR/NFR IDs, Epic/Feature/Story IDs, and TRD/ADR references. For UI work include UI/UX flow, wireframe screen and design-system component IDs; explain any not-applicable entries.
+      description: Cite FR/NFR IDs, Epic/Feature/Story IDs, architecture coverage IDs and TRD/ADR references. Give quantitative quality thresholds and affected unresolved/deferred decisions. For UI work include flow, wireframe screen and design-system component IDs; explain exclusions.
     validations:
       required: true
   - type: textarea

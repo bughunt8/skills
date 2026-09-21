@@ -123,6 +123,9 @@ Every agent-ready issue needs:
 - Testable acceptance criteria, exact validation commands, and evidence.
 - Parent and blockers, risk classification, and human escalation conditions.
 - Ownership and handoff state, including unfinished work.
+- Architecture coverage IDs, workload/NFR thresholds and the reviewed impact
+  set from [system-design.md](system-design.md). Unresolved/deferred affected
+  implementation decisions block pickup; unrelated decisions do not.
 
 Use labels for triage, type, risk, and area. Optional GitHub Projects can show
 Backlog, Ready, In progress, In review, Verified, and Done, but must not become

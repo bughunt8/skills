@@ -4,6 +4,12 @@ Read this before generating the document plan or backlog. These are required
 contracts, not a list of empty files. Reuse established equivalent paths and
 record the mapping in README and the traceability document.
 
+Apply [system-design.md](system-design.md) to architecture coverage. Require the
+81-topic plus 16-domain register and workload/NFR worksheet, using TRD sections
+or proportionate linked architecture files. Each affected Story/PR maps decision
+IDs to requirements, hierarchy, tests and revision-specific evidence. Names of
+folders or accepted decisions alone do not establish implementation readiness.
+
 ## Required document set
 
 | Artifact | Minimum useful content | Acceptance check |

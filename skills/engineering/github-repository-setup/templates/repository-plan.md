@@ -44,6 +44,25 @@ Map requirement -> Epic -> Feature -> Story -> ADR/design/test -> PR -> evidence
 Tailor Preliminary and ADM A-H plus continuous Requirements Management.
 Define Story readiness, real red/green evidence and documented test exceptions.
 
+## Architecture coverage and quality decisions
+
+Embed the [workload/NFR worksheet](workload-nfr.md) and the reviewed
+[coverage register](architecture-register.md), covering all 81 original
+considerations and 16 additional domains from the
+[catalog](architecture-catalog.yml). Map existing TRD/ADRs instead of creating
+duplicate authority. In the final project replace these template-relative links
+with the canonical project paths.
+
+Record applicability, rationale, alternatives, selected approach, owner,
+approval, FR/NFR and Epic/Feature/Story links, tests, evidence, implementation
+state and revisit conditions. Accepted is not implemented or verified.
+Identify affected-work blockers and separately authorized discovery.
+List triggered patterns and their simpler alternatives; do not install every
+technology. Include operational, security, recovery and release evidence gates.
+
+Before selecting tools, distinguish development agents from product AI.
+CodeGraph/LSP/GitHub MCP alone do not require AI runtime architecture.
+
 ## Agent operating model
 
 AGENTS.md is the instruction entry; Agent.md defines roles; Agent-Protocol.md

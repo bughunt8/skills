@@ -46,6 +46,10 @@ Use `templates/repository-plan.md` as the drafting seed and
 3. Document plan: PRD, TRD, TOGAF ADM, TDD, Epic/Feature/Story hierarchy,
    DESIGN.md, DESIGN-SYSTEM.md, UI-UX.md, WIREFRAME.md, ADRs and traceability.
    Record approved not-applicable entries with reasons, not omissions.
+   Apply [system-design.md](system-design.md): workload/NFR worksheet, all
+   81 considerations plus 16 additional domains, architecture decisions,
+   conditional patterns and impacted-work readiness. Embed drafts here until
+   supporting documents are approved. Distinguish product AI from agent tools.
 4. Agent operating model: AGENTS.md, Agent.md, Agent-Protocol.md, one canonical
    protocol, dispatcher/claim mechanism, roles, permissions and escalation.
 5. GitHub workflow: logical IDs, parent/child/blocking relationships, labels,

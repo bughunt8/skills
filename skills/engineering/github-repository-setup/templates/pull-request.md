@@ -15,6 +15,9 @@ Link follow-up issues for gaps. Do not mark incomplete criteria as passed.
 Include Epic, Feature and Story IDs. For UI changes, link the UI/UX flow,
 wireframe screen, and design-system tokens/components. Record affected
 TOGAF ADM decisions and the TDD red/green evidence or approved exception.
+List affected architecture coverage IDs, NFR thresholds and decision changes.
+Separate accepted, implemented and verified status; link the reviewed impact
+set and disclose unresolved/deferred dependencies instead of claiming readiness.
 
 ## Verification evidence
 
@@ -22,6 +25,8 @@ TOGAF ADM decisions and the TDD red/green evidence or approved exception.
 - Commands and exit codes:
 - Actual output or sanitized durable artifact/run URL:
 - Failure-case tests:
+- NFR/load/security/recovery or AI-evaluation results, where applicable:
+- Evidence environment and revision; stale evidence requiring renewal:
 - Integration/deployment verification still required:
 
 ## Architecture and risk

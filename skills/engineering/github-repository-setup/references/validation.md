@@ -5,6 +5,16 @@ can guide checks but does not itself implement locks, rulesets, or CI.
 
 ## Local validation
 
+For architecture registers, follow
+[system-design.md](system-design.md) and the
+[register commands](../templates/architecture-register.md). Run the bundled
+`scripts/test_architecture_register.py` as well as `scripts/test_bundle.py`
+before using this package. The latter invokes the former for CI coverage.
+Verify completeness (81 original plus 16 additional domains), duplicate and
+invalid IDs, reasoned exclusions, decision/implementation separation and
+impacted-Story/release gates. These are structural checks, not proof of actual
+approval, genuine evidence, complete impact analysis or sound architecture.
+
 1. Parse frontmatter and issue-form YAML. Check unique field IDs, required
    acceptance/evidence fields, referenced resources, and no unresolved
    template values in generated target files.
