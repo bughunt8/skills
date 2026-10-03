@@ -1,0 +1,25 @@
+{
+  "reviewer": "Illustrative reviewer, not real authorization",
+  "reviewed_at": "2026-10-03T00:00:00Z",
+  "phase": "pre-build",
+  "base": "Demo baseline: supplied example, not a git comparison",
+  "diff": "Example intent only; no real implementation review or PR claimed",
+  "summary": "DEMONSTRATION. Planned and supplied green artifacts align structurally. Real approval and actual red evidence are absent; no production authorization or compliance claimed.",
+  "blockers": [],
+  "checks": {
+    "scope": "One local message preview capability; no transport or UI.",
+    "ears": "Example EARS describes externally observable outcomes only.",
+    "traceability": "Three requirements map to two invariants, one observation, one task.",
+    "contracts": "Caller owns the local function-input boundary; exact output fields are planned.",
+    "security_positive": "Acceptance assertion intent is present; no real run evidence attached.",
+    "security_negative": "Empty-input and confidentiality violation assertions are present.",
+    "tests": "Supplied green tests illustrate intent. Actual red history is not claimed.",
+    "observability": "Returned event allowlist excludes raw message contents.",
+    "simplicity": "Plain function, no extra dependencies, no framework.",
+    "drift": "No production code comparison asserted; named fixture files are hash-bound.",
+    "ui": "N/A: this fixture has no user interface or UI telemetry."
+  },
+  "scope_files": ["app.py", "tests/test_app.py"],
+  "implementation_files": ["app.py"],
+  "evidence": ["evidence/review.txt"]
+}

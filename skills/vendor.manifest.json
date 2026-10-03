@@ -143,6 +143,34 @@
         "Only the skill is vendored. Upstream also ships tool-specific integrations this library does not use: Claude, Codex, Cursor and Gemini plugin manifests, an OpenCode command and JS plugin, TypeScript extensions under extensions/, and an eval harness under evals/. None are needed to load the skill, and several would require a Node or TypeScript toolchain this repository does not run.",
         "Upstream keeps the skill under .cursor/skills/, so it vendors to skills/i-have-adhd/i-have-adhd/. The inner directory name is the skill's frontmatter name, which SK004 requires them to match."
       ]
+    },
+    {
+      "id": "addyosmani-sdd-reference",
+      "name": "Addy Osmani SDD reference",
+      "repo": "https://github.com/addyosmani/agent-skills",
+      "homepage": "https://github.com/addyosmani/agent-skills/tree/main/skills/spec-driven-development",
+      "author": "Addy Osmani",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "main",
+      "pinned_commit": "a06bc63b3f8b829c14b0bbf53d99fefc39d58092",
+      "pinned_at": "2026-10-03",
+      "dest": "docs/reference-sources/addyosmani-sdd",
+      "paths": [
+        {
+          "from": "skills/spec-driven-development",
+          "to": "source",
+          "kind": "support",
+          "exclude": [],
+          "exclude_reasons": {}
+        }
+      ],
+      "mandatory": [],
+      "limitations": [
+        "This is an immutable research reference, not a second routable skill. The integrated spec-driven-development is authored under skills/engineering and documents its adaptations.",
+        "Only the complete SDD directory is imported. Adjacent skills named in the upstream prose are not bundled or claimed as available here.",
+        "The snapshot records the imported commit. Scheduled updates may propose newer reference content; the integrated skill does not change automatically and requires a new integration review."
+      ]
     }
   ]
 }

@@ -91,6 +91,29 @@ and each one is a live risk of the wrong skill loading.
 New domain: add a line to `docs/domain-descriptions.json`, then
 `python3 scripts/generate_index.py --write`.
 
+## Spec-driven development
+
+Use [spec-driven-development](skills/engineering/spec-driven-development/SKILL.md)
+for the nine-artifact `.specs/` workflow. Read its
+[README](skills/engineering/spec-driven-development/README.md) for the scaffold,
+structural checks, review gates and compatibility with existing PRD/TRD documents.
+The older `spec-driven-workflow` remains available for its combined specification
+format and existing generator, validator and test extractor. Do not overwrite it
+or treat its score as validation of the split EARS format.
+
+The upstream research snapshot is imported by `scripts/sync_vendor.py` into
+[docs/reference-sources/addyosmani-sdd](docs/reference-sources/addyosmani-sdd/ATTRIBUTION.md).
+It is reference material, not another routable skill. Do not edit it in place.
+The integrated skill's own tests run in A0:
+
+```bash
+python3 -m unittest discover -s skills/engineering/spec-driven-development/tests -p 'test_*.py' -v
+```
+
+Passing structural checks does not prove that code implements a specification.
+Read the actual diff, run the named tests, verify negative security paths, and
+resolve independent review findings before marking a task complete.
+
 ## Adding a solution
 
 ```
