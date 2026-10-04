@@ -79,6 +79,135 @@ test.describe("accessible workspace", () => {
     else expect(after.camera, "composite graph arrows pan").not.toEqual(before.camera);
   });
 
+  test("lead links rove as one composite: spatial arrows, Home/End jumps, one Tab entry, focus never selects", async ({ page }) => {
+    await openWorkspace(page);
+    // The runtime enhancement: exactly one lead carries the graph's Tab stop and
+    // the canvas is not a second entry. The build itself never writes a tabindex.
+    const composite = await page.evaluate(() => {
+      const leads = [...document.querySelectorAll(".g-node[data-leads]")];
+      return {
+        count: leads.length,
+        tabbable: leads.filter((el) => el.tabIndex === 0).length,
+        removed: leads.filter((el) => el.tabIndex === -1).length,
+        canvas: document.getElementById("gsvg").tabIndex
+      };
+    });
+    expect(composite.count, "the graph must have Solution lead links to rove over").toBeGreaterThan(0);
+    expect(composite.tabbable, "exactly one lead is the graph's Tab stop").toBe(1);
+    expect(composite.removed).toBe(composite.count - 1);
+    expect(composite.canvas, "the canvas must not add a second graph entry").toBe(-1);
+
+    // From the top of the page: the graph is entered exactly once and the next
+    // Tab leaves it again, instead of one stop per lead link.
+    let graphStops = 0, leftGraph = false;
+    for (let i = 0; i < 40 && !leftGraph; i++) {
+      await page.keyboard.press("Tab");
+      const at = await page.evaluate(() => {
+        const el = document.activeElement;
+        return { onLead: !!el.closest(".g-node[data-leads]"), inGraph: !!el.closest("#gsvg") };
+      });
+      if (at.onLead) graphStops++;
+      if (graphStops > 0 && !at.inGraph) leftGraph = true;
+    }
+    expect(graphStops, "Tab enters the graph once").toBe(1);
+    expect(leftGraph, "Tab leaves the graph to the next control").toBe(true);
+
+    const focusLead = () => page.evaluate(() => {
+      const el = document.activeElement.closest(".g-node[data-leads]");
+      return el ? {
+        key: el.dataset.key,
+        x: Number(el.dataset.renderX ?? el.dataset.x), y: Number(el.dataset.renderY ?? el.dataset.y)
+      } : null;
+    });
+    await page.keyboard.press("Shift+Tab");
+    expect(await focusLead(), "Shift+Tab returns to the roving lead").not.toBeNull();
+
+    // Each arrow lands strictly further along its own axis: the order comes from
+    // the positions the scene paints, not from document order. The two reversals
+    // are guaranteed by the move that preceded them.
+    const before = await readState(page);
+    for (const [key, axis, sign] of [["ArrowRight", "x", 1], ["ArrowLeft", "x", -1],
+      ["ArrowDown", "y", 1], ["ArrowUp", "y", -1]]) {
+      const from = await focusLead();
+      await page.keyboard.press(key);
+      const to = await focusLead();
+      expect(to, `${key} keeps focus on a lead`).not.toBeNull();
+      expect(sign * (to[axis] - from[axis]), `${key} moves to a lead further ${key.slice(5).toLowerCase()}`)
+        .toBeGreaterThan(0);
+    }
+    const after = await readState(page);
+    expect(after.context, "moving focus through the composite must not select").toEqual(before.context);
+
+    // Home and End jump to the reading-order ends of the leads in the scene.
+    const ends = await page.evaluate(() => {
+      const visible = [...document.querySelectorAll(".g-node[data-leads]")]
+        .filter((el) => el.dataset.inContext !== "false")
+        .map((el) => ({ key: el.dataset.key,
+          x: Number(el.dataset.renderX ?? el.dataset.x), y: Number(el.dataset.renderY ?? el.dataset.y) }))
+        .sort((a, b) => a.y - b.y || a.x - b.x || a.key.localeCompare(b.key));
+      return { first: visible[0].key, last: visible[visible.length - 1].key };
+    });
+    expect(ends.first).not.toBe(ends.last);
+    await page.keyboard.press("Home");
+    expect(await focusLead(), "Home jumps to the first lead in reading order").toMatchObject({ key: ends.first });
+    await page.keyboard.press("End");
+    expect(await focusLead(), "End jumps to the last lead in reading order").toMatchObject({ key: ends.last });
+  });
+
+  test("Enter and Space on a focused lead are explicit activations", async ({ page }) => {
+    await openWorkspace(page);
+    let onLead = false;
+    for (let i = 0; i < 25 && !onLead; i++) {
+      await page.keyboard.press("Tab");
+      onLead = await page.evaluate(() =>
+        !!document.activeElement.closest(".g-node[data-leads]"));
+    }
+    expect(onLead, "the roving lead must be reachable by Tab").toBe(true);
+    const enterKey = await page.evaluate(() => document.activeElement.dataset.key);
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#top")).toHaveAttribute("data-selected-key", enterKey);
+    await expect(page.locator("#top")).toHaveAttribute("data-mode", "node");
+
+    // Escape is the documented Reset shortcut: back to the overview, where every
+    // lead is in context again and the rest of the walk stays deterministic.
+    await page.keyboard.press("Escape");
+    await expect(page.locator("#top")).toHaveAttribute("data-selected-key", "");
+    await page.keyboard.press("End");
+    const spaceKey = await page.evaluate(() =>
+      document.activeElement.closest(".g-node[data-leads]")?.dataset.key ?? "");
+    expect(spaceKey, "End puts focus on a lead").toBeTruthy();
+    expect(spaceKey).not.toBe(enterKey);
+    await page.keyboard.press("Space");
+    await expect(page.locator("#top")).toHaveAttribute("data-selected-key", spaceKey);
+  });
+
+  test("without scripting every lead stays an ordinary tabbable link", async ({ browser }) => {
+    const ctx = await browser.newContext({ javaScriptEnabled: false });
+    const page = await ctx.newPage();
+    await page.goto("/index.html");
+    // With scripting off the DOM is exactly the generated markup. The no-JS
+    // interface is the text library, so the proof is structural: every lead is
+    // a plain anchor with a resolvable target, and nothing in the build demotes
+    // any node out of the tab order — that demotion lives only in app.js.
+    const leads = await page.evaluate(() => {
+      const nodes = [...document.querySelectorAll(".g-node")];
+      const read = (el) => ({
+        tag: el.tagName.toLowerCase(),
+        href: el.getAttribute("href"),
+        tabindex: el.getAttribute("tabindex"),
+        target: !!document.getElementById(el.getAttribute("href").slice(1))
+      });
+      return { all: nodes.map(read), leadCount: nodes.filter((el) => el.hasAttribute("data-leads")).length };
+    });
+    expect(leads.leadCount, "the graph has Solution lead links").toBeGreaterThan(0);
+    expect(leads.all.every((l) => l.tag === "a"), "every node is an anchor").toBe(true);
+    expect(leads.all.every((l) => (l.href || "").startsWith("#skill-")), "every node links into the library").toBe(true);
+    expect(leads.all.filter((l) => l.tabindex === null),
+      "no lead or node is demoted in the generated markup").toHaveLength(leads.all.length);
+    expect(leads.all.every((l) => l.target), "every lead link's target exists").toBe(true);
+    await ctx.close();
+  });
+
   test("document landmarks and text alternatives retain names", async ({ page }) => {
     await openWorkspace(page);
     await expect(page.locator("h1")).toHaveCount(1);
