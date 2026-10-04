@@ -432,6 +432,32 @@ test.describe("graph motion acceptance", () => {
     expect(motionEpisodes(probe.motionLog).length,
       "non-vacuity: the interrupted burst must actually have animated").toBeGreaterThan(0);
 
+    // Issue #51: one post-idle snapshot races whatever the burst left pending.
+    // `data-motion="idle"` says the app's own tweens finished, but a stale-target
+    // defect can still hold a timer that writes the camera back afterwards;
+    // whenever idle wins that race the snapshot misses the write and the planted
+    // gate flips. Assert the contract instead of racing it: a settled result is
+    // final (MOTION.md, Interruptibility — a beat "never replays a stale
+    // target"). Re-read the real settled values for one full documented settle
+    // bound — MOTION.md requires idle within 900ms of any beat, so no legitimate
+    // beat work can still be pending inside this window — and require every
+    // reading to equal the first. This is the acceptance doc's bounded
+    // quiescence window: it observes actual state on every pass and fails the
+    // instant a late write lands, whenever it lands, with no dependence on the
+    // defect's private timing.
+    const settled = comparableSnapshot(animated);
+    const stabilityDeadline = Date.now() + 900;
+    let stabilitySamples = 0;
+    const drifted = [];
+    while (Date.now() < stabilityDeadline) {
+      const again = comparableSnapshot(await motionSnapshot(page));
+      stabilitySamples++;
+      if (JSON.stringify(again) !== JSON.stringify(settled)) { drifted.push(again); break; }
+    }
+    expect(drifted,
+      "MOTION_INTERRUPTIBLE: a settled result is final — the settled state must not change after idle")
+      .toEqual([]);
+
     const context = await newReducedContext(page, testInfo);
     let reduced;
     try {
@@ -444,6 +470,18 @@ test.describe("graph motion acceptance", () => {
       reduced = await motionSnapshot(reducedPage);
     } finally { await context.close(); }
 
+    // The reduced replay above is a second, longer bounded observation of the
+    // animated page: context creation, the first-paint wait and its own burst
+    // all elapse before this line. Require the settled state to be unchanged
+    // across it. Together with the reference comparisons below this closes the
+    // last ordering: a stale write landing before the first snapshot fails the
+    // reference comparison, one landing any time before now fails here or in
+    // the stability window above — no gap is left to luck.
+    const stillSettled = comparableSnapshot(await motionSnapshot(page));
+    expect(stillSettled,
+      "MOTION_INTERRUPTIBLE: the settled state must still equal the first settled reading after the reduced replay")
+      .toEqual(settled);
+
     expect(comparableSnapshot(animated).vp,
       "MOTION_INTERRUPTIBLE: the settled #vp transform must equal the instant result").toEqual(reduced.vp);
     expect(comparableSnapshot(animated).nodes,
@@ -452,7 +490,8 @@ test.describe("graph motion acceptance", () => {
       "MOTION_INTERRUPTIBLE: settled #top datasets must equal the instant result").toEqual(reduced.top);
     expect(animated.title,
       "MOTION_INTERRUPTIBLE: the settled title must equal the instant result").toEqual(reduced.title);
-    await saveEvidence(page, testInfo, "motion-interruptible", { keys, animated, reduced });
+    await saveEvidence(page, testInfo, "motion-interruptible", { keys, animated, reduced,
+      stabilitySamples, drift: drifted, stillSettled });
   });
 
   test("MOTION_REDUCED_MOTION no animation frames run and the end state matches", async ({ page }, testInfo) => {
