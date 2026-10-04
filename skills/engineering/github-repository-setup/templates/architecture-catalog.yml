@@ -1,0 +1,143 @@
+# Stable coverage IDs, not installation requirements.
+# original: 81 user-supplied considerations; additional: 16 cross-cutting domains.
+schema_version: 1
+groups:
+  - category: Foundations
+    kind: original
+    topics:
+      F01: HTTP / HTTPS
+      F02: DNS
+      F03: TCP / UDP
+      F04: REST / GraphQL / gRPC
+      F05: Serialization (JSON, Protobuf, Avro)
+      F06: WebSockets
+  - category: Data & Storage
+    kind: original
+    topics:
+      D01: SQL Databases
+      D02: Object Storage
+      D03: Cache
+      D04: Search Engine
+      D05: Vector Database
+      D06: NoSQL Databases
+  - category: Scalability & Performance
+    kind: original
+    topics:
+      P01: Horizontal Scaling
+      P02: Vertical Scaling
+      P03: Auto-Scaling
+      P04: Caching
+      P05: Database Sharding
+      P06: Read Replicas
+      P07: Connection Pooling
+  - category: Distributed Systems
+    kind: original
+    topics:
+      DS01: Message Queues
+      DS02: Pub/Sub
+      DS03: Service Discovery
+      DS04: Distributed Locks
+      DS05: Idempotency
+      DS06: Consensus
+      DS07: Event-Driven Architecture
+  - category: Reliability & Resilience
+    kind: original
+    topics:
+      R01: Retries
+      R02: Exponential Backoff
+      R03: Circuit Breakers
+      R04: Timeouts
+      R05: Replication
+      R06: Disaster Recovery
+      R07: Failover
+  - category: Traffic Management
+    kind: original
+    topics:
+      TM01: DNS Routing
+      TM02: Load Balancing
+      TM03: API Gateway
+      TM04: Reverse Proxy
+      TM05: Rate Limiting
+      TM06: CDN
+  - category: AI-Ready Architecture
+    kind: original
+    topics:
+      AI01: LLM APIs
+      AI02: RAG
+      AI03: Embedding Models
+      AI04: Model Routing
+      AI05: AI Agents
+      AI06: Tool Calling
+      AI07: Semantic Cache
+      AI08: Guardrails
+  - category: Clients & Application Layer
+    kind: original
+    topics:
+      CL01: Web Apps
+      CL02: Mobile Apps
+      CL03: Desktop Apps
+      CL04: Backend Services
+      CL05: APIs
+      CL06: BFF Pattern
+  - category: Architecture & Services
+    kind: original
+    topics:
+      AR01: Monolith
+      AR02: Modular Monolith
+      AR03: CQRS
+      AR04: Microservices
+      AR05: Saga Pattern
+      AR06: Serverless
+      AR07: Event-Driven Systems
+  - category: Security & Access
+    kind: original
+    topics:
+      S01: Authentication
+      S02: Authorization
+      S03: OAuth / OIDC
+      S04: JWT
+      S05: TLS
+      S06: Secrets Management
+      S07: Zero Trust
+  - category: Observability
+    kind: original
+    topics:
+      O01: Logging
+      O02: Metrics
+      O03: Distributed Tracing
+      O04: APM
+      O05: Dashboards
+      O06: Alerting
+      O07: SLOs / SLIs
+  - category: Deployment & Infrastructure
+    kind: original
+    topics:
+      DEP01: Git
+      DEP02: CI/CD
+      DEP03: Docker
+      DEP04: Kubernetes
+      DEP05: Canary Deployment
+      DEP06: Blue-Green Deployment
+      DEP07: Infrastructure as Code
+  - category: Additional design domains
+    kind: additional
+    topics:
+      X01: Workload and business invariants
+      X02: Quantitative quality and resource budgets
+      X03: Consistency and transaction boundaries
+      X04: Data lifecycle and privacy
+      X05: Tenancy and entitlements
+      X06: Interface and schema evolution
+      X07: Asynchronous correctness
+      X08: Threat modeling and abuse prevention
+      X09: Secure software supply chain
+      X10: Operational readiness
+      X11: Configuration and change control
+      X12: Safe database and application evolution
+      X13: AI quality and lifecycle
+      X14: AI autonomy and resource governance
+      X15: Client experience constraints
+      X16: Cost, sustainability and exit strategy
+related:
+  - [D03, P04]
+  - [DS07, AR07]
