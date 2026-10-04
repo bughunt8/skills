@@ -12,6 +12,7 @@ Reads skills/vendor.manifest.json. Standard library only.
     scripts/sync_vendor.py --sync               # apply upstream into the tree
     scripts/sync_vendor.py --sync --source pstack
     scripts/sync_vendor.py --check --output json
+    scripts/sync_vendor.py --self-test          # prove the ownership record fails closed
 
 --validate-manifest needs no network, so it can gate every pull request. --check
 and --sync clone upstream and belong in the scheduled refresh, where an upstream
@@ -43,7 +44,10 @@ manage, leaving redistributed content published with nothing tracking it.
 
 Each destination now carries `.vendor-owned.json`, written by this script, listing
 exactly what the previous run put there. A sync deletes what it used to own and no
-longer does, and touches nothing else.
+longer does, and touches nothing else. The record is read before anything is removed
+or copied, and one that is unreadable, malformed, or absent on a destination that
+already holds content is a hard error rather than an empty baseline: a missing
+baseline silently keeps content upstream deleted, and re-running cannot repair that.
 
 ## Symlinks are rejected, not followed
 
@@ -61,9 +65,11 @@ Exit codes
 from __future__ import annotations
 
 import argparse
+import contextlib
 import datetime as _dt
 import fnmatch
 import hashlib
+import io
 import json
 import os
 import posixpath
@@ -275,14 +281,45 @@ def _copy_tree(src: Path, dst: Path, file_include=None) -> None:
 # ------------------------------------------------------------------- ownership
 
 
-def read_ownership(dest_root: Path) -> list:
+def read_ownership(dest_root: Path, source_id: str) -> list:
+    """Read what the previous sync placed in this destination, failing closed.
+
+    Deletion is computed from this record, so one that exists but cannot be read,
+    is not valid JSON, or carries no `paths` list of strings is a hard error:
+    treating corruption as "owns nothing" makes every owned path look new and
+    silently keeps content upstream deleted, and the next sync cannot repair
+    that (issue #56). A record that is missing entirely is refused the same way
+    when the destination already holds content, because ownership cannot then be
+    inferred from the directory. Only a destination with nothing in it starts
+    with an empty baseline.
+    """
     path = dest_root / OWNERSHIP_FILE
+
+    def refuse(problem: str) -> None:
+        _fail(
+            f"[{source_id}] ownership record `{path}` {problem}. Refusing to treat this "
+            'as "owns nothing": that silently keeps content upstream deleted, and '
+            "re-running --sync cannot repair it. Restore the record from version control "
+            f"(`git checkout -- {path}`) or, if this destination is a fresh import, remove "
+            "the directory and re-run --sync."
+        )
+
     if not path.exists():
+        if dest_root.is_dir() and any(dest_root.iterdir()):
+            refuse(
+                f"is missing while `{dest_root}` already contains content, so what the "
+                "previous sync owned cannot be known"
+            )
         return []
     try:
-        return sorted(set(json.loads(path.read_text(encoding="utf-8")).get("paths", [])))
-    except (json.JSONDecodeError, AttributeError):
-        return []
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        refuse(f"cannot be read ({exc})")
+    if not isinstance(data, dict) or not isinstance(data.get("paths"), list) or not all(
+        isinstance(entry, str) for entry in data["paths"]
+    ):
+        refuse("has no `paths` list of strings")
+    return sorted(set(data["paths"]))
 
 
 def write_ownership(dest_root: Path, owned: list, source_id: str) -> None:
@@ -640,6 +677,10 @@ def process_source(source: dict, checkout: Path, sha: str, apply: bool) -> dict:
         _fail(f"[{sid}] `dest` is required")
     dest_root = resolve_under(REPO_ROOT, dest_rel, "dest", sid)
     plan = path_specs(source)
+    # Read before anything is removed or copied: a corrupt or absent ownership
+    # record must abort the run with the tree untouched, not after a partial
+    # write (issue #56).
+    previously = read_ownership(dest_root, sid)
     added, removed, changed = [], [], []
     owned = []
 
@@ -698,7 +739,6 @@ def process_source(source: dict, checkout: Path, sha: str, apply: bool) -> dict:
 
     # Anything the previous run owned and this one does not is deleted. Ownership
     # is read from the record on disk, never inferred from sibling directories.
-    previously = read_ownership(dest_root)
     orphans = [p for p in previously if p not in owned]
     for orphan in sorted(orphans):
         target = resolve_under(dest_root, orphan, "previously owned path", sid)
@@ -842,7 +882,7 @@ def validate_manifest(manifest: dict) -> list:
                         f"[{sid}] support tree `{dest}/{spec['to']}` has no PROVENANCE.md; run --sync"
                     )
 
-        recorded = set(read_ownership(dest_root))
+        recorded = set(read_ownership(dest_root, sid))
         for stale in sorted(recorded - expected_owned):
             problems.append(
                 f"[{sid}] `{dest}/{OWNERSHIP_FILE}` still claims `{stale}`, which the manifest no "
@@ -869,6 +909,200 @@ def validate_manifest(manifest: dict) -> list:
     return problems
 
 
+def self_test() -> int:
+    """Prove the ownership record fails closed (issue #56), on fixtures in /tmp.
+
+    A truncated or malformed `.vendor-owned.json` used to read as "owns nothing",
+    so a refresh whose upstream had deleted a skill exited 0, kept the stale skill,
+    and left the scheduled workflow wedged. These cases pin the refusals, the
+    first import on an empty destination that must still succeed, and the healthy
+    deletion once a valid record is restored.
+    """
+    global REPO_ROOT, MANIFEST_PATH, NOTICES_PATH, INVENTORY_PATH
+    failures = []
+
+    def check(label: str, ok: bool, detail: str) -> None:
+        status = "PASS" if ok else "FAIL"
+        if not ok:
+            failures.append(label)
+        print(f"{status}  {label}: {detail}")
+
+    def refusal(dest_root: Path) -> str:
+        """Stderr of read_ownership's refusal, or a marker if it did not refuse."""
+        err = io.StringIO()
+        try:
+            with contextlib.redirect_stderr(err):
+                read_ownership(dest_root, "fixture")
+        except SystemExit as exc:
+            return err.getvalue() if exc.code == 2 else f"<exit {exc.code}>"
+        return "<no failure>"
+
+    def named_record(detail: str) -> bool:
+        return OWNERSHIP_FILE in detail and "git checkout" in detail
+
+    with tempfile.TemporaryDirectory(prefix="vendor-self-test-") as tmp_raw:
+        tmp = Path(tmp_raw)
+
+        # Unit rules for a record that exists but cannot be trusted.
+        corrupt_records = [
+            ("truncated JSON", '{"paths": ["a",'),
+            ("no paths key", '{"source": "fixture"}'),
+            ("paths not a list", '{"paths": "a"}'),
+            ("non-string path entries", '{"paths": ["a", 7]}'),
+            ("top-level JSON array", '["a", "b"]'),
+        ]
+        for label, text in corrupt_records:
+            bad = tmp / "record" / label.replace(" ", "-")
+            bad.mkdir(parents=True)
+            (bad / OWNERSHIP_FILE).write_text(text, encoding="utf-8")
+            detail = refusal(bad)
+            check(f"record with {label} is refused", named_record(detail), detail.strip()[:110])
+
+        populated = tmp / "destination-with-content"
+        (populated / "skills" / "a").mkdir(parents=True)
+        detail = refusal(populated)
+        check(
+            "missing record on a non-empty destination is refused",
+            named_record(detail),
+            detail.strip()[:110],
+        )
+
+        empty = tmp / "empty-destination"
+        empty.mkdir()
+        baseline = read_ownership(empty, "fixture")
+        check("missing record on an empty destination is a first import", baseline == [], repr(baseline))
+
+        # End to end: the deletion case from the issue, against a local upstream.
+        upstream = tmp / "upstream"
+        for name in ("a", "b"):
+            skill = upstream / "skills" / name
+            skill.mkdir(parents=True)
+            (skill / "SKILL.md").write_text(
+                f"---\nname: {name}\ndescription: fixture skill {name}\n---\nbody\n",
+                encoding="utf-8",
+            )
+        (upstream / "LICENSE").write_text("MIT (fixture licence)\n", encoding="utf-8")
+
+        def git_upstream(*args: str) -> None:
+            subprocess.run(
+                ["git", "-C", str(upstream), "-c", "user.email=self@test", "-c", "user.name=self-test", *args],
+                check=True,
+                capture_output=True,
+            )
+
+        subprocess.run(["git", "init", "-q", "-b", "main", str(upstream)], check=True, capture_output=True)
+        git_upstream("add", "-A")
+        git_upstream("commit", "-qm", "fixture: skills a and b")
+
+        repo = tmp / "repo"
+        (repo / "skills").mkdir(parents=True)
+        (repo / "docs").mkdir()
+        manifest_path = repo / "skills" / "vendor.manifest.json"
+        manifest_path.write_text(
+            json.dumps(
+                {
+                    "sources": [
+                        {
+                            "id": "fixture",
+                            "name": "fixture",
+                            "repo": str(upstream),
+                            "ref": "main",
+                            "author": "Fixture Author",
+                            "license": "MIT",
+                            "license_path": "LICENSE",
+                            "dest": "skills/fixture",
+                            "paths": [
+                                {"from": "skills", "to": "", "kind": SKILL_COLLECTION, "include": ["*"]}
+                            ],
+                        }
+                    ]
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        (repo / "docs" / "third-party-inventory.json").write_text(
+            json.dumps({"legacy": []}, indent=2), encoding="utf-8"
+        )
+
+        def run(argv: list):
+            out, err = io.StringIO(), io.StringIO()
+            try:
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                    code = main(argv)
+            except SystemExit as exc:
+                code = exc.code if isinstance(exc.code, int) else 1
+            return code, out.getvalue(), err.getvalue()
+
+        def tree(root: Path) -> list:
+            return sorted(
+                p.relative_to(root).as_posix() for p in root.rglob("*") if ".git" not in p.parts
+            )
+
+        saved = (REPO_ROOT, MANIFEST_PATH, NOTICES_PATH, INVENTORY_PATH)
+        REPO_ROOT, MANIFEST_PATH = repo, manifest_path
+        NOTICES_PATH, INVENTORY_PATH = repo / "THIRD_PARTY_NOTICES.md", repo / "docs" / "third-party-inventory.json"
+        try:
+            dest = repo / "skills" / "fixture"
+            record = dest / OWNERSHIP_FILE
+
+            code, _out, err = run(["--sync"])
+            imported = (
+                code == 0
+                and (dest / "a" / "SKILL.md").is_file()
+                and (dest / "b" / "SKILL.md").is_file()
+                and record.is_file()
+            )
+            check("first import on an empty destination still syncs", imported, f"exit={code} {err.strip()[:70]!r}")
+
+            record.write_text('{"paths": ["a",', encoding="utf-8")  # corrupt, as in issue #56
+            git_upstream("rm", "-q", "-r", "skills/b")
+            git_upstream("commit", "-qm", "remove skill b")
+            before, before_record = tree(dest), record.read_text(encoding="utf-8")
+            code, _out, err = run(["--sync"])
+            untouched = tree(dest) == before and record.read_text(encoding="utf-8") == before_record
+            check(
+                "corrupt record aborts the sync before any copy or deletion",
+                code == 2 and untouched,
+                f"exit={code} tree_untouched={untouched}",
+            )
+            check(
+                "abort message names the record and the recovery path",
+                named_record(err),
+                err.strip()[:120],
+            )
+
+            code, _out, err = run(["--validate-manifest"])
+            check(
+                "validate-manifest also fails closed on the corrupt record",
+                code == 2 and named_record(err),
+                f"exit={code} {err.strip()[:100]!r}",
+            )
+
+            record.write_text(
+                json.dumps({"source": "fixture", "paths": ["a", "b"]}, indent=2) + "\n",
+                encoding="utf-8",
+            )  # the git-checkout recovery
+            code, _out, err = run(["--sync"])
+            healthy = code == 0 and (dest / "a" / "SKILL.md").is_file() and not (dest / "b").exists()
+            check("restored record syncs and deletes b, keeping a", healthy, f"exit={code}")
+
+            record.unlink()
+            code, _out, err = run(["--sync"])
+            check(
+                "missing record on a populated destination aborts the sync",
+                code == 2 and named_record(err),
+                f"exit={code} {err.strip()[:100]!r}",
+            )
+        finally:
+            REPO_ROOT, MANIFEST_PATH, NOTICES_PATH, INVENTORY_PATH = saved
+
+    print()
+    print(f"{len(failures)} failure(s)" + (f": {', '.join(failures)}" if failures else ""))
+    return 1 if failures else 0
+
+
 def main(argv: list) -> int:
     ap = argparse.ArgumentParser(description="Import and refresh vendored upstream content.")
     mode = ap.add_mutually_exclusive_group(required=True)
@@ -879,9 +1113,15 @@ def main(argv: list) -> int:
     )
     mode.add_argument("--check", action="store_true", help="report upstream drift, write nothing")
     mode.add_argument("--sync", action="store_true", help="apply upstream into the working tree")
+    mode.add_argument(
+        "--self-test", action="store_true", help="test the ownership fail-closed rules on /tmp fixtures"
+    )
     ap.add_argument("--source", action="append", help="limit to a manifest source id (repeatable)")
     ap.add_argument("--output", choices=("text", "json"), default="text")
     args = ap.parse_args(argv)
+
+    if args.self_test:
+        return self_test()
 
     manifest = load_manifest()
 
