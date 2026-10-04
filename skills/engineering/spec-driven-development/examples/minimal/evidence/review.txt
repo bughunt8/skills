@@ -1,0 +1,4 @@
+DEMONSTRATION ONLY. This is fixture context, not authorization.
+The green example uses local strings and no persistence or network.
+Actual production assumptions, security, and telemetry policy require owner review.
+No actual red test run or human approval is claimed here.
