@@ -1,53 +1,53 @@
-# Domain Docs
+# Domain documentation
 
-How the engineering skills should consume this repo's domain documentation when exploring the codebase.
+Engineering skills consume the project's glossary and ADRs while exploring a
+codebase. Vocabulary is separate from behavioral specifications and technical
+design.
 
-## Before exploring, read these
+## Before exploring
 
-- **`CONTEXT.md`** at the repo root, or
-- **`CONTEXT-MAP.md`** at the repo root if it exists: it points at one `CONTEXT.md` per context. Read each one relevant to the topic.
-- **`docs/adr/`**: read ADRs that touch the area you're about to work in. In multi-context repos, also check `src/<context>/docs/adr/` for context-scoped decisions.
+- Read root `GLOSSARY.md` if present.
+- If root `GLOSSARY-MAP.md` exists, read the glossaries relevant to the topic.
+- Read affected ADRs in `docs/adr/`, preserving established context-specific
+  locations when a project has several bounded contexts.
 
-If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
+Absent glossary or ADR files are not a setup failure. Proceed without inventing
+content. Active `domain-modeling` creates terms and decisions lazily when they
+actually resolve; reading vocabulary does not invoke that skill.
 
-This repo is **single-context**: one `CONTEXT.md` and one `docs/adr/` at the root. There is no `CONTEXT-MAP.md`.
+This repository uses a single-context convention, a future root `GLOSSARY.md`
+and the existing ADR location. The upgrade changes consumer pointers only.
+There was no root CONTEXT or GLOSSARY file to rename, and no domain map was
+created.
 
-## File structure
+## Naming migration
 
-Single-context repo (this repo):
+Matt v1.3.1 names domain vocabulary `GLOSSARY.md` and bounded-context maps
+`GLOSSARY-MAP.md`. Inspect legacy `CONTEXT.md` or `CONTEXT-MAP.md` contents and
+consumers before migrating an existing project. Rename only confirmed domain
+files within approved scope, update consumers and preserve history.
 
-```
-/
-├── CONTEXT.md
-├── docs/adr/
-│   ├── 0001-example-decision.md
-│   └── 0002-example-decision.md
-└── skills/
-```
+Do not bulk-rename unrelated context documents. If both naming conventions have
+maintained authorities, stop for the user's canonical-source choice rather than
+merge or maintain two copies. A multi-context map requires actual multiple
+bounded contexts, not merely a monorepo directory structure.
 
-Multi-context repo (presence of `CONTEXT-MAP.md` at the root):
+## Vocabulary and decisions
 
-```
-/
-├── CONTEXT-MAP.md
-├── docs/adr/                          ← system-wide decisions
-└── src/
-    ├── ordering/
-    │   ├── CONTEXT.md
-    │   └── docs/adr/                  ← context-specific decisions
-    └── billing/
-        ├── CONTEXT.md
-        └── docs/adr/
-```
+Use a defined domain term in issues, designs and tests rather than its rejected
+synonyms. A missing term may indicate an unnecessary new concept or a genuine
+gap to resolve through approved domain work.
 
-## Use the glossary's vocabulary
+Keep implementation constraints in TRD and ADRs. Keep behavioral EARS rules in
+the canonical `.specs/` authority when that workflow is used. GitHub tickets and
+PRD/design documents link to those rules instead of duplicating them.
 
-When your output names a domain concept (in an issue title, a refactor proposal, a hypothesis, a test name), use the term as defined in `CONTEXT.md`. Don't drift to synonyms the glossary explicitly avoids.
+Flag a conflict with an existing ADR explicitly and identify the decision to
+reopen. Do not silently override it.
 
-If the concept you need isn't in the glossary yet, that's a signal: either you're inventing language the project doesn't use (reconsider) or there's a real gap (note it for `/domain-modeling`).
+## Related governance
 
-## Flag ADR conflicts
-
-If your output contradicts an existing ADR, surface it explicitly rather than silently overriding:
-
-> _Contradicts ADR-0007 (event-sourced orders), but worth reopening because…_
+Read [invocation policy](../../.agents/invocation.md) for command reachability
+and [the migration guide](../matt-pocock-v1.3.1.md) for sources and compatibility.
+The policy path is plural `.agents/invocation.md`. This upgrade defines no
+`GRAMMAR.md` file.

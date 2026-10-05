@@ -72,6 +72,12 @@ jobs:
       - name: Validate vendored provenance
         run: python3 scripts/sync_vendor.py --validate-manifest
 
+      - name: Test importer adoption and dependency failure gates
+        run: python3 -m unittest discover -s scripts -p 'test_*.py' -v
+
+      - name: Validate Matt release resources and invocation dependencies
+        run: python3 scripts/check_skill_dependencies.py
+
       # Every licence, notice or attribution marker in the tree must be covered by
       # the vendor manifest or the third-party inventory. This is the check that
       # would have caught redistributing mattpocock/skills with no MIT notice.
@@ -81,7 +87,7 @@ jobs:
       # Vendored trees link into each other and into sibling support directories.
       # An upstream refactor can break those links on any scheduled refresh.
       - name: Check relative links resolve
-        run: python3 scripts/check_links.py --path skills/engineering/spec-driven-development
+        run: python3 scripts/check_links.py --path skills/engineering/spec-driven-development --path skills/engineering/github-repository-setup --path .agents --path docs/matt-pocock-v1.3.1.md
 
       # A Solution Skill references skills by name. A renamed or removed skill
       # must not leave a solution pointing at nothing, and an ambiguous name must

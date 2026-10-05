@@ -3,6 +3,16 @@
 Use this checklist before declaring an agentic setup complete. A prompt skill
 can guide checks but does not itself implement locks, rulesets, or CI.
 
+## Client metadata and core schema
+
+This package uses top-level `disable-model-invocation` and `argument-hint`
+client extensions, plus `agents/openai.yaml` with implicit invocation disabled.
+The strict core-schema `agentskills validate` tool rejects those extension
+fields. Report that rejection as a schema limitation, not as a passed package.
+Validate a throwaway projection without those two fields for core-schema
+compatibility, then run the actual bundle tests to verify client metadata.
+Never move the human-only flag under metadata to silence the validator.
+
 ## Local validation
 
 For architecture registers, follow
@@ -25,8 +35,11 @@ approval, genuine evidence, complete impact analysis or sound architecture.
    to one authority each, with no circular protocol pointers.
 3. Check triage installed and absent paths. Custom label mappings survive;
    the absent path creates neither the triage document nor its entry block.
-4. Verify every listed consumer skill exists and every context/ADR pointer
-   resolves. Missing seeds must trigger the documented fallback or a blocker.
+4. Verify every listed companion and transitive model dependency exists and
+   every glossary/ADR pointer resolves. Check invocation metadata against the
+   host registry if present; do not assume a listed command is installed.
+   v1.3.1 seeds are present; an actually missing installed seed triggers the
+   documented conditional fallback or a blocker, not automatic upstream setup.
 5. Run repository formatting, link checks, workflow validation, and relevant
    architecture, lint, type, unit, and integration tests. Use real commands.
    Do not add successful placeholder checks when a runtime is absent.
@@ -84,6 +97,21 @@ record them as walkthroughs, not as executed integration tests.
 | Documentation deploy wants to rewrite and push source | Move edits to a reviewed PR; deploy built artifacts only |
 | Template sync overwrites agent policy or project requirements | Refuse overwrite; explicit diff and approval required |
 | Issue chooser has placeholder or disabled support destinations | Setup incomplete until verified or omitted |
+| Config already works, setup companion is absent | Preserve config; native setup can proceed within its approved scope |
+| Another skill tries to tool-call user-only setup, retro or implement-spec | Refuse; recommend the independent human command |
+| Two model dependencies are needed | Two native loader calls, one verified model-invoked name each |
+| Invocation policy file exists but runtime permissions are untested | Documented only, not enforced |
+| Legacy and new glossary authorities coexist | Stop for canonical-source choice before rename/merge |
+| Unrelated CONTEXT files exist | Preserve them; migrate only confirmed domain files after approval |
+| Single-context project requests a map by habit | Keep GLOSSARY.md; map requires confirmed multiple contexts |
+| Upgrade asks for singular .agent or root GRAMMAR.md | Use plural .agents/invocation.md; explain vocabulary/spec distinction |
+| Optional implement-spec encounters dirty worktree or wrong base | Preserve work; no automatic reset/removal; seek scoped remedy approval |
+| Parallel run reaches staging but release is not approved | Verify integrated SHA and use chosen issue-closure policy; no release |
+| Prototype tests are omitted outside approved throwaway scope | Reject bypass; normal implementation requires TDD and review |
+| Prototype winner is proposed for direct production promotion | Separate approved tested implementation, no automatic commit/deploy |
+| Retro finds a mechanical coding violation | Recommend deterministic check using existing command/CI, not a standards prose substitute |
+| Retro proposes local/global environment edits | Recommendations only until exact edit scope is approved |
+| /grill-me-with-docs alias is unavailable | Explain canonical /grill-with-docs; do not silently rename vendor or promise alias |
 
 ## Live verification and handoff
 

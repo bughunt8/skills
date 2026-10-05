@@ -5,7 +5,7 @@ anything here.
 
 ## What this repository is
 
-A library of 475 skill files across 23 directories, 474 of which are linted; the difference is
+A library of 479 skill files across 23 directories, 478 of which are linted; the difference is
 one deliberate test fixture. The skill index in `README.md` is the authoritative count.
 `scripts/generate_index.py` regenerates it and CI checks it, so refresh these numbers there
 when the tree changes. The skill files are instructions to another agent. The
@@ -15,8 +15,8 @@ future session, with credentials you do not have. Write accordingly.
 
 ## The five rules
 
-1. **Do not edit anything under a vendored directory.** Currently `skills/pstack/` and
-   `skills/job-hunt/`. Those files are copies, and the fortnightly sync overwrites them. The
+1. **Do not edit anything under a vendored directory.** Those files are copies,
+   and the sync script refreshes them. The
    authoritative list of vendored destinations is the `dest` field of each source in
    `skills/vendor.manifest.json`.
 2. **Do not hand-edit generated files.** They carry a banner saying so. That covers the
@@ -27,11 +27,11 @@ future session, with credentials you do not have. Write accordingly.
    `skills/vendor.manifest.json` and run `scripts/sync_vendor.py --sync`. That is the only
    path that produces correct licence, author and commit-pinned attribution, and CI rejects
    an import that lacks them.
-4. **Run the three checks before you claim to be finished.** Not "should pass". Run them.
+4. **Run the applicable checks before you claim to be finished.** Not "should pass". Run them.
 5. **Apply `skills/pstack/unslop/SKILL.md` to every sentence you write here,** including
    commit messages and pull request bodies. It is a mandatory import for exactly this reason.
 
-## The three checks
+## Repository checks
 
 ```bash
 python3 scripts/lint_skills.py --self-test         # the frontmatter parser refuses what it cannot read
@@ -41,14 +41,17 @@ python3 scripts/sync_vendor.py --validate-manifest # provenance, licences, owner
 python3 scripts/audit_third_party.py               # every licence marker is accounted for
 python3 scripts/check_links.py                     # relative links resolve
 python3 scripts/check_solutions.py                 # every solution step resolves to one real skill
+python3 scripts/check_skill_dependencies.py        # exact Matt providers, resources and invocation closure
+python3 -m unittest discover -s scripts -p 'test_*.py' -v # importer and dependency regression tests
 ```
 
-All offline. Standard library plus PyYAML, which CI installs. These are exactly the steps in
-`.github/workflows/a0-skills-checks.yml`, so a green local run means a green pull request. Run them. Do not
-report "should pass".
+These checks are offline and require the standard library plus PyYAML, which CI
+installs. They cover A0 metadata and governance gates; the setup and SDD suites,
+site gates and actual remote checks remain separate evidence. A local pass is
+not a guarantee that CI passes. Run the relevant suites and report actual results.
 
-`scripts/lint_skills.py --strict` shows the 68 findings the baseline currently accepts. Do not add
-to that number. `--write-baseline` exists, and using it to silence a violation you introduced is
+`scripts/lint_skills.py --strict` shows the findings the baseline currently accepts. Do not add
+to that baseline. `--write-baseline` exists, and using it to silence a violation you introduced is
 the wrong move.
 
 ## The graph workspace
@@ -133,6 +136,7 @@ input: a one-line idea
 output: reviewed, shippable code
 steps:
   - skill: to-spec                  # a real frontmatter name from skills/
+    invocation: user                # explicit human stage for a user-only provider
     handoff: the spec               # the artifact passed to the next step
     why: turn the idea into a spec
 prompt: |                            # the hand-off prompt another LLM executes
@@ -144,6 +148,11 @@ ambiguous names (a name matching more than one skill) fail. A solution reference
 name and never copies their text; the `prompt` is written fresh. The credit is `composed_by`,
 never "built by" — the skills stay their authors'. Validate with
 `python3 scripts/check_solutions.py`.
+
+A user-only step must declare `invocation: user` and the prompt must stop for
+the independent human command. Omitted invocation defaults to model dispatch.
+The checker rejects user-only automatic steps; it does not prove that a host
+honors the human boundary at runtime.
 
 ## Where things are
 
@@ -216,7 +225,42 @@ The five canonical roles, each label string equal to its name: `needs-triage`, `
 
 ### Domain docs
 
-Single-context: one `CONTEXT.md` and one `docs/adr/` at the root. See `docs/agents/domain.md`.
+Single-context: a lazily created `GLOSSARY.md` and existing `docs/adr/` at the root.
+See `docs/agents/domain.md`. Do not invent domain content to fill a template.
+
+### Invocation and Matt v1.3.1
+
+Read [.agents/invocation.md](.agents/invocation.md) before selecting a companion.
+The [dependency registry](.agents/skill-dependencies.json) binds the 27 stable
+Matt providers to exact paths and resources. Validate it with
+`python3 scripts/check_skill_dependencies.py`. User-only commands cannot be
+called by another skill, even a user-invoked skill. Read setup seeds as data,
+not as permission to activate setup. Use one model-invoked target per loader call.
+
+Resolve `/grill-me-with-docs` as a human command alias before invocation.
+It selects canonical `/grill-with-docs`, not a wrapper that calls a user-only
+target. Resolve `/setup-github-repository` to the existing native
+`github-repository-setup`. A host without alias expansion must use the canonical
+command; a policy file is not evidence that its loader supports aliases.
+
+Matt `research` and the separate hybrid research router are different providers.
+Use the registry's exact Matt path for Matt consumers. If the host cannot
+qualify the provider, block dispatch rather than choose by bare name. Bound
+background reading workers to their assigned question, not recursive self-dispatch.
+
+The native setup profile remains AGENTS-only and GitHub-Issues-only.
+Vendor defaults do not authorize commits, publishing, readiness labels,
+destructive cleanup, secrets changes, merges or deployment. Preserve existing
+work and obtain authorization for the exact action. `prototype` may omit tests
+only in approved isolated throwaway work; production adoption needs separate
+tested implementation. `retro` recommends environment changes, not implicit
+global or local writes. Existing SDD gates and independent review remain in force.
+
+The [migration guide](docs/matt-pocock-v1.3.1.md) explains pins, archives and
+limits. Future imports and refreshes use `scripts/sync_vendor.py`; never copy
+external skills or forge ownership records. The one-time `--adopt-existing`
+operation requires explicit source IDs, a verified complete-tree hash and an
+unused archive path. Do not use it on an already managed source.
 
 ## Commit convention
 
