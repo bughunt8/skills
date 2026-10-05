@@ -8,8 +8,8 @@ This directory is vendored, unmodified, from an upstream project. Do not edit it
 | --- | --- |
 | Upstream project | [pstack](https://github.com/backnotprop/pstack) |
 | Upstream path | `skills/maintain-verification-skill` |
-| Pinned commit | [`18e0e908a135`](https://github.com/backnotprop/pstack/commit/18e0e908a13553b0e58d065ab26dbc9a972ec8ba) |
-| Permalink | https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/maintain-verification-skill |
+| Pinned commit | [`124f622bcaea`](https://github.com/backnotprop/pstack/commit/124f622bcaeac490e7e9dac6af83f3ef9611d554) |
+| Permalink | https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/maintain-verification-skill |
 | Original author | Lauren Tan (@backnotprop, "poteto") |
 | Upstream licence | MIT |
 | Licence copy | [`../LICENSE.upstream`](../LICENSE.upstream) |

@@ -8,8 +8,8 @@ This directory is vendored, unmodified, from an upstream project. Do not edit it
 | --- | --- |
 | Upstream project | [job-hunt-skills](https://github.com/Remotivated/job-hunt-skills) |
 | Upstream path | `skills/interview-coach` |
-| Pinned commit | [`5fb238febf14`](https://github.com/Remotivated/job-hunt-skills/commit/5fb238febf14a0b41fb5a8fe7384594ad1f59335) |
-| Permalink | https://github.com/Remotivated/job-hunt-skills/tree/5fb238febf14a0b41fb5a8fe7384594ad1f59335/skills/interview-coach |
+| Pinned commit | [`74fe9165e1eb`](https://github.com/Remotivated/job-hunt-skills/commit/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960) |
+| Permalink | https://github.com/Remotivated/job-hunt-skills/tree/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960/skills/interview-coach |
 | Original author | Remotivated |
 | Upstream licence | MIT, plus OFL-1.1 |
 | Licence copy | [`../../LICENSE.upstream`](../../LICENSE.upstream) |
