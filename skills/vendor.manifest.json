@@ -12,8 +12,8 @@
       "license": "MIT",
       "license_path": "LICENSE",
       "ref": "main",
-      "pinned_commit": "18e0e908a13553b0e58d065ab26dbc9a972ec8ba",
-      "pinned_at": "2026-09-14",
+      "pinned_commit": "124f622bcaeac490e7e9dac6af83f3ef9611d554",
+      "pinned_at": "2026-10-05",
       "dest": "skills/pstack",
       "paths": [
         {
@@ -56,8 +56,8 @@
       "license": "MIT",
       "license_path": "LICENSE",
       "ref": "main",
-      "pinned_commit": "5fb238febf14a0b41fb5a8fe7384594ad1f59335",
-      "pinned_at": "2026-09-14",
+      "pinned_commit": "74fe9165e1eb5c7f6052bf665a54c5cfb81e0960",
+      "pinned_at": "2026-10-05",
       "dest": "skills/job-hunt",
       "paths": [
         {
@@ -123,8 +123,8 @@
       "license": "MIT",
       "license_path": "LICENSE",
       "ref": "main",
-      "pinned_commit": "4092de07ce3ed88389d77c0d623b7af89b40ac0e",
-      "pinned_at": "2026-09-15",
+      "pinned_commit": "839872f9d1cd634fed642b4589ce7226199cc15f",
+      "pinned_at": "2026-10-05",
       "dest": "skills/i-have-adhd",
       "paths": [
         {

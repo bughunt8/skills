@@ -3,7 +3,7 @@
 # Attribution: i-have-adhd
 
 Everything in this directory was copied from [i-have-adhd](https://github.com/ayghri/i-have-adhd) at commit
-[`4092de07ce3ed88389d77c0d623b7af89b40ac0e`](https://github.com/ayghri/i-have-adhd/commit/4092de07ce3ed88389d77c0d623b7af89b40ac0e), pinned on 2026-09-15.
+[`839872f9d1cd634fed642b4589ce7226199cc15f`](https://github.com/ayghri/i-have-adhd/commit/839872f9d1cd634fed642b4589ce7226199cc15f), pinned on 2026-09-15.
 
 - **Upstream project:** <https://github.com/ayghri/i-have-adhd>
 - **Original author:** Ayoub Ghriss (@ayghri)
@@ -27,7 +27,7 @@ Upstream subtrees are mapped so that the relative links inside them keep resolvi
 
 | Skill | Upstream permalink |
 | --- | --- |
-| [`i-have-adhd`](./i-have-adhd/) | [`.cursor/skills/i-have-adhd`](https://github.com/ayghri/i-have-adhd/tree/4092de07ce3ed88389d77c0d623b7af89b40ac0e/.cursor/skills/i-have-adhd) |
+| [`i-have-adhd`](./i-have-adhd/) | [`.cursor/skills/i-have-adhd`](https://github.com/ayghri/i-have-adhd/tree/839872f9d1cd634fed642b4589ce7226199cc15f/.cursor/skills/i-have-adhd) |
 
 ## Known limitations of this import
 

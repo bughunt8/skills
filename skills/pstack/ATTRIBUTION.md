@@ -3,7 +3,7 @@
 # Attribution: pstack
 
 Everything in this directory was copied from [pstack](https://github.com/backnotprop/pstack) at commit
-[`18e0e908a13553b0e58d065ab26dbc9a972ec8ba`](https://github.com/backnotprop/pstack/commit/18e0e908a13553b0e58d065ab26dbc9a972ec8ba), pinned on 2026-08-25.
+[`124f622bcaeac490e7e9dac6af83f3ef9611d554`](https://github.com/backnotprop/pstack/commit/124f622bcaeac490e7e9dac6af83f3ef9611d554), pinned on 2026-09-14.
 
 - **Upstream project:** <https://github.com/backnotprop/pstack>
 - **Original author:** Lauren Tan (@backnotprop, "poteto")
@@ -24,50 +24,56 @@ Upstream subtrees are mapped so that the relative links inside them keep resolvi
 | --- | --- | --- |
 | `skills` | [`./`](./) | skill-collection |
 
-## Imported skills from `skills` (40)
+## Imported skills from `skills` (46)
 
 | Skill | Upstream permalink |
 | --- | --- |
-| [`architect`](./architect/) | [`skills/architect`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/architect) |
-| [`arena`](./arena/) | [`skills/arena`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/arena) |
-| [`automate-me`](./automate-me/) | [`skills/automate-me`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/automate-me) |
-| [`blast-radius`](./blast-radius/) | [`skills/blast-radius`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/blast-radius) |
-| [`create-verification-skill`](./create-verification-skill/) | [`skills/create-verification-skill`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/create-verification-skill) |
-| [`figure-it-out`](./figure-it-out/) | [`skills/figure-it-out`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/figure-it-out) |
-| [`how`](./how/) | [`skills/how`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/how) |
-| [`interrogate`](./interrogate/) | [`skills/interrogate`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/interrogate) |
-| [`maintain-verification-skill`](./maintain-verification-skill/) | [`skills/maintain-verification-skill`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/maintain-verification-skill) |
-| [`no-comments`](./no-comments/) | [`skills/no-comments`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/no-comments) |
-| [`poteto-mode`](./poteto-mode/) | [`skills/poteto-mode`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/poteto-mode) |
-| [`principle-boundary-discipline`](./principle-boundary-discipline/) | [`skills/principle-boundary-discipline`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-boundary-discipline) |
-| [`principle-build-the-lever`](./principle-build-the-lever/) | [`skills/principle-build-the-lever`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-build-the-lever) |
-| [`principle-encode-lessons-in-structure`](./principle-encode-lessons-in-structure/) | [`skills/principle-encode-lessons-in-structure`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-encode-lessons-in-structure) |
-| [`principle-exhaust-the-design-space`](./principle-exhaust-the-design-space/) | [`skills/principle-exhaust-the-design-space`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-exhaust-the-design-space) |
-| [`principle-experience-first`](./principle-experience-first/) | [`skills/principle-experience-first`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-experience-first) |
-| [`principle-fix-root-causes`](./principle-fix-root-causes/) | [`skills/principle-fix-root-causes`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-fix-root-causes) |
-| [`principle-foundational-thinking`](./principle-foundational-thinking/) | [`skills/principle-foundational-thinking`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-foundational-thinking) |
-| [`principle-guard-the-context-window`](./principle-guard-the-context-window/) | [`skills/principle-guard-the-context-window`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-guard-the-context-window) |
-| [`principle-laziness-protocol`](./principle-laziness-protocol/) | [`skills/principle-laziness-protocol`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-laziness-protocol) |
-| [`principle-make-operations-idempotent`](./principle-make-operations-idempotent/) | [`skills/principle-make-operations-idempotent`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-make-operations-idempotent) |
-| [`principle-migrate-callers-then-delete-legacy-apis`](./principle-migrate-callers-then-delete-legacy-apis/) | [`skills/principle-migrate-callers-then-delete-legacy-apis`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-migrate-callers-then-delete-legacy-apis) |
-| [`principle-minimize-reader-load`](./principle-minimize-reader-load/) | [`skills/principle-minimize-reader-load`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-minimize-reader-load) |
-| [`principle-model-the-domain`](./principle-model-the-domain/) | [`skills/principle-model-the-domain`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-model-the-domain) |
-| [`principle-never-block-on-the-human`](./principle-never-block-on-the-human/) | [`skills/principle-never-block-on-the-human`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-never-block-on-the-human) |
-| [`principle-outcome-oriented-execution`](./principle-outcome-oriented-execution/) | [`skills/principle-outcome-oriented-execution`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-outcome-oriented-execution) |
-| [`principle-prove-it-works`](./principle-prove-it-works/) | [`skills/principle-prove-it-works`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-prove-it-works) |
-| [`principle-redesign-from-first-principles`](./principle-redesign-from-first-principles/) | [`skills/principle-redesign-from-first-principles`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-redesign-from-first-principles) |
-| [`principle-separate-before-serializing-shared-state`](./principle-separate-before-serializing-shared-state/) | [`skills/principle-separate-before-serializing-shared-state`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-separate-before-serializing-shared-state) |
-| [`principle-sequence-verifiable-units`](./principle-sequence-verifiable-units/) | [`skills/principle-sequence-verifiable-units`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-sequence-verifiable-units) |
-| [`principle-subtract-before-you-add`](./principle-subtract-before-you-add/) | [`skills/principle-subtract-before-you-add`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-subtract-before-you-add) |
-| [`principle-type-system-discipline`](./principle-type-system-discipline/) | [`skills/principle-type-system-discipline`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/principle-type-system-discipline) |
-| [`recall`](./recall/) | [`skills/recall`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/recall) |
-| [`setup-pstack`](./setup-pstack/) | [`skills/setup-pstack`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/setup-pstack) |
-| [`show-me-your-work`](./show-me-your-work/) | [`skills/show-me-your-work`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/show-me-your-work) |
-| [`swarm`](./swarm/) | [`skills/swarm`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/swarm) |
-| [`technical-writing`](./technical-writing/) | [`skills/technical-writing`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/technical-writing) |
-| [`typescript-best-practices`](./typescript-best-practices/) | [`skills/typescript-best-practices`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/typescript-best-practices) |
-| [`unslop`](./unslop/) | [`skills/unslop`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/unslop) |
-| [`why`](./why/) | [`skills/why`](https://github.com/backnotprop/pstack/tree/18e0e908a13553b0e58d065ab26dbc9a972ec8ba/skills/why) |
+| [`architect`](./architect/) | [`skills/architect`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/architect) |
+| [`arena`](./arena/) | [`skills/arena`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/arena) |
+| [`automate-me`](./automate-me/) | [`skills/automate-me`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/automate-me) |
+| [`benchmark-checklist`](./benchmark-checklist/) | [`skills/benchmark-checklist`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/benchmark-checklist) |
+| [`blast-radius`](./blast-radius/) | [`skills/blast-radius`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/blast-radius) |
+| [`correct`](./correct/) | [`skills/correct`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/correct) |
+| [`create-verification-skill`](./create-verification-skill/) | [`skills/create-verification-skill`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/create-verification-skill) |
+| [`figure-it-out`](./figure-it-out/) | [`skills/figure-it-out`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/figure-it-out) |
+| [`how`](./how/) | [`skills/how`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/how) |
+| [`interrogate`](./interrogate/) | [`skills/interrogate`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/interrogate) |
+| [`maintain-verification-skill`](./maintain-verification-skill/) | [`skills/maintain-verification-skill`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/maintain-verification-skill) |
+| [`make-bot-ui`](./make-bot-ui/) | [`skills/make-bot-ui`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/make-bot-ui) |
+| [`no-comments`](./no-comments/) | [`skills/no-comments`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/no-comments) |
+| [`poteto-mode`](./poteto-mode/) | [`skills/poteto-mode`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/poteto-mode) |
+| [`principle-attack-the-premise`](./principle-attack-the-premise/) | [`skills/principle-attack-the-premise`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-attack-the-premise) |
+| [`principle-boundary-discipline`](./principle-boundary-discipline/) | [`skills/principle-boundary-discipline`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-boundary-discipline) |
+| [`principle-build-the-lever`](./principle-build-the-lever/) | [`skills/principle-build-the-lever`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-build-the-lever) |
+| [`principle-encode-lessons-in-structure`](./principle-encode-lessons-in-structure/) | [`skills/principle-encode-lessons-in-structure`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-encode-lessons-in-structure) |
+| [`principle-exhaust-the-design-space`](./principle-exhaust-the-design-space/) | [`skills/principle-exhaust-the-design-space`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-exhaust-the-design-space) |
+| [`principle-experience-first`](./principle-experience-first/) | [`skills/principle-experience-first`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-experience-first) |
+| [`principle-explain-the-number`](./principle-explain-the-number/) | [`skills/principle-explain-the-number`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-explain-the-number) |
+| [`principle-fix-root-causes`](./principle-fix-root-causes/) | [`skills/principle-fix-root-causes`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-fix-root-causes) |
+| [`principle-foundational-thinking`](./principle-foundational-thinking/) | [`skills/principle-foundational-thinking`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-foundational-thinking) |
+| [`principle-guard-the-context-window`](./principle-guard-the-context-window/) | [`skills/principle-guard-the-context-window`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-guard-the-context-window) |
+| [`principle-laziness-protocol`](./principle-laziness-protocol/) | [`skills/principle-laziness-protocol`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-laziness-protocol) |
+| [`principle-make-operations-idempotent`](./principle-make-operations-idempotent/) | [`skills/principle-make-operations-idempotent`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-make-operations-idempotent) |
+| [`principle-migrate-callers-then-delete-legacy-apis`](./principle-migrate-callers-then-delete-legacy-apis/) | [`skills/principle-migrate-callers-then-delete-legacy-apis`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-migrate-callers-then-delete-legacy-apis) |
+| [`principle-minimize-reader-load`](./principle-minimize-reader-load/) | [`skills/principle-minimize-reader-load`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-minimize-reader-load) |
+| [`principle-model-the-domain`](./principle-model-the-domain/) | [`skills/principle-model-the-domain`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-model-the-domain) |
+| [`principle-never-block-on-the-human`](./principle-never-block-on-the-human/) | [`skills/principle-never-block-on-the-human`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-never-block-on-the-human) |
+| [`principle-outcome-oriented-execution`](./principle-outcome-oriented-execution/) | [`skills/principle-outcome-oriented-execution`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-outcome-oriented-execution) |
+| [`principle-prove-it-works`](./principle-prove-it-works/) | [`skills/principle-prove-it-works`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-prove-it-works) |
+| [`principle-redesign-from-first-principles`](./principle-redesign-from-first-principles/) | [`skills/principle-redesign-from-first-principles`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-redesign-from-first-principles) |
+| [`principle-separate-before-serializing-shared-state`](./principle-separate-before-serializing-shared-state/) | [`skills/principle-separate-before-serializing-shared-state`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-separate-before-serializing-shared-state) |
+| [`principle-sequence-verifiable-units`](./principle-sequence-verifiable-units/) | [`skills/principle-sequence-verifiable-units`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-sequence-verifiable-units) |
+| [`principle-subtract-before-you-add`](./principle-subtract-before-you-add/) | [`skills/principle-subtract-before-you-add`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-subtract-before-you-add) |
+| [`principle-test-behavior-not-implementation`](./principle-test-behavior-not-implementation/) | [`skills/principle-test-behavior-not-implementation`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-test-behavior-not-implementation) |
+| [`principle-type-system-discipline`](./principle-type-system-discipline/) | [`skills/principle-type-system-discipline`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/principle-type-system-discipline) |
+| [`recall`](./recall/) | [`skills/recall`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/recall) |
+| [`setup-pstack`](./setup-pstack/) | [`skills/setup-pstack`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/setup-pstack) |
+| [`show-me-your-work`](./show-me-your-work/) | [`skills/show-me-your-work`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/show-me-your-work) |
+| [`swarm`](./swarm/) | [`skills/swarm`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/swarm) |
+| [`technical-writing`](./technical-writing/) | [`skills/technical-writing`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/technical-writing) |
+| [`typescript-best-practices`](./typescript-best-practices/) | [`skills/typescript-best-practices`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/typescript-best-practices) |
+| [`unslop`](./unslop/) | [`skills/unslop`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/unslop) |
+| [`why`](./why/) | [`skills/why`](https://github.com/backnotprop/pstack/tree/124f622bcaeac490e7e9dac6af83f3ef9611d554/skills/why) |
 
 ## Mandatory imports
 

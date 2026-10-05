@@ -3,7 +3,7 @@
 # Attribution: job-hunt-skills
 
 Everything in this directory was copied from [job-hunt-skills](https://github.com/Remotivated/job-hunt-skills) at commit
-[`5fb238febf14a0b41fb5a8fe7384594ad1f59335`](https://github.com/Remotivated/job-hunt-skills/commit/5fb238febf14a0b41fb5a8fe7384594ad1f59335), pinned on 2026-08-25.
+[`74fe9165e1eb5c7f6052bf665a54c5cfb81e0960`](https://github.com/Remotivated/job-hunt-skills/commit/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960), pinned on 2026-09-14.
 
 - **Upstream project:** <https://github.com/Remotivated/job-hunt-skills>
 - **Original author:** Remotivated
@@ -38,17 +38,17 @@ Upstream subtrees are mapped so that the relative links inside them keep resolvi
 
 | Skill | Upstream permalink |
 | --- | --- |
-| [`claim-check`](./skills/claim-check/) | [`skills/claim-check`](https://github.com/Remotivated/job-hunt-skills/tree/5fb238febf14a0b41fb5a8fe7384594ad1f59335/skills/claim-check) |
-| [`company-research`](./skills/company-research/) | [`skills/company-research`](https://github.com/Remotivated/job-hunt-skills/tree/5fb238febf14a0b41fb5a8fe7384594ad1f59335/skills/company-research) |
-| [`cover-letter`](./skills/cover-letter/) | [`skills/cover-letter`](https://github.com/Remotivated/job-hunt-skills/tree/5fb238febf14a0b41fb5a8fe7384594ad1f59335/skills/cover-letter) |
-| [`get-started`](./skills/get-started/) | [`skills/get-started`](https://github.com/Remotivated/job-hunt-skills/tree/5fb238febf14a0b41fb5a8fe7384594ad1f59335/skills/get-started) |
-| [`interview-coach`](./skills/interview-coach/) | [`skills/interview-coach`](https://github.com/Remotivated/job-hunt-skills/tree/5fb238febf14a0b41fb5a8fe7384594ad1f59335/skills/interview-coach) |
-| [`interviewing`](./skills/interviewing/) | [`skills/interviewing`](https://github.com/Remotivated/job-hunt-skills/tree/5fb238febf14a0b41fb5a8fe7384594ad1f59335/skills/interviewing) |
-| [`linkedin-optimizer`](./skills/linkedin-optimizer/) | [`skills/linkedin-optimizer`](https://github.com/Remotivated/job-hunt-skills/tree/5fb238febf14a0b41fb5a8fe7384594ad1f59335/skills/linkedin-optimizer) |
-| [`proof-asset-creator`](./skills/proof-asset-creator/) | [`skills/proof-asset-creator`](https://github.com/Remotivated/job-hunt-skills/tree/5fb238febf14a0b41fb5a8fe7384594ad1f59335/skills/proof-asset-creator) |
-| [`resume-auditor`](./skills/resume-auditor/) | [`skills/resume-auditor`](https://github.com/Remotivated/job-hunt-skills/tree/5fb238febf14a0b41fb5a8fe7384594ad1f59335/skills/resume-auditor) |
-| [`resume-builder`](./skills/resume-builder/) | [`skills/resume-builder`](https://github.com/Remotivated/job-hunt-skills/tree/5fb238febf14a0b41fb5a8fe7384594ad1f59335/skills/resume-builder) |
-| [`resume-tailor`](./skills/resume-tailor/) | [`skills/resume-tailor`](https://github.com/Remotivated/job-hunt-skills/tree/5fb238febf14a0b41fb5a8fe7384594ad1f59335/skills/resume-tailor) |
+| [`claim-check`](./skills/claim-check/) | [`skills/claim-check`](https://github.com/Remotivated/job-hunt-skills/tree/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960/skills/claim-check) |
+| [`company-research`](./skills/company-research/) | [`skills/company-research`](https://github.com/Remotivated/job-hunt-skills/tree/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960/skills/company-research) |
+| [`cover-letter`](./skills/cover-letter/) | [`skills/cover-letter`](https://github.com/Remotivated/job-hunt-skills/tree/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960/skills/cover-letter) |
+| [`get-started`](./skills/get-started/) | [`skills/get-started`](https://github.com/Remotivated/job-hunt-skills/tree/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960/skills/get-started) |
+| [`interview-coach`](./skills/interview-coach/) | [`skills/interview-coach`](https://github.com/Remotivated/job-hunt-skills/tree/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960/skills/interview-coach) |
+| [`interviewing`](./skills/interviewing/) | [`skills/interviewing`](https://github.com/Remotivated/job-hunt-skills/tree/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960/skills/interviewing) |
+| [`linkedin-optimizer`](./skills/linkedin-optimizer/) | [`skills/linkedin-optimizer`](https://github.com/Remotivated/job-hunt-skills/tree/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960/skills/linkedin-optimizer) |
+| [`proof-asset-creator`](./skills/proof-asset-creator/) | [`skills/proof-asset-creator`](https://github.com/Remotivated/job-hunt-skills/tree/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960/skills/proof-asset-creator) |
+| [`resume-auditor`](./skills/resume-auditor/) | [`skills/resume-auditor`](https://github.com/Remotivated/job-hunt-skills/tree/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960/skills/resume-auditor) |
+| [`resume-builder`](./skills/resume-builder/) | [`skills/resume-builder`](https://github.com/Remotivated/job-hunt-skills/tree/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960/skills/resume-builder) |
+| [`resume-tailor`](./skills/resume-tailor/) | [`skills/resume-tailor`](https://github.com/Remotivated/job-hunt-skills/tree/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960/skills/resume-tailor) |
 
 Also imported from `skills`, carrying no `SKILL.md` and therefore not skills: `_shared`.
 
