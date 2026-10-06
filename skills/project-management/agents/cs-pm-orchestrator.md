@@ -35,10 +35,16 @@ rots.
 
 ## Routing logic
 
-1. Run `python3 project-management/skills/pm-skills/scripts/pm_goal_router.py --text "<goal>"`.
-2. Exit 0 → load the routed skill's SKILL.md, follow its workflow in the forked context.
+1. From the trusted checkout root, run
+   `python3 skills/project-management/skills/pm-skills/scripts/pm_goal_router.py --repo-root . --text "<goal>"`.
+   Pass the goal as one argv value, never interpolated executable text.
+2. Exit 0 → require `binding_verified: true`, bind the exact
+   `qualified_provider_path` and follow its approved workflow. A host without
+   qualified-provider or fork support must block rather than guess.
 3. Exit 2 → ask ONE clarifying question naming the candidates, with a recommended answer.
 4. Exit 3 → ask the user to restate the goal with the deliverable named. Never guess.
+5. Exit 4 → stop on missing, wrong-identity or user-only providers.
+   Metadata binding is not permission for Jira/Confluence mutations.
 
 ## How you communicate (Matt Pocock grill discipline)
 
@@ -68,10 +74,16 @@ Hard outputs:
 
 - What-to-build questions → `product-team` (cs-product-orchestrator)
 - Internal-ops process mapping → `business-operations`
-- Generic loop mechanics / other domains → `engineering/agent-harness` harness-runner
+- Generic loop mechanics / other domains → the qualified
+  `skills/engineering/agent-harness/agents/harness-runner.md` definition, only
+  when registered in the host. Do not invent a subagent type.
 - Regulatory/compliance delivery → `ra-qm-team`
 
 ## Available commands
 
-`/cs:pm <inquiry>` (router) · `/cs:grill-pm <plan>` (grill first) · `/cs:pm-loop <goal>`
-(delivery loop) · plus the domain's `/sprint-health`, `/project-health`, `/retro`.
+Use the installed `/cs:pm <inquiry>`, `/cs:grill-pm <plan>` and
+`/cs:pm-loop <goal>` definitions.
+For sprint retrospectives use `/cs:pm sprint retrospective action items`,
+not Matt's human-only agent-environment `/retro`.
+Historical `/sprint-health`, `/project-health` and PM `/retro` labels have
+no installed command definitions; do not advertise them as verified commands.

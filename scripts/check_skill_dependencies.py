@@ -400,7 +400,7 @@ def check(root, r, require_provenance=False):
     return errors
 
 
-def resolve(root, r, name, invoker="user", caller=None):
+def resolve(root, r, name, invoker="user", caller=None, namespace=None):
     by_name = validate_registry(r)
     # Check everything before resolving: no successful routing through a broken bundle.
     errors = check(root, r)
@@ -408,6 +408,15 @@ def resolve(root, r, name, invoker="user", caller=None):
         raise Invalid("dependency check failed: " + "; ".join(errors))
     if name.startswith("/"):
         name = name[1:]
+    if namespace and name != "retro":
+        raise Invalid("namespace is only supported for retro; other providers use caller scope")
+    if name == "retro" and invoker == "user":
+        if namespace == "project-management":
+            raise Invalid("PM retrospective is /cs:pm sprint retrospective action items; "
+                          "use --resolve-pm-retrospective, not Matt retro")
+        if namespace != "matt":
+            raise Invalid("ambiguous retro intent: specify --namespace matt for agent-environment "
+                          "review, or --resolve-pm-retrospective for sprint retrospectives")
     alias = r["aliases"].get(name)
     if alias:
         if invoker != "user":
@@ -458,6 +467,14 @@ def main(argv=None):
     parser.add_argument("--resolve", metavar="NAME")
     parser.add_argument("--invoker", choices=("user", "model"), default="user")
     parser.add_argument("--caller", metavar="NAME")
+    parser.add_argument("--namespace", choices=("matt", "project-management"),
+                        help="qualify the human retro request; never infer a PM-to-Matt alias")
+    parser.add_argument("--include-legacy", action="store_true",
+                        help="also validate declared local consumer routes and PM command bindings")
+    parser.add_argument("--resolve-pm-retrospective", action="store_true",
+                        help="emit qualified PM command metadata, without invoking any command")
+    parser.add_argument("--resolve-legacy-target", metavar="PROVIDER_PATH",
+                        help="resolve one declared legacy consumer's exact model Skill path")
     parser.add_argument("--require-provenance", action="store_true",
                         help="require importer evidence even without detected import markers")
     args = parser.parse_args(argv)
@@ -466,12 +483,49 @@ def main(argv=None):
             raise Invalid("symlink root refused")
         root = args.root.resolve(strict=True)
         r = read_registry(root)
+        if args.resolve_pm_retrospective and (args.resolve or args.namespace or args.caller
+                                             or args.resolve_legacy_target):
+            raise Invalid("PM command resolution cannot be combined with skill resolution or caller scope")
+        if args.resolve_legacy_target and (not args.caller or args.resolve or args.namespace):
+            raise Invalid("legacy target resolution requires --caller and an exact path, not a skill name")
+        if args.namespace and not args.resolve:
+            raise Invalid("--namespace requires --resolve retro")
+        if args.include_legacy or args.resolve_pm_retrospective or args.resolve_legacy_target:
+            from check_legacy_bindings import validate as validate_legacy
+            legacy_errors = validate_legacy(root, r)
+            if legacy_errors:
+                raise Invalid("; ".join(legacy_errors))
+        if args.resolve_legacy_target:
+            errors = check(root, r, args.require_provenance)
+            if errors:
+                raise Invalid("; ".join(errors))
+            from check_legacy_bindings import resolve_consumer
+            relative = resolve_consumer(
+                root, r, args.caller, args.resolve_legacy_target, args.invoker)
+            print(checked_path(root, relative))
+            return 0
+        if args.resolve_pm_retrospective:
+            if args.invoker != "user":
+                raise Invalid("model invocation refused: PM command requires an independent human command")
+            errors = check(root, r, args.require_provenance)
+            if errors:
+                raise Invalid("; ".join(errors))
+            binding = r["legacy_bindings"]["pm_retrospective"]
+            print(json.dumps({
+                "command": binding["command"],
+                "arguments": binding["arguments"],
+                "command_path": str(checked_path(root, binding["command_path"])),
+                "provider_path": str(checked_path(root, binding["provider_path"])),
+                "invocation": "user",
+                "executed": False,
+            }))
+            return 0
         if args.resolve:
             if args.require_provenance:
                 errors = check(root, r, True)
                 if errors:
                     raise Invalid("; ".join(errors))
-            print(resolve(root, r, args.resolve, args.invoker, args.caller))
+            print(resolve(root, r, args.resolve, args.invoker, args.caller, args.namespace))
         else:
             errors = check(root, r, args.require_provenance)
             if errors:

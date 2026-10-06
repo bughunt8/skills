@@ -19,5 +19,5 @@
 // the rendered page matches data.js and that neither shrank behind our backs.
 export const EXPECTED_TOTAL = 495;
 export const EXPECTED_CATEGORIES = 25;
-export const EXPECTED_COMMUNITIES = 77;
+export const EXPECTED_COMMUNITIES = 76;
 export const EXPECTED_SOLUTIONS = 50;

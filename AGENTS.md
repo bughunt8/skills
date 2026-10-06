@@ -41,8 +41,10 @@ python3 scripts/sync_vendor.py --validate-manifest # provenance, licences, owner
 python3 scripts/audit_third_party.py               # every licence marker is accounted for
 python3 scripts/check_links.py                     # relative links resolve
 python3 scripts/check_solutions.py                 # every solution step resolves to one real skill
-python3 scripts/check_skill_dependencies.py        # exact Matt providers, resources and invocation closure
+python3 scripts/check_skill_dependencies.py --include-legacy # Matt providers and declared legacy consumers
 python3 -m unittest discover -s scripts -p 'test_*.py' -v # importer and dependency regression tests
+HARNESS_SOURCE_ROOT="$PWD" python3 -m unittest discover -s skills/engineering/agent-harness/tests -p 'test_*.py' -v
+python3 skills/engineering/agent-harness/skills/agent-harness/scripts/harness_manifest_builder.py --check --repo-root .
 ```
 
 These checks are offline and require the standard library plus PyYAML, which CI
@@ -233,7 +235,7 @@ See `docs/agents/domain.md`. Do not invent domain content to fill a template.
 Read [.agents/invocation.md](.agents/invocation.md) before selecting a companion.
 The [dependency registry](.agents/skill-dependencies.json) binds the 27 stable
 Matt providers to exact paths and resources. Validate it with
-`python3 scripts/check_skill_dependencies.py`. User-only commands cannot be
+`python3 scripts/check_skill_dependencies.py --include-legacy`. User-only commands cannot be
 called by another skill, even a user-invoked skill. Read setup seeds as data,
 not as permission to activate setup. Use one model-invoked target per loader call.
 
@@ -261,6 +263,25 @@ limits. Future imports and refreshes use `scripts/sync_vendor.py`; never copy
 external skills or forge ownership records. The one-time `--adopt-existing`
 operation requires explicit source IDs, a verified complete-tree hash and an
 unused archive path. Do not use it on an already managed source.
+
+### Legacy harness consumers
+
+Read [legacy bindings](docs/legacy-harness-bindings.md) before model dispatch
+from a senior-engineer composition map or resuming an old harness state.
+The existing builder owns all 18 generated domain inventories. After reviewed
+Skill/resource changes, regenerate them with `--all --repo-root . --no-timestamp`
+and require `--check` to pass. Never edit their hashes to conceal drift.
+
+The compiler/controller use manifest, plan and state v2 with live provider
+identity, invocation and file checks. Preserve old state and evidence; legacy
+or stale state requires review and a NEW state filename, not an automatic reset.
+Exact paths survive fresh-session directives. Qualification is not host
+registration, execution authority or proof that a goal was accomplished.
+
+Missing wrappers are blocked rather than invented. PM sprint retrospectives use
+`/cs:pm sprint retrospective action items`; Matt's environment retrospective
+requires explicit `--resolve retro --namespace matt --invoker user` in the
+repository resolver. Do not turn a PM label into a human-only Skill call.
 
 ## Commit convention
 

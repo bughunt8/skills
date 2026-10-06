@@ -38,6 +38,7 @@ Run the read-only checker against the installed repository before dispatch:
 
 ```bash
 python3 scripts/check_skill_dependencies.py --root /path/to/repository
+python3 scripts/check_skill_dependencies.py --root /path/to/repository --include-legacy
 python3 scripts/check_skill_dependencies.py --root /path/to/repository \
   --resolve grilling --invoker model --caller grill-me
 ```
@@ -74,6 +75,29 @@ When `--caller` is supplied for model dispatch, the resolver validates the
 declared caller and its operative graph or explicit local scope. Without a
 caller on a unique name, it checks provider reachability only. It does not prove
 that a currently running caller has authorization to use that provider.
+
+## Qualified legacy consumers
+
+The same registry now contains `legacy_bindings` for the three senior-engineer
+consumers and the explicit PM retrospective command. The structural helper
+validates concrete map links, consumer instruction hashes and dispatch kinds.
+Use `--include-legacy` in the repository gate. It does not prove a native host
+registered an agent or can bind an exact file.
+
+```bash
+python3 scripts/check_skill_dependencies.py \
+  --resolve-legacy-target skills/productivity/grilling/SKILL.md \
+  --caller senior-backend --invoker model
+python3 scripts/check_skill_dependencies.py --resolve-pm-retrospective --invoker user
+python3 scripts/check_skill_dependencies.py --resolve retro --namespace matt --invoker user
+```
+
+Human `retro` without a namespace is ambiguous. PM sprint retrospectives use
+the installed `/cs:pm` inquiry, never an alias to Matt's human-only environment
+review. Missing wrappers are blocked, and agent definitions are not Skill
+targets. Conditional routes retain their separate approval and host requirements.
+Read [legacy binding recovery](../docs/legacy-harness-bindings.md) before
+regenerating inventories or resuming an old loop state.
 
 ## Human aliases
 
@@ -164,9 +188,14 @@ implementation.
 The checker validates the declared 27-provider pinned bundle, YAML/Codex pairs,
 owned file hashes, graph evidence/closure/cycles, aliases, and importer source
 paths once import markers or Matt manifest entries exist. It is read-only.
+`--include-legacy` additionally checks the three qualified senior consumers and
+PM command binding. The executable harness separately validates live providers
+against its regenerated 18 inventories and persisted v2 task bindings.
 
 It is not runtime enforcement, a sandbox, a signing service, an authenticated
 approval channel, a license-rights audit, or whole-repository dispatch closure.
 Treat registry/script files as trusted reviewed inputs. Do not bypass a failed
 check by editing source hashes or graph entries to match unexplained drift.
-The inbound inventory's unresolved callers require their own review.
+The historical inbound inventory is not a current whole-library registration
+record. Missing wrappers stay blocked, and actual host roles and integrations
+still require separate qualification.

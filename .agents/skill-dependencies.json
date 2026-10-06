@@ -1589,5 +1589,2698 @@
     "ask-matt": "human-facing setup suggestion, not an operative call",
     "setup-matt-pocock-skills": "triage presence check is not dispatch"
   },
-  "static_limit": "Pinned native graph only. Inbound inventory and dynamic dispatch require host review."
+  "static_limit": "Pinned native graph only. Inbound inventory and dynamic dispatch require host review.",
+  "legacy_bindings": {
+    "schema_version": 1,
+    "scope": "three_senior_consumers_and_pm_retrospective",
+    "verification": "read_only_structural_registration_not_runtime_closure",
+    "consumers": [
+      {
+        "id": "senior-backend",
+        "skill_path": "skills/engineering-team/skills/senior-backend/SKILL.md",
+        "map_path": "skills/engineering-team/skills/senior-backend/references/composition_map.md",
+        "files": [
+          {
+            "path": "skills/engineering-team/skills/senior-backend/SKILL.md",
+            "sha256": "37c0c0d9e52a824c954785deac6018893ac8121bb01a963e9f357a5436b74b05"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-backend/references/api_design_patterns.md",
+            "sha256": "b474416e963f7538af0d60d28f570e20b5bbb4bf546c1ae5627c2b8c9132d845"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-backend/references/backend_security_practices.md",
+            "sha256": "f3c95135944a862c5dee3fcb2bd436997e77433f48d5300eaa3d950000e9978c"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-backend/references/composition_map.md",
+            "sha256": "dc1a26f36f6b0c98ffe62c7777f5f7c10bc75178265444539cf8e911a0cc59ad"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-backend/references/database_optimization_guide.md",
+            "sha256": "6603c50b79cdfe63f5f9a87ab9753c5b9efb954495bd5aa71ba57828c735d186"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-backend/references/forcing_questions.md",
+            "sha256": "29b6f51d65ef72300b41649311d46f189a7e33cbd03cc269ce9c83b043d5d0b0"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-backend/references/workflow.md",
+            "sha256": "df63c4095cc2921febd30b63ecb9699aa1ff7a663cf1c7cd1739af6db3b03993"
+          }
+        ],
+        "routes": [
+          {
+            "id": "senior-backend:L13:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/productivity/grilling/SKILL.md",
+              "canonical_name": "grilling",
+              "namespace": "productivity",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/productivity/grilling/SKILL.md",
+                  "sha256": "10ff989e7498b23b5acb49d5048f11dcd906757d2f79c5cdf8a00001381296f2"
+                },
+                {
+                  "path": "skills/productivity/grilling/agents/openai.yaml",
+                  "sha256": "1411d7df7d99b7e621a1ff8283c8133cc2464be63d064e52d8ce169c6800ee9b"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 13,
+              "ordinal": 1,
+              "label": "grilling",
+              "href": "../../../../productivity/grilling/SKILL.md",
+              "path": "skills/productivity/grilling/SKILL.md",
+              "instruction": "Native [grilling](../../../../productivity/grilling/SKILL.md) is the explicit model preflight target. It asks frontier rounds and waits for shared-understanding confirmation. It is not an alias for missing `cs-grill-master` or human-only `grill-me` / `grill-with-docs`. Keep the local [forcing questions](forcing_questions.md) one-question-per-turn intake unchanged. Read those first when inputs are unknown. If domain boundaries need a separate approved modeling task, resolve and call [domain-modeling](../../../../engineering/domain-modeling/SKILL.md) independently after approval. Passive glossary reads do not invoke it. Never call either human wrapper from a model, even when this skill was user-invoked."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "preflight_shared_understanding_required"
+          },
+          {
+            "id": "senior-backend:L13:N2",
+            "provider": {
+              "kind": "document",
+              "path": "skills/engineering-team/skills/senior-backend/references/forcing_questions.md",
+              "invocation": "passive",
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-backend/references/forcing_questions.md",
+                  "sha256": "29b6f51d65ef72300b41649311d46f189a7e33cbd03cc269ce9c83b043d5d0b0"
+                }
+              ]
+            },
+            "action": "passive_read",
+            "evidence": {
+              "line": 13,
+              "ordinal": 2,
+              "label": "forcing questions",
+              "href": "forcing_questions.md",
+              "path": "skills/engineering-team/skills/senior-backend/references/forcing_questions.md",
+              "instruction": "Native [grilling](../../../../productivity/grilling/SKILL.md) is the explicit model preflight target. It asks frontier rounds and waits for shared-understanding confirmation. It is not an alias for missing `cs-grill-master` or human-only `grill-me` / `grill-with-docs`. Keep the local [forcing questions](forcing_questions.md) one-question-per-turn intake unchanged. Read those first when inputs are unknown. If domain boundaries need a separate approved modeling task, resolve and call [domain-modeling](../../../../engineering/domain-modeling/SKILL.md) independently after approval. Passive glossary reads do not invoke it. Never call either human wrapper from a model, even when this skill was user-invoked."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L13:N3",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/domain-modeling/SKILL.md",
+              "canonical_name": "domain-modeling",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/domain-modeling/SKILL.md",
+                  "sha256": "7b925d7b1e341a2eeae33ad68a8a8c0ab889a38ddd22a7598e4c240e5a7556a3"
+                },
+                {
+                  "path": "skills/engineering/domain-modeling/agents/openai.yaml",
+                  "sha256": "f6bf2aa996c6e6f53fdd0708e18a0d16a56aed8322cca59fedbe3c0d2c75f06b"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 13,
+              "ordinal": 3,
+              "label": "domain-modeling",
+              "href": "../../../../engineering/domain-modeling/SKILL.md",
+              "path": "skills/engineering/domain-modeling/SKILL.md",
+              "instruction": "Native [grilling](../../../../productivity/grilling/SKILL.md) is the explicit model preflight target. It asks frontier rounds and waits for shared-understanding confirmation. It is not an alias for missing `cs-grill-master` or human-only `grill-me` / `grill-with-docs`. Keep the local [forcing questions](forcing_questions.md) one-question-per-turn intake unchanged. Read those first when inputs are unknown. If domain boundaries need a separate approved modeling task, resolve and call [domain-modeling](../../../../engineering/domain-modeling/SKILL.md) independently after approval. Passive glossary reads do not invoke it. Never call either human wrapper from a model, even when this skill was user-invoked."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "separate_approved_modeling_task"
+          },
+          {
+            "id": "senior-backend:L22:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/api-design-reviewer/SKILL.md",
+              "canonical_name": "api-design-reviewer",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/api-design-reviewer/SKILL.md",
+                  "sha256": "a4e61a67981d7cab02f479f959b9e83d032e705c17b72e763d07ef9a3247bf54"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 22,
+              "ordinal": 1,
+              "label": "api-design-reviewer",
+              "href": "../../../../engineering/skills/api-design-reviewer/SKILL.md",
+              "path": "skills/engineering/skills/api-design-reviewer/SKILL.md",
+              "instruction": "| API contract / REST / GraphQL design / breaking-change risk | api-design-reviewer | After Q1\u2013Q3 reveal API shape | [api-design-reviewer](../../../../engineering/skills/api-design-reviewer/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L23:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/database-designer/SKILL.md",
+              "canonical_name": "database-designer",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/database-designer/SKILL.md",
+                  "sha256": "3729790a4e29e45ea0e9cb0bbb220d2162fea0e954d32f2abf8728aa8ef41ad1"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 23,
+              "ordinal": 1,
+              "label": "database-designer",
+              "href": "../../../../engineering/skills/database-designer/SKILL.md",
+              "path": "skills/engineering/skills/database-designer/SKILL.md",
+              "instruction": "| Schema design / ERD / normalization / indexing | database-designer + database-schema-designer | After Q1 (read/write ratio) is known | [database-designer](../../../../engineering/skills/database-designer/SKILL.md) + [database-schema-designer](../../../../engineering/skills/database-schema-designer/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L23:N2",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/database-schema-designer/SKILL.md",
+              "canonical_name": "database-schema-designer",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/database-schema-designer/SKILL.md",
+                  "sha256": "0a964937e39dc65462ad5b3e36e30ebd08f17eea6503e0f7d0b2dbe86fbe35fc"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 23,
+              "ordinal": 2,
+              "label": "database-schema-designer",
+              "href": "../../../../engineering/skills/database-schema-designer/SKILL.md",
+              "path": "skills/engineering/skills/database-schema-designer/SKILL.md",
+              "instruction": "| Schema design / ERD / normalization / indexing | database-designer + database-schema-designer | After Q1 (read/write ratio) is known | [database-designer](../../../../engineering/skills/database-designer/SKILL.md) + [database-schema-designer](../../../../engineering/skills/database-schema-designer/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L24:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/migration-architect/SKILL.md",
+              "canonical_name": "migration-architect",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/migration-architect/SKILL.md",
+                  "sha256": "b262c3b4eea8389b4fb65016734a092a99e096a226662c37efc89bc93c69a77a"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 24,
+              "ordinal": 1,
+              "label": "migration-architect",
+              "href": "../../../../engineering/skills/migration-architect/SKILL.md",
+              "path": "skills/engineering/skills/migration-architect/SKILL.md",
+              "instruction": "| Zero-downtime schema migrations | migration-architect | Before any production schema change | [migration-architect](../../../../engineering/skills/migration-architect/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L25:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/slo-architect/skills/slo-architect/SKILL.md",
+              "canonical_name": "slo-architect",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/slo-architect/skills/slo-architect/SKILL.md",
+                  "sha256": "63917f3e02caa905a9b81a5526f4d750780aa7049436f1cc56bfe43450c29afa"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 25,
+              "ordinal": 1,
+              "label": "slo-architect",
+              "href": "../../../../engineering/slo-architect/skills/slo-architect/SKILL.md",
+              "path": "skills/engineering/slo-architect/skills/slo-architect/SKILL.md",
+              "instruction": "| SLO + SLI + error-budget design | slo-architect | After Q7 (SLO) is set | [slo-architect](../../../../engineering/slo-architect/skills/slo-architect/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L26:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/observability-designer/SKILL.md",
+              "canonical_name": "observability-designer",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/observability-designer/SKILL.md",
+                  "sha256": "70ab54164e3cb58f30f4f4e1500bd54361c67f6ecbde954b13596dc2902fe2ac"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 26,
+              "ordinal": 1,
+              "label": "observability-designer",
+              "href": "../../../../engineering/skills/observability-designer/SKILL.md",
+              "path": "skills/engineering/skills/observability-designer/SKILL.md",
+              "instruction": "| Observability / golden signals / alert design | observability-designer | Concurrent with SLO design | [observability-designer](../../../../engineering/skills/observability-designer/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L27:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/mcp-server-builder/SKILL.md",
+              "canonical_name": "mcp-server-builder",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/mcp-server-builder/SKILL.md",
+                  "sha256": "363e0984c512f16b1b45635fc7197ca259435ca75a13d3b4f6b28dc2b25fe9d0"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 27,
+              "ordinal": 1,
+              "label": "mcp-server-builder",
+              "href": "../../../../engineering/skills/mcp-server-builder/SKILL.md",
+              "path": "skills/engineering/skills/mcp-server-builder/SKILL.md",
+              "instruction": "| MCP server build (tools-from-OpenAPI) | mcp-server-builder | When backend exposes tools to LLM agents | [mcp-server-builder](../../../../engineering/skills/mcp-server-builder/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L28:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/ci-cd-pipeline-builder/SKILL.md",
+              "canonical_name": "ci-cd-pipeline-builder",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/ci-cd-pipeline-builder/SKILL.md",
+                  "sha256": "b9628224a9fe77caca4aedda49a72938147000ab275da92ebccf190c3ba8f161"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 28,
+              "ordinal": 1,
+              "label": "ci-cd-pipeline-builder",
+              "href": "../../../../engineering/skills/ci-cd-pipeline-builder/SKILL.md",
+              "path": "skills/engineering/skills/ci-cd-pipeline-builder/SKILL.md",
+              "instruction": "| CI/CD pipeline for backend service | ci-cd-pipeline-builder | After Q2 (tenancy) and Q5 (pattern) are set | [ci-cd-pipeline-builder](../../../../engineering/skills/ci-cd-pipeline-builder/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L29:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/dependency-auditor/SKILL.md",
+              "canonical_name": "dependency-auditor",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/dependency-auditor/SKILL.md",
+                  "sha256": "4bde5bd43d14b39a9c282f1ab74b202d102b070b99a5083724e84526bc5e2f0a"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 29,
+              "ordinal": 1,
+              "label": "dependency-auditor",
+              "href": "../../../../engineering/skills/dependency-auditor/SKILL.md",
+              "path": "skills/engineering/skills/dependency-auditor/SKILL.md",
+              "instruction": "| Dependency vulnerability + license risk | dependency-auditor | Before every release | [dependency-auditor](../../../../engineering/skills/dependency-auditor/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L30:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/api-test-suite-builder/SKILL.md",
+              "canonical_name": "api-test-suite-builder",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/api-test-suite-builder/SKILL.md",
+                  "sha256": "a0db3fd9004317097c1c9c7ef7da6276a98d205a1c2af79fbbddd72fab976d42"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 30,
+              "ordinal": 1,
+              "label": "api-test-suite-builder",
+              "href": "../../../../engineering/skills/api-test-suite-builder/SKILL.md",
+              "path": "skills/engineering/skills/api-test-suite-builder/SKILL.md",
+              "instruction": "| API test suite + contract tests | api-test-suite-builder | After API contract is stable | [api-test-suite-builder](../../../../engineering/skills/api-test-suite-builder/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L31:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/senior-security/SKILL.md",
+              "canonical_name": "senior-security",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-security/SKILL.md",
+                  "sha256": "454188e4f0188d3e0219f58c70dc666e0a9e98383d53a7437a027b13db68643a"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 31,
+              "ordinal": 1,
+              "label": "senior-security",
+              "href": "../../../../engineering-team/skills/senior-security/SKILL.md",
+              "path": "skills/engineering-team/skills/senior-security/SKILL.md",
+              "instruction": "| Security hardening / threat model / authZ | senior-security + adversarial-reviewer | Before public launch; before handling PII/PHI/PCI | [senior-security](../../../../engineering-team/skills/senior-security/SKILL.md) + [adversarial-reviewer](../../../../engineering-team/skills/adversarial-reviewer/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L31:N2",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/adversarial-reviewer/SKILL.md",
+              "canonical_name": "adversarial-reviewer",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/adversarial-reviewer/SKILL.md",
+                  "sha256": "d69e917a7c84405a18b40bd6e41d5fae9aba966db903171028f86bb5c25f6f94"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 31,
+              "ordinal": 2,
+              "label": "adversarial-reviewer",
+              "href": "../../../../engineering-team/skills/adversarial-reviewer/SKILL.md",
+              "path": "skills/engineering-team/skills/adversarial-reviewer/SKILL.md",
+              "instruction": "| Security hardening / threat model / authZ | senior-security + adversarial-reviewer | Before public launch; before handling PII/PHI/PCI | [senior-security](../../../../engineering-team/skills/senior-security/SKILL.md) + [adversarial-reviewer](../../../../engineering-team/skills/adversarial-reviewer/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L32:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/aws-solution-architect/SKILL.md",
+              "canonical_name": "aws-solution-architect",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/aws-solution-architect/SKILL.md",
+                  "sha256": "4d5f067b82f3ea77d3ed6356eb18e6cda86126a2b36f9e53b7614bbc149e973c"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 32,
+              "ordinal": 1,
+              "label": "aws-solution-architect",
+              "href": "../../../../engineering-team/skills/aws-solution-architect/SKILL.md",
+              "path": "skills/engineering-team/skills/aws-solution-architect/SKILL.md",
+              "instruction": "| Cloud architecture (AWS / Azure / GCP) | aws-solution-architect + azure-cloud-architect + gcp-cloud-architect | When infrastructure choice is the bottleneck | [aws-solution-architect](../../../../engineering-team/skills/aws-solution-architect/SKILL.md) / [azure-cloud-architect](../../../../engineering-team/skills/azure-cloud-architect/SKILL.md) / [gcp-cloud-architect](../../../../engineering-team/skills/gcp-cloud-architect/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L32:N2",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/azure-cloud-architect/SKILL.md",
+              "canonical_name": "azure-cloud-architect",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/azure-cloud-architect/SKILL.md",
+                  "sha256": "d92c2d096b11cc10d2525f79bcaff3f75727968b84c24a629ef589082ad2a825"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 32,
+              "ordinal": 2,
+              "label": "azure-cloud-architect",
+              "href": "../../../../engineering-team/skills/azure-cloud-architect/SKILL.md",
+              "path": "skills/engineering-team/skills/azure-cloud-architect/SKILL.md",
+              "instruction": "| Cloud architecture (AWS / Azure / GCP) | aws-solution-architect + azure-cloud-architect + gcp-cloud-architect | When infrastructure choice is the bottleneck | [aws-solution-architect](../../../../engineering-team/skills/aws-solution-architect/SKILL.md) / [azure-cloud-architect](../../../../engineering-team/skills/azure-cloud-architect/SKILL.md) / [gcp-cloud-architect](../../../../engineering-team/skills/gcp-cloud-architect/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L32:N3",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/gcp-cloud-architect/SKILL.md",
+              "canonical_name": "gcp-cloud-architect",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/gcp-cloud-architect/SKILL.md",
+                  "sha256": "5ea03c02ce083de1a846a843213bf18da03e2bd335af71e50a7807fb05e84c7d"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 32,
+              "ordinal": 3,
+              "label": "gcp-cloud-architect",
+              "href": "../../../../engineering-team/skills/gcp-cloud-architect/SKILL.md",
+              "path": "skills/engineering-team/skills/gcp-cloud-architect/SKILL.md",
+              "instruction": "| Cloud architecture (AWS / Azure / GCP) | aws-solution-architect + azure-cloud-architect + gcp-cloud-architect | When infrastructure choice is the bottleneck | [aws-solution-architect](../../../../engineering-team/skills/aws-solution-architect/SKILL.md) / [azure-cloud-architect](../../../../engineering-team/skills/azure-cloud-architect/SKILL.md) / [gcp-cloud-architect](../../../../engineering-team/skills/gcp-cloud-architect/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L33:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/feature-flags-architect/skills/feature-flags-architect/SKILL.md",
+              "canonical_name": "feature-flags-architect",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/feature-flags-architect/skills/feature-flags-architect/SKILL.md",
+                  "sha256": "8beb229d269bf25c1a94f6683c3d731662c7d53b774ed5d3e7b65fe23a9234b6"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 33,
+              "ordinal": 1,
+              "label": "feature-flags-architect",
+              "href": "../../../../engineering/feature-flags-architect/skills/feature-flags-architect/SKILL.md",
+              "path": "skills/engineering/feature-flags-architect/skills/feature-flags-architect/SKILL.md",
+              "instruction": "| Feature-flag investment + cleanup | feature-flags-architect | After Q5 (pattern) is set; before per-PR cadence | [feature-flags-architect](../../../../engineering/feature-flags-architect/skills/feature-flags-architect/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L34:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/chaos-engineering/skills/chaos-engineering/SKILL.md",
+              "canonical_name": "chaos-engineering",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/chaos-engineering/skills/chaos-engineering/SKILL.md",
+                  "sha256": "fde41aeb8b9977e85e33a69140c9d5aac099698f480bac6c89a9a5ef8baca8bc"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 34,
+              "ordinal": 1,
+              "label": "chaos-engineering",
+              "href": "../../../../engineering/chaos-engineering/skills/chaos-engineering/SKILL.md",
+              "path": "skills/engineering/chaos-engineering/skills/chaos-engineering/SKILL.md",
+              "instruction": "| Chaos engineering / failure-injection experiments | chaos-engineering | After SLO is in place + stable | [chaos-engineering](../../../../engineering/chaos-engineering/skills/chaos-engineering/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L35:N1",
+            "provider": {
+              "kind": "agent_definition",
+              "path": "skills/engineering/karpathy-coder/agents/karpathy-reviewer.md",
+              "canonical_name": "karpathy-reviewer",
+              "namespace": "engineering",
+              "invocation": "host_registration_required",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/karpathy-coder/agents/karpathy-reviewer.md",
+                  "sha256": "cfdb011397a130c74a8d0a8b881aa251cb0de472146bac05c31cad66f9fb1761"
+                }
+              ]
+            },
+            "action": "host_registered_agent_handoff",
+            "evidence": {
+              "line": 35,
+              "ordinal": 1,
+              "label": "karpathy-reviewer agent",
+              "href": "../../../../engineering/karpathy-coder/agents/karpathy-reviewer.md",
+              "path": "skills/engineering/karpathy-coder/agents/karpathy-reviewer.md",
+              "instruction": "| Pre-commit Karpathy review | karpathy-reviewer agent, corrected from cs-karpathy-reviewer | Before EVERY commit | [karpathy-reviewer agent](../../../../engineering/karpathy-coder/agents/karpathy-reviewer.md) |"
+            },
+            "host_registration_required": true,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L36:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/productivity/grilling/SKILL.md",
+              "canonical_name": "grilling",
+              "namespace": "productivity",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/productivity/grilling/SKILL.md",
+                  "sha256": "10ff989e7498b23b5acb49d5048f11dcd906757d2f79c5cdf8a00001381296f2"
+                },
+                {
+                  "path": "skills/productivity/grilling/agents/openai.yaml",
+                  "sha256": "1411d7df7d99b7e621a1ff8283c8133cc2464be63d064e52d8ce169c6800ee9b"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 36,
+              "ordinal": 1,
+              "label": "grilling",
+              "href": "../../../../productivity/grilling/SKILL.md",
+              "path": "skills/productivity/grilling/SKILL.md",
+              "instruction": "| Pre-flight architecture grill | grilling skill, explicit preflight rebinding | Before locking pattern or DB choice | [grilling](../../../../productivity/grilling/SKILL.md); legacy cs-grill-master remains BLOCKED |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "preflight_shared_understanding_required"
+          },
+          {
+            "id": "senior-backend:L68:N1",
+            "provider": {
+              "kind": "agent_definition",
+              "path": "skills/c-level-advisor/c-level-agents/agents/cs-vpe-advisor.md",
+              "canonical_name": "cs-vpe-advisor",
+              "namespace": "c-level-advisor",
+              "invocation": "host_registration_required",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/c-level-advisor/c-level-agents/agents/cs-vpe-advisor.md",
+                  "sha256": "ffc439bee1b740c9a722e814a62a1ec6425a43f24a87fdd760c5ef67106478be"
+                }
+              ]
+            },
+            "action": "host_registered_agent_handoff",
+            "evidence": {
+              "line": 68,
+              "ordinal": 1,
+              "label": "cs-vpe-advisor",
+              "href": "../../../../c-level-advisor/c-level-agents/agents/cs-vpe-advisor.md",
+              "path": "skills/c-level-advisor/c-level-agents/agents/cs-vpe-advisor.md",
+              "instruction": "- Org design, capacity, hiring \u2192 [cs-vpe-advisor](../../../../c-level-advisor/c-level-agents/agents/cs-vpe-advisor.md) for engineering, or [cs-bizops-orchestrator](../../../../business-operations/agents/cs-bizops-orchestrator.md) for cross-functional operations. Require the matching native agent-role binding."
+            },
+            "host_registration_required": true,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L68:N2",
+            "provider": {
+              "kind": "agent_definition",
+              "path": "skills/business-operations/agents/cs-bizops-orchestrator.md",
+              "canonical_name": "cs-bizops-orchestrator",
+              "namespace": "business-operations",
+              "invocation": "host_registration_required",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/business-operations/agents/cs-bizops-orchestrator.md",
+                  "sha256": "b3160790fcb24879872ac1c23635cc6deefc75477378f25faa98c76dd68cb84d"
+                }
+              ]
+            },
+            "action": "host_registered_agent_handoff",
+            "evidence": {
+              "line": 68,
+              "ordinal": 2,
+              "label": "cs-bizops-orchestrator",
+              "href": "../../../../business-operations/agents/cs-bizops-orchestrator.md",
+              "path": "skills/business-operations/agents/cs-bizops-orchestrator.md",
+              "instruction": "- Org design, capacity, hiring \u2192 [cs-vpe-advisor](../../../../c-level-advisor/c-level-agents/agents/cs-vpe-advisor.md) for engineering, or [cs-bizops-orchestrator](../../../../business-operations/agents/cs-bizops-orchestrator.md) for cross-functional operations. Require the matching native agent-role binding."
+            },
+            "host_registration_required": true,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L70:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/senior-ml-engineer/SKILL.md",
+              "canonical_name": "senior-ml-engineer",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-ml-engineer/SKILL.md",
+                  "sha256": "612ad6c37d6c1d6965add0f2319996c22d39d98346ee33a7e615b6d359e9eec0"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 70,
+              "ordinal": 1,
+              "label": "senior-ml-engineer",
+              "href": "../../../../engineering-team/skills/senior-ml-engineer/SKILL.md",
+              "path": "skills/engineering-team/skills/senior-ml-engineer/SKILL.md",
+              "instruction": "- AI/ML pipelines and serving \u2192 [senior-ml-engineer](../../../../engineering-team/skills/senior-ml-engineer/SKILL.md)."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L71:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/senior-data-engineer/SKILL.md",
+              "canonical_name": "senior-data-engineer",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-data-engineer/SKILL.md",
+                  "sha256": "20495d2ee96a7b5a6d7026713f254f274682438997dd44933b7bca1882a1dae2"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 71,
+              "ordinal": 1,
+              "label": "senior-data-engineer",
+              "href": "../../../../engineering-team/skills/senior-data-engineer/SKILL.md",
+              "path": "skills/engineering-team/skills/senior-data-engineer/SKILL.md",
+              "instruction": "- Warehouse, dbt, lakehouse \u2192 [senior-data-engineer](../../../../engineering-team/skills/senior-data-engineer/SKILL.md)."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L72:N1",
+            "provider": {
+              "kind": "agent_definition",
+              "path": "skills/c-level-advisor/c-level-agents/agents/cs-ciso-advisor.md",
+              "canonical_name": "cs-ciso-advisor",
+              "namespace": "c-level-advisor",
+              "invocation": "host_registration_required",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/c-level-advisor/c-level-agents/agents/cs-ciso-advisor.md",
+                  "sha256": "8d3af2fc95b8d0abfdb6fc112b5a8b028a355ad6703a245c1efdc05e88e225c2"
+                }
+              ]
+            },
+            "action": "host_registered_agent_handoff",
+            "evidence": {
+              "line": 72,
+              "ordinal": 1,
+              "label": "cs-ciso-advisor",
+              "href": "../../../../c-level-advisor/c-level-agents/agents/cs-ciso-advisor.md",
+              "path": "skills/c-level-advisor/c-level-agents/agents/cs-ciso-advisor.md",
+              "instruction": "- Pure security threat model \u2192 [cs-ciso-advisor](../../../../c-level-advisor/c-level-agents/agents/cs-ciso-advisor.md) for strategic review with an authorized agent-role binding, or [senior-security](../../../../engineering-team/skills/senior-security/SKILL.md) for tactical threat modeling."
+            },
+            "host_registration_required": true,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L72:N2",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/senior-security/SKILL.md",
+              "canonical_name": "senior-security",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-security/SKILL.md",
+                  "sha256": "454188e4f0188d3e0219f58c70dc666e0a9e98383d53a7437a027b13db68643a"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 72,
+              "ordinal": 2,
+              "label": "senior-security",
+              "href": "../../../../engineering-team/skills/senior-security/SKILL.md",
+              "path": "skills/engineering-team/skills/senior-security/SKILL.md",
+              "instruction": "- Pure security threat model \u2192 [cs-ciso-advisor](../../../../c-level-advisor/c-level-agents/agents/cs-ciso-advisor.md) for strategic review with an authorized agent-role binding, or [senior-security](../../../../engineering-team/skills/senior-security/SKILL.md) for tactical threat modeling."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L76:N1",
+            "provider": {
+              "kind": "document",
+              "path": "skills/engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md",
+              "invocation": "passive",
+              "files": [
+                {
+                  "path": "skills/engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md",
+                  "sha256": "c1470d2f73763d8a740830b39e3eff2784e35b7588a95bbb991754d290893bff"
+                }
+              ]
+            },
+            "action": "passive_read",
+            "evidence": {
+              "line": 76,
+              "ordinal": 1,
+              "label": "karpathy-principles.md",
+              "href": "../../../../engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md",
+              "path": "skills/engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md",
+              "instruction": "- Karpathy 4 principles, passive read \u2192 [karpathy-principles.md](../../../../engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md)"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L77:N1",
+            "provider": {
+              "kind": "document",
+              "path": "skills/engineering-team/skills/senior-backend/references/forcing_questions.md",
+              "invocation": "passive",
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-backend/references/forcing_questions.md",
+                  "sha256": "29b6f51d65ef72300b41649311d46f189a7e33cbd03cc269ce9c83b043d5d0b0"
+                }
+              ]
+            },
+            "action": "passive_read",
+            "evidence": {
+              "line": 77,
+              "ordinal": 1,
+              "label": "forcing_questions.md",
+              "href": "forcing_questions.md",
+              "path": "skills/engineering-team/skills/senior-backend/references/forcing_questions.md",
+              "instruction": "- Historical Matt Pocock attribution stays in [forcing_questions.md](forcing_questions.md). The legacy `forcing_question_patterns.md` resource is BLOCKED, absent; do not use an archive or manufacture a path. Native grilling is linked above as an explicit behavior change."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L78:N1",
+            "provider": {
+              "kind": "document",
+              "path": "skills/business-operations/CLAUDE.md",
+              "invocation": "passive",
+              "files": [
+                {
+                  "path": "skills/business-operations/CLAUDE.md",
+                  "sha256": "b02a279414f7960eb4a224d4a1cc3880bff87301f03787c8a2ac034ed1f787b7"
+                }
+              ]
+            },
+            "action": "passive_read",
+            "evidence": {
+              "line": 78,
+              "ordinal": 1,
+              "label": "business-operations/CLAUDE.md",
+              "href": "../../../../business-operations/CLAUDE.md",
+              "path": "skills/business-operations/CLAUDE.md",
+              "instruction": "- Path-B 11-file contract, passive read \u2192 [business-operations/CLAUDE.md](../../../../business-operations/CLAUDE.md)"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-backend:L79:N1",
+            "provider": {
+              "kind": "document",
+              "path": "skills/engineering/slo-architect/skills/slo-architect/references/slo_principles.md",
+              "invocation": "passive",
+              "files": [
+                {
+                  "path": "skills/engineering/slo-architect/skills/slo-architect/references/slo_principles.md",
+                  "sha256": "5a99f431d9d62bee701c60bf4d2968ec4bb183455a4a1bc4c3a354af24640cf7"
+                }
+              ]
+            },
+            "action": "passive_read",
+            "evidence": {
+              "line": 79,
+              "ordinal": 1,
+              "label": "slo_principles.md",
+              "href": "../../../../engineering/slo-architect/skills/slo-architect/references/slo_principles.md",
+              "path": "skills/engineering/slo-architect/skills/slo-architect/references/slo_principles.md",
+              "instruction": "- SLO canon, passive read \u2192 [slo_principles.md](../../../../engineering/slo-architect/skills/slo-architect/references/slo_principles.md)"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          }
+        ],
+        "blocked": [
+          {
+            "id": "senior-backend:blocked:/cs:backend-review",
+            "declared_name": "/cs:backend-review",
+            "kind": "command",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-backend:blocked:cs-backend-engineer",
+            "declared_name": "cs-backend-engineer",
+            "kind": "agent_definition",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-backend:blocked:cs-cto-advisor",
+            "declared_name": "cs-cto-advisor",
+            "kind": "agent_definition",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-backend:blocked:cs-frontend-engineer",
+            "declared_name": "cs-frontend-engineer",
+            "kind": "agent_definition",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-backend:blocked:cs-grill-master",
+            "declared_name": "cs-grill-master",
+            "kind": "agent_definition",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-backend:blocked:forcing_question_patterns.md",
+            "declared_name": "forcing_question_patterns.md",
+            "kind": "document",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-backend:blocked:ra-qm-team",
+            "declared_name": "ra-qm-team",
+            "kind": "domain",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          }
+        ],
+        "historical_registration": "body_hash_not_independent_human_proof",
+        "runtime_closure_claimed": false
+      },
+      {
+        "id": "senior-frontend",
+        "skill_path": "skills/engineering-team/skills/senior-frontend/SKILL.md",
+        "map_path": "skills/engineering-team/skills/senior-frontend/references/composition_map.md",
+        "files": [
+          {
+            "path": "skills/engineering-team/skills/senior-frontend/SKILL.md",
+            "sha256": "8862ca7b4facd5c88e62f974cb494054be19e4d765fd10ad5bcbf578162e6c0a"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-frontend/references/composition_map.md",
+            "sha256": "69773ee5310a6329e8c998b7dc8d9533ea3b446abe1112183e35066033927616"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-frontend/references/forcing_questions.md",
+            "sha256": "a590e99e071eb67be4066b1901bfb30ff19df55fb2eb20d5f0735c53c69d9094"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-frontend/references/frontend_best_practices.md",
+            "sha256": "b6231c354c2665671cb4ec0db7fab0143ddf533647e8b0b2dffb2b42f4890fc1"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-frontend/references/nextjs_optimization_guide.md",
+            "sha256": "6080456975399fef46e01dda08856e901f8a96b48574fefdf4d9b73c34457fb9"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-frontend/references/react_patterns.md",
+            "sha256": "b626ba1d38af86e746524c4b71c93a1f7b73ed659256e04a143bf5384df97160"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-frontend/references/workflow.md",
+            "sha256": "1c6542bae70131666ad334022964c885c416a73a37fa5570e26c8902475d85d0"
+          }
+        ],
+        "routes": [
+          {
+            "id": "senior-frontend:L13:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/productivity/grilling/SKILL.md",
+              "canonical_name": "grilling",
+              "namespace": "productivity",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/productivity/grilling/SKILL.md",
+                  "sha256": "10ff989e7498b23b5acb49d5048f11dcd906757d2f79c5cdf8a00001381296f2"
+                },
+                {
+                  "path": "skills/productivity/grilling/agents/openai.yaml",
+                  "sha256": "1411d7df7d99b7e621a1ff8283c8133cc2464be63d064e52d8ce169c6800ee9b"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 13,
+              "ordinal": 1,
+              "label": "grilling",
+              "href": "../../../../productivity/grilling/SKILL.md",
+              "path": "skills/productivity/grilling/SKILL.md",
+              "instruction": "Native [grilling](../../../../productivity/grilling/SKILL.md) is the explicit model preflight target. It asks frontier rounds and waits for shared-understanding confirmation. It is not an alias for missing `cs-grill-master` or human-only `grill-me` / `grill-with-docs`. Keep the local [forcing questions](forcing_questions.md) one-question-per-turn intake unchanged. Read those first when inputs are unknown. If domain boundaries need a separate approved modeling task, resolve and call [domain-modeling](../../../../engineering/domain-modeling/SKILL.md) independently after approval. Passive glossary reads do not invoke it. Never call either human wrapper from a model, even when this skill was user-invoked."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "preflight_shared_understanding_required"
+          },
+          {
+            "id": "senior-frontend:L13:N2",
+            "provider": {
+              "kind": "document",
+              "path": "skills/engineering-team/skills/senior-frontend/references/forcing_questions.md",
+              "invocation": "passive",
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-frontend/references/forcing_questions.md",
+                  "sha256": "a590e99e071eb67be4066b1901bfb30ff19df55fb2eb20d5f0735c53c69d9094"
+                }
+              ]
+            },
+            "action": "passive_read",
+            "evidence": {
+              "line": 13,
+              "ordinal": 2,
+              "label": "forcing questions",
+              "href": "forcing_questions.md",
+              "path": "skills/engineering-team/skills/senior-frontend/references/forcing_questions.md",
+              "instruction": "Native [grilling](../../../../productivity/grilling/SKILL.md) is the explicit model preflight target. It asks frontier rounds and waits for shared-understanding confirmation. It is not an alias for missing `cs-grill-master` or human-only `grill-me` / `grill-with-docs`. Keep the local [forcing questions](forcing_questions.md) one-question-per-turn intake unchanged. Read those first when inputs are unknown. If domain boundaries need a separate approved modeling task, resolve and call [domain-modeling](../../../../engineering/domain-modeling/SKILL.md) independently after approval. Passive glossary reads do not invoke it. Never call either human wrapper from a model, even when this skill was user-invoked."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L13:N3",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/domain-modeling/SKILL.md",
+              "canonical_name": "domain-modeling",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/domain-modeling/SKILL.md",
+                  "sha256": "7b925d7b1e341a2eeae33ad68a8a8c0ab889a38ddd22a7598e4c240e5a7556a3"
+                },
+                {
+                  "path": "skills/engineering/domain-modeling/agents/openai.yaml",
+                  "sha256": "f6bf2aa996c6e6f53fdd0708e18a0d16a56aed8322cca59fedbe3c0d2c75f06b"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 13,
+              "ordinal": 3,
+              "label": "domain-modeling",
+              "href": "../../../../engineering/domain-modeling/SKILL.md",
+              "path": "skills/engineering/domain-modeling/SKILL.md",
+              "instruction": "Native [grilling](../../../../productivity/grilling/SKILL.md) is the explicit model preflight target. It asks frontier rounds and waits for shared-understanding confirmation. It is not an alias for missing `cs-grill-master` or human-only `grill-me` / `grill-with-docs`. Keep the local [forcing questions](forcing_questions.md) one-question-per-turn intake unchanged. Read those first when inputs are unknown. If domain boundaries need a separate approved modeling task, resolve and call [domain-modeling](../../../../engineering/domain-modeling/SKILL.md) independently after approval. Passive glossary reads do not invoke it. Never call either human wrapper from a model, even when this skill was user-invoked."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "separate_approved_modeling_task"
+          },
+          {
+            "id": "senior-frontend:L22:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/a11y-audit/skills/a11y-audit/SKILL.md",
+              "canonical_name": "a11y-audit",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/a11y-audit/skills/a11y-audit/SKILL.md",
+                  "sha256": "e1cbabce8168ea0cb18d44b49c754c7de2e2dc29f8560cb9c4631a89e8652e4e"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 22,
+              "ordinal": 1,
+              "label": "a11y-audit",
+              "href": "../../../../engineering-team/a11y-audit/skills/a11y-audit/SKILL.md",
+              "path": "skills/engineering-team/a11y-audit/skills/a11y-audit/SKILL.md",
+              "instruction": "| WCAG audit, contrast checks, screen-reader gaps | a11y-audit | After Q7 (WCAG target) is set | [a11y-audit](../../../../engineering-team/a11y-audit/skills/a11y-audit/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L23:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/performance-profiler/SKILL.md",
+              "canonical_name": "performance-profiler",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/performance-profiler/SKILL.md",
+                  "sha256": "953948b591db0afc4dac8ff4e84d65a2c34fa62b7b579e3ba6cf3398e79ec18b"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 23,
+              "ordinal": 1,
+              "label": "performance-profiler",
+              "href": "../../../../engineering/skills/performance-profiler/SKILL.md",
+              "path": "skills/engineering/skills/performance-profiler/SKILL.md",
+              "instruction": "| Bundle profiling, Lighthouse perf, runtime CPU/memory | performance-profiler | After Q2 (LCP target) is set | [performance-profiler](../../../../engineering/skills/performance-profiler/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L24:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/epic-design/SKILL.md",
+              "canonical_name": "epic-design",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/epic-design/SKILL.md",
+                  "sha256": "f5f7c9f9edd5d6b469dbfff28cece10202588c69def3fe5be3c797ebfda37142"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 24,
+              "ordinal": 1,
+              "label": "epic-design",
+              "href": "../../../../engineering-team/skills/epic-design/SKILL.md",
+              "path": "skills/engineering-team/skills/epic-design/SKILL.md",
+              "instruction": "| Cinematic / parallax / scroll-storytelling landing | epic-design | When `marketing-site` or `landing-page` profile applies | [epic-design](../../../../engineering-team/skills/epic-design/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L25:N1",
+            "provider": {
+              "kind": "agent_definition",
+              "path": "skills/engineering/karpathy-coder/agents/karpathy-reviewer.md",
+              "canonical_name": "karpathy-reviewer",
+              "namespace": "engineering",
+              "invocation": "host_registration_required",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/karpathy-coder/agents/karpathy-reviewer.md",
+                  "sha256": "cfdb011397a130c74a8d0a8b881aa251cb0de472146bac05c31cad66f9fb1761"
+                }
+              ]
+            },
+            "action": "host_registered_agent_handoff",
+            "evidence": {
+              "line": 25,
+              "ordinal": 1,
+              "label": "karpathy-reviewer agent",
+              "href": "../../../../engineering/karpathy-coder/agents/karpathy-reviewer.md",
+              "path": "skills/engineering/karpathy-coder/agents/karpathy-reviewer.md",
+              "instruction": "| Pre-commit Karpathy review on changed files | karpathy-reviewer agent, corrected from cs-karpathy-reviewer | Before EVERY commit this skill produces | [karpathy-reviewer agent](../../../../engineering/karpathy-coder/agents/karpathy-reviewer.md) |"
+            },
+            "host_registration_required": true,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L26:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/productivity/grilling/SKILL.md",
+              "canonical_name": "grilling",
+              "namespace": "productivity",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/productivity/grilling/SKILL.md",
+                  "sha256": "10ff989e7498b23b5acb49d5048f11dcd906757d2f79c5cdf8a00001381296f2"
+                },
+                {
+                  "path": "skills/productivity/grilling/agents/openai.yaml",
+                  "sha256": "1411d7df7d99b7e621a1ff8283c8133cc2464be63d064e52d8ce169c6800ee9b"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 26,
+              "ordinal": 1,
+              "label": "grilling",
+              "href": "../../../../productivity/grilling/SKILL.md",
+              "path": "skills/productivity/grilling/SKILL.md",
+              "instruction": "| Pre-flight architecture grill | grilling skill, explicit preflight rebinding | Before locking framework or rendering model | [grilling](../../../../productivity/grilling/SKILL.md); legacy cs-grill-master remains BLOCKED |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "preflight_shared_understanding_required"
+          },
+          {
+            "id": "senior-frontend:L27:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/monorepo-navigator/SKILL.md",
+              "canonical_name": "monorepo-navigator",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/monorepo-navigator/SKILL.md",
+                  "sha256": "19184d57f8eea27ed974b0e7eac2033b366b9cdacb6454bb9a1977314b182335"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 27,
+              "ordinal": 1,
+              "label": "monorepo-navigator",
+              "href": "../../../../engineering/skills/monorepo-navigator/SKILL.md",
+              "path": "skills/engineering/skills/monorepo-navigator/SKILL.md",
+              "instruction": "| Monorepo coordination (Turbo / Nx / pnpm) | monorepo-navigator | When frontend shares repo with backend / mobile / extension | [monorepo-navigator](../../../../engineering/skills/monorepo-navigator/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L28:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/dependency-auditor/SKILL.md",
+              "canonical_name": "dependency-auditor",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/dependency-auditor/SKILL.md",
+                  "sha256": "4bde5bd43d14b39a9c282f1ab74b202d102b070b99a5083724e84526bc5e2f0a"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 28,
+              "ordinal": 1,
+              "label": "dependency-auditor",
+              "href": "../../../../engineering/skills/dependency-auditor/SKILL.md",
+              "path": "skills/engineering/skills/dependency-auditor/SKILL.md",
+              "instruction": "| Dependency vulnerability sweep | dependency-auditor | Before every major release | [dependency-auditor](../../../../engineering/skills/dependency-auditor/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L29:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/api-test-suite-builder/SKILL.md",
+              "canonical_name": "api-test-suite-builder",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/api-test-suite-builder/SKILL.md",
+                  "sha256": "a0db3fd9004317097c1c9c7ef7da6276a98d205a1c2af79fbbddd72fab976d42"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 29,
+              "ordinal": 1,
+              "label": "api-test-suite-builder",
+              "href": "../../../../engineering/skills/api-test-suite-builder/SKILL.md",
+              "path": "skills/engineering/skills/api-test-suite-builder/SKILL.md",
+              "instruction": "| Visual / accessibility regression in CI | api-test-suite-builder + pw toolkit, separate scopes | After Q7 (WCAG target) is set | [api-test-suite-builder](../../../../engineering/skills/api-test-suite-builder/SKILL.md) + [pw](../../../../engineering-team/playwright-pro/skills/pw/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L29:N2",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/playwright-pro/skills/pw/SKILL.md",
+              "canonical_name": "pw",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/playwright-pro/skills/pw/SKILL.md",
+                  "sha256": "351142309635794f22c4e982ec34af5ff40e59304c0f4d1681174a07063e1b82"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 29,
+              "ordinal": 2,
+              "label": "pw",
+              "href": "../../../../engineering-team/playwright-pro/skills/pw/SKILL.md",
+              "path": "skills/engineering-team/playwright-pro/skills/pw/SKILL.md",
+              "instruction": "| Visual / accessibility regression in CI | api-test-suite-builder + pw toolkit, separate scopes | After Q7 (WCAG target) is set | [api-test-suite-builder](../../../../engineering/skills/api-test-suite-builder/SKILL.md) + [pw](../../../../engineering-team/playwright-pro/skills/pw/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L30:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/product-team/apple-hig-expert/skills/apple-hig-expert/SKILL.md",
+              "canonical_name": "apple-hig-expert",
+              "namespace": "product-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/product-team/apple-hig-expert/skills/apple-hig-expert/SKILL.md",
+                  "sha256": "85c5aaa9653aeb9671b7047a9ea64063bdaee81955a918bc627aa38b307eb68c"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 30,
+              "ordinal": 1,
+              "label": "apple-hig-expert",
+              "href": "../../../../product-team/apple-hig-expert/skills/apple-hig-expert/SKILL.md",
+              "path": "skills/product-team/apple-hig-expert/skills/apple-hig-expert/SKILL.md",
+              "instruction": "| Apple HIG / iOS / macOS / visionOS app review | apple-hig-expert | When the surface is Apple-platform-native | [apple-hig-expert](../../../../product-team/apple-hig-expert/skills/apple-hig-expert/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L31:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/marketing-skill/skills/aeo/SKILL.md",
+              "canonical_name": "aeo",
+              "namespace": "marketing-skill",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/marketing-skill/skills/aeo/SKILL.md",
+                  "sha256": "c2b1fe51416b7e4e951ce55072d937c4c5783b92573c88714c58e27cefa862fe"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 31,
+              "ordinal": 1,
+              "label": "aeo",
+              "href": "../../../../marketing-skill/skills/aeo/SKILL.md",
+              "path": "skills/marketing-skill/skills/aeo/SKILL.md",
+              "instruction": "| AEO (Answer Engine Optimization) \u2014 visibility in LLM search | aeo | After Q5 (SEO-dependent surface) is confirmed | [aeo](../../../../marketing-skill/skills/aeo/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L32:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/marketing-skill/skills/seo-audit/SKILL.md",
+              "canonical_name": "seo-audit",
+              "namespace": "marketing-skill",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/marketing-skill/skills/seo-audit/SKILL.md",
+                  "sha256": "e91739cc21461f4b92979fc79bd11d606e1e10f5a50911b1ef02b2ce46dd25a6"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 32,
+              "ordinal": 1,
+              "label": "seo-audit",
+              "href": "../../../../marketing-skill/skills/seo-audit/SKILL.md",
+              "path": "skills/marketing-skill/skills/seo-audit/SKILL.md",
+              "instruction": "| SEO crawlability + meta + structured data | seo-audit, explicit label correction, optional | After Q5 (SEO-dependent surface) | [seo-audit](../../../../marketing-skill/skills/seo-audit/SKILL.md) only if installed, authorized and Q5 is SEO-dependent. No seo-auditor provider. Technical/on-page audit is not structured-data implementation. |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "optional_installed_authorized_and_Q5_SEO_dependent"
+          },
+          {
+            "id": "senior-frontend:L33:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/api-design-reviewer/SKILL.md",
+              "canonical_name": "api-design-reviewer",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/api-design-reviewer/SKILL.md",
+                  "sha256": "a4e61a67981d7cab02f479f959b9e83d032e705c17b72e763d07ef9a3247bf54"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 33,
+              "ordinal": 1,
+              "label": "api-design-reviewer",
+              "href": "../../../../engineering/skills/api-design-reviewer/SKILL.md",
+              "path": "skills/engineering/skills/api-design-reviewer/SKILL.md",
+              "instruction": "| API contract from the consumer side | api-design-reviewer | When frontend defines/consumes a new API contract | [api-design-reviewer](../../../../engineering/skills/api-design-reviewer/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L64:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/marketing-skill/skills/content-creator/SKILL.md",
+              "canonical_name": "content-creator",
+              "namespace": "marketing-skill",
+              "invocation": "model_or_user",
+              "deprecated": true,
+              "files": [
+                {
+                  "path": "skills/marketing-skill/skills/content-creator/SKILL.md",
+                  "sha256": "0f548f6236783d8cf0dcc3d4f793ea6072e67bfd4eba36f773137fcd810e4a00"
+                }
+              ]
+            },
+            "action": "manual_selection",
+            "evidence": {
+              "line": 64,
+              "ordinal": 1,
+              "label": "content-creator",
+              "href": "../../../../marketing-skill/skills/content-creator/SKILL.md",
+              "path": "skills/marketing-skill/skills/content-creator/SKILL.md",
+              "instruction": "- Brand voice and copy \u2192 [content-creator](../../../../marketing-skill/skills/content-creator/SKILL.md) is a deprecated redirect, not a writer. `cs-content-creator` is BLOCKED, absent. Its documented [content-production successor](../../../../marketing-skill/skills/content-production/SKILL.md) is passive selection guidance only, not an automatic rebind. Ask the user to approve a direct successor binding before writing."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L64:N2",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/marketing-skill/skills/content-production/SKILL.md",
+              "canonical_name": "content-production",
+              "namespace": "marketing-skill",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/marketing-skill/skills/content-production/SKILL.md",
+                  "sha256": "8e893a54ee044459e6dc8f3c901aa6617cfa6f66d940f60881b9957fd7c1aed3"
+                }
+              ]
+            },
+            "action": "manual_selection",
+            "evidence": {
+              "line": 64,
+              "ordinal": 2,
+              "label": "content-production successor",
+              "href": "../../../../marketing-skill/skills/content-production/SKILL.md",
+              "path": "skills/marketing-skill/skills/content-production/SKILL.md",
+              "instruction": "- Brand voice and copy \u2192 [content-creator](../../../../marketing-skill/skills/content-creator/SKILL.md) is a deprecated redirect, not a writer. `cs-content-creator` is BLOCKED, absent. Its documented [content-production successor](../../../../marketing-skill/skills/content-production/SKILL.md) is passive selection guidance only, not an automatic rebind. Ask the user to approve a direct successor binding before writing."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L65:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/api-design-reviewer/SKILL.md",
+              "canonical_name": "api-design-reviewer",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/api-design-reviewer/SKILL.md",
+                  "sha256": "a4e61a67981d7cab02f479f959b9e83d032e705c17b72e763d07ef9a3247bf54"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 65,
+              "ordinal": 1,
+              "label": "api-design-reviewer",
+              "href": "../../../../engineering/skills/api-design-reviewer/SKILL.md",
+              "path": "skills/engineering/skills/api-design-reviewer/SKILL.md",
+              "instruction": "- Backend API design \u2192 `cs-backend-engineer` is BLOCKED, absent. The separate [api-design-reviewer](../../../../engineering/skills/api-design-reviewer/SKILL.md) skill can review REST contracts, but does not satisfy the missing engineer-agent handoff."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L66:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/product-team/apple-hig-expert/skills/apple-hig-expert/SKILL.md",
+              "canonical_name": "apple-hig-expert",
+              "namespace": "product-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/product-team/apple-hig-expert/skills/apple-hig-expert/SKILL.md",
+                  "sha256": "85c5aaa9653aeb9671b7047a9ea64063bdaee81955a918bc627aa38b307eb68c"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 66,
+              "ordinal": 1,
+              "label": "apple-hig-expert skill alternative",
+              "href": "../../../../product-team/apple-hig-expert/skills/apple-hig-expert/SKILL.md",
+              "path": "skills/product-team/apple-hig-expert/skills/apple-hig-expert/SKILL.md",
+              "instruction": "- iOS/macOS-native UI \u2192 `cs-apple-hig` is absent, not a callable conditional agent. Use the already-declared [apple-hig-expert skill alternative](../../../../product-team/apple-hig-expert/skills/apple-hig-expert/SKILL.md) when the surface is Apple-native."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L71:N1",
+            "provider": {
+              "kind": "document",
+              "path": "skills/engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md",
+              "invocation": "passive",
+              "files": [
+                {
+                  "path": "skills/engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md",
+                  "sha256": "c1470d2f73763d8a740830b39e3eff2784e35b7588a95bbb991754d290893bff"
+                }
+              ]
+            },
+            "action": "passive_read",
+            "evidence": {
+              "line": 71,
+              "ordinal": 1,
+              "label": "karpathy-principles.md",
+              "href": "../../../../engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md",
+              "path": "skills/engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md",
+              "instruction": "- Karpathy 4 principles, passive read \u2192 [karpathy-principles.md](../../../../engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md)"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L72:N1",
+            "provider": {
+              "kind": "document",
+              "path": "skills/engineering-team/skills/senior-frontend/references/forcing_questions.md",
+              "invocation": "passive",
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-frontend/references/forcing_questions.md",
+                  "sha256": "a590e99e071eb67be4066b1901bfb30ff19df55fb2eb20d5f0735c53c69d9094"
+                }
+              ]
+            },
+            "action": "passive_read",
+            "evidence": {
+              "line": 72,
+              "ordinal": 1,
+              "label": "forcing_questions.md",
+              "href": "forcing_questions.md",
+              "path": "skills/engineering-team/skills/senior-frontend/references/forcing_questions.md",
+              "instruction": "- Historical Matt Pocock attribution stays in [forcing_questions.md](forcing_questions.md). The legacy `forcing_question_patterns.md` resource is BLOCKED, absent; do not use an archive or manufacture a path. Native grilling is linked above as an explicit behavior change."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-frontend:L73:N1",
+            "provider": {
+              "kind": "document",
+              "path": "skills/business-operations/CLAUDE.md",
+              "invocation": "passive",
+              "files": [
+                {
+                  "path": "skills/business-operations/CLAUDE.md",
+                  "sha256": "b02a279414f7960eb4a224d4a1cc3880bff87301f03787c8a2ac034ed1f787b7"
+                }
+              ]
+            },
+            "action": "passive_read",
+            "evidence": {
+              "line": 73,
+              "ordinal": 1,
+              "label": "business-operations/CLAUDE.md",
+              "href": "../../../../business-operations/CLAUDE.md",
+              "path": "skills/business-operations/CLAUDE.md",
+              "instruction": "- Path-B 11-file contract, passive read \u2192 [business-operations/CLAUDE.md](../../../../business-operations/CLAUDE.md)"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          }
+        ],
+        "blocked": [
+          {
+            "id": "senior-frontend:blocked:/cs:frontend-review",
+            "declared_name": "/cs:frontend-review",
+            "kind": "command",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-frontend:blocked:cs-apple-hig",
+            "declared_name": "cs-apple-hig",
+            "kind": "agent_definition",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-frontend:blocked:cs-backend-engineer",
+            "declared_name": "cs-backend-engineer",
+            "kind": "agent_definition",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-frontend:blocked:cs-content-creator",
+            "declared_name": "cs-content-creator",
+            "kind": "agent_definition",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-frontend:blocked:cs-frontend-engineer",
+            "declared_name": "cs-frontend-engineer",
+            "kind": "agent_definition",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-frontend:blocked:cs-fullstack-engineer",
+            "declared_name": "cs-fullstack-engineer",
+            "kind": "agent_definition",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-frontend:blocked:cs-grill-master",
+            "declared_name": "cs-grill-master",
+            "kind": "agent_definition",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-frontend:blocked:forcing_question_patterns.md",
+            "declared_name": "forcing_question_patterns.md",
+            "kind": "document",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          }
+        ],
+        "historical_registration": "body_hash_not_independent_human_proof",
+        "runtime_closure_claimed": false
+      },
+      {
+        "id": "senior-fullstack",
+        "skill_path": "skills/engineering-team/skills/senior-fullstack/SKILL.md",
+        "map_path": "skills/engineering-team/skills/senior-fullstack/references/composition_map.md",
+        "files": [
+          {
+            "path": "skills/engineering-team/skills/senior-fullstack/SKILL.md",
+            "sha256": "50bacc83387e8d200a15c206a11df3c944ea9f292f611f9f6e2129c2b81dc70b"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-fullstack/references/architecture_patterns.md",
+            "sha256": "a4efd7bf910148c9792aafd4263aa8a90db7b0d4b102e49d6909847b3e946877"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-fullstack/references/composition_map.md",
+            "sha256": "bd26c68354d9c37853bb979f48e4cea150b35baef2ab009b568d416871cc71d6"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-fullstack/references/development_workflows.md",
+            "sha256": "fbe5eb0f77f031ea335ff4e74181d17b0b6e470135209b4ee11d0883b4c36059"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-fullstack/references/forcing_questions.md",
+            "sha256": "4b089de03195eaca8e7225a312a9a96b03e9a0ef37aa0228d12cc397a23de162"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-fullstack/references/tech_stack_guide.md",
+            "sha256": "883e6f19db2e6043f95233766ceb2554a2a2221cbcc0c929800c276cd1f7c4c3"
+          },
+          {
+            "path": "skills/engineering-team/skills/senior-fullstack/references/workflow.md",
+            "sha256": "1b73795772c34e18fa00b484073784dd58fecfdcc3cf5329cf5dd63fcb34a8d3"
+          }
+        ],
+        "routes": [
+          {
+            "id": "senior-fullstack:L13:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/productivity/grilling/SKILL.md",
+              "canonical_name": "grilling",
+              "namespace": "productivity",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/productivity/grilling/SKILL.md",
+                  "sha256": "10ff989e7498b23b5acb49d5048f11dcd906757d2f79c5cdf8a00001381296f2"
+                },
+                {
+                  "path": "skills/productivity/grilling/agents/openai.yaml",
+                  "sha256": "1411d7df7d99b7e621a1ff8283c8133cc2464be63d064e52d8ce169c6800ee9b"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 13,
+              "ordinal": 1,
+              "label": "grilling",
+              "href": "../../../../productivity/grilling/SKILL.md",
+              "path": "skills/productivity/grilling/SKILL.md",
+              "instruction": "Native [grilling](../../../../productivity/grilling/SKILL.md) is the explicit model preflight target. It asks frontier rounds and waits for shared-understanding confirmation. It is not an alias for missing `cs-grill-master` or human-only `grill-me` / `grill-with-docs`. Keep the local [forcing questions](forcing_questions.md) one-question-per-turn intake unchanged. Read those first when inputs are unknown. If domain boundaries need a separate approved modeling task, resolve and call [domain-modeling](../../../../engineering/domain-modeling/SKILL.md) independently after approval. Passive glossary reads do not invoke it. Never call either human wrapper from a model, even when this skill was user-invoked."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "preflight_shared_understanding_required"
+          },
+          {
+            "id": "senior-fullstack:L13:N2",
+            "provider": {
+              "kind": "document",
+              "path": "skills/engineering-team/skills/senior-fullstack/references/forcing_questions.md",
+              "invocation": "passive",
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-fullstack/references/forcing_questions.md",
+                  "sha256": "4b089de03195eaca8e7225a312a9a96b03e9a0ef37aa0228d12cc397a23de162"
+                }
+              ]
+            },
+            "action": "passive_read",
+            "evidence": {
+              "line": 13,
+              "ordinal": 2,
+              "label": "forcing questions",
+              "href": "forcing_questions.md",
+              "path": "skills/engineering-team/skills/senior-fullstack/references/forcing_questions.md",
+              "instruction": "Native [grilling](../../../../productivity/grilling/SKILL.md) is the explicit model preflight target. It asks frontier rounds and waits for shared-understanding confirmation. It is not an alias for missing `cs-grill-master` or human-only `grill-me` / `grill-with-docs`. Keep the local [forcing questions](forcing_questions.md) one-question-per-turn intake unchanged. Read those first when inputs are unknown. If domain boundaries need a separate approved modeling task, resolve and call [domain-modeling](../../../../engineering/domain-modeling/SKILL.md) independently after approval. Passive glossary reads do not invoke it. Never call either human wrapper from a model, even when this skill was user-invoked."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L13:N3",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/domain-modeling/SKILL.md",
+              "canonical_name": "domain-modeling",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/domain-modeling/SKILL.md",
+                  "sha256": "7b925d7b1e341a2eeae33ad68a8a8c0ab889a38ddd22a7598e4c240e5a7556a3"
+                },
+                {
+                  "path": "skills/engineering/domain-modeling/agents/openai.yaml",
+                  "sha256": "f6bf2aa996c6e6f53fdd0708e18a0d16a56aed8322cca59fedbe3c0d2c75f06b"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 13,
+              "ordinal": 3,
+              "label": "domain-modeling",
+              "href": "../../../../engineering/domain-modeling/SKILL.md",
+              "path": "skills/engineering/domain-modeling/SKILL.md",
+              "instruction": "Native [grilling](../../../../productivity/grilling/SKILL.md) is the explicit model preflight target. It asks frontier rounds and waits for shared-understanding confirmation. It is not an alias for missing `cs-grill-master` or human-only `grill-me` / `grill-with-docs`. Keep the local [forcing questions](forcing_questions.md) one-question-per-turn intake unchanged. Read those first when inputs are unknown. If domain boundaries need a separate approved modeling task, resolve and call [domain-modeling](../../../../engineering/domain-modeling/SKILL.md) independently after approval. Passive glossary reads do not invoke it. Never call either human wrapper from a model, even when this skill was user-invoked."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "separate_approved_modeling_task"
+          },
+          {
+            "id": "senior-fullstack:L22:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/api-design-reviewer/SKILL.md",
+              "canonical_name": "api-design-reviewer",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/api-design-reviewer/SKILL.md",
+                  "sha256": "a4e61a67981d7cab02f479f959b9e83d032e705c17b72e763d07ef9a3247bf54"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 22,
+              "ordinal": 1,
+              "label": "api-design-reviewer",
+              "href": "../../../../engineering/skills/api-design-reviewer/SKILL.md",
+              "path": "skills/engineering/skills/api-design-reviewer/SKILL.md",
+              "instruction": "| API contract / REST + GraphQL design / breaking change risk | api-design-reviewer | After Q1\u2013Q3 of the forcing-question library reveal API surface area | [api-design-reviewer](../../../../engineering/skills/api-design-reviewer/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L23:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/database-designer/SKILL.md",
+              "canonical_name": "database-designer",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/database-designer/SKILL.md",
+                  "sha256": "3729790a4e29e45ea0e9cb0bbb220d2162fea0e954d32f2abf8728aa8ef41ad1"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 23,
+              "ordinal": 1,
+              "label": "database-designer",
+              "href": "../../../../engineering/skills/database-designer/SKILL.md",
+              "path": "skills/engineering/skills/database-designer/SKILL.md",
+              "instruction": "| Database schema / migration safety / index strategy | database-designer + migration-architect | After Q4 (traffic forecast) \u2014 read/write ratio drives schema choice | [database-designer](../../../../engineering/skills/database-designer/SKILL.md) + [migration-architect](../../../../engineering/skills/migration-architect/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L23:N2",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/migration-architect/SKILL.md",
+              "canonical_name": "migration-architect",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/migration-architect/SKILL.md",
+                  "sha256": "b262c3b4eea8389b4fb65016734a092a99e096a226662c37efc89bc93c69a77a"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 23,
+              "ordinal": 2,
+              "label": "migration-architect",
+              "href": "../../../../engineering/skills/migration-architect/SKILL.md",
+              "path": "skills/engineering/skills/migration-architect/SKILL.md",
+              "instruction": "| Database schema / migration safety / index strategy | database-designer + migration-architect | After Q4 (traffic forecast) \u2014 read/write ratio drives schema choice | [database-designer](../../../../engineering/skills/database-designer/SKILL.md) + [migration-architect](../../../../engineering/skills/migration-architect/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L24:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/performance-profiler/SKILL.md",
+              "canonical_name": "performance-profiler",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/performance-profiler/SKILL.md",
+                  "sha256": "953948b591db0afc4dac8ff4e84d65a2c34fa62b7b579e3ba6cf3398e79ec18b"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 24,
+              "ordinal": 1,
+              "label": "performance-profiler",
+              "href": "../../../../engineering/skills/performance-profiler/SKILL.md",
+              "path": "skills/engineering/skills/performance-profiler/SKILL.md",
+              "instruction": "| Bundle size, frontend perf, server response perf | performance-profiler | After Q7 success criteria include a latency/LCP target | [performance-profiler](../../../../engineering/skills/performance-profiler/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L25:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/slo-architect/skills/slo-architect/SKILL.md",
+              "canonical_name": "slo-architect",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/slo-architect/skills/slo-architect/SKILL.md",
+                  "sha256": "63917f3e02caa905a9b81a5526f4d750780aa7049436f1cc56bfe43450c29afa"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 25,
+              "ordinal": 1,
+              "label": "slo-architect",
+              "href": "../../../../engineering/slo-architect/skills/slo-architect/SKILL.md",
+              "path": "skills/engineering/slo-architect/skills/slo-architect/SKILL.md",
+              "instruction": "| Reliability target / SLO / error budget | slo-architect | After Q7 lists an uptime or p99 SLA | [slo-architect](../../../../engineering/slo-architect/skills/slo-architect/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L26:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/ci-cd-pipeline-builder/SKILL.md",
+              "canonical_name": "ci-cd-pipeline-builder",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/ci-cd-pipeline-builder/SKILL.md",
+                  "sha256": "b9628224a9fe77caca4aedda49a72938147000ab275da92ebccf190c3ba8f161"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 26,
+              "ordinal": 1,
+              "label": "ci-cd-pipeline-builder",
+              "href": "../../../../engineering/skills/ci-cd-pipeline-builder/SKILL.md",
+              "path": "skills/engineering/skills/ci-cd-pipeline-builder/SKILL.md",
+              "instruction": "| CI/CD pipeline (multi-language fullstack) | ci-cd-pipeline-builder | After Q2 cadence is daily / per-PR | [ci-cd-pipeline-builder](../../../../engineering/skills/ci-cd-pipeline-builder/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L27:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/dependency-auditor/SKILL.md",
+              "canonical_name": "dependency-auditor",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/dependency-auditor/SKILL.md",
+                  "sha256": "4bde5bd43d14b39a9c282f1ab74b202d102b070b99a5083724e84526bc5e2f0a"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 27,
+              "ordinal": 1,
+              "label": "dependency-auditor",
+              "href": "../../../../engineering/skills/dependency-auditor/SKILL.md",
+              "path": "skills/engineering/skills/dependency-auditor/SKILL.md",
+              "instruction": "| Dependency vulnerability + license risk | dependency-auditor | Before every major release; before any production push | [dependency-auditor](../../../../engineering/skills/dependency-auditor/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L28:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/monorepo-navigator/SKILL.md",
+              "canonical_name": "monorepo-navigator",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/monorepo-navigator/SKILL.md",
+                  "sha256": "19184d57f8eea27ed974b0e7eac2033b366b9cdacb6454bb9a1977314b182335"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 28,
+              "ordinal": 1,
+              "label": "monorepo-navigator",
+              "href": "../../../../engineering/skills/monorepo-navigator/SKILL.md",
+              "path": "skills/engineering/skills/monorepo-navigator/SKILL.md",
+              "instruction": "| Monorepo tooling (Turbo / Nx / pnpm workspaces) | monorepo-navigator | When team size \u2265 6 and the codebase houses multiple deployable surfaces | [monorepo-navigator](../../../../engineering/skills/monorepo-navigator/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L29:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/api-test-suite-builder/SKILL.md",
+              "canonical_name": "api-test-suite-builder",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/api-test-suite-builder/SKILL.md",
+                  "sha256": "a0db3fd9004317097c1c9c7ef7da6276a98d205a1c2af79fbbddd72fab976d42"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 29,
+              "ordinal": 1,
+              "label": "api-test-suite-builder",
+              "href": "../../../../engineering/skills/api-test-suite-builder/SKILL.md",
+              "path": "skills/engineering/skills/api-test-suite-builder/SKILL.md",
+              "instruction": "| API test generation + contract tests | api-test-suite-builder | After API contract is stable | [api-test-suite-builder](../../../../engineering/skills/api-test-suite-builder/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L30:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/observability-designer/SKILL.md",
+              "canonical_name": "observability-designer",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/observability-designer/SKILL.md",
+                  "sha256": "70ab54164e3cb58f30f4f4e1500bd54361c67f6ecbde954b13596dc2902fe2ac"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 30,
+              "ordinal": 1,
+              "label": "observability-designer",
+              "href": "../../../../engineering/skills/observability-designer/SKILL.md",
+              "path": "skills/engineering/skills/observability-designer/SKILL.md",
+              "instruction": "| Observability + golden signals + alert design | observability-designer | Concurrent with SLO design | [observability-designer](../../../../engineering/skills/observability-designer/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L31:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering/skills/codebase-onboarding/SKILL.md",
+              "canonical_name": "codebase-onboarding",
+              "namespace": "engineering",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/skills/codebase-onboarding/SKILL.md",
+                  "sha256": "70261b95a8855d422b0d7538e138ef7434f032a953bd646507ac09a8379e6b7c"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 31,
+              "ordinal": 1,
+              "label": "codebase-onboarding",
+              "href": "../../../../engineering/skills/codebase-onboarding/SKILL.md",
+              "path": "skills/engineering/skills/codebase-onboarding/SKILL.md",
+              "instruction": "| Architecture onboarding doc for a new team member | codebase-onboarding | When \u2265 3 engineers will touch the code in 90 days | [codebase-onboarding](../../../../engineering/skills/codebase-onboarding/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L32:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/senior-security/SKILL.md",
+              "canonical_name": "senior-security",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-security/SKILL.md",
+                  "sha256": "454188e4f0188d3e0219f58c70dc666e0a9e98383d53a7437a027b13db68643a"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 32,
+              "ordinal": 1,
+              "label": "senior-security",
+              "href": "../../../../engineering-team/skills/senior-security/SKILL.md",
+              "path": "skills/engineering-team/skills/senior-security/SKILL.md",
+              "instruction": "| Hardening: AuthZ/AuthN, threat model, sensitive-data handling | senior-security + adversarial-reviewer | Before public launch; before handling PII/PHI/PCI data | [senior-security](../../../../engineering-team/skills/senior-security/SKILL.md) + [adversarial-reviewer](../../../../engineering-team/skills/adversarial-reviewer/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L32:N2",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/adversarial-reviewer/SKILL.md",
+              "canonical_name": "adversarial-reviewer",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/adversarial-reviewer/SKILL.md",
+                  "sha256": "d69e917a7c84405a18b40bd6e41d5fae9aba966db903171028f86bb5c25f6f94"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 32,
+              "ordinal": 2,
+              "label": "adversarial-reviewer",
+              "href": "../../../../engineering-team/skills/adversarial-reviewer/SKILL.md",
+              "path": "skills/engineering-team/skills/adversarial-reviewer/SKILL.md",
+              "instruction": "| Hardening: AuthZ/AuthN, threat model, sensitive-data handling | senior-security + adversarial-reviewer | Before public launch; before handling PII/PHI/PCI data | [senior-security](../../../../engineering-team/skills/senior-security/SKILL.md) + [adversarial-reviewer](../../../../engineering-team/skills/adversarial-reviewer/SKILL.md) |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L33:N1",
+            "provider": {
+              "kind": "agent_definition",
+              "path": "skills/engineering/karpathy-coder/agents/karpathy-reviewer.md",
+              "canonical_name": "karpathy-reviewer",
+              "namespace": "engineering",
+              "invocation": "host_registration_required",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering/karpathy-coder/agents/karpathy-reviewer.md",
+                  "sha256": "cfdb011397a130c74a8d0a8b881aa251cb0de472146bac05c31cad66f9fb1761"
+                }
+              ]
+            },
+            "action": "host_registered_agent_handoff",
+            "evidence": {
+              "line": 33,
+              "ordinal": 1,
+              "label": "karpathy-reviewer agent",
+              "href": "../../../../engineering/karpathy-coder/agents/karpathy-reviewer.md",
+              "path": "skills/engineering/karpathy-coder/agents/karpathy-reviewer.md",
+              "instruction": "| Pre-commit code review (Karpathy 4 principles) | karpathy-reviewer agent, corrected from cs-karpathy-reviewer | Before EVERY commit this skill produces | [karpathy-reviewer agent](../../../../engineering/karpathy-coder/agents/karpathy-reviewer.md) |"
+            },
+            "host_registration_required": true,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L34:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/productivity/grilling/SKILL.md",
+              "canonical_name": "grilling",
+              "namespace": "productivity",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/productivity/grilling/SKILL.md",
+                  "sha256": "10ff989e7498b23b5acb49d5048f11dcd906757d2f79c5cdf8a00001381296f2"
+                },
+                {
+                  "path": "skills/productivity/grilling/agents/openai.yaml",
+                  "sha256": "1411d7df7d99b7e621a1ff8283c8133cc2464be63d064e52d8ce169c6800ee9b"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 34,
+              "ordinal": 1,
+              "label": "grilling",
+              "href": "../../../../productivity/grilling/SKILL.md",
+              "path": "skills/productivity/grilling/SKILL.md",
+              "instruction": "| Pre-flight grill on a draft architecture | grilling skill, explicit preflight rebinding | Before locking the stack picks | [grilling](../../../../productivity/grilling/SKILL.md); legacy cs-grill-master remains BLOCKED |"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "preflight_shared_understanding_required"
+          },
+          {
+            "id": "senior-fullstack:L61:N1",
+            "provider": {
+              "kind": "agent_definition",
+              "path": "skills/c-level-advisor/c-level-agents/agents/cs-vpe-advisor.md",
+              "canonical_name": "cs-vpe-advisor",
+              "namespace": "c-level-advisor",
+              "invocation": "host_registration_required",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/c-level-advisor/c-level-agents/agents/cs-vpe-advisor.md",
+                  "sha256": "ffc439bee1b740c9a722e814a62a1ec6425a43f24a87fdd760c5ef67106478be"
+                }
+              ]
+            },
+            "action": "host_registered_agent_handoff",
+            "evidence": {
+              "line": 61,
+              "ordinal": 1,
+              "label": "cs-vpe-advisor",
+              "href": "../../../../c-level-advisor/c-level-agents/agents/cs-vpe-advisor.md",
+              "path": "skills/c-level-advisor/c-level-agents/agents/cs-vpe-advisor.md",
+              "instruction": "- Pure-engineering org design, team topology, manager triggers \u2192 [cs-vpe-advisor](../../../../c-level-advisor/c-level-agents/agents/cs-vpe-advisor.md) with an authorized native agent-role binding."
+            },
+            "host_registration_required": true,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L63:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/senior-ml-engineer/SKILL.md",
+              "canonical_name": "senior-ml-engineer",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-ml-engineer/SKILL.md",
+                  "sha256": "612ad6c37d6c1d6965add0f2319996c22d39d98346ee33a7e615b6d359e9eec0"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 63,
+              "ordinal": 1,
+              "label": "senior-ml-engineer",
+              "href": "../../../../engineering-team/skills/senior-ml-engineer/SKILL.md",
+              "path": "skills/engineering-team/skills/senior-ml-engineer/SKILL.md",
+              "instruction": "- AI/ML pipelines \u2192 choose [senior-ml-engineer](../../../../engineering-team/skills/senior-ml-engineer/SKILL.md) for pipelines/serving or [senior-prompt-engineer](../../../../engineering-team/skills/senior-prompt-engineer/SKILL.md) for prompt work, according to the actual concern."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L63:N2",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/senior-prompt-engineer/SKILL.md",
+              "canonical_name": "senior-prompt-engineer",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-prompt-engineer/SKILL.md",
+                  "sha256": "bbf9324400a094eef1a92b076d3e2bd2303bc2962db4dd59157adcc827f7e7ef"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 63,
+              "ordinal": 2,
+              "label": "senior-prompt-engineer",
+              "href": "../../../../engineering-team/skills/senior-prompt-engineer/SKILL.md",
+              "path": "skills/engineering-team/skills/senior-prompt-engineer/SKILL.md",
+              "instruction": "- AI/ML pipelines \u2192 choose [senior-ml-engineer](../../../../engineering-team/skills/senior-ml-engineer/SKILL.md) for pipelines/serving or [senior-prompt-engineer](../../../../engineering-team/skills/senior-prompt-engineer/SKILL.md) for prompt work, according to the actual concern."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L64:N1",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/senior-data-engineer/SKILL.md",
+              "canonical_name": "senior-data-engineer",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-data-engineer/SKILL.md",
+                  "sha256": "20495d2ee96a7b5a6d7026713f254f274682438997dd44933b7bca1882a1dae2"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 64,
+              "ordinal": 1,
+              "label": "senior-data-engineer",
+              "href": "../../../../engineering-team/skills/senior-data-engineer/SKILL.md",
+              "path": "skills/engineering-team/skills/senior-data-engineer/SKILL.md",
+              "instruction": "- Warehouse, lakehouse, dbt \u2192 [senior-data-engineer](../../../../engineering-team/skills/senior-data-engineer/SKILL.md)."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L65:N1",
+            "provider": {
+              "kind": "agent_definition",
+              "path": "skills/c-level-advisor/c-level-agents/agents/cs-ciso-advisor.md",
+              "canonical_name": "cs-ciso-advisor",
+              "namespace": "c-level-advisor",
+              "invocation": "host_registration_required",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/c-level-advisor/c-level-agents/agents/cs-ciso-advisor.md",
+                  "sha256": "8d3af2fc95b8d0abfdb6fc112b5a8b028a355ad6703a245c1efdc05e88e225c2"
+                }
+              ]
+            },
+            "action": "host_registered_agent_handoff",
+            "evidence": {
+              "line": 65,
+              "ordinal": 1,
+              "label": "cs-ciso-advisor",
+              "href": "../../../../c-level-advisor/c-level-agents/agents/cs-ciso-advisor.md",
+              "path": "skills/c-level-advisor/c-level-agents/agents/cs-ciso-advisor.md",
+              "instruction": "- Pure security threat model \u2192 [cs-ciso-advisor](../../../../c-level-advisor/c-level-agents/agents/cs-ciso-advisor.md) for strategic review with an authorized native agent-role binding, or [senior-security](../../../../engineering-team/skills/senior-security/SKILL.md) for tactical threat modeling."
+            },
+            "host_registration_required": true,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L65:N2",
+            "provider": {
+              "kind": "skill",
+              "path": "skills/engineering-team/skills/senior-security/SKILL.md",
+              "canonical_name": "senior-security",
+              "namespace": "engineering-team",
+              "invocation": "model_or_user",
+              "deprecated": false,
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-security/SKILL.md",
+                  "sha256": "454188e4f0188d3e0219f58c70dc666e0a9e98383d53a7437a027b13db68643a"
+                }
+              ]
+            },
+            "action": "declared_model_route",
+            "evidence": {
+              "line": 65,
+              "ordinal": 2,
+              "label": "senior-security",
+              "href": "../../../../engineering-team/skills/senior-security/SKILL.md",
+              "path": "skills/engineering-team/skills/senior-security/SKILL.md",
+              "instruction": "- Pure security threat model \u2192 [cs-ciso-advisor](../../../../c-level-advisor/c-level-agents/agents/cs-ciso-advisor.md) for strategic review with an authorized native agent-role binding, or [senior-security](../../../../engineering-team/skills/senior-security/SKILL.md) for tactical threat modeling."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L69:N1",
+            "provider": {
+              "kind": "document",
+              "path": "skills/engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md",
+              "invocation": "passive",
+              "files": [
+                {
+                  "path": "skills/engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md",
+                  "sha256": "c1470d2f73763d8a740830b39e3eff2784e35b7588a95bbb991754d290893bff"
+                }
+              ]
+            },
+            "action": "passive_read",
+            "evidence": {
+              "line": 69,
+              "ordinal": 1,
+              "label": "karpathy-principles.md",
+              "href": "../../../../engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md",
+              "path": "skills/engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md",
+              "instruction": "- Karpathy 4 principles, passive read \u2192 [karpathy-principles.md](../../../../engineering/karpathy-coder/skills/karpathy-coder/references/karpathy-principles.md)"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L70:N1",
+            "provider": {
+              "kind": "document",
+              "path": "skills/engineering-team/skills/senior-fullstack/references/forcing_questions.md",
+              "invocation": "passive",
+              "files": [
+                {
+                  "path": "skills/engineering-team/skills/senior-fullstack/references/forcing_questions.md",
+                  "sha256": "4b089de03195eaca8e7225a312a9a96b03e9a0ef37aa0228d12cc397a23de162"
+                }
+              ]
+            },
+            "action": "passive_read",
+            "evidence": {
+              "line": 70,
+              "ordinal": 1,
+              "label": "forcing_questions.md",
+              "href": "forcing_questions.md",
+              "path": "skills/engineering-team/skills/senior-fullstack/references/forcing_questions.md",
+              "instruction": "- Historical Matt Pocock attribution stays in [forcing_questions.md](forcing_questions.md). The legacy `forcing_question_patterns.md` resource is BLOCKED, absent; do not use an archive or manufacture a path. Native grilling is linked above as an explicit behavior change."
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          },
+          {
+            "id": "senior-fullstack:L71:N1",
+            "provider": {
+              "kind": "document",
+              "path": "skills/business-operations/CLAUDE.md",
+              "invocation": "passive",
+              "files": [
+                {
+                  "path": "skills/business-operations/CLAUDE.md",
+                  "sha256": "b02a279414f7960eb4a224d4a1cc3880bff87301f03787c8a2ac034ed1f787b7"
+                }
+              ]
+            },
+            "action": "passive_read",
+            "evidence": {
+              "line": 71,
+              "ordinal": 1,
+              "label": "business-operations/CLAUDE.md",
+              "href": "../../../../business-operations/CLAUDE.md",
+              "path": "skills/business-operations/CLAUDE.md",
+              "instruction": "- Path-B 11-file contract, passive read \u2192 [business-operations/CLAUDE.md](../../../../business-operations/CLAUDE.md)"
+            },
+            "host_registration_required": false,
+            "runtime_closure_claimed": false,
+            "condition": "follow_exact_map_instruction_and_host_authorization"
+          }
+        ],
+        "blocked": [
+          {
+            "id": "senior-fullstack:blocked:/cs:fullstack-review",
+            "declared_name": "/cs:fullstack-review",
+            "kind": "command",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-fullstack:blocked:cs-cto-advisor",
+            "declared_name": "cs-cto-advisor",
+            "kind": "agent_definition",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-fullstack:blocked:cs-fullstack-engineer",
+            "declared_name": "cs-fullstack-engineer",
+            "kind": "agent_definition",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-fullstack:blocked:cs-grill-master",
+            "declared_name": "cs-grill-master",
+            "kind": "agent_definition",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          },
+          {
+            "id": "senior-fullstack:blocked:forcing_question_patterns.md",
+            "declared_name": "forcing_question_patterns.md",
+            "kind": "document",
+            "status": "blocked_manual_selection",
+            "provider_path": null,
+            "alias": false
+          }
+        ],
+        "historical_registration": "body_hash_not_independent_human_proof",
+        "runtime_closure_claimed": false
+      }
+    ],
+    "pm_retrospective": {
+      "command": "/cs:pm",
+      "arguments": "sprint retrospective action items",
+      "command_path": "skills/project-management/commands/cs-pm.md",
+      "provider_path": "skills/project-management/skills/scrum-master/SKILL.md",
+      "router_path": "skills/project-management/skills/pm-skills/scripts/pm_goal_router.py",
+      "canonical_name": "scrum-master",
+      "namespace": "project-management",
+      "invocation": "user",
+      "independent_human_command_required": true,
+      "executed": false,
+      "verification": "literal_metadata_only_not_execution",
+      "files": [
+        {
+          "path": "skills/project-management/commands/cs-pm.md",
+          "sha256": "19e5c7a1025d2278ca444544d5cb89606fd6f989992df18425a690084b9afd3c"
+        },
+        {
+          "path": "skills/project-management/skills/scrum-master/SKILL.md",
+          "sha256": "aa2f4ffcec2439e2e8df877b7fb7b158dadfdb3ab46b95726ea78bbd0f7a280c"
+        },
+        {
+          "path": "skills/project-management/skills/pm-skills/scripts/pm_goal_router.py",
+          "sha256": "9dd8ca1dd6228dbfed0578337fd22b17d00c37b180a7cd427c41284a8f399e25"
+        }
+      ],
+      "provider_invocation": "model_or_user"
+    }
+  }
 }

@@ -82,6 +82,24 @@ class Dependencies(unittest.TestCase):
         duplicate.write_text('---\nname: "tdd"   # valid YAML comment\ndescription: "Shadow"\n---\n')
         self.refuse("ambiguous provider identity", "tdd")
 
+    def test_retro_requires_explicit_human_namespace(self):
+        self.refuse("ambiguous retro intent", "retro", invoker="user")
+        self.assertEqual(
+            checker.resolve(self.root, self.r, "retro", "user", namespace="matt"),
+            self.root / checker.NATIVE["retro"])
+
+    def test_pm_retro_is_not_matt_skill_alias(self):
+        with self.assertRaisesRegex(checker.Invalid, "PM retrospective is"):
+            checker.resolve(self.root, self.r, "retro", "user",
+                            namespace="project-management")
+
+    def test_retro_still_refuses_model_invocation(self):
+        self.refuse("user-only", "retro")
+
+    def test_namespace_cannot_relabel_an_unrelated_skill(self):
+        with self.assertRaisesRegex(checker.Invalid, "namespace is only supported"):
+            checker.resolve(self.root, self.r, "grilling", "user", namespace="matt")
+
     def test_human_alias_expands_before_invocation(self):
         self.assertEqual(checker.resolve(self.root, self.r, "/grill-me-with-docs", "user"),
                          self.root / "skills/engineering/grill-with-docs/SKILL.md")

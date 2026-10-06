@@ -322,15 +322,17 @@ reviewed. This records notices, not independently proven text ancestry.
 [PR credits](https://github.com/mattpocock/skills/blob/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/pr/CREDITS.md),
 [HumanLayer MIT notice](https://github.com/humanlayer/skills/blob/ca7c8088db69e315a8b2deea43820270457f8f3c/LICENSE)
 
-## Current inbound closures and unresolved legacy consumers
+## Current inbound closures
 
 The historical inbound inventory is evidence of the pre-upgrade snapshot,
 not a claim that all findings remain open. The native setup now uses top-level
 human-only metadata with matching Codex policy, never auto-calls Matt setup,
 and tells the user to invoke `/start-github-repo docs` independently if needed.
-The existing `start-github-repo` package's legacy nested invocation metadata is
-outside this upgrade's client-metadata qualification; the setup guard does not
-claim that every host correctly classifies that other package.
+The existing `start-github-repo` package has nested
+`disable-model-invocation: false`, which expresses model-routing intent.
+It is not a missing human-only guard. The native setup's narrower independent
+human-command rule still applies to its starter handoff; neither that rule nor
+metadata parsing proves that every host implements the client extensions.
 
 The strict `agentskills validate` tool implements the core Agent Skills schema.
 It rejects top-level `disable-model-invocation` and `argument-hint`, which are
@@ -348,12 +350,14 @@ as `invocation: user`. Its prompt stops for each independent human command.
 regression tests. This fixes that executable chain without modifying Matt's
 vendor bodies.
 
-Senior-engineer derivative agent paths, broader harness assets and the PM
-`/retro` namespace remain separate legacy qualification work. The root policy
-blocks dispatch if the intended provider, invocation class or required resources
-cannot be verified; it does not silently substitute a Matt skill. The inbound
-inventory reports the actual candidates so these limits are visible rather than
-presenting the 27-provider check as full-library closure.
+The [legacy binding follow-up](legacy-harness-bindings.md) now qualifies the
+three senior-engineer consumers, the 18 generated domain harness inventories
+and the PM retrospective command. Missing wrappers remain explicit blocked
+branches; no agents were invented. New harness plan/state versions carry and
+revalidate the exact live provider into fresh-session directives.
+Use `scripts/check_skill_dependencies.py --include-legacy` for the extended gate.
+The historical inbound inventory remains a pre-upgrade snapshot, not a list of
+current unresolved paths or a claim of whole-library runtime closure.
 
 The local domain consumer now points to lazy `GLOSSARY.md` and existing ADRs.
 No missing glossary was fabricated or unrelated CONTEXT file renamed.

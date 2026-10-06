@@ -13,7 +13,9 @@ Stdlib only. Deterministic: same text in, same route out.
 """
 
 import argparse
+import importlib.util
 import json
+from pathlib import Path
 import sys
 
 SIGNALS = {
@@ -115,6 +117,55 @@ def decide(scores: dict) -> dict:
     return {"decision": "ASK", "candidates": candidates, "exit": 2}
 
 
+def qualify_provider(repo_root, relative, expected_name):
+    """Use this router's own checkout; never execute the selected Skill/command."""
+    root = Path(repo_root).resolve(strict=True)
+    installed = Path(__file__).resolve()
+    trusted_root = installed.parents[5]
+    expected_router = trusted_root / "skills/project-management/skills/pm-skills/scripts/pm_goal_router.py"
+    if installed != expected_router or root != trusted_root:
+        raise ValueError("--repo-root must match this router's own trusted checkout")
+    module = root / "scripts/check_skill_dependencies.py"
+    component = root
+    for part in ("scripts", "check_skill_dependencies.py"):
+        component = component / part
+        if component.is_symlink():
+            raise ValueError("trusted checkout dependency checker path is a symlink")
+    if not module.is_file():
+        raise ValueError("trusted checkout dependency checker is missing")
+    spec = importlib.util.spec_from_file_location("_pm_dependency_metadata", module)
+    checker = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(checker)
+    provider = checker.checked_path(root, relative)
+    try:
+        fm = checker.frontmatter(provider)
+    except checker.yaml.YAMLError as exc:
+        raise ValueError("PM provider has malformed YAML metadata") from exc
+    if fm.get("name") != expected_name:
+        raise ValueError("PM provider identity does not match the selected lane")
+    if checker.disabled(fm):
+        raise ValueError("PM lane is user-only; independent human invocation required")
+    client = provider.parent / "agents/openai.yaml"
+    if client.parent.is_symlink():
+        raise ValueError("PM provider client metadata parent is a symlink")
+    if client.exists() or client.is_symlink():
+        try:
+            metadata = checker.codex(checker.checked_path(root, client.relative_to(root).as_posix()))
+        except checker.yaml.YAMLError as exc:
+            raise ValueError("PM provider has malformed client metadata") from exc
+        if metadata.get("policy", {}).get("allow_implicit_invocation", True) is not True:
+            raise ValueError("PM provider client policy blocks implicit model dispatch")
+    legacy_path = checker.checked_path(root, "scripts/check_legacy_bindings.py")
+    legacy_spec = importlib.util.spec_from_file_location("_pm_declared_binding", legacy_path)
+    legacy = importlib.util.module_from_spec(legacy_spec)
+    legacy_spec.loader.exec_module(legacy)
+    registry = legacy.read_registry(root)
+    errors = legacy.validate_pm(root, registry)
+    if errors:
+        raise ValueError("PM declaration is missing or stale: " + "; ".join(errors))
+    return provider
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(
         description="Deterministic lane router for project-management goals."
@@ -125,6 +176,8 @@ def main() -> int:
     ap.add_argument("--output", choices=["json", "human"], default="json")
     ap.add_argument("--sample", action="store_true",
                     help="Classify a built-in sample goal and exit.")
+    ap.add_argument("--repo-root",
+                    help="Trusted skills checkout root; verify exact live provider metadata.")
     args = ap.parse_args()
 
     if args.sample:
@@ -147,8 +200,22 @@ def main() -> int:
     if verdict["decision"] == "ROUTE":
         lane = verdict["lane"]
         out["route_to"] = SIGNALS[lane]["skill"]
-        out["skill_path"] = SIGNALS[lane]["path"]
+        out["skill_path"] = "skills/" + SIGNALS[lane]["path"]
+        out["provider_path"] = out["skill_path"] + "/SKILL.md"
+        out["binding_verified"] = False
+        out["execution_allowed"] = False
         out["matched_signals"] = result["hits"][lane]
+        if args.repo_root:
+            try:
+                provider = qualify_provider(args.repo_root, out["provider_path"], out["route_to"])
+                out["qualified_provider_path"] = str(provider)
+                out["binding_verified"] = True
+                # Qualified metadata is not authorization to perform operations.
+                out["instruction"] = "Use the exact provider in approved scope; binding does not grant mutation authority."
+            except (OSError, ValueError, ImportError, TypeError, KeyError) as exc:
+                out["decision"] = "BLOCKED_PROVIDER"
+                out["error"] = str(exc)
+                verdict["exit"] = 4
     elif verdict["decision"] == "ASK":
         out["candidates"] = [
             {"lane": lane, "skill": SIGNALS[lane]["skill"], "score": result["scores"][lane]}

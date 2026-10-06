@@ -1,5 +1,5 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "research-ops",
   "skill_count": 5,
   "loop_defaults": {
@@ -15,101 +15,171 @@
   "skills": [
     {
       "name": "clinical-research",
-      "path": "research-ops/skills/clinical-research",
+      "path": "skills/research-ops/skills/clinical-research",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "clinical-research",
+        "skill_path": "skills/research-ops/skills/clinical-research",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research-ops/skills/clinical-research/SKILL.md",
+            "sha256": "2ee6764353ca5dd7b2366557be898e4aea17c7223e0f9ac6799c9b21a0ef8041",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/research-ops/skills/clinical-research/assets/protocol_synopsis_template.md",
+            "sha256": "771c5a858d8003885ebf40994d4e7e1bc6eea2b95acd5443c3baadf8c547e429",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/clinical-research/references/endpoint_and_power.md",
+            "sha256": "cf64ef85371ed60da0154f57206f5ee930b334d8d05784ed4219148bd6a00564",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/clinical-research/references/study_design_canon.md",
+            "sha256": "a405ca4bb0127a1aacee1b6c2616a5e0aed35c9fe10427359c9e8483aa1a55da",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/clinical-research/references/trial_operations.md",
+            "sha256": "1e2cf94b86dd44a98a96b30066f37cc8b371932cbead4b3b920268487b716428",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/clinical-research/scripts/ar_evaluator.py",
+            "sha256": "4b2c5a047f4db6cecc633c72f2e3d203adccf7a9d139448e432e6374af65a7f5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/clinical-research/scripts/config_loader.py",
+            "sha256": "a11052365a00da34b26051ce07ed1119600210917b19197cd9ea1c60078c5ba1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/clinical-research/scripts/endpoint_selector.py",
+            "sha256": "f203e064e5e37cb964828ba893e5396dc46cdd44d79b7646a9bc4c3ba9edd73d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/clinical-research/scripts/onboard.py",
+            "sha256": "7032774a75be13046bd2f3e810b882e09b1d1f24f4535eacffb3889e6bf59a48",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/clinical-research/scripts/phase_gate_scorer.py",
+            "sha256": "3f030a4aeefec1a38a153542c73168ac3c5a2d859376a3aefc8feb7e80bc85a3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/clinical-research/scripts/sample_size_estimator.py",
+            "sha256": "c755b9d65630cef753d02d0c9a6ceffcb5531951f910937aa9498750ddc7bff5",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when designing a prospective clinical study before submission \u2014 selecting and classifying endpoints (primary / key-secondary / exploratory, with surrogate-endpoint flagging), estimating sample size and power for two-arm designs (means / proportions / survival), or scoring a study plan for feasibility and a GO / GO-WITH-CONDITIONS / REDESIGN / NO-GO phase-gate decision. Every output is an ESTIMATE plus a named human owner (clinician / biostatistician / regulatory owner) \u2014 never clinical fact, never a finished protocol. Distinct from ra-qm-team, which handles the regulatory/QM submission \u2026",
       "tools": [
         {
-          "script": "research-ops/skills/clinical-research/scripts/ar_evaluator.py",
+          "script": "skills/research-ops/skills/clinical-research/scripts/ar_evaluator.py",
+          "sha256": "4b2c5a047f4db6cecc633c72f2e3d203adccf7a9d139448e432e6374af65a7f5",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/clinical-research/scripts/ar_evaluator.py --help",
+              "cmd": "python3 skills/research-ops/skills/clinical-research/scripts/ar_evaluator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/clinical-research/scripts/ar_evaluator.py --sample",
+              "cmd": "python3 skills/research-ops/skills/clinical-research/scripts/ar_evaluator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/clinical-research/scripts/config_loader.py",
+          "script": "skills/research-ops/skills/clinical-research/scripts/config_loader.py",
+          "sha256": "a11052365a00da34b26051ce07ed1119600210917b19197cd9ea1c60078c5ba1",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/clinical-research/scripts/config_loader.py --help",
+              "cmd": "python3 skills/research-ops/skills/clinical-research/scripts/config_loader.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/clinical-research/scripts/config_loader.py --sample",
+              "cmd": "python3 skills/research-ops/skills/clinical-research/scripts/config_loader.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/clinical-research/scripts/endpoint_selector.py",
+          "script": "skills/research-ops/skills/clinical-research/scripts/endpoint_selector.py",
+          "sha256": "f203e064e5e37cb964828ba893e5396dc46cdd44d79b7646a9bc4c3ba9edd73d",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/clinical-research/scripts/endpoint_selector.py --help",
+              "cmd": "python3 skills/research-ops/skills/clinical-research/scripts/endpoint_selector.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/clinical-research/scripts/endpoint_selector.py --sample",
+              "cmd": "python3 skills/research-ops/skills/clinical-research/scripts/endpoint_selector.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/clinical-research/scripts/onboard.py",
+          "script": "skills/research-ops/skills/clinical-research/scripts/onboard.py",
+          "sha256": "7032774a75be13046bd2f3e810b882e09b1d1f24f4535eacffb3889e6bf59a48",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/clinical-research/scripts/onboard.py --help",
+              "cmd": "python3 skills/research-ops/skills/clinical-research/scripts/onboard.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "research-ops/skills/clinical-research/scripts/phase_gate_scorer.py",
+          "script": "skills/research-ops/skills/clinical-research/scripts/phase_gate_scorer.py",
+          "sha256": "3f030a4aeefec1a38a153542c73168ac3c5a2d859376a3aefc8feb7e80bc85a3",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/clinical-research/scripts/phase_gate_scorer.py --help",
+              "cmd": "python3 skills/research-ops/skills/clinical-research/scripts/phase_gate_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/clinical-research/scripts/phase_gate_scorer.py --sample",
+              "cmd": "python3 skills/research-ops/skills/clinical-research/scripts/phase_gate_scorer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/clinical-research/scripts/sample_size_estimator.py",
+          "script": "skills/research-ops/skills/clinical-research/scripts/sample_size_estimator.py",
+          "sha256": "c755b9d65630cef753d02d0c9a6ceffcb5531951f910937aa9498750ddc7bff5",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/clinical-research/scripts/sample_size_estimator.py --help",
+              "cmd": "python3 skills/research-ops/skills/clinical-research/scripts/sample_size_estimator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/clinical-research/scripts/sample_size_estimator.py --sample",
+              "cmd": "python3 skills/research-ops/skills/clinical-research/scripts/sample_size_estimator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -124,108 +194,178 @@
         "close_out": false
       },
       "references": [
-        "endpoint_and_power.md",
-        "study_design_canon.md",
-        "trial_operations.md"
+        "skills/research-ops/skills/clinical-research/references/endpoint_and_power.md",
+        "skills/research-ops/skills/clinical-research/references/study_design_canon.md",
+        "skills/research-ops/skills/clinical-research/references/trial_operations.md"
       ]
     },
     {
       "name": "market-research",
-      "path": "research-ops/skills/market-research",
+      "path": "skills/research-ops/skills/market-research",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "market-research",
+        "skill_path": "skills/research-ops/skills/market-research",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research-ops/skills/market-research/SKILL.md",
+            "sha256": "0e4037294f8e6bea1cb53de035eaa97bd2d74349d06f9b61d85f4420d7c084c9",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/research-ops/skills/market-research/assets/market_research_brief_template.md",
+            "sha256": "211dba32d174b62b741b73e08732c5e40170f2dffafd84b8e45aa4d795f1a8da",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/market-research/references/market_sizing_canon.md",
+            "sha256": "8aaa68b34491317e183f0e3f31d1b3e5494c79831ff0b9f98e5d031a8d8507e5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/market-research/references/segmentation_and_ci.md",
+            "sha256": "20d318b2632e82de0e156a6f296292a3c3939d7d5e346cc7b88f1d7181999c72",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/market-research/references/survey_methodology.md",
+            "sha256": "477d0508ac4d7485850fbe371ecda25c62e2fcd6db483fec994c394075d725f6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/market-research/scripts/ar_evaluator.py",
+            "sha256": "d6093aab293a3aba3e092969f96935499a47041f8801df99f191d48c979556c7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/market-research/scripts/config_loader.py",
+            "sha256": "12479462255f27eef0cb45eb2a903d205849b35af58bd229e2876d11fa8cc9ae",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/market-research/scripts/market_sizer.py",
+            "sha256": "baad9dc0d2c144f47a24126c0781878b6a41a9e093d99420f605806a936cac6c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/market-research/scripts/onboard.py",
+            "sha256": "1bdae366637fe6c76bc31942382a4b3222fd2ab2311d0d544a3e0b7f9c758330",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/market-research/scripts/sample_size_planner.py",
+            "sha256": "633bb10418b65a3b9923fab465bd3802d232ffbce0ae0f543c510c414efad574",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/market-research/scripts/segmentation_scorer.py",
+            "sha256": "11387bc2d135b90d2de8b55cbd36fd02d983950750160a0dbc8077bc5acd1d56",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when doing upstream market-research methodology \u2014 sizing a market as TAM/SAM/SOM computed BOTH top-down and bottoms-up (never a single unsourced number), planning a survey sample size with finite-population correction and per-segment minimums, or scoring candidate market segments against Kotler's measurable/substantial/accessible/differentiable/actionable criteria. Outputs always show the method and the assumptions. For market-research analysts and product-marketing at the sizing/survey/segmentation moment. Distinct from marketing-skill (campaign analytics, attribution, demand-gen) \u2014 \u2026",
       "tools": [
         {
-          "script": "research-ops/skills/market-research/scripts/ar_evaluator.py",
+          "script": "skills/research-ops/skills/market-research/scripts/ar_evaluator.py",
+          "sha256": "d6093aab293a3aba3e092969f96935499a47041f8801df99f191d48c979556c7",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/market-research/scripts/ar_evaluator.py --help",
+              "cmd": "python3 skills/research-ops/skills/market-research/scripts/ar_evaluator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/market-research/scripts/ar_evaluator.py --sample",
+              "cmd": "python3 skills/research-ops/skills/market-research/scripts/ar_evaluator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/market-research/scripts/config_loader.py",
+          "script": "skills/research-ops/skills/market-research/scripts/config_loader.py",
+          "sha256": "12479462255f27eef0cb45eb2a903d205849b35af58bd229e2876d11fa8cc9ae",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/market-research/scripts/config_loader.py --help",
+              "cmd": "python3 skills/research-ops/skills/market-research/scripts/config_loader.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/market-research/scripts/config_loader.py --sample",
+              "cmd": "python3 skills/research-ops/skills/market-research/scripts/config_loader.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/market-research/scripts/market_sizer.py",
+          "script": "skills/research-ops/skills/market-research/scripts/market_sizer.py",
+          "sha256": "baad9dc0d2c144f47a24126c0781878b6a41a9e093d99420f605806a936cac6c",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/market-research/scripts/market_sizer.py --help",
+              "cmd": "python3 skills/research-ops/skills/market-research/scripts/market_sizer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/market-research/scripts/market_sizer.py --sample",
+              "cmd": "python3 skills/research-ops/skills/market-research/scripts/market_sizer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/market-research/scripts/onboard.py",
+          "script": "skills/research-ops/skills/market-research/scripts/onboard.py",
+          "sha256": "1bdae366637fe6c76bc31942382a4b3222fd2ab2311d0d544a3e0b7f9c758330",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/market-research/scripts/onboard.py --help",
+              "cmd": "python3 skills/research-ops/skills/market-research/scripts/onboard.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "research-ops/skills/market-research/scripts/sample_size_planner.py",
+          "script": "skills/research-ops/skills/market-research/scripts/sample_size_planner.py",
+          "sha256": "633bb10418b65a3b9923fab465bd3802d232ffbce0ae0f543c510c414efad574",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/market-research/scripts/sample_size_planner.py --help",
+              "cmd": "python3 skills/research-ops/skills/market-research/scripts/sample_size_planner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/market-research/scripts/sample_size_planner.py --sample",
+              "cmd": "python3 skills/research-ops/skills/market-research/scripts/sample_size_planner.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/market-research/scripts/segmentation_scorer.py",
+          "script": "skills/research-ops/skills/market-research/scripts/segmentation_scorer.py",
+          "sha256": "11387bc2d135b90d2de8b55cbd36fd02d983950750160a0dbc8077bc5acd1d56",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/market-research/scripts/segmentation_scorer.py --help",
+              "cmd": "python3 skills/research-ops/skills/market-research/scripts/segmentation_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/market-research/scripts/segmentation_scorer.py --sample",
+              "cmd": "python3 skills/research-ops/skills/market-research/scripts/segmentation_scorer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -240,108 +380,178 @@
         "close_out": false
       },
       "references": [
-        "market_sizing_canon.md",
-        "segmentation_and_ci.md",
-        "survey_methodology.md"
+        "skills/research-ops/skills/market-research/references/market_sizing_canon.md",
+        "skills/research-ops/skills/market-research/references/segmentation_and_ci.md",
+        "skills/research-ops/skills/market-research/references/survey_methodology.md"
       ]
     },
     {
       "name": "product-research",
-      "path": "research-ops/skills/product-research",
+      "path": "skills/research-ops/skills/product-research",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "product-research",
+        "skill_path": "skills/research-ops/skills/product-research",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research-ops/skills/product-research/SKILL.md",
+            "sha256": "a483e2e81808dc8cb55996a1ec8a120ef60c37c4585435a2fdba9c438fc37f84",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/research-ops/skills/product-research/assets/research_plan_template.md",
+            "sha256": "7a96d431c9df07a6a3ec2edc8f1d73a1732e1cefb2963cdb98224541ac6c2c80",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/product-research/references/repository_and_synthesis.md",
+            "sha256": "14bea023aaa3e857ccea6ca85347579cb5eae296db2f8e178ad9f8770a6aad39",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/product-research/references/research_methods_canon.md",
+            "sha256": "e3134a1c93969032dbcc5a78746e9283c79f1cbbaa63d193bdc7dd76c6901e5f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/product-research/references/sampling_and_saturation.md",
+            "sha256": "22db38bdd62f49c28db75e0b94d46fe20680357935ed3a1f257e572717c431ca",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/product-research/scripts/ar_evaluator.py",
+            "sha256": "6782c5219a05e42ce81caba0874750bf072b82122b274cb11ce8825dc63232be",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/product-research/scripts/config_loader.py",
+            "sha256": "f66b80942f64ddcad09c85f884f4c775ba48e7c5625ff62f835aa57a75d19880",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/product-research/scripts/insight_synthesizer.py",
+            "sha256": "1af06a3cfa685a70426e51027a7967f3b371f87bedaa0ff9007bdbb4a6698e86",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/product-research/scripts/onboard.py",
+            "sha256": "11c365148e55741ac32424f2912c0c41d99aa679fefdb32555a596be759b89f9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/product-research/scripts/saturation_planner.py",
+            "sha256": "e2d096cfa15aff2ebfdccf69cf6c54f254cdb3d5c7ae2b383504ef69aae5225b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/product-research/scripts/study_designer.py",
+            "sha256": "d79a05e0caaae22bd3cdc26569f7460e7844164cce9b41b355b84687f754c36a",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when planning and synthesizing product/user research as a method-and-repository discipline \u2014 selecting the right method for the goal (generative interviews vs usability test vs concept test vs validation), computing method-based saturation/sample size with an explicit confidence level, or synthesizing coded observations into insights while flagging single-source anecdotes. Never fabricates user insight; an insight requires recurrence across independent participants. Distinct from product-team/ux-researcher-designer (persona/journey artifacts), product-discovery (discovery-sprint \u2026",
       "tools": [
         {
-          "script": "research-ops/skills/product-research/scripts/ar_evaluator.py",
+          "script": "skills/research-ops/skills/product-research/scripts/ar_evaluator.py",
+          "sha256": "6782c5219a05e42ce81caba0874750bf072b82122b274cb11ce8825dc63232be",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/product-research/scripts/ar_evaluator.py --help",
+              "cmd": "python3 skills/research-ops/skills/product-research/scripts/ar_evaluator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/product-research/scripts/ar_evaluator.py --sample",
+              "cmd": "python3 skills/research-ops/skills/product-research/scripts/ar_evaluator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/product-research/scripts/config_loader.py",
+          "script": "skills/research-ops/skills/product-research/scripts/config_loader.py",
+          "sha256": "f66b80942f64ddcad09c85f884f4c775ba48e7c5625ff62f835aa57a75d19880",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/product-research/scripts/config_loader.py --help",
+              "cmd": "python3 skills/research-ops/skills/product-research/scripts/config_loader.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/product-research/scripts/config_loader.py --sample",
+              "cmd": "python3 skills/research-ops/skills/product-research/scripts/config_loader.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/product-research/scripts/insight_synthesizer.py",
+          "script": "skills/research-ops/skills/product-research/scripts/insight_synthesizer.py",
+          "sha256": "1af06a3cfa685a70426e51027a7967f3b371f87bedaa0ff9007bdbb4a6698e86",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/product-research/scripts/insight_synthesizer.py --help",
+              "cmd": "python3 skills/research-ops/skills/product-research/scripts/insight_synthesizer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/product-research/scripts/insight_synthesizer.py --sample",
+              "cmd": "python3 skills/research-ops/skills/product-research/scripts/insight_synthesizer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/product-research/scripts/onboard.py",
+          "script": "skills/research-ops/skills/product-research/scripts/onboard.py",
+          "sha256": "11c365148e55741ac32424f2912c0c41d99aa679fefdb32555a596be759b89f9",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/product-research/scripts/onboard.py --help",
+              "cmd": "python3 skills/research-ops/skills/product-research/scripts/onboard.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "research-ops/skills/product-research/scripts/saturation_planner.py",
+          "script": "skills/research-ops/skills/product-research/scripts/saturation_planner.py",
+          "sha256": "e2d096cfa15aff2ebfdccf69cf6c54f254cdb3d5c7ae2b383504ef69aae5225b",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/product-research/scripts/saturation_planner.py --help",
+              "cmd": "python3 skills/research-ops/skills/product-research/scripts/saturation_planner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/product-research/scripts/saturation_planner.py --sample",
+              "cmd": "python3 skills/research-ops/skills/product-research/scripts/saturation_planner.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/product-research/scripts/study_designer.py",
+          "script": "skills/research-ops/skills/product-research/scripts/study_designer.py",
+          "sha256": "d79a05e0caaae22bd3cdc26569f7460e7844164cce9b41b355b84687f754c36a",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/product-research/scripts/study_designer.py --help",
+              "cmd": "python3 skills/research-ops/skills/product-research/scripts/study_designer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/product-research/scripts/study_designer.py --sample",
+              "cmd": "python3 skills/research-ops/skills/product-research/scripts/study_designer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -356,108 +566,178 @@
         "close_out": false
       },
       "references": [
-        "repository_and_synthesis.md",
-        "research_methods_canon.md",
-        "sampling_and_saturation.md"
+        "skills/research-ops/skills/product-research/references/repository_and_synthesis.md",
+        "skills/research-ops/skills/product-research/references/research_methods_canon.md",
+        "skills/research-ops/skills/product-research/references/sampling_and_saturation.md"
       ]
     },
     {
       "name": "research-finance",
-      "path": "research-ops/skills/research-finance",
+      "path": "skills/research-ops/skills/research-finance",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "research-finance",
+        "skill_path": "skills/research-ops/skills/research-finance",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research-ops/skills/research-finance/SKILL.md",
+            "sha256": "a40e86d877bcab0a8c9018dca2b63e69fe1b2d9cf3d41c0f852abda699794ff4",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/research-ops/skills/research-finance/assets/rd_program_budget_template.md",
+            "sha256": "b26d32e094c004eac660cba82ba85fc8c3e1c56b39077bc9e2192073e9d81992",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/research-finance/references/burn_and_portfolio.md",
+            "sha256": "98e07af1bed3466db10df2d88a3a977c610a9fea7abfeae83228b9b0d7d01b7f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/research-finance/references/indirect_rate_modeling.md",
+            "sha256": "dfca76e9975bd3ca2e9861fe71d3af137e24e9eea5ec5151891ce0338d80c78b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/research-finance/references/rd_program_finance_canon.md",
+            "sha256": "47b02d8c8e970e436ccc3d1842de6b3f8fc8b1ad31b15c761a26dddddfbb0744",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/research-finance/scripts/ar_evaluator.py",
+            "sha256": "ff4aa9b9023cc6365007a4606c36cae1d2d7787a3a870d0b26a009f6e0af6641",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/research-finance/scripts/burn_runway_tracker.py",
+            "sha256": "eea0b80169000f2b4507355330c34d06806736f5df572719e3b1c33077197ffd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/research-finance/scripts/capex_vs_opex_router.py",
+            "sha256": "ef39a805bd6f559c753400a2d0b60fa4c5be7edd55d1115f32592ca2b6c3141f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/research-finance/scripts/config_loader.py",
+            "sha256": "810c5026bc57ea3af6239b409d5dd6e81bd47fff155138fa97b98dbb1825ecff",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/research-finance/scripts/onboard.py",
+            "sha256": "07612151ee0539baae500bdea9b20735615b6e286b790d2cf4900472470da6de",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research-ops/skills/research-finance/scripts/program_budget_planner.py",
+            "sha256": "5127aae1fa31cc9ecae9511d2fb9f1f6d9dd095785b164912c00502409a49fed",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when managing the money for an internal R&D program or portfolio \u2014 building a multi-period program budget with the F&A (indirect) split, tracking burn rate and runway against value-inflection milestones, or routing R&D cost items to a capitalize-vs-expense determination. Every budget output surfaces its assumptions block; capitalize-vs-expense is decision-support only and routes to a named finance owner \u2014 it never books an entry or decides accounting treatment. Distinct from finance/financial-analysis (corporate DCF, close, valuation) and research/grants (funding discovery \u2014 this \u2026",
       "tools": [
         {
-          "script": "research-ops/skills/research-finance/scripts/ar_evaluator.py",
+          "script": "skills/research-ops/skills/research-finance/scripts/ar_evaluator.py",
+          "sha256": "ff4aa9b9023cc6365007a4606c36cae1d2d7787a3a870d0b26a009f6e0af6641",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/research-finance/scripts/ar_evaluator.py --help",
+              "cmd": "python3 skills/research-ops/skills/research-finance/scripts/ar_evaluator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/research-finance/scripts/ar_evaluator.py --sample",
+              "cmd": "python3 skills/research-ops/skills/research-finance/scripts/ar_evaluator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/research-finance/scripts/burn_runway_tracker.py",
+          "script": "skills/research-ops/skills/research-finance/scripts/burn_runway_tracker.py",
+          "sha256": "eea0b80169000f2b4507355330c34d06806736f5df572719e3b1c33077197ffd",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/research-finance/scripts/burn_runway_tracker.py --help",
+              "cmd": "python3 skills/research-ops/skills/research-finance/scripts/burn_runway_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/research-finance/scripts/burn_runway_tracker.py --sample",
+              "cmd": "python3 skills/research-ops/skills/research-finance/scripts/burn_runway_tracker.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/research-finance/scripts/capex_vs_opex_router.py",
+          "script": "skills/research-ops/skills/research-finance/scripts/capex_vs_opex_router.py",
+          "sha256": "ef39a805bd6f559c753400a2d0b60fa4c5be7edd55d1115f32592ca2b6c3141f",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/research-finance/scripts/capex_vs_opex_router.py --help",
+              "cmd": "python3 skills/research-ops/skills/research-finance/scripts/capex_vs_opex_router.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/research-finance/scripts/capex_vs_opex_router.py --sample",
+              "cmd": "python3 skills/research-ops/skills/research-finance/scripts/capex_vs_opex_router.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/research-finance/scripts/config_loader.py",
+          "script": "skills/research-ops/skills/research-finance/scripts/config_loader.py",
+          "sha256": "810c5026bc57ea3af6239b409d5dd6e81bd47fff155138fa97b98dbb1825ecff",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/research-finance/scripts/config_loader.py --help",
+              "cmd": "python3 skills/research-ops/skills/research-finance/scripts/config_loader.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/research-finance/scripts/config_loader.py --sample",
+              "cmd": "python3 skills/research-ops/skills/research-finance/scripts/config_loader.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research-ops/skills/research-finance/scripts/onboard.py",
+          "script": "skills/research-ops/skills/research-finance/scripts/onboard.py",
+          "sha256": "07612151ee0539baae500bdea9b20735615b6e286b790d2cf4900472470da6de",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/research-finance/scripts/onboard.py --help",
+              "cmd": "python3 skills/research-ops/skills/research-finance/scripts/onboard.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "research-ops/skills/research-finance/scripts/program_budget_planner.py",
+          "script": "skills/research-ops/skills/research-finance/scripts/program_budget_planner.py",
+          "sha256": "5127aae1fa31cc9ecae9511d2fb9f1f6d9dd095785b164912c00502409a49fed",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research-ops/skills/research-finance/scripts/program_budget_planner.py --help",
+              "cmd": "python3 skills/research-ops/skills/research-finance/scripts/program_budget_planner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research-ops/skills/research-finance/scripts/program_budget_planner.py --sample",
+              "cmd": "python3 skills/research-ops/skills/research-finance/scripts/program_budget_planner.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -472,14 +752,28 @@
         "close_out": false
       },
       "references": [
-        "burn_and_portfolio.md",
-        "indirect_rate_modeling.md",
-        "rd_program_finance_canon.md"
+        "skills/research-ops/skills/research-finance/references/burn_and_portfolio.md",
+        "skills/research-ops/skills/research-finance/references/indirect_rate_modeling.md",
+        "skills/research-ops/skills/research-finance/references/rd_program_finance_canon.md"
       ]
     },
     {
       "name": "research-ops-skills",
-      "path": "research-ops/skills/research-ops-skills",
+      "path": "skills/research-ops/skills/research-ops-skills",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "research-ops-skills",
+        "skill_path": "skills/research-ops/skills/research-ops-skills",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research-ops/skills/research-ops-skills/SKILL.md",
+            "sha256": "58b58e51a1fc39d58efe284fd2e95bfdf7d0cc341ff2c3da982238c5bc803e75",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Use when planning, funding, scoping, or synthesizing enterprise research across workstreams \u2014 clinical study design, R&D program finance, market sizing/surveys, or product/user research. Triggers on \"design this clinical study\", \"what sample size\", \"R&D budget\", \"burn rate\", \"capitalize or expense\", \"TAM SAM SOM\", \"market sizing\", \"survey design\", \"segment the market\", \"plan user interviews\", \"usability test\", \"synthesize research insights\". Forks context to route to one of four Research-Operations sub-skills (clinical-research, research-finance, market-research, product-research) and \u2026",
       "tools": [],
       "agentic_signals": {

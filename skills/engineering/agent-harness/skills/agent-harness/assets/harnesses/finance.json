@@ -1,5 +1,5 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "finance",
   "skill_count": 4,
   "loop_defaults": {
@@ -15,7 +15,21 @@
   "skills": [
     {
       "name": "business-investment-advisor",
-      "path": "finance/business-investment-advisor/skills/business-investment-advisor",
+      "path": "skills/finance/business-investment-advisor/skills/business-investment-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "business-investment-advisor",
+        "skill_path": "skills/finance/business-investment-advisor/skills/business-investment-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/finance/business-investment-advisor/skills/business-investment-advisor/SKILL.md",
+            "sha256": "8d3c386f999900cdce3c9f28f8639c6365b659b01ebdeca9ee06c58cdb1b0745",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Business investment analysis and capital allocation advisor. Use when evaluating whether to invest in equipment, real estate, a new business, hiring, technology, or any capital expenditure. Also use for ROI calculations, IRR, NPV, payback period, build vs buy decisions, lease vs buy analysis, vendor evaluation, or deciding where to allocate limited budget for maximum return.",
       "tools": [],
       "agentic_signals": {
@@ -29,7 +43,21 @@
     },
     {
       "name": "finance-skills",
-      "path": "finance/skills/finance-skills",
+      "path": "skills/finance/skills/finance-skills",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "finance-skills",
+        "skill_path": "skills/finance/skills/finance-skills",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/finance/skills/finance-skills/SKILL.md",
+            "sha256": "7482aca0118302cdaa5f55c3a2742a6af8abe87f36e6369a5ed284ab3054a16f",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Router/index for the 2 finance skills bundled in this plugin: financial-analyst (ratio analysis, DCF valuation, budget variance, rolling forecasts) and saas-metrics-coach (ARR/MRR, churn, CAC/LTV, NRR, quick ratio). Use when a finance request doesn't obviously match one skill and you need to pick the right one (e.g., 'analyze these financials', 'how healthy are my SaaS metrics').",
       "tools": [],
       "agentic_signals": {
@@ -43,52 +71,135 @@
     },
     {
       "name": "financial-analyst",
-      "path": "finance/skills/financial-analyst",
+      "path": "skills/finance/skills/financial-analyst",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "financial-analyst",
+        "skill_path": "skills/finance/skills/financial-analyst",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/finance/skills/financial-analyst/SKILL.md",
+            "sha256": "96e7844b15c0e6f4edefa9f6d3fbce8943e9e89187b26d11bc7cef7544ba80df",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/finance/skills/financial-analyst/assets/dcf_analysis_template.md",
+            "sha256": "07593113bc953a5c3d6010daeb2a0cfa9e427d02ca5a0f1b453a5ce25bd47500",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/financial-analyst/assets/expected_output.json",
+            "sha256": "0ff42094c7cfc31cf1c979620e316c136a1030639ed1c0fdb4472fc8da3ac683",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/financial-analyst/assets/forecast_report_template.md",
+            "sha256": "8683aef2844e510075cd1c0fc08d85c8656480d7fd494b3b4dd9e396e3b4a227",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/financial-analyst/assets/sample_financial_data.json",
+            "sha256": "1e7f486e62e9de2b585a10a6b0ace771cfed26bd02575e305234c3e3a54a902c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/financial-analyst/assets/variance_report_template.md",
+            "sha256": "428aa3e407b8f15b08b460e0523d97d90a9bb82cb151600aea3f14b3d8847c33",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/financial-analyst/references/financial-ratios-guide.md",
+            "sha256": "a1c7b935963a738981427a8e3a8807e7d912e3579fbacac86d8888c459223a40",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/financial-analyst/references/forecasting-best-practices.md",
+            "sha256": "f12e8496eeb7a6626c65a82b72cce326c5e364d1856d715f5928a08aed078282",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/financial-analyst/references/industry-adaptations.md",
+            "sha256": "3884033f3ecbdcecd4be44b8926320e2398c754c6332dbd56c85b86477d4e047",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/financial-analyst/references/valuation-methodology.md",
+            "sha256": "d7cedb0aa0325bdf2d956d8b3ff21e08bd2d2ab6c8c79b1fa758ff4e16fe1b5d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/financial-analyst/scripts/budget_variance_analyzer.py",
+            "sha256": "e033cd7fdca26ce1dd0d85070e748c091eb2bb6eab974b75d70bee6829ac49c6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/financial-analyst/scripts/dcf_valuation.py",
+            "sha256": "f2617ea1becb439a454001d9ff261f4d995e98c3fb96006ef54ccb1f3d618c81",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/financial-analyst/scripts/forecast_builder.py",
+            "sha256": "5ea5b660747ad11ea7354fd6625e95c745cee0ef21497999e7079e816c1656d9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/financial-analyst/scripts/ratio_calculator.py",
+            "sha256": "64f8a8074ad235da54b13c73027661d2f58c8c7a1a3b5815e57f0ceecf45d82e",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Performs financial ratio analysis, DCF valuation, budget variance analysis, and rolling forecast construction for strategic decision-making. Use when analyzing financial statements, building valuation models, assessing budget variances, or constructing financial projections and forecasts. Also applicable when users mention financial modeling, cash flow analysis, company valuation, financial projections, or spreadsheet analysis.",
       "tools": [
         {
-          "script": "finance/skills/financial-analyst/scripts/budget_variance_analyzer.py",
+          "script": "skills/finance/skills/financial-analyst/scripts/budget_variance_analyzer.py",
+          "sha256": "e033cd7fdca26ce1dd0d85070e748c091eb2bb6eab974b75d70bee6829ac49c6",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 finance/skills/financial-analyst/scripts/budget_variance_analyzer.py --help",
+              "cmd": "python3 skills/finance/skills/financial-analyst/scripts/budget_variance_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "finance/skills/financial-analyst/scripts/dcf_valuation.py",
+          "script": "skills/finance/skills/financial-analyst/scripts/dcf_valuation.py",
+          "sha256": "f2617ea1becb439a454001d9ff261f4d995e98c3fb96006ef54ccb1f3d618c81",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 finance/skills/financial-analyst/scripts/dcf_valuation.py --help",
+              "cmd": "python3 skills/finance/skills/financial-analyst/scripts/dcf_valuation.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "finance/skills/financial-analyst/scripts/forecast_builder.py",
+          "script": "skills/finance/skills/financial-analyst/scripts/forecast_builder.py",
+          "sha256": "5ea5b660747ad11ea7354fd6625e95c745cee0ef21497999e7079e816c1656d9",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 finance/skills/financial-analyst/scripts/forecast_builder.py --help",
+              "cmd": "python3 skills/finance/skills/financial-analyst/scripts/forecast_builder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "finance/skills/financial-analyst/scripts/ratio_calculator.py",
+          "script": "skills/finance/skills/financial-analyst/scripts/ratio_calculator.py",
+          "sha256": "64f8a8074ad235da54b13c73027661d2f58c8c7a1a3b5815e57f0ceecf45d82e",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 finance/skills/financial-analyst/scripts/ratio_calculator.py --help",
+              "cmd": "python3 skills/finance/skills/financial-analyst/scripts/ratio_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -103,48 +214,95 @@
         "close_out": false
       },
       "references": [
-        "financial-ratios-guide.md",
-        "forecasting-best-practices.md",
-        "industry-adaptations.md",
-        "valuation-methodology.md"
+        "skills/finance/skills/financial-analyst/references/financial-ratios-guide.md",
+        "skills/finance/skills/financial-analyst/references/forecasting-best-practices.md",
+        "skills/finance/skills/financial-analyst/references/industry-adaptations.md",
+        "skills/finance/skills/financial-analyst/references/valuation-methodology.md"
       ]
     },
     {
       "name": "saas-metrics-coach",
-      "path": "finance/skills/saas-metrics-coach",
+      "path": "skills/finance/skills/saas-metrics-coach",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "saas-metrics-coach",
+        "skill_path": "skills/finance/skills/saas-metrics-coach",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/finance/skills/saas-metrics-coach/SKILL.md",
+            "sha256": "bc6fcf0302ee0e2cf88bb05a61a2dbd3301051e1f99155fbd664f14e9aab4291",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/finance/skills/saas-metrics-coach/assets/input-template.md",
+            "sha256": "235fcd9768c07b96baf32a34eea747d2647515dc4da067cc9ed5b0c61e1077b3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/saas-metrics-coach/references/benchmarks.md",
+            "sha256": "c06584d2494a41710f7ac6e16bf878742078413fa17a3255a94e7dd094af2c0c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/saas-metrics-coach/references/formulas.md",
+            "sha256": "df7acae541e96cb5164329e63aa1a4fdd9f67c32bf68a88e5f58ac07604497ff",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/saas-metrics-coach/scripts/metrics_calculator.py",
+            "sha256": "1bfcacc27aca6699cb955ec0dcfbad22bc5369617228b4744a8e26f1e4f176d9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/saas-metrics-coach/scripts/quick_ratio_calculator.py",
+            "sha256": "f4e2c3e92dda6bac37ff5f1ea1b0e89c36d925df766e030265591eb20f03e66d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/finance/skills/saas-metrics-coach/scripts/unit_economics_simulator.py",
+            "sha256": "db951c9c1bc6dca35c94ea0c6cfa7d02592b31b14e1b40502285f3ef131b0f45",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "SaaS financial health advisor. Use when a user shares revenue or customer numbers, or mentions ARR, MRR, churn, LTV, CAC, NRR, or asks how their SaaS business is doing.",
       "tools": [
         {
-          "script": "finance/skills/saas-metrics-coach/scripts/metrics_calculator.py",
+          "script": "skills/finance/skills/saas-metrics-coach/scripts/metrics_calculator.py",
+          "sha256": "1bfcacc27aca6699cb955ec0dcfbad22bc5369617228b4744a8e26f1e4f176d9",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 finance/skills/saas-metrics-coach/scripts/metrics_calculator.py --help",
+              "cmd": "python3 skills/finance/skills/saas-metrics-coach/scripts/metrics_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "finance/skills/saas-metrics-coach/scripts/quick_ratio_calculator.py",
+          "script": "skills/finance/skills/saas-metrics-coach/scripts/quick_ratio_calculator.py",
+          "sha256": "f4e2c3e92dda6bac37ff5f1ea1b0e89c36d925df766e030265591eb20f03e66d",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 finance/skills/saas-metrics-coach/scripts/quick_ratio_calculator.py --help",
+              "cmd": "python3 skills/finance/skills/saas-metrics-coach/scripts/quick_ratio_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "finance/skills/saas-metrics-coach/scripts/unit_economics_simulator.py",
+          "script": "skills/finance/skills/saas-metrics-coach/scripts/unit_economics_simulator.py",
+          "sha256": "db951c9c1bc6dca35c94ea0c6cfa7d02592b31b14e1b40502285f3ef131b0f45",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 finance/skills/saas-metrics-coach/scripts/unit_economics_simulator.py --help",
+              "cmd": "python3 skills/finance/skills/saas-metrics-coach/scripts/unit_economics_simulator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -159,8 +317,8 @@
         "close_out": false
       },
       "references": [
-        "benchmarks.md",
-        "formulas.md"
+        "skills/finance/skills/saas-metrics-coach/references/benchmarks.md",
+        "skills/finance/skills/saas-metrics-coach/references/formulas.md"
       ]
     }
   ]

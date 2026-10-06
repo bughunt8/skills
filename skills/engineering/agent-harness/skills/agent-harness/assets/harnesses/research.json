@@ -1,5 +1,5 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "research",
   "skill_count": 9,
   "loop_defaults": {
@@ -15,7 +15,26 @@
   "skills": [
     {
       "name": "deep-research",
-      "path": "research/deep-research/skills/deep-research",
+      "path": "skills/research/deep-research/skills/deep-research",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "deep-research",
+        "skill_path": "skills/research/deep-research/skills/deep-research",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research/deep-research/skills/deep-research/SKILL.md",
+            "sha256": "0c3f02d1ba581a2368c5e8a3b99a2428f42e78081136621359cfecef2fabca25",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/research/deep-research/skills/deep-research/references/full-catalog.md",
+            "sha256": "9047df66e2b9737d10cda047b69bc4afa0ddd9df852673bbfeaa4c687ed6d880",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Run a disciplined, multi-source research investigation for a high-stakes question or decision \u2014 fan-out web search across many channels, parallel sub-agents, source triangulation (each claim backed by \u22653 independent sources), an adversarial review pass, and every source saved to its own file with verbatim quotes for reuse. Use when a low-quality answer is expensive: strategy work, comparing N products/methods/markets, validating a hypothesis with external data, or mapping how a field works. NOT for quick fact-checks (answer directly), structured 12-dimension competitor scoring (use \u2026",
       "tools": [],
       "agentic_signals": {
@@ -26,55 +45,102 @@
         "close_out": false
       },
       "references": [
-        "full-catalog.md"
+        "skills/research/deep-research/skills/deep-research/references/full-catalog.md"
       ]
     },
     {
       "name": "dossier",
-      "path": "research/dossier/skills/dossier",
+      "path": "skills/research/dossier/skills/dossier",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "dossier",
+        "skill_path": "skills/research/dossier/skills/dossier",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research/dossier/skills/dossier/SKILL.md",
+            "sha256": "e5833cf7a539bc84147512b7e55cfb91e5e7223d72276a2cd92e6ee99a7bd002",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/research/dossier/skills/dossier/references/conversation_hook_quality.md",
+            "sha256": "669efb4fcf531245b8b943d511221adb60392bd664f228eb766ba0ea19d6a9ee",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/dossier/skills/dossier/references/hypothesis_testing_discipline.md",
+            "sha256": "7814176847ff6f2c19d652a4812f2feb0c2ac7023f841ace584414206e251170",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/dossier/skills/dossier/references/subject_type_source_matrix.md",
+            "sha256": "d5d1fe8d549de3e0907df74f85023f8e779bbf81be4b53538a5256f667b29447",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/dossier/skills/dossier/scripts/citation_tracker.py",
+            "sha256": "ab9c1cfe7993a6c46926fe5afc59fc68726dea450fdbb76f410960991359ccca",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/dossier/skills/dossier/scripts/disconfirming_evidence_balance.py",
+            "sha256": "0be331fffd35712831d1e2db6684a1747c63c2d6a871dfc59d2917f5dda1e9e4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/dossier/skills/dossier/scripts/source_tier_classifier.py",
+            "sha256": "38ac60f711fd863b9ecfea243b389181e1fccd86f690017d2427a80f6e9585b7",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Decision-grade entity research skill \u2014 produces a hypothesis-tested dossier on a specific company, person, nonprofit, or government org, not a generic profile. Forcing intake makes the user state their hypothesis upfront (what they already believe and want to verify or disprove) so the dossier tests it rather than confirms it. Output is an editable Word document (.docx) with verdict on the hypothesis, identity facts, 12-month activity timeline, network and reputation signals, red flags, conversation hooks tied to specific findings, and source-provenance audit log. Uses WebSearch + WebFetch \u2026",
       "tools": [
         {
-          "script": "research/dossier/skills/dossier/scripts/citation_tracker.py",
+          "script": "skills/research/dossier/skills/dossier/scripts/citation_tracker.py",
+          "sha256": "ab9c1cfe7993a6c46926fe5afc59fc68726dea450fdbb76f410960991359ccca",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 research/dossier/skills/dossier/scripts/citation_tracker.py --help",
+              "cmd": "python3 skills/research/dossier/skills/dossier/scripts/citation_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "research/dossier/skills/dossier/scripts/disconfirming_evidence_balance.py",
+          "script": "skills/research/dossier/skills/dossier/scripts/disconfirming_evidence_balance.py",
+          "sha256": "0be331fffd35712831d1e2db6684a1747c63c2d6a871dfc59d2917f5dda1e9e4",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/dossier/skills/dossier/scripts/disconfirming_evidence_balance.py --help",
+              "cmd": "python3 skills/research/dossier/skills/dossier/scripts/disconfirming_evidence_balance.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/dossier/skills/dossier/scripts/disconfirming_evidence_balance.py --sample",
+              "cmd": "python3 skills/research/dossier/skills/dossier/scripts/disconfirming_evidence_balance.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research/dossier/skills/dossier/scripts/source_tier_classifier.py",
+          "script": "skills/research/dossier/skills/dossier/scripts/source_tier_classifier.py",
+          "sha256": "38ac60f711fd863b9ecfea243b389181e1fccd86f690017d2427a80f6e9585b7",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/dossier/skills/dossier/scripts/source_tier_classifier.py --help",
+              "cmd": "python3 skills/research/dossier/skills/dossier/scripts/source_tier_classifier.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/dossier/skills/dossier/scripts/source_tier_classifier.py --sample",
+              "cmd": "python3 skills/research/dossier/skills/dossier/scripts/source_tier_classifier.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -89,52 +155,99 @@
         "close_out": false
       },
       "references": [
-        "conversation_hook_quality.md",
-        "hypothesis_testing_discipline.md",
-        "subject_type_source_matrix.md"
+        "skills/research/dossier/skills/dossier/references/conversation_hook_quality.md",
+        "skills/research/dossier/skills/dossier/references/hypothesis_testing_discipline.md",
+        "skills/research/dossier/skills/dossier/references/subject_type_source_matrix.md"
       ]
     },
     {
       "name": "grants",
-      "path": "research/grants/skills/grants",
+      "path": "skills/research/grants/skills/grants",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "grants",
+        "skill_path": "skills/research/grants/skills/grants",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research/grants/skills/grants/SKILL.md",
+            "sha256": "f4f45e4d32a9fe298a479a2fd0afa5333cdd2f120ab7cf0618604ed02a970d55",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/research/grants/skills/grants/references/docx_9_sections.md",
+            "sha256": "fc1824a4def5ac1e36cd4950236a6f7876b7741a1b16eed339705b35df0b728f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/grants/skills/grants/references/nih_mechanism_matching.md",
+            "sha256": "478633d06b28e46b34141201ccfa1b1943865a61594c646da4f1dd5ad4561141",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/grants/skills/grants/references/reporter_post_patterns.md",
+            "sha256": "64cd28f1edc23c66de8c8a5a31c5ed3aac47d221a527bd2edee60877eff04126",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/grants/skills/grants/scripts/citation_tracker.py",
+            "sha256": "dd8d6686e28879dd8c397d8d6fc5ac804e9e5445e71461dd3fabd48b88d6fcec",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/grants/skills/grants/scripts/fiscal_year_calculator.py",
+            "sha256": "2c7f57466888a3667e7dccd5a3dbd0d7d5b41fc3a31ca094dee031e4e676f87f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/grants/skills/grants/scripts/mechanism_matcher.py",
+            "sha256": "738b94bac7fa82ee1edea8a839b31ab9c18f28ce0d5c726b0e318e4ef115445c",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "NIH grant research skill for clinical researchers. Grill-me intake (research idea + career stage + preliminary data + environment + submission posture + known institute targets) locks down the funding strategy before any search runs. Runs a 5-facet Consensus positioning analysis (with draft Significance/Innovation language), maps the research to the right NIH institutes and study sections via RePORTER, finds NOSIs and funded overlap, and produces an editable Word document (.docx) with budget/scope-aware mechanism recommendations, submission timelines, and a mandatory program officer \u2026",
       "tools": [
         {
-          "script": "research/grants/skills/grants/scripts/citation_tracker.py",
+          "script": "skills/research/grants/skills/grants/scripts/citation_tracker.py",
+          "sha256": "dd8d6686e28879dd8c397d8d6fc5ac804e9e5445e71461dd3fabd48b88d6fcec",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 research/grants/skills/grants/scripts/citation_tracker.py --help",
+              "cmd": "python3 skills/research/grants/skills/grants/scripts/citation_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "research/grants/skills/grants/scripts/fiscal_year_calculator.py",
+          "script": "skills/research/grants/skills/grants/scripts/fiscal_year_calculator.py",
+          "sha256": "2c7f57466888a3667e7dccd5a3dbd0d7d5b41fc3a31ca094dee031e4e676f87f",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 research/grants/skills/grants/scripts/fiscal_year_calculator.py --help",
+              "cmd": "python3 skills/research/grants/skills/grants/scripts/fiscal_year_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "research/grants/skills/grants/scripts/mechanism_matcher.py",
+          "script": "skills/research/grants/skills/grants/scripts/mechanism_matcher.py",
+          "sha256": "738b94bac7fa82ee1edea8a839b31ab9c18f28ce0d5c726b0e318e4ef115445c",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/grants/skills/grants/scripts/mechanism_matcher.py --help",
+              "cmd": "python3 skills/research/grants/skills/grants/scripts/mechanism_matcher.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/grants/skills/grants/scripts/mechanism_matcher.py --sample",
+              "cmd": "python3 skills/research/grants/skills/grants/scripts/mechanism_matcher.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -149,69 +262,122 @@
         "close_out": false
       },
       "references": [
-        "docx_9_sections.md",
-        "nih_mechanism_matching.md",
-        "reporter_post_patterns.md"
+        "skills/research/grants/skills/grants/references/docx_9_sections.md",
+        "skills/research/grants/skills/grants/references/nih_mechanism_matching.md",
+        "skills/research/grants/skills/grants/references/reporter_post_patterns.md"
       ]
     },
     {
       "name": "litreview",
-      "path": "research/litreview/skills/litreview",
+      "path": "skills/research/litreview/skills/litreview",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "litreview",
+        "skill_path": "skills/research/litreview/skills/litreview",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research/litreview/skills/litreview/SKILL.md",
+            "sha256": "d16332fcd440bf475a268e3fc26b054bff838d3c6ffa3e63baefc8db1f8aea83",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/research/litreview/skills/litreview/references/docx_8_sections.md",
+            "sha256": "076dba294e34144726c9ac92d1729183ee29b0125be3e34cb3d99f31b72d4f1d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/litreview/skills/litreview/references/framework_selection.md",
+            "sha256": "2922fe656a2ee60df56cf4c801f9213ec4bc07fbb75c53d147df03d436306e5c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/litreview/skills/litreview/references/search_budget_allocation.md",
+            "sha256": "a218edba9adfc40825b97d20efab770c1fa01b99bee82b7ed559a99596fc8e4b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/litreview/skills/litreview/scripts/citation_tracker.py",
+            "sha256": "9c7ee9f7e854b277b1e4a44e8cd2848b4af889087b7069ad7fbafcb72b6daccc",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/litreview/skills/litreview/scripts/cross_search_aggregator.py",
+            "sha256": "cc86e1594f64f26a6e1c7815819e4cf4ef1d46abe5c8a7a494d8ec9857e94b03",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/litreview/skills/litreview/scripts/framework_recommender.py",
+            "sha256": "a816ce3ef389e9300218fe066639cad95051faf6f1659cb13a6a1bbd2ec6dad6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/litreview/skills/litreview/scripts/free_search.py",
+            "sha256": "7bca347bb0de953c0f268f894c6ab37c77ae08c4888e77e864d5c3ecc7aea166",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Academic literature orientation skill that searches papers via free keyless APIs (PubMed E-utilities + OpenAlex) by default \u2014 with the Consensus MCP as an optional enhancement lane when connected \u2014 builds a strategic search plan using PICO (default) or SPIDER / Decomposition / hybrid as fallbacks, and synthesizes findings into a formatted Word (.docx) research guide. Grill-me intake (research question specificity + framework hint + tentative depth) before the recon search; a second forcing checkpoint after Phase 2 confirms framework + sub-areas + depth before searches consume budget. \u2026",
       "tools": [
         {
-          "script": "research/litreview/skills/litreview/scripts/citation_tracker.py",
+          "script": "skills/research/litreview/skills/litreview/scripts/citation_tracker.py",
+          "sha256": "9c7ee9f7e854b277b1e4a44e8cd2848b4af889087b7069ad7fbafcb72b6daccc",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 research/litreview/skills/litreview/scripts/citation_tracker.py --help",
+              "cmd": "python3 skills/research/litreview/skills/litreview/scripts/citation_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "research/litreview/skills/litreview/scripts/cross_search_aggregator.py",
+          "script": "skills/research/litreview/skills/litreview/scripts/cross_search_aggregator.py",
+          "sha256": "cc86e1594f64f26a6e1c7815819e4cf4ef1d46abe5c8a7a494d8ec9857e94b03",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/litreview/skills/litreview/scripts/cross_search_aggregator.py --help",
+              "cmd": "python3 skills/research/litreview/skills/litreview/scripts/cross_search_aggregator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/litreview/skills/litreview/scripts/cross_search_aggregator.py --sample",
+              "cmd": "python3 skills/research/litreview/skills/litreview/scripts/cross_search_aggregator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research/litreview/skills/litreview/scripts/framework_recommender.py",
+          "script": "skills/research/litreview/skills/litreview/scripts/framework_recommender.py",
+          "sha256": "a816ce3ef389e9300218fe066639cad95051faf6f1659cb13a6a1bbd2ec6dad6",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/litreview/skills/litreview/scripts/framework_recommender.py --help",
+              "cmd": "python3 skills/research/litreview/skills/litreview/scripts/framework_recommender.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/litreview/skills/litreview/scripts/framework_recommender.py --sample",
+              "cmd": "python3 skills/research/litreview/skills/litreview/scripts/framework_recommender.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research/litreview/skills/litreview/scripts/free_search.py",
+          "script": "skills/research/litreview/skills/litreview/scripts/free_search.py",
+          "sha256": "7bca347bb0de953c0f268f894c6ab37c77ae08c4888e77e864d5c3ecc7aea166",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 research/litreview/skills/litreview/scripts/free_search.py --help",
+              "cmd": "python3 skills/research/litreview/skills/litreview/scripts/free_search.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -226,62 +392,109 @@
         "close_out": false
       },
       "references": [
-        "docx_8_sections.md",
-        "framework_selection.md",
-        "search_budget_allocation.md"
+        "skills/research/litreview/skills/litreview/references/docx_8_sections.md",
+        "skills/research/litreview/skills/litreview/references/framework_selection.md",
+        "skills/research/litreview/skills/litreview/references/search_budget_allocation.md"
       ]
     },
     {
       "name": "notebooklm",
-      "path": "research/notebooklm/skills/notebooklm",
+      "path": "skills/research/notebooklm/skills/notebooklm",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "notebooklm",
+        "skill_path": "skills/research/notebooklm/skills/notebooklm",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research/notebooklm/skills/notebooklm/SKILL.md",
+            "sha256": "5fea964386ae6e0f8d0819dc2e633218b77b05bbe31155460c2fb560c7773f1c",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/research/notebooklm/skills/notebooklm/references/async_action_discipline.md",
+            "sha256": "11ff35ff30d91ddea634708c023d3df4301b1d6ba91ee4f60840bb74f62853ad",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/notebooklm/skills/notebooklm/references/browser_automation_canon.md",
+            "sha256": "8f69f7d5ec125ba27c4532c5f2ad0eda904e5350b1f661a6577a2f82887fe96d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/notebooklm/skills/notebooklm/references/studio_output_custom_prompts.md",
+            "sha256": "affd0340351acc573d67edda35ea6da816c19c8a8870b1e05324196b2996379d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/notebooklm/skills/notebooklm/scripts/action_router.py",
+            "sha256": "a7b88ebad25812b6df8086c955e3b1c10a609cca7b300ab06e5062bb1b821b6d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/notebooklm/skills/notebooklm/scripts/async_action_classifier.py",
+            "sha256": "67b87256a2b6a35782e9bef4ecb199c4b3aa6e567baab8d64bae12ee2269ca96",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/notebooklm/skills/notebooklm/scripts/custom_prompt_template_generator.py",
+            "sha256": "11bf5c7526177f160c119d55f0f2dd7495dd6837e1b984456b7079b5d5e1279c",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Browser automation skill for controlling Google's NotebookLM. Use when the user wants anything done in NotebookLM (e.g., 'open NotebookLM', 'check my [name] notebook', 'ask my notebook about X', 'add [source] to NotebookLM', 'generate a Video Overview from my notebook', 'use NotebookLM Studio'). Handles reading and querying notebooks, adding sources (URLs, text, files, YouTube links, synthesized content), generating Studio outputs (Audio/Video Overviews, Mind Maps, Reports incl. Briefing Doc/Study Guide/FAQ, Flashcards, Quiz, slide decks, infographics \u2014 discover the exact set from the live \u2026",
       "tools": [
         {
-          "script": "research/notebooklm/skills/notebooklm/scripts/action_router.py",
+          "script": "skills/research/notebooklm/skills/notebooklm/scripts/action_router.py",
+          "sha256": "a7b88ebad25812b6df8086c955e3b1c10a609cca7b300ab06e5062bb1b821b6d",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/notebooklm/skills/notebooklm/scripts/action_router.py --help",
+              "cmd": "python3 skills/research/notebooklm/skills/notebooklm/scripts/action_router.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/notebooklm/skills/notebooklm/scripts/action_router.py --sample",
+              "cmd": "python3 skills/research/notebooklm/skills/notebooklm/scripts/action_router.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research/notebooklm/skills/notebooklm/scripts/async_action_classifier.py",
+          "script": "skills/research/notebooklm/skills/notebooklm/scripts/async_action_classifier.py",
+          "sha256": "67b87256a2b6a35782e9bef4ecb199c4b3aa6e567baab8d64bae12ee2269ca96",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/notebooklm/skills/notebooklm/scripts/async_action_classifier.py --help",
+              "cmd": "python3 skills/research/notebooklm/skills/notebooklm/scripts/async_action_classifier.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/notebooklm/skills/notebooklm/scripts/async_action_classifier.py --sample",
+              "cmd": "python3 skills/research/notebooklm/skills/notebooklm/scripts/async_action_classifier.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research/notebooklm/skills/notebooklm/scripts/custom_prompt_template_generator.py",
+          "script": "skills/research/notebooklm/skills/notebooklm/scripts/custom_prompt_template_generator.py",
+          "sha256": "11bf5c7526177f160c119d55f0f2dd7495dd6837e1b984456b7079b5d5e1279c",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/notebooklm/skills/notebooklm/scripts/custom_prompt_template_generator.py --help",
+              "cmd": "python3 skills/research/notebooklm/skills/notebooklm/scripts/custom_prompt_template_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/notebooklm/skills/notebooklm/scripts/custom_prompt_template_generator.py --sample",
+              "cmd": "python3 skills/research/notebooklm/skills/notebooklm/scripts/custom_prompt_template_generator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -296,57 +509,104 @@
         "close_out": true
       },
       "references": [
-        "async_action_discipline.md",
-        "browser_automation_canon.md",
-        "studio_output_custom_prompts.md"
+        "skills/research/notebooklm/skills/notebooklm/references/async_action_discipline.md",
+        "skills/research/notebooklm/skills/notebooklm/references/browser_automation_canon.md",
+        "skills/research/notebooklm/skills/notebooklm/references/studio_output_custom_prompts.md"
       ]
     },
     {
       "name": "patent",
-      "path": "research/patent/skills/patent",
+      "path": "skills/research/patent/skills/patent",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "patent",
+        "skill_path": "skills/research/patent/skills/patent",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research/patent/skills/patent/SKILL.md",
+            "sha256": "e2549f6539ce07b1fdd135980846e4a72097a79f956b15051e57f5f8d67fea8a",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/research/patent/skills/patent/references/cpc_classification_canon.md",
+            "sha256": "1e41f4ade29d8129c1d6f413e77a398a295c2eb2313f098c65fa3ecf4bcbff94",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/patent/skills/patent/references/legal_disclaimer_discipline.md",
+            "sha256": "dce0e6a240aac6ec41f1944a13f159bf22ae5a8ad0aa25e6367df869c55c6396",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/patent/skills/patent/references/sub_use_case_routing.md",
+            "sha256": "e5580e0c4eca1eb906f512cca6fd3843107c7362ea663988338d458584309dc3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/patent/skills/patent/scripts/citation_tracker.py",
+            "sha256": "7839e934c5c4e9f89874111a94a44be2510d68f88c3af994d3d424e5d6b14dae",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/patent/skills/patent/scripts/family_resolver.py",
+            "sha256": "30fb113c9774238810d8cab6bc674305c1c35098dceb157ca78730936217c081",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/patent/skills/patent/scripts/sub_use_case_router.py",
+            "sha256": "a05c1ca88e07ac23e3c2917e45fa4e6d257933fbee009432fefa640656e8a8d6",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Patent prior-art and landscape intelligence skill \u2014 not generic patent help. Commits to one of five sub-use-cases via forcing intake (novelty search / freedom-to-operate / competitive landscape / acquisition diligence / litigation prior-art) before any search runs. Searches Google Patents, Espacenet, USPTO, and optionally Lens.org for citation-graph signals. Output is an editable Word document (.docx) with verdict, ranked closest art (claim-text extracted), CPC-class-aware landscape, family-resolved hits, geographic coverage, FTO flags where applicable, strategy recommendations, and full \u2026",
       "tools": [
         {
-          "script": "research/patent/skills/patent/scripts/citation_tracker.py",
+          "script": "skills/research/patent/skills/patent/scripts/citation_tracker.py",
+          "sha256": "7839e934c5c4e9f89874111a94a44be2510d68f88c3af994d3d424e5d6b14dae",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 research/patent/skills/patent/scripts/citation_tracker.py --help",
+              "cmd": "python3 skills/research/patent/skills/patent/scripts/citation_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "research/patent/skills/patent/scripts/family_resolver.py",
+          "script": "skills/research/patent/skills/patent/scripts/family_resolver.py",
+          "sha256": "30fb113c9774238810d8cab6bc674305c1c35098dceb157ca78730936217c081",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/patent/skills/patent/scripts/family_resolver.py --help",
+              "cmd": "python3 skills/research/patent/skills/patent/scripts/family_resolver.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/patent/skills/patent/scripts/family_resolver.py --sample",
+              "cmd": "python3 skills/research/patent/skills/patent/scripts/family_resolver.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research/patent/skills/patent/scripts/sub_use_case_router.py",
+          "script": "skills/research/patent/skills/patent/scripts/sub_use_case_router.py",
+          "sha256": "a05c1ca88e07ac23e3c2917e45fa4e6d257933fbee009432fefa640656e8a8d6",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/patent/skills/patent/scripts/sub_use_case_router.py --help",
+              "cmd": "python3 skills/research/patent/skills/patent/scripts/sub_use_case_router.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/patent/skills/patent/scripts/sub_use_case_router.py --sample",
+              "cmd": "python3 skills/research/patent/skills/patent/scripts/sub_use_case_router.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -361,47 +621,94 @@
         "close_out": false
       },
       "references": [
-        "cpc_classification_canon.md",
-        "legal_disclaimer_discipline.md",
-        "sub_use_case_routing.md"
+        "skills/research/patent/skills/patent/references/cpc_classification_canon.md",
+        "skills/research/patent/skills/patent/references/legal_disclaimer_discipline.md",
+        "skills/research/patent/skills/patent/references/sub_use_case_routing.md"
       ]
     },
     {
       "name": "pulse",
-      "path": "research/pulse/skills/pulse",
+      "path": "skills/research/pulse/skills/pulse",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "pulse",
+        "skill_path": "skills/research/pulse/skills/pulse",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research/pulse/skills/pulse/SKILL.md",
+            "sha256": "628bca6035d7f1d181f12e0f9fced0fc9d293851fbc4d95294df4535275d388e",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/research/pulse/skills/pulse/references/cross_platform_synthesis.md",
+            "sha256": "dbd40db546c7249cfde4f5b2de3c2a4206410d932fe089fc0390e781397ba3f8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/pulse/skills/pulse/references/parallel_execution_discipline.md",
+            "sha256": "ef43cb8fe290417db6fa7e52cfbc6c2deee7e292d50c60e2070506f723f373e6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/pulse/skills/pulse/references/research_pack_conventions.md",
+            "sha256": "34e175e806a7d187ff14c9745c045860964a3253a1ffdb05b181a69033bfa2a8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/pulse/skills/pulse/scripts/citation_tracker.py",
+            "sha256": "91b7c87a3226d283023b22c6823ac47d6e8ec2de26924db5e6a76eaed69401f1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/pulse/skills/pulse/scripts/time_window_calculator.py",
+            "sha256": "8d3b690f1b51a33f6cb49337c4ff699c6727647952615ed03be8217e04b6e7f8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/pulse/skills/pulse/scripts/topic_slug_generator.py",
+            "sha256": "79114630e94f95e459dd87e473e109db86621a71c1e0f406d685afd17322e4d7",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Multi-source recency research skill that takes the pulse of any topic across Reddit, Hacker News, the open web, and optionally X/Twitter within a configurable recent window (default 30 days). Forcing intake clarifies topic specificity, angle (trend/sentiment/problems/opportunities/comparison), time window, and platform scope before searching. Returns a synthesized briefing with citations, engagement metrics, and cross-platform pattern analysis. Use when the user requests multi-source recency intelligence on a topic (e.g., 'pulse on [topic]', 'what's happening with [topic]', 'what are people \u2026",
       "tools": [
         {
-          "script": "research/pulse/skills/pulse/scripts/citation_tracker.py",
+          "script": "skills/research/pulse/skills/pulse/scripts/citation_tracker.py",
+          "sha256": "91b7c87a3226d283023b22c6823ac47d6e8ec2de26924db5e6a76eaed69401f1",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 research/pulse/skills/pulse/scripts/citation_tracker.py --help",
+              "cmd": "python3 skills/research/pulse/skills/pulse/scripts/citation_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "research/pulse/skills/pulse/scripts/time_window_calculator.py",
+          "script": "skills/research/pulse/skills/pulse/scripts/time_window_calculator.py",
+          "sha256": "8d3b690f1b51a33f6cb49337c4ff699c6727647952615ed03be8217e04b6e7f8",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 research/pulse/skills/pulse/scripts/time_window_calculator.py --help",
+              "cmd": "python3 skills/research/pulse/skills/pulse/scripts/time_window_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "research/pulse/skills/pulse/scripts/topic_slug_generator.py",
+          "script": "skills/research/pulse/skills/pulse/scripts/topic_slug_generator.py",
+          "sha256": "79114630e94f95e459dd87e473e109db86621a71c1e0f406d685afd17322e4d7",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 research/pulse/skills/pulse/scripts/topic_slug_generator.py --help",
+              "cmd": "python3 skills/research/pulse/skills/pulse/scripts/topic_slug_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -416,62 +723,109 @@
         "close_out": false
       },
       "references": [
-        "cross_platform_synthesis.md",
-        "parallel_execution_discipline.md",
-        "research_pack_conventions.md"
+        "skills/research/pulse/skills/pulse/references/cross_platform_synthesis.md",
+        "skills/research/pulse/skills/pulse/references/parallel_execution_discipline.md",
+        "skills/research/pulse/skills/pulse/references/research_pack_conventions.md"
       ]
     },
     {
       "name": "research",
-      "path": "research/research/skills/research",
+      "path": "skills/research/research/skills/research",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "research",
+        "skill_path": "skills/research/research/skills/research",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research/research/skills/research/SKILL.md",
+            "sha256": "1088a59dc8a43d1fcf161b6f6b191f9c5f3d466c8ef3ab0acf28836d819b46b0",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/research/research/skills/research/references/deterministic_classification_canon.md",
+            "sha256": "660cf44d15c17ef5db95aa41520e603bc351f2f43cd7c94fdd4d3f63b6b6dcc0",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/research/skills/research/references/fallback_workflow_canon.md",
+            "sha256": "1ad9b61a48a3d65ae74d53e91046c040fec6c6d0b03b0a4e7a81fd1b647aded4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/research/skills/research/references/hybrid_router_architecture.md",
+            "sha256": "dc23a09482909e04c7508f7ded60d714e9865f48fb720658ad4b6565bc330cfb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/research/skills/research/scripts/classifier.py",
+            "sha256": "e08a7a334b0a3dc72747d622814deaafa32aa487a27fcd0e271deb536cfbf80f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/research/skills/research/scripts/fallback_decomposer.py",
+            "sha256": "0ea1484ee7cb24fee92bdc9f53f291421e1183d3a4ca6e449d2e7b9aeeba13e6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/research/skills/research/scripts/routing_transparency_logger.py",
+            "sha256": "d47bb49258982691114d77853d20f9daf900f756b0c7fdc1a8d6ecd7db6865be",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Default entry point for any research request \u2014 a hybrid router that classifies the question deterministically and either delegates to a specialist research skill (pulse for trends/sentiment, grants for NIH funding, litreview for academic literature, syllabus for course reading, patent for prior-art + IP landscape, dossier for entity research) or runs its own plan-decompose-multi-source-search-synthesize-cite fallback workflow when no specialist matches. Always surfaces the routing decision so users can override. Use when the user makes any research request that doesn't obviously match a \u2026",
       "tools": [
         {
-          "script": "research/research/skills/research/scripts/classifier.py",
+          "script": "skills/research/research/skills/research/scripts/classifier.py",
+          "sha256": "e08a7a334b0a3dc72747d622814deaafa32aa487a27fcd0e271deb536cfbf80f",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/research/skills/research/scripts/classifier.py --help",
+              "cmd": "python3 skills/research/research/skills/research/scripts/classifier.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/research/skills/research/scripts/classifier.py --sample",
+              "cmd": "python3 skills/research/research/skills/research/scripts/classifier.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research/research/skills/research/scripts/fallback_decomposer.py",
+          "script": "skills/research/research/skills/research/scripts/fallback_decomposer.py",
+          "sha256": "0ea1484ee7cb24fee92bdc9f53f291421e1183d3a4ca6e449d2e7b9aeeba13e6",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/research/skills/research/scripts/fallback_decomposer.py --help",
+              "cmd": "python3 skills/research/research/skills/research/scripts/fallback_decomposer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/research/skills/research/scripts/fallback_decomposer.py --sample",
+              "cmd": "python3 skills/research/research/skills/research/scripts/fallback_decomposer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research/research/skills/research/scripts/routing_transparency_logger.py",
+          "script": "skills/research/research/skills/research/scripts/routing_transparency_logger.py",
+          "sha256": "d47bb49258982691114d77853d20f9daf900f756b0c7fdc1a8d6ecd7db6865be",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/research/skills/research/scripts/routing_transparency_logger.py --help",
+              "cmd": "python3 skills/research/research/skills/research/scripts/routing_transparency_logger.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/research/skills/research/scripts/routing_transparency_logger.py --sample",
+              "cmd": "python3 skills/research/research/skills/research/scripts/routing_transparency_logger.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -486,57 +840,109 @@
         "close_out": true
       },
       "references": [
-        "deterministic_classification_canon.md",
-        "fallback_workflow_canon.md",
-        "hybrid_router_architecture.md"
+        "skills/research/research/skills/research/references/deterministic_classification_canon.md",
+        "skills/research/research/skills/research/references/fallback_workflow_canon.md",
+        "skills/research/research/skills/research/references/hybrid_router_architecture.md"
       ]
     },
     {
       "name": "syllabus",
-      "path": "research/syllabus/skills/syllabus",
+      "path": "skills/research/syllabus/skills/syllabus",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "syllabus",
+        "skill_path": "skills/research/syllabus/skills/syllabus",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research/syllabus/skills/syllabus/SKILL.md",
+            "sha256": "ac2805dcd835f09b68a59d2476ff1f79f94a70cf19d3c8517adf9cd20c390295",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/research/syllabus/skills/syllabus/references/applied_domain_weaving.md",
+            "sha256": "a97f49a14641c452abfa348121286a07b770786f639cde61ecead8efb35ebddb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/syllabus/skills/syllabus/references/audience_calibration.md",
+            "sha256": "f755fd52086783df6dcf729dad922e8f7b5900f88ddc099a36f57f774ee74b2d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/syllabus/skills/syllabus/references/bundled_script_pattern.md",
+            "sha256": "634fd189c0e526b3d8a49391d35986114bec03808bb916a88a05a5f43e35ac4d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/syllabus/skills/syllabus/scripts/citation_tracker.py",
+            "sha256": "b2c478e5457c96dcba0d2db80c9dff067142ae7fd3a59600000d5343c37c2ff5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/syllabus/skills/syllabus/scripts/discussion_question_validator.py",
+            "sha256": "2d20eac1b4fe089f6ba78328c249c2aa725d669c23b9b9a2f4db6944f0756139",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/syllabus/skills/syllabus/scripts/generate_reading_list.js",
+            "sha256": "be69604734bb5a6daa5a159f0a993397c09a60987f3ef55f1ed990fc50cefdf1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/research/syllabus/skills/syllabus/scripts/topic_grouper.py",
+            "sha256": "f2665e12626520d9619b4c1dfbe370148e9f93478e4e85550ac91dfa5d8926fa",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Generates a curated supplementary reading list from any course syllabus using Consensus academic search. Grill-me intake (syllabus input format + course audience + year range) plus a grouping forcing-options checkpoint before any search runs \u2014 so the reading list matches the course's level and recency need. Parses the syllabus to extract topics and learning outcomes, searches Consensus for recent peer-reviewed papers per topic, and produces a professionally formatted .docx with clickable Consensus links, plain-language summaries calibrated to audience level, and Bloom-higher-order \u2026",
       "tools": [
         {
-          "script": "research/syllabus/skills/syllabus/scripts/citation_tracker.py",
+          "script": "skills/research/syllabus/skills/syllabus/scripts/citation_tracker.py",
+          "sha256": "b2c478e5457c96dcba0d2db80c9dff067142ae7fd3a59600000d5343c37c2ff5",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 research/syllabus/skills/syllabus/scripts/citation_tracker.py --help",
+              "cmd": "python3 skills/research/syllabus/skills/syllabus/scripts/citation_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "research/syllabus/skills/syllabus/scripts/discussion_question_validator.py",
+          "script": "skills/research/syllabus/skills/syllabus/scripts/discussion_question_validator.py",
+          "sha256": "2d20eac1b4fe089f6ba78328c249c2aa725d669c23b9b9a2f4db6944f0756139",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/syllabus/skills/syllabus/scripts/discussion_question_validator.py --help",
+              "cmd": "python3 skills/research/syllabus/skills/syllabus/scripts/discussion_question_validator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/syllabus/skills/syllabus/scripts/discussion_question_validator.py --sample",
+              "cmd": "python3 skills/research/syllabus/skills/syllabus/scripts/discussion_question_validator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "research/syllabus/skills/syllabus/scripts/topic_grouper.py",
+          "script": "skills/research/syllabus/skills/syllabus/scripts/topic_grouper.py",
+          "sha256": "f2665e12626520d9619b4c1dfbe370148e9f93478e4e85550ac91dfa5d8926fa",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 research/syllabus/skills/syllabus/scripts/topic_grouper.py --help",
+              "cmd": "python3 skills/research/syllabus/skills/syllabus/scripts/topic_grouper.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 research/syllabus/skills/syllabus/scripts/topic_grouper.py --sample",
+              "cmd": "python3 skills/research/syllabus/skills/syllabus/scripts/topic_grouper.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -551,9 +957,9 @@
         "close_out": false
       },
       "references": [
-        "applied_domain_weaving.md",
-        "audience_calibration.md",
-        "bundled_script_pattern.md"
+        "skills/research/syllabus/skills/syllabus/references/applied_domain_weaving.md",
+        "skills/research/syllabus/skills/syllabus/references/audience_calibration.md",
+        "skills/research/syllabus/skills/syllabus/references/bundled_script_pattern.md"
       ]
     }
   ]

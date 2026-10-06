@@ -76,7 +76,15 @@ jobs:
         run: python3 -m unittest discover -s scripts -p 'test_*.py' -v
 
       - name: Validate Matt release resources and invocation dependencies
-        run: python3 scripts/check_skill_dependencies.py
+        run: python3 scripts/check_skill_dependencies.py --include-legacy
+
+      - name: Test executable harness provider bindings
+        env:
+          HARNESS_SOURCE_ROOT: ${{ github.workspace }}
+        run: python3 -m unittest discover -s skills/engineering/agent-harness/tests -p 'test_*.py' -v
+
+      - name: Check generated domain harness inventories
+        run: python3 skills/engineering/agent-harness/skills/agent-harness/scripts/harness_manifest_builder.py --check --repo-root .
 
       # Every licence, notice or attribution marker in the tree must be covered by
       # the vendor manifest or the third-party inventory. This is the check that
@@ -87,7 +95,17 @@ jobs:
       # Vendored trees link into each other and into sibling support directories.
       # An upstream refactor can break those links on any scheduled refresh.
       - name: Check relative links resolve
-        run: python3 scripts/check_links.py --path skills/engineering/spec-driven-development --path skills/engineering/github-repository-setup --path .agents --path docs/matt-pocock-v1.3.1.md
+        run: |
+          python3 scripts/check_links.py \
+            --path skills/engineering/spec-driven-development \
+            --path skills/engineering/github-repository-setup \
+            --path skills/engineering/agent-harness \
+            --path skills/engineering-team/skills/senior-backend \
+            --path skills/engineering-team/skills/senior-frontend \
+            --path skills/engineering-team/skills/senior-fullstack \
+            --path skills/project-management/AGENTS.md \
+            --path .agents --path docs/matt-pocock-v1.3.1.md \
+            --path docs/legacy-harness-bindings.md
 
       # A Solution Skill references skills by name. A renamed or removed skill
       # must not leave a solution pointing at nothing, and an ambiguous name must
