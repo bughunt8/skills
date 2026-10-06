@@ -1,5 +1,5 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "commercial",
   "skill_count": 8,
   "loop_defaults": {
@@ -15,55 +15,107 @@
   "skills": [
     {
       "name": "channel-economics",
-      "path": "commercial/skills/channel-economics",
+      "path": "skills/commercial/skills/channel-economics",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "channel-economics",
+        "skill_path": "skills/commercial/skills/channel-economics",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/commercial/skills/channel-economics/SKILL.md",
+            "sha256": "fb1b193f7efcfe36189cdfcb660294e1ed95413d92cab9dd084c0b417aaab3e0",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/commercial/skills/channel-economics/assets/channel_data_template.md",
+            "sha256": "19d96ffd1e7bc965f1a58d3a0d3a92b903385fee77c5ba6085a3d9279e64c8b9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/channel-economics/references/channel_anti_patterns.md",
+            "sha256": "73d2189a72ac31673d023cdfbce1341e3e2e03b72cba639cc2c0a8aa4884668a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/channel-economics/references/channel_economics_canon.md",
+            "sha256": "5b7025eba7f8d7ae084c0c61304f5822b03778df56b1ea7ec06097654de49b5a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/channel-economics/references/cost_to_serve_canon.md",
+            "sha256": "f073bc501ce51ac2059f174b3ee7558c317b2ec0d9eee82669d9bc19ca426938",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/channel-economics/scripts/channel_mix_optimizer.py",
+            "sha256": "663cf12b4ed25740fb428eba5b8983748fc6c212dae5e2228d880e74c65fc702",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/channel-economics/scripts/channel_roi_analyzer.py",
+            "sha256": "7c6859db25fa917dcf35c1743fe767e540c8df04f62e712f2d5bfe13f2d769fa",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/channel-economics/scripts/cost_to_serve_calculator.py",
+            "sha256": "bd055a689ef516052692b0b2f22d2377acd1149616ac0ad73202328bf40a81a0",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when reviewing or rebalancing direct vs. partner-led channel economics \u2014 computing fully-loaded cost-to-serve per channel, channel ROI with cash / LTV / marginal lenses, and optimal channel mix subject to constraints. For Head of Commercial, RevOps, and VP Sales doing quarterly channel review when pipeline is mixed (e.g., 60% direct + 40% partner-led) and nobody actually knows which channel makes money after CAC, support load, partner discount, deal-velocity differences, retention differential, and overhead allocation are all loaded in. Outputs cost to serve, channel ROI verdicts \u2026",
       "tools": [
         {
-          "script": "commercial/skills/channel-economics/scripts/channel_mix_optimizer.py",
+          "script": "skills/commercial/skills/channel-economics/scripts/channel_mix_optimizer.py",
+          "sha256": "663cf12b4ed25740fb428eba5b8983748fc6c212dae5e2228d880e74c65fc702",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/channel-economics/scripts/channel_mix_optimizer.py --help",
+              "cmd": "python3 skills/commercial/skills/channel-economics/scripts/channel_mix_optimizer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/channel-economics/scripts/channel_mix_optimizer.py --sample",
+              "cmd": "python3 skills/commercial/skills/channel-economics/scripts/channel_mix_optimizer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "commercial/skills/channel-economics/scripts/channel_roi_analyzer.py",
+          "script": "skills/commercial/skills/channel-economics/scripts/channel_roi_analyzer.py",
+          "sha256": "7c6859db25fa917dcf35c1743fe767e540c8df04f62e712f2d5bfe13f2d769fa",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/channel-economics/scripts/channel_roi_analyzer.py --help",
+              "cmd": "python3 skills/commercial/skills/channel-economics/scripts/channel_roi_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/channel-economics/scripts/channel_roi_analyzer.py --sample",
+              "cmd": "python3 skills/commercial/skills/channel-economics/scripts/channel_roi_analyzer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "commercial/skills/channel-economics/scripts/cost_to_serve_calculator.py",
+          "script": "skills/commercial/skills/channel-economics/scripts/cost_to_serve_calculator.py",
+          "sha256": "bd055a689ef516052692b0b2f22d2377acd1149616ac0ad73202328bf40a81a0",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/channel-economics/scripts/cost_to_serve_calculator.py --help",
+              "cmd": "python3 skills/commercial/skills/channel-economics/scripts/cost_to_serve_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/channel-economics/scripts/cost_to_serve_calculator.py --sample",
+              "cmd": "python3 skills/commercial/skills/channel-economics/scripts/cost_to_serve_calculator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -78,62 +130,114 @@
         "close_out": false
       },
       "references": [
-        "channel_anti_patterns.md",
-        "channel_economics_canon.md",
-        "cost_to_serve_canon.md"
+        "skills/commercial/skills/channel-economics/references/channel_anti_patterns.md",
+        "skills/commercial/skills/channel-economics/references/channel_economics_canon.md",
+        "skills/commercial/skills/channel-economics/references/cost_to_serve_canon.md"
       ]
     },
     {
       "name": "commercial-forecaster",
-      "path": "commercial/skills/commercial-forecaster",
+      "path": "skills/commercial/skills/commercial-forecaster",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "commercial-forecaster",
+        "skill_path": "skills/commercial/skills/commercial-forecaster",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/commercial/skills/commercial-forecaster/SKILL.md",
+            "sha256": "ad604e6d0e26b42a446029160e24097af88992c3d4b4a63a528bbc6f835de40d",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/commercial/skills/commercial-forecaster/assets/forecast_intake_template.md",
+            "sha256": "9bb919bc110749fbc2143238f05acdccc0085ca4d522b7a6994067a118c5c5c2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/commercial-forecaster/references/cohort_analysis_canon.md",
+            "sha256": "10384663b78e292d38dc56f31cc78f0a077daf6a322549117bc0c8b6b0e02fb3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/commercial-forecaster/references/forecast_anti_patterns.md",
+            "sha256": "02420e11265457a65cc53c993ca8bc8065806bbbddd79530fbace400538a325f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/commercial-forecaster/references/saas_forecasting_canon.md",
+            "sha256": "a751dddc4834c9bc0724dc646027963ec611a8323b481504c9a006c07c1ec5d3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/commercial-forecaster/scripts/bookings_forecaster.py",
+            "sha256": "4156dab94903425c733b6a23231b7eb82a6ce0ee9f6141c5e7c2aeb0a5d65f90",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/commercial-forecaster/scripts/cohort_arr_projector.py",
+            "sha256": "0499539e482214ab8cb41462df7799acf39b4fa2ce1d47ed1569903b9dfdb2b3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/commercial-forecaster/scripts/funnel_confidence_scorer.py",
+            "sha256": "a1a1ec977fef3a8808f2f71a943538d29b3b0053ceeb3ed5d26e6d6fff212062",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when building a quarterly bookings forecast, ARR projection, pipeline forecast, NRR projection, or commit/best-case/pipe-only board number \u2014 especially when the CRO needs to walk the board through funnel math + cohort ARR + per-stage conversion assumptions without the theatre of a single undefended number. Decomposes pipeline into commit, best-case, and pipe-only tiers; projects cohort-level NRR/GRR to surface leaky cohorts before they show up in the consolidated number; scores per-stage funnel confidence so soft-floor stages get treated differently from high-confidence ones. Every \u2026",
       "tools": [
         {
-          "script": "commercial/skills/commercial-forecaster/scripts/bookings_forecaster.py",
+          "script": "skills/commercial/skills/commercial-forecaster/scripts/bookings_forecaster.py",
+          "sha256": "4156dab94903425c733b6a23231b7eb82a6ce0ee9f6141c5e7c2aeb0a5d65f90",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/commercial-forecaster/scripts/bookings_forecaster.py --help",
+              "cmd": "python3 skills/commercial/skills/commercial-forecaster/scripts/bookings_forecaster.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/commercial-forecaster/scripts/bookings_forecaster.py --sample",
+              "cmd": "python3 skills/commercial/skills/commercial-forecaster/scripts/bookings_forecaster.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "commercial/skills/commercial-forecaster/scripts/cohort_arr_projector.py",
+          "script": "skills/commercial/skills/commercial-forecaster/scripts/cohort_arr_projector.py",
+          "sha256": "0499539e482214ab8cb41462df7799acf39b4fa2ce1d47ed1569903b9dfdb2b3",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/commercial-forecaster/scripts/cohort_arr_projector.py --help",
+              "cmd": "python3 skills/commercial/skills/commercial-forecaster/scripts/cohort_arr_projector.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/commercial-forecaster/scripts/cohort_arr_projector.py --sample",
+              "cmd": "python3 skills/commercial/skills/commercial-forecaster/scripts/cohort_arr_projector.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "commercial/skills/commercial-forecaster/scripts/funnel_confidence_scorer.py",
+          "script": "skills/commercial/skills/commercial-forecaster/scripts/funnel_confidence_scorer.py",
+          "sha256": "a1a1ec977fef3a8808f2f71a943538d29b3b0053ceeb3ed5d26e6d6fff212062",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/commercial-forecaster/scripts/funnel_confidence_scorer.py --help",
+              "cmd": "python3 skills/commercial/skills/commercial-forecaster/scripts/funnel_confidence_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/commercial-forecaster/scripts/funnel_confidence_scorer.py --sample",
+              "cmd": "python3 skills/commercial/skills/commercial-forecaster/scripts/funnel_confidence_scorer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -148,62 +252,114 @@
         "close_out": false
       },
       "references": [
-        "cohort_analysis_canon.md",
-        "forecast_anti_patterns.md",
-        "saas_forecasting_canon.md"
+        "skills/commercial/skills/commercial-forecaster/references/cohort_analysis_canon.md",
+        "skills/commercial/skills/commercial-forecaster/references/forecast_anti_patterns.md",
+        "skills/commercial/skills/commercial-forecaster/references/saas_forecasting_canon.md"
       ]
     },
     {
       "name": "commercial-policy",
-      "path": "commercial/skills/commercial-policy",
+      "path": "skills/commercial/skills/commercial-policy",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "commercial-policy",
+        "skill_path": "skills/commercial/skills/commercial-policy",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/commercial/skills/commercial-policy/SKILL.md",
+            "sha256": "6e812240f2b99e369cb1053dfe8b70567629696be1e10c6a87e076cdfb19fd73",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/commercial/skills/commercial-policy/assets/policy_design_template.md",
+            "sha256": "2064f0e1806ea3d04d348c1ef7f9355ebadec4fd741e7bbd3163dc2437c2ebf4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/commercial-policy/references/discount_governance_canon.md",
+            "sha256": "6af296c9074d9233a3a87aa5cd41018de6f68c6e897a61f754070f524f1dd582",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/commercial-policy/references/policy_anti_patterns.md",
+            "sha256": "71fb4cd6b8bcebfbf7b4c9aeaff48f9ac1b13f4b3e363e2bf2af7ae721e36721",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/commercial-policy/references/policy_design_canon.md",
+            "sha256": "2ff406f8391df1ee46d868efff1605e399e467db925006e215fe9a39d40108f7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/commercial-policy/scripts/discount_matrix_builder.py",
+            "sha256": "de77e4e3951158b198cbc5832bdc43477788c69b1d6e426bf1a4c9fa13202fbc",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/commercial-policy/scripts/exception_router.py",
+            "sha256": "0278cc2336c093f7fef3ff09e357ce0f8b4908f10f7092589f8066e482a414fb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/commercial-policy/scripts/policy_linter.py",
+            "sha256": "2f06b3d57d55a5367ad1d8697eccd64a9760983d8c002636e0a1dfd921b59597",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when designing or revising a company's commercial policy \u2014 the rules of engagement governing discounts off list price, approver thresholds, exception flows, and the deal framework that Deal Desk and AEs operate under. Covers discount matrix design (ARR band x term length x payment terms x strategic value), commercial policy design, exception policy, discount governance, approval thresholds, deal framework structure, and policy linting (contradictions, gaps, cliff edges, gaming surfaces). For Head of Commercial, Head of Deal Desk, VP Sales, or RevOps at the policy-design moment \u2014 NOT \u2026",
       "tools": [
         {
-          "script": "commercial/skills/commercial-policy/scripts/discount_matrix_builder.py",
+          "script": "skills/commercial/skills/commercial-policy/scripts/discount_matrix_builder.py",
+          "sha256": "de77e4e3951158b198cbc5832bdc43477788c69b1d6e426bf1a4c9fa13202fbc",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/commercial-policy/scripts/discount_matrix_builder.py --help",
+              "cmd": "python3 skills/commercial/skills/commercial-policy/scripts/discount_matrix_builder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/commercial-policy/scripts/discount_matrix_builder.py --sample",
+              "cmd": "python3 skills/commercial/skills/commercial-policy/scripts/discount_matrix_builder.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "commercial/skills/commercial-policy/scripts/exception_router.py",
+          "script": "skills/commercial/skills/commercial-policy/scripts/exception_router.py",
+          "sha256": "0278cc2336c093f7fef3ff09e357ce0f8b4908f10f7092589f8066e482a414fb",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/commercial-policy/scripts/exception_router.py --help",
+              "cmd": "python3 skills/commercial/skills/commercial-policy/scripts/exception_router.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/commercial-policy/scripts/exception_router.py --sample",
+              "cmd": "python3 skills/commercial/skills/commercial-policy/scripts/exception_router.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "commercial/skills/commercial-policy/scripts/policy_linter.py",
+          "script": "skills/commercial/skills/commercial-policy/scripts/policy_linter.py",
+          "sha256": "2f06b3d57d55a5367ad1d8697eccd64a9760983d8c002636e0a1dfd921b59597",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/commercial-policy/scripts/policy_linter.py --help",
+              "cmd": "python3 skills/commercial/skills/commercial-policy/scripts/policy_linter.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/commercial-policy/scripts/policy_linter.py --sample",
+              "cmd": "python3 skills/commercial/skills/commercial-policy/scripts/policy_linter.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -218,14 +374,28 @@
         "close_out": false
       },
       "references": [
-        "discount_governance_canon.md",
-        "policy_anti_patterns.md",
-        "policy_design_canon.md"
+        "skills/commercial/skills/commercial-policy/references/discount_governance_canon.md",
+        "skills/commercial/skills/commercial-policy/references/policy_anti_patterns.md",
+        "skills/commercial/skills/commercial-policy/references/policy_design_canon.md"
       ]
     },
     {
       "name": "commercial-skills",
-      "path": "commercial/skills/commercial-skills",
+      "path": "skills/commercial/skills/commercial-skills",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "commercial-skills",
+        "skill_path": "skills/commercial/skills/commercial-skills",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/commercial/skills/commercial-skills/SKILL.md",
+            "sha256": "58983bd3e32e38d711be4ece7630f08b69caf87fc8004bcf70c92d491c9a6a7a",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Use when reviewing, approving, or designing commercial motion \u2014 pricing models, deal review, discount approval, partnership economics, channel mix, commercial policy, RFP/RFI response, bookings forecast. Triggers on \"review this deal\", \"should we discount\", \"pricing model\", \"partner economics\", \"RFP response\", \"bookings forecast\", \"channel mix\". Forks context to route to one of seven Commercial sub-skills (pricing-strategist, deal-desk, partnerships-architect, channel-economics, commercial-policy, rfp-responder, commercial-forecaster) and returns a digest. Distinct from business-growth \u2026",
       "tools": [],
       "agentic_signals": {
@@ -239,55 +409,107 @@
     },
     {
       "name": "deal-desk",
-      "path": "commercial/skills/deal-desk",
+      "path": "skills/commercial/skills/deal-desk",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "deal-desk",
+        "skill_path": "skills/commercial/skills/deal-desk",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/commercial/skills/deal-desk/SKILL.md",
+            "sha256": "39dcfb0d50983bbfaf2b25876ce5fe4fb23b2cf5b3d5469191de9c349743af20",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/commercial/skills/deal-desk/assets/deal_intake_template.md",
+            "sha256": "5428143c21ce47c7799ccbc831774bbf4fc9978e463db2a3cd53f9fd927953e2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/deal-desk/references/contract_landmines.md",
+            "sha256": "a5e5a4b91d797e9b220a22a278efe4fc55e9845298a729772bd13982cceed75d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/deal-desk/references/deal_desk_canon.md",
+            "sha256": "a54c00e8bea2b3d02f788a8df4694016eb97506543722bd0bf8546ef19da4d6f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/deal-desk/references/discount_economics.md",
+            "sha256": "beee5c28ff2a78dc4ec1e15cb2f0572dc6e1ffea401ec335c9121c10247c5024",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/deal-desk/scripts/deal_scorer.py",
+            "sha256": "2152509fe73e5ee4dd4bb46d7b8de24d0b127238237ac56e1cfc294be83207cf",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/deal-desk/scripts/discount_approval_router.py",
+            "sha256": "089187ec835289c5b40240bf0a4a69f2f3bae301927cbd95fdf6e2e6990aa344",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/deal-desk/scripts/terms_redliner.py",
+            "sha256": "c634065d0ec9159deefd9ea4b401748b1d9e3becea81a950151d11626b9abfb5",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when reviewing a specific inbound deal before close \u2014 when sales has asked for a discount that exceeds AE authority, when the customer has redlined the MSA, when per-deal economics (margin after discount, multi-year payment shape, indemnity exposure) need to be quantified, or when discount approval needs to be routed to a named human approver (Sales Director, VP Sales, CFO, CRO, General Counsel). Covers deal review, discount approval routing, per-deal margin scoring, deal exception handling, MSA redline triage, contract landmine detection (uncapped indemnity, MFN, perpetual \u2026",
       "tools": [
         {
-          "script": "commercial/skills/deal-desk/scripts/deal_scorer.py",
+          "script": "skills/commercial/skills/deal-desk/scripts/deal_scorer.py",
+          "sha256": "2152509fe73e5ee4dd4bb46d7b8de24d0b127238237ac56e1cfc294be83207cf",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/deal-desk/scripts/deal_scorer.py --help",
+              "cmd": "python3 skills/commercial/skills/deal-desk/scripts/deal_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/deal-desk/scripts/deal_scorer.py --sample",
+              "cmd": "python3 skills/commercial/skills/deal-desk/scripts/deal_scorer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "commercial/skills/deal-desk/scripts/discount_approval_router.py",
+          "script": "skills/commercial/skills/deal-desk/scripts/discount_approval_router.py",
+          "sha256": "089187ec835289c5b40240bf0a4a69f2f3bae301927cbd95fdf6e2e6990aa344",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/deal-desk/scripts/discount_approval_router.py --help",
+              "cmd": "python3 skills/commercial/skills/deal-desk/scripts/discount_approval_router.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/deal-desk/scripts/discount_approval_router.py --sample",
+              "cmd": "python3 skills/commercial/skills/deal-desk/scripts/discount_approval_router.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "commercial/skills/deal-desk/scripts/terms_redliner.py",
+          "script": "skills/commercial/skills/deal-desk/scripts/terms_redliner.py",
+          "sha256": "c634065d0ec9159deefd9ea4b401748b1d9e3becea81a950151d11626b9abfb5",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/deal-desk/scripts/terms_redliner.py --help",
+              "cmd": "python3 skills/commercial/skills/deal-desk/scripts/terms_redliner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/deal-desk/scripts/terms_redliner.py --sample",
+              "cmd": "python3 skills/commercial/skills/deal-desk/scripts/terms_redliner.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -302,62 +524,114 @@
         "close_out": false
       },
       "references": [
-        "contract_landmines.md",
-        "deal_desk_canon.md",
-        "discount_economics.md"
+        "skills/commercial/skills/deal-desk/references/contract_landmines.md",
+        "skills/commercial/skills/deal-desk/references/deal_desk_canon.md",
+        "skills/commercial/skills/deal-desk/references/discount_economics.md"
       ]
     },
     {
       "name": "partnerships-architect",
-      "path": "commercial/skills/partnerships-architect",
+      "path": "skills/commercial/skills/partnerships-architect",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "partnerships-architect",
+        "skill_path": "skills/commercial/skills/partnerships-architect",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/commercial/skills/partnerships-architect/SKILL.md",
+            "sha256": "224a929d13179997de1e8092d385e8683a4891fb34173f379678a6cf6602bb10",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/commercial/skills/partnerships-architect/assets/partnership_intake_template.md",
+            "sha256": "4f6372c5800e3683b46d915b018b5071bd03673290630d2ba0bf03ece8a99b81",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/partnerships-architect/references/channel_partner_canon.md",
+            "sha256": "77ee29bd98a8613125abb6930899bd2c66f6455481eaca946a93191b40d7f0a3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/partnerships-architect/references/joint_gtm_canon.md",
+            "sha256": "681ff7b579b83048b1ba43e34bc0fbcfb52854d3d3ea4e99612db4291faf51e9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/partnerships-architect/references/partnership_anti_patterns.md",
+            "sha256": "0e34072089ab65612f78fb6c1a893c872b1913c03bf07c85a9c14b72044c0cf5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/partnerships-architect/scripts/joint_gtm_planner.py",
+            "sha256": "13fe4b8ef3ec47fc8635c3bd67dcb8a742b1c886d7809f271d0cb307ce4ecd6b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/partnerships-architect/scripts/partner_tier_classifier.py",
+            "sha256": "e57354fa73393ffef700a01697ff162538055a27b038f8a33a5202698f18a891",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/partnerships-architect/scripts/revshare_modeler.py",
+            "sha256": "dbf84d214af4735d2c85aeb599c3b2cfa39a51d495e73d5202612b6f34a45252",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when a startup is approached by a prospective partner and someone has to decide should we sign this partner, at what partner tier (referral / reseller / OEM / SI-consulting / strategic alliance), with what joint GTM commitment, and at what revshare. Classifies partner tier from independent-demand evidence vs. preferential-terms hunting, designs a 90-day joint GTM plan, models revshare against direct-sale margin, and surfaces kill criteria for unwinding under-performing partnerships. For Head of Partnerships, Head of BD, and Founder-CEOs doing reseller agreement, OEM deal, or strategic \u2026",
       "tools": [
         {
-          "script": "commercial/skills/partnerships-architect/scripts/joint_gtm_planner.py",
+          "script": "skills/commercial/skills/partnerships-architect/scripts/joint_gtm_planner.py",
+          "sha256": "13fe4b8ef3ec47fc8635c3bd67dcb8a742b1c886d7809f271d0cb307ce4ecd6b",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/partnerships-architect/scripts/joint_gtm_planner.py --help",
+              "cmd": "python3 skills/commercial/skills/partnerships-architect/scripts/joint_gtm_planner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/partnerships-architect/scripts/joint_gtm_planner.py --sample",
+              "cmd": "python3 skills/commercial/skills/partnerships-architect/scripts/joint_gtm_planner.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "commercial/skills/partnerships-architect/scripts/partner_tier_classifier.py",
+          "script": "skills/commercial/skills/partnerships-architect/scripts/partner_tier_classifier.py",
+          "sha256": "e57354fa73393ffef700a01697ff162538055a27b038f8a33a5202698f18a891",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/partnerships-architect/scripts/partner_tier_classifier.py --help",
+              "cmd": "python3 skills/commercial/skills/partnerships-architect/scripts/partner_tier_classifier.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/partnerships-architect/scripts/partner_tier_classifier.py --sample",
+              "cmd": "python3 skills/commercial/skills/partnerships-architect/scripts/partner_tier_classifier.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "commercial/skills/partnerships-architect/scripts/revshare_modeler.py",
+          "script": "skills/commercial/skills/partnerships-architect/scripts/revshare_modeler.py",
+          "sha256": "dbf84d214af4735d2c85aeb599c3b2cfa39a51d495e73d5202612b6f34a45252",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/partnerships-architect/scripts/revshare_modeler.py --help",
+              "cmd": "python3 skills/commercial/skills/partnerships-architect/scripts/revshare_modeler.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/partnerships-architect/scripts/revshare_modeler.py --sample",
+              "cmd": "python3 skills/commercial/skills/partnerships-architect/scripts/revshare_modeler.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -372,62 +646,114 @@
         "close_out": false
       },
       "references": [
-        "channel_partner_canon.md",
-        "joint_gtm_canon.md",
-        "partnership_anti_patterns.md"
+        "skills/commercial/skills/partnerships-architect/references/channel_partner_canon.md",
+        "skills/commercial/skills/partnerships-architect/references/joint_gtm_canon.md",
+        "skills/commercial/skills/partnerships-architect/references/partnership_anti_patterns.md"
       ]
     },
     {
       "name": "pricing-strategist",
-      "path": "commercial/skills/pricing-strategist",
+      "path": "skills/commercial/skills/pricing-strategist",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "pricing-strategist",
+        "skill_path": "skills/commercial/skills/pricing-strategist",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/commercial/skills/pricing-strategist/SKILL.md",
+            "sha256": "0dcefcdeb60a2c319a0c12119290d1f812919ef7fe98aed9748aee2f9e79c9e6",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/commercial/skills/pricing-strategist/assets/pricing_brief_template.md",
+            "sha256": "d1ea641d9b68c143235d041a491905634f562b1eca1dc7794b070faca2eb0f40",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/pricing-strategist/references/packaging_anti_patterns.md",
+            "sha256": "b8f358d4a77bb51b2e428c55cadac74269aaac8cedf1754ca5ea81f012a78cb3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/pricing-strategist/references/saas_pricing_canon.md",
+            "sha256": "616104f34a8773ea41f1c48886eaeb6f576d67c0bac61f7b379794b9db8c5ea4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/pricing-strategist/references/van_westendorp_methodology.md",
+            "sha256": "baf10f064004791d68cf6644011d7bc454e42f927c5f96e35dadddcc352e0443",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/pricing-strategist/scripts/packaging_designer.py",
+            "sha256": "62c31dca54aa646c525bb21d942bda6a94b0f8374d12af1f52e227dcf8436914",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/pricing-strategist/scripts/pricing_model_picker.py",
+            "sha256": "481bd4ea8e63656d773b5cefea16372169134af1c7d2f05cb52d56c2d57f2972",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/pricing-strategist/scripts/wtp_analyzer.py",
+            "sha256": "6c78d2d2fd18fe5bfc8075033d84134551ebc8827110bc15c93c6c583001ee06",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when designing or revisiting product pricing \u2014 selecting a pricing model (subscription seat-based, usage-based, value-based, freemium, or hybrid), running Van Westendorp Price Sensitivity Meter analysis on WTP survey data, or designing Good/Better/Best packaging tiers. Recommends a model and a price range with trade-offs, never a single number. For Commercial leads, Product Marketing, and CMOs at the pricing-design moment \u2014 not deal-by-deal discounting, not brand positioning.",
       "tools": [
         {
-          "script": "commercial/skills/pricing-strategist/scripts/packaging_designer.py",
+          "script": "skills/commercial/skills/pricing-strategist/scripts/packaging_designer.py",
+          "sha256": "62c31dca54aa646c525bb21d942bda6a94b0f8374d12af1f52e227dcf8436914",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/pricing-strategist/scripts/packaging_designer.py --help",
+              "cmd": "python3 skills/commercial/skills/pricing-strategist/scripts/packaging_designer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/pricing-strategist/scripts/packaging_designer.py --sample",
+              "cmd": "python3 skills/commercial/skills/pricing-strategist/scripts/packaging_designer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "commercial/skills/pricing-strategist/scripts/pricing_model_picker.py",
+          "script": "skills/commercial/skills/pricing-strategist/scripts/pricing_model_picker.py",
+          "sha256": "481bd4ea8e63656d773b5cefea16372169134af1c7d2f05cb52d56c2d57f2972",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/pricing-strategist/scripts/pricing_model_picker.py --help",
+              "cmd": "python3 skills/commercial/skills/pricing-strategist/scripts/pricing_model_picker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/pricing-strategist/scripts/pricing_model_picker.py --sample",
+              "cmd": "python3 skills/commercial/skills/pricing-strategist/scripts/pricing_model_picker.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "commercial/skills/pricing-strategist/scripts/wtp_analyzer.py",
+          "script": "skills/commercial/skills/pricing-strategist/scripts/wtp_analyzer.py",
+          "sha256": "6c78d2d2fd18fe5bfc8075033d84134551ebc8827110bc15c93c6c583001ee06",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/pricing-strategist/scripts/wtp_analyzer.py --help",
+              "cmd": "python3 skills/commercial/skills/pricing-strategist/scripts/wtp_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/pricing-strategist/scripts/wtp_analyzer.py --sample",
+              "cmd": "python3 skills/commercial/skills/pricing-strategist/scripts/wtp_analyzer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -442,62 +768,114 @@
         "close_out": false
       },
       "references": [
-        "packaging_anti_patterns.md",
-        "saas_pricing_canon.md",
-        "van_westendorp_methodology.md"
+        "skills/commercial/skills/pricing-strategist/references/packaging_anti_patterns.md",
+        "skills/commercial/skills/pricing-strategist/references/saas_pricing_canon.md",
+        "skills/commercial/skills/pricing-strategist/references/van_westendorp_methodology.md"
       ]
     },
     {
       "name": "rfp-responder",
-      "path": "commercial/skills/rfp-responder",
+      "path": "skills/commercial/skills/rfp-responder",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "rfp-responder",
+        "skill_path": "skills/commercial/skills/rfp-responder",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/commercial/skills/rfp-responder/SKILL.md",
+            "sha256": "7d70369c5fe2f512c7bf7b92ce286cb078cfdeabe15fdb76902d72244d9ccf7c",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/commercial/skills/rfp-responder/assets/rfp_intake_template.md",
+            "sha256": "e530f70ebddac245394f351cfe2c1f6a06d2365497350ed4f2efc86d41352704",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/rfp-responder/references/rfp_anti_patterns.md",
+            "sha256": "1e5f4e504fc8a341be6efbc2644c3646e1304cc6e62c73f2b79f86c3015c2b67",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/rfp-responder/references/rfp_strategy_canon.md",
+            "sha256": "fcba5c1b7cfb5191baaef9f6f20729de44419059e975434f19b3dafe9574e23b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/rfp-responder/references/shipley_method_canon.md",
+            "sha256": "7fd46c6040ce7237839bd85c25e33e57960048bcc975bb51c5ffdd3c19c0cb90",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/rfp-responder/scripts/response_drafter.py",
+            "sha256": "cf2a34884b86f7e1d97961ed9847f739cbd53f67a6e1ded04adae4df34cb3d6f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/rfp-responder/scripts/rfp_parser.py",
+            "sha256": "cc6dca6cdddcc9f0d083fb44bd600e4a9e2bd82de17373bd4afb647faa81e568",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/commercial/skills/rfp-responder/scripts/winrate_predictor.py",
+            "sha256": "e494d317a491c7609e4afcb7b1c293b23ea5fcb4d0e2c3b112016c7dc568de6a",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when an RFP, RFI, RFQ, security questionnaire, vendor questionnaire, or proposal request arrives and the team needs a structured response \u2014 parsing multi-section buyer-dictated requirements (MANDATORY vs WEIGHTED vs NICE-TO-HAVE), building a Shipley-method proof-point matrix mapping each requirement to a verifiable proof point, articulating 3-5 win-themes that ladder up across requirements, and producing a Shipley-derived winrate estimate that informs a bid / no-bid / partner-bid recommendation. For Bid Managers, Proposal Leads, Directors of Sales, and Sales Engineers at the \u2026",
       "tools": [
         {
-          "script": "commercial/skills/rfp-responder/scripts/response_drafter.py",
+          "script": "skills/commercial/skills/rfp-responder/scripts/response_drafter.py",
+          "sha256": "cf2a34884b86f7e1d97961ed9847f739cbd53f67a6e1ded04adae4df34cb3d6f",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/rfp-responder/scripts/response_drafter.py --help",
+              "cmd": "python3 skills/commercial/skills/rfp-responder/scripts/response_drafter.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/rfp-responder/scripts/response_drafter.py --sample",
+              "cmd": "python3 skills/commercial/skills/rfp-responder/scripts/response_drafter.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "commercial/skills/rfp-responder/scripts/rfp_parser.py",
+          "script": "skills/commercial/skills/rfp-responder/scripts/rfp_parser.py",
+          "sha256": "cc6dca6cdddcc9f0d083fb44bd600e4a9e2bd82de17373bd4afb647faa81e568",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/rfp-responder/scripts/rfp_parser.py --help",
+              "cmd": "python3 skills/commercial/skills/rfp-responder/scripts/rfp_parser.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/rfp-responder/scripts/rfp_parser.py --sample",
+              "cmd": "python3 skills/commercial/skills/rfp-responder/scripts/rfp_parser.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "commercial/skills/rfp-responder/scripts/winrate_predictor.py",
+          "script": "skills/commercial/skills/rfp-responder/scripts/winrate_predictor.py",
+          "sha256": "e494d317a491c7609e4afcb7b1c293b23ea5fcb4d0e2c3b112016c7dc568de6a",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 commercial/skills/rfp-responder/scripts/winrate_predictor.py --help",
+              "cmd": "python3 skills/commercial/skills/rfp-responder/scripts/winrate_predictor.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 commercial/skills/rfp-responder/scripts/winrate_predictor.py --sample",
+              "cmd": "python3 skills/commercial/skills/rfp-responder/scripts/winrate_predictor.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -512,9 +890,9 @@
         "close_out": false
       },
       "references": [
-        "rfp_anti_patterns.md",
-        "rfp_strategy_canon.md",
-        "shipley_method_canon.md"
+        "skills/commercial/skills/rfp-responder/references/rfp_anti_patterns.md",
+        "skills/commercial/skills/rfp-responder/references/rfp_strategy_canon.md",
+        "skills/commercial/skills/rfp-responder/references/shipley_method_canon.md"
       ]
     }
   ]

@@ -12,13 +12,18 @@ Route this inquiry through the `pm-skills` orchestrator:
 ## Routing (deterministic — run the script, don't eyeball)
 
 ```bash
-python3 project-management/skills/pm-skills/scripts/pm_goal_router.py --text "$ARGUMENTS" --output json
+python3 skills/project-management/skills/pm-skills/scripts/pm_goal_router.py --repo-root . --text "$ARGUMENTS" --output json
 ```
 
-- Exit 0 → load `skill_path`/SKILL.md and follow that skill's own workflow in a fork.
+- Exit 0 → require `binding_verified: true`, bind the exact `qualified_provider_path`
+  and follow that skill in approved scope. Do not pass an ambiguous bare name
+  to a loader or assume the host supports forked agents.
 - Exit 2 → ask ONE clarifying question naming the listed candidates, recommended answer
   first.
 - Exit 3 → ask the user to restate the goal with the deliverable named. Never guess.
+- Exit 4 → stop on missing, stale, wrong-identity or user-only provider metadata.
+  Never switch providers silently. Pass the inquiry as one argv value, not
+  an interpolated shell command. Metadata verification grants no mutation authority.
 - Explore the workspace first — a saved Jira snapshot, retro log, or transcript resolves
   the lane silently. Never silently chain a second sub-skill.
 
@@ -36,8 +41,17 @@ python3 project-management/skills/pm-skills/scripts/pm_goal_router.py --text "$A
 - Flow numbers come from `jira_snapshot_bridge.py` on real snapshot data.
 - Forecasts are Monte Carlo percentile ranges, never single dates.
 - Live Jira/Confluence ops use only the tools in
-  `project-management/references/atlassian-mcp-tools.md` — never invent tool names.
+  `skills/project-management/references/atlassian-mcp-tools.md` — never invent tool names.
 - Goals (not questions) go to `/cs:pm-loop` instead.
+
+## Retrospective namespace
+
+Use `/cs:pm sprint retrospective action items` for a team or sprint
+retrospective. Its qualified target is
+`skills/project-management/skills/scrum-master/SKILL.md`.
+Matt's `/retro` reviews an agent coding environment and is a different,
+human-only skill. Do not alias PM retrospectives to it. The historical PM
+guide's `/retro` label has no matching installed PM command definition.
 
 ## Distinct from
 

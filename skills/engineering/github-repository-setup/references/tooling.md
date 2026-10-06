@@ -108,13 +108,17 @@ installed names and inspect their resource paths before adding a dependency.
 | Stage | Candidate skill in this library | Selection rule |
 | --- | --- | --- |
 | Unresolved setup decisions | `grilling` | Conditional interview before approval; see the process below |
-| Domain decisions during grilling | `grill-with-docs` plus `domain-modeling` | Only when domain terms or ADRs need clarification; inspect their templates first |
-| Agent conventions | `setup-matt-pocock-skills` | Required integration; apply AGENTS-only override and seed fallback |
-| Missing document skeleton | `start-github-repo` in docs mode | Only when equivalent documents do not exist |
+| Domain decisions during grilling | `domain-modeling` | Model-invoked active discipline after document scope approval; user-only `grill-with-docs` is a human option |
+| Agent conventions | `setup-matt-pocock-skills` | User-only human option, not a hard dependency; preserve compatible config or use approved native templates |
+| Missing document skeleton | `start-github-repo` in docs mode | Human command only, when equivalent documents do not exist; never auto-call it |
 | Requirements and backlog | `to-spec`, `to-tickets` | Use approved PRD/requirements and preserve Epic/Feature/Story hierarchy |
 | Ticket classification | `triage` | If installed, configure canonical role mappings; only maintainers grant readiness |
 | Implementation and tests | `tdd` | Follow project commands and criterion-level evidence |
 | Independent review | `code-review` | Run by an independent reviewer; not self-approval |
+| PR body | `pr` | Model-invoked Summary/Evidence/Merge Danger plus native traceability and completion |
+| Whole-spec implementation | `implement-spec` | User-only, opt-in; ready frontier, TDD, isolated worktrees and approved integration branch |
+| Throwaway discovery | `prototype` | Model-invoked only for approved throwaway scope; never production TDD bypass |
+| Environment retrospective | `retro` | User-only recommendation, no automatic environment writes |
 | Architecture and design | Existing TOGAF, design-system, UI/UX skills | Select one suitable installed skill per task; no blanket installation |
 
 Do not invent an LSP, GitHub or Penpot "skill" to mean the corresponding
@@ -123,6 +127,10 @@ use the document contract directly or obtain approval to install from a
 reviewed, pinned source with license/provenance. Never import third-party
 skills by undocumented copying.
 
+Before advertising or calling companions, read
+[Matt governance](matt-governance.md) for user-only entry points, aliases,
+transitive dependencies and profile overrides. Verify the host dependency
+registry against installed files; do not create another loader or registry.
 The setup profile's approval and readiness gates take precedence over
 companion shortcuts. In particular, `to-spec` may suggest publishing and
 applying `ready-for-agent` immediately; here it must draft first unless
@@ -133,7 +141,8 @@ ready implementation ticket.
 ## Conditional grilling during setup
 
 Use the installed skill whose exact name is `grilling`, not a guessed alias.
-Load it when inspection leaves consequential choices unresolved: project
+Call the runtime's native Skill loader with `grilling` when inspection leaves
+consequential choices unresolved: project
 scope, Epic/Feature/Story boundaries, acceptance, ADM tailoring, agent
 authority, branching/completion, design ownership, or tooling permissions.
 If the repository and user instructions already settle them, skip the
@@ -146,11 +155,13 @@ interview and record that basis. Do not reopen the no-Claude/no-Plane choices.
    Do not ask downstream questions whose prerequisites are still open.
 3. Wait for the user's answers and recompute the frontier. Keep completed
    branches settled; avoid repeated confirmations for unchanged scope.
-4. Use `grill-with-docs` and `domain-modeling` if domain ambiguity or meaningful
-   architectural trade-offs need capture. Inspect their linked format files
-   before invoking them. If resources are missing, disclose the gap and
-   draft the agreed glossary/ADR against the existing repository convention.
-   Keep CONTEXT.md a domain glossary when that companion is in use; store
+4. For approved active domain work, call the native Skill loader with
+   `domain-modeling` separately from `grilling`. `grill-with-docs` and `grill-me`
+   are user-only options, never callable dependencies. Explain the local
+   `/grill-me-with-docs` alias only if available; canonical upstream is
+   `/grill-with-docs`. Verify the called skill's format resources; if missing,
+   disclose the gap and draft against the established repository convention.
+   Keep GLOSSARY.md a domain glossary; store
    implementation constraints in TRD/ADRs, not in the glossary.
 5. Record decisions and unresolved blockers in the setup plan and relevant
    PRD/TRD, TOGAF-ADM, design or tooling documents. Require shared-understanding

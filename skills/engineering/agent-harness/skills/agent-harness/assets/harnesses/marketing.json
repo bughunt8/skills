@@ -1,5 +1,5 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "marketing",
   "skill_count": 1,
   "loop_defaults": {
@@ -15,55 +15,102 @@
   "skills": [
     {
       "name": "landing",
-      "path": "marketing/landing/skills/landing",
+      "path": "skills/marketing/landing/skills/landing",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "landing",
+        "skill_path": "skills/marketing/landing/skills/landing",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing/landing/skills/landing/SKILL.md",
+            "sha256": "dc6c4227a1512112717675a3a2b73a9f4dff4b6bbf34f3f1c6f198b39a4ef2f9",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing/landing/skills/landing/references/brand_system_design.md",
+            "sha256": "93550b56ea08747c6d8c93a56f713605a52488ee456f1836f0a3e32e42fbfa61",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing/landing/skills/landing/references/gsap_animation_patterns.md",
+            "sha256": "962e75987d67ee1696d75f6a3d5aa2e0062b2e58fdd5c0d28a70485b158ff8b1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing/landing/skills/landing/references/single_file_html_discipline.md",
+            "sha256": "c94754ab8fe580a935af71550eb4b22815ec8cfb63916607f680179b148e91dd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing/landing/skills/landing/scripts/brand_palette_validator.py",
+            "sha256": "b3ae7e208ef68739786478521289b2263d1365cc993d33dd508a1e76b5eb3756",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing/landing/skills/landing/scripts/html_validator.py",
+            "sha256": "72d67466d41b49a8aaffeeda4e5cfb2454a6085de4f05229dc87e6a5e03572c2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing/landing/skills/landing/scripts/kebab_slug_generator.py",
+            "sha256": "b112dc5658be4d363d5d3fe6acc709108aad5222ddbea2acfb07180a2c733267",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Generates a premium single-page HTML landing page with 3D CSS animations, GSAP scroll effects, and mouse-parallax depth. Forcing intake (product + elevator pitch, audience register, brand overrides, tone) locks down positioning before any copy or markup is written, so the page reflects the actual product rather than generic boilerplate. Use whenever the user says 'landing for X', 'create a landing page', 'build a landing page', 'make a landing page for X', 'I need a web page for Y', or provides product/service details and wants a polished website. Also triggers on 'promotional page' \u2026",
       "tools": [
         {
-          "script": "marketing/landing/skills/landing/scripts/brand_palette_validator.py",
+          "script": "skills/marketing/landing/skills/landing/scripts/brand_palette_validator.py",
+          "sha256": "b3ae7e208ef68739786478521289b2263d1365cc993d33dd508a1e76b5eb3756",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 marketing/landing/skills/landing/scripts/brand_palette_validator.py --help",
+              "cmd": "python3 skills/marketing/landing/skills/landing/scripts/brand_palette_validator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 marketing/landing/skills/landing/scripts/brand_palette_validator.py --sample",
+              "cmd": "python3 skills/marketing/landing/skills/landing/scripts/brand_palette_validator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "marketing/landing/skills/landing/scripts/html_validator.py",
+          "script": "skills/marketing/landing/skills/landing/scripts/html_validator.py",
+          "sha256": "72d67466d41b49a8aaffeeda4e5cfb2454a6085de4f05229dc87e6a5e03572c2",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 marketing/landing/skills/landing/scripts/html_validator.py --help",
+              "cmd": "python3 skills/marketing/landing/skills/landing/scripts/html_validator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 marketing/landing/skills/landing/scripts/html_validator.py --sample",
+              "cmd": "python3 skills/marketing/landing/skills/landing/scripts/html_validator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "marketing/landing/skills/landing/scripts/kebab_slug_generator.py",
+          "script": "skills/marketing/landing/skills/landing/scripts/kebab_slug_generator.py",
+          "sha256": "b112dc5658be4d363d5d3fe6acc709108aad5222ddbea2acfb07180a2c733267",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 marketing/landing/skills/landing/scripts/kebab_slug_generator.py --help",
+              "cmd": "python3 skills/marketing/landing/skills/landing/scripts/kebab_slug_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 marketing/landing/skills/landing/scripts/kebab_slug_generator.py --sample",
+              "cmd": "python3 skills/marketing/landing/skills/landing/scripts/kebab_slug_generator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -78,9 +125,9 @@
         "close_out": false
       },
       "references": [
-        "brand_system_design.md",
-        "gsap_animation_patterns.md",
-        "single_file_html_discipline.md"
+        "skills/marketing/landing/skills/landing/references/brand_system_design.md",
+        "skills/marketing/landing/skills/landing/references/gsap_animation_patterns.md",
+        "skills/marketing/landing/skills/landing/references/single_file_html_discipline.md"
       ]
     }
   ]

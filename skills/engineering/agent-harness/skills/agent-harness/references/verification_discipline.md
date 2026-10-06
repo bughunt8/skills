@@ -64,7 +64,8 @@ never evidence. The controller's design decisions trace to these sources.
 ## Anti-gaming rules the controller enforces
 
 - `verify` executes checks itself (subprocess, timeout, output tail captured to the evidence
-  log) — recorded exit codes are for the *execute* phase only.
+  log). `record --phase verify` also accepts observed evidence under its existing
+  transition rules; a recorded assertion is not independently measured proof.
 - A passing verify record without evidence text is exit 6, not a pass.
 - Failure at `max_attempts` escalates (exit 2); the loop cannot convert an exhausted task
   into a success, only a human can waive it — and `close --waive` demands a reason that is
@@ -76,10 +77,16 @@ never evidence. The controller's design decisions trace to these sources.
 `loop_controller.py verify` shell-executes each task's `verification[].cmd` string via
 `subprocess.run(..., shell=True)`. In the documented flow those commands are template-
 generated from repo-scanned script paths (`harness_manifest_builder.py` → `goal_compiler.py`),
-so they are not attacker-reachable. But the controller does **not** re-validate a `--state`
-or `--plan` file's contents before shelling out — a hand-crafted or tampered plan/state file
-is therefore effectively arbitrary local command execution, the same trust model as a
-Makefile or a CI config. **Treat `plan.json` and `state.json` as a trust boundary: only
+and bound to actual source paths. The controller now revalidates live provider identity,
+role and file hashes before each operation. It does not authenticate plan/state authors
+or validate arbitrary check commands. A hand-crafted or tampered plan/state file may still
+execute arbitrary local commands, the same trust model as a Makefile or CI config.
+**Treat `plan.json` and `state.json` as a trust boundary: only
 run the harness on plan/state files you (or the `goal_compiler`) produced, never on files
 sourced from untrusted input.** This matters because the harness is designed to be driven by
 an agent (`harness-runner`) that could in principle be handed a malicious plan.
+
+Smoke/sample checks establish tool operation, not goal acceptance. A `verified` state
+records the controller's check contract, not human authorization or proof that the
+host loader honors provider paths. Define objective-specific evidence separately.
+Read [provider bindings](provider_bindings.md) on a hash or invocation refusal.

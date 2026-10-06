@@ -1,5 +1,5 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "loop-library",
   "skill_count": 1,
   "loop_defaults": {
@@ -15,7 +15,46 @@
   "skills": [
     {
       "name": "loop-library",
-      "path": "loop-library",
+      "path": "skills/loop-library",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "loop-library",
+        "skill_path": "skills/loop-library",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/loop-library/LICENSE",
+            "sha256": "499ee96ced52e2f9829abc848119f1e5f2c6d2085a261d654968297839b628cc",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/loop-library/README.md",
+            "sha256": "8eb4a20648f2f1c77206f13eaf60cbb247e1f2dcd080b1535f984373b2dbc0c7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/loop-library/SKILL.md",
+            "sha256": "0a976cfc29e86c7eaa56e761d9e68bc55284b50fce05b4bdddaf78e2bde38425",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/loop-library/agents/openai.yaml",
+            "sha256": "8f69649806589d435698d661b5e0cf7272da3805bdf1e9a16f292389d9b777b7",
+            "role": "codex_invocation_metadata"
+          },
+          {
+            "path": "skills/loop-library/references/audit.md",
+            "sha256": "c58d26f53df9a762c40f7d0286f7f0fa31812a2ce85cb8c368adc0bb0fb2906f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/loop-library/references/discover.md",
+            "sha256": "f3c46e4cc66740e99eda7df026e1be8ff582b33c8874eff4aeff2ebe291a453a",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Discover, find, compare, audit, repair, adapt, and design repeatable AI-agent loops with explicit triggers, actions, verification, stopping conditions, guardrails, and handoffs. Use when a user asks to analyze a codebase for potential loops, mine coding-thread history for work done more than once, turn repeated engineering work into a loop, find or recommend a published loop, create a recurring agent workflow or automation cadence, turn an outcome into a bounded copy-ready loop, or review an existing loop for weak checks, unsafe authority, unbounded repetition, stale state, or unclear \u2026",
       "tools": [],
       "agentic_signals": {
@@ -26,8 +65,8 @@
         "close_out": true
       },
       "references": [
-        "audit.md",
-        "discover.md"
+        "skills/loop-library/references/audit.md",
+        "skills/loop-library/references/discover.md"
       ]
     }
   ]
