@@ -18,7 +18,7 @@
       "flat_category": "creative-writing",
       "license": "Apache-2.0",
       "note": "Indexed at cw/skills, which its own .claude-plugin/marketplace.json declares as the plugin source ('source': './cw'). That tree holds the complete set of 24. A top-level skills/ tree also exists with 11 of them in a different frontmatter format; indexing the repository root picked up both, and 'shallowest path wins' then preferred the 11-file partial copy over the canonical one. Naming the canonical subtree removes the ambiguity instead of guessing at it.",
-      "ref": "fd7a3ad9cd7697a0645ff6ff4bd5e809cf7673a3"
+      "ref": "254d4bb9b3b2e50a47def955b6461c06057eedae"
     },
     {
       "id": "shuohao-skills",
@@ -28,7 +28,7 @@
       "flat_category": "shuohao",
       "license": "Apache-2.0",
       "note": "AI short-drama production pipeline.",
-      "ref": "7ebef4f2f53159ee1eaaec2793271a114a8be8cc"
+      "ref": "d28a9c539b40523d081794b25ff9113016bd98e0"
     }
   ]
 }

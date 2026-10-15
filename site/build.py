@@ -103,20 +103,51 @@ def load_sources() -> list:
     return json.loads(SOURCES.read_text(encoding="utf-8"))["sources"]
 
 
+# A YAML block scalar indicator: `|`, `>` and their chomping/indent variants.
+_BLOCK_SCALAR = re.compile(r"^[|>][+-]?\d*$")
+
+
 def frontmatter(path: Path) -> "tuple[str, str]":
+    """Read `name` and `description` from a SKILL.md frontmatter block.
+
+    Block scalars (`description: |` plus indented prose) are ordinary YAML and
+    were rendering as the literal string "|" on 44 cards. Nothing compared a
+    description against the file it came from, so it shipped.
+    """
     text = path.read_text(encoding="utf-8", errors="replace")
     match = re.match(r"\A---[ \t]*\r?\n(.*?)\r?\n---", text, re.S)
     name = desc = None
     if match:
-        block = match.group(1)
-        for key in ("name", "description"):
-            m = re.search(rf"^{key}:[ \t]*(.*)$", block, re.M)
-            if m:
-                value = m.group(1).strip().strip("\"'")
-                if key == "name":
-                    name = value
-                else:
-                    desc = value
+        lines = match.group(1).split("\n")
+        i = 0
+        while i < len(lines):
+            m = re.match(r"^(name|description):[ \t]*(.*)$", lines[i])
+            if not m:
+                i += 1
+                continue
+            key, raw = m.group(1), m.group(2).strip()
+            if _BLOCK_SCALAR.match(raw.strip("\"'")):
+                body = []
+                j = i + 1
+                while j < len(lines):
+                    nxt = lines[j]
+                    if nxt.strip() and not nxt[:1].isspace():
+                        break
+                    body.append(nxt)
+                    j += 1
+                indents = [len(b) - len(b.lstrip()) for b in body if b.strip()]
+                cut = min(indents) if indents else 0
+                dedented = [b[cut:] if b.strip() else "" for b in body]
+                joined = (" " if raw.startswith(">") else "\n").join(dedented)
+                value = joined.strip()
+                i = j
+            else:
+                value = raw.strip().strip("\"'")
+                i += 1
+            if key == "name":
+                name = value
+            else:
+                desc = value
     return (name or path.parent.name), re.sub(r"\s+", " ", desc or "").strip()
 
 
@@ -1047,6 +1078,13 @@ AUDIT = re.compile(
     r"\b(\d+)\s+(?:AI\s+)?(?:agent\s+)?(?:skills|categories|communities)\b"
 )
 
+# intro.html is audited but has no generated region, so its headline was hand-corrected
+# every refresh. Writing it here makes the audit and the write share one source.
+INTRO_CLAIMS = [
+    (re.compile(r"\b\d+ skills\. \d+ communities\."),
+     "{t} skills. {com} communities."),
+]
+
 
 def splice(
     page: str, blocks: dict, total: int, cats: int, sols: int, stated: int
@@ -1192,8 +1230,14 @@ def main(argv: list) -> int:
         return 1
 
     if INTRO.exists():
+        intro_current = INTRO.read_text(encoding="utf-8")
+        intro_updated = intro_current
+        for pattern, template in INTRO_CLAIMS:
+            intro_updated = pattern.sub(
+                template.format(t=len(rows), c=len(counts), com=comms), intro_updated
+            )
         intro_drift = audit_claims(
-            INTRO.read_text(encoding="utf-8"),
+            intro_updated,
             len(rows),
             len(counts),
             comms,
@@ -1215,6 +1259,8 @@ def main(argv: list) -> int:
             stale.append("index.html")
         if not DATA.exists() or DATA.read_text(encoding="utf-8") != data:
             stale.append("data.js")
+        if INTRO.exists() and intro_updated != intro_current:
+            stale.append("intro.html")
         if stale:
             print(
                 f"error: {', '.join(stale)} out of date against the sources. "
@@ -1247,6 +1293,8 @@ def main(argv: list) -> int:
 
     INDEX.write_text(updated, encoding="utf-8")
     DATA.write_text(data, encoding="utf-8")
+    if INTRO.exists() and intro_updated != intro_current:
+        INTRO.write_text(intro_updated, encoding="utf-8")
     print(f"wrote index.html and data.js: {len(rows)} skills across {len(counts)} categories")
     return 0
 

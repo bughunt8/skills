@@ -57,12 +57,12 @@ jobs:
         run: |
           set -euo pipefail
           python3 build.py --refresh --write | tee /tmp/build.log
-          if git diff --quiet -- index.html data.js sources.json; then
+          if git diff --quiet -- index.html data.js sources.json intro.html; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "no upstream changes"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            git --no-pager diff --stat -- index.html data.js sources.json
+            git --no-pager diff --stat -- index.html data.js sources.json intro.html
           fi
 
       # The same gates a pull request to staging would run. They run here
@@ -133,3 +133,4 @@ jobs:
             site/index.html
             site/data.js
             site/sources.json
+            site/intro.html
