@@ -16,9 +16,9 @@ refreshed at least every two weeks. Provenance presence is enforced on every pul
 
 | Upstream project | Author | Licence | Vendored to | Pinned commit | Attribution |
 | --- | --- | --- | --- | --- | --- |
-| [pstack](https://github.com/backnotprop/pstack) | Lauren Tan (@backnotprop, "poteto") | MIT | `skills/pstack/` | [`18e0e908a135`](https://github.com/backnotprop/pstack/commit/18e0e908a13553b0e58d065ab26dbc9a972ec8ba) | [ATTRIBUTION.md](./skills/pstack/ATTRIBUTION.md) |
-| [job-hunt-skills](https://github.com/Remotivated/job-hunt-skills) | Remotivated | MIT, plus OFL-1.1 | `skills/job-hunt/` | [`5fb238febf14`](https://github.com/Remotivated/job-hunt-skills/commit/5fb238febf14a0b41fb5a8fe7384594ad1f59335) | [ATTRIBUTION.md](./skills/job-hunt/ATTRIBUTION.md) |
-| [i-have-adhd](https://github.com/ayghri/i-have-adhd) | Ayoub Ghriss (@ayghri) | MIT | `skills/i-have-adhd/` | [`4092de07ce3e`](https://github.com/ayghri/i-have-adhd/commit/4092de07ce3ed88389d77c0d623b7af89b40ac0e) | [ATTRIBUTION.md](./skills/i-have-adhd/ATTRIBUTION.md) |
+| [pstack](https://github.com/backnotprop/pstack) | Lauren Tan (@backnotprop, "poteto") | MIT | `skills/pstack/` | [`124f622bcaea`](https://github.com/backnotprop/pstack/commit/124f622bcaeac490e7e9dac6af83f3ef9611d554) | [ATTRIBUTION.md](./skills/pstack/ATTRIBUTION.md) |
+| [job-hunt-skills](https://github.com/Remotivated/job-hunt-skills) | Remotivated | MIT, plus OFL-1.1 | `skills/job-hunt/` | [`74fe9165e1eb`](https://github.com/Remotivated/job-hunt-skills/commit/74fe9165e1eb5c7f6052bf665a54c5cfb81e0960) | [ATTRIBUTION.md](./skills/job-hunt/ATTRIBUTION.md) |
+| [i-have-adhd](https://github.com/ayghri/i-have-adhd) | Ayoub Ghriss (@ayghri) | MIT | `skills/i-have-adhd/` | [`839872f9d1cd`](https://github.com/ayghri/i-have-adhd/commit/839872f9d1cd634fed642b4589ce7226199cc15f) | [ATTRIBUTION.md](./skills/i-have-adhd/ATTRIBUTION.md) |
 
 ### Secondary licences inside those imports
 

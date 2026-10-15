@@ -8,8 +8,8 @@ This directory is vendored, unmodified, from an upstream project. Do not edit it
 | --- | --- |
 | Upstream project | [i-have-adhd](https://github.com/ayghri/i-have-adhd) |
 | Upstream path | `.cursor/skills/i-have-adhd` |
-| Pinned commit | [`4092de07ce3e`](https://github.com/ayghri/i-have-adhd/commit/4092de07ce3ed88389d77c0d623b7af89b40ac0e) |
-| Permalink | https://github.com/ayghri/i-have-adhd/tree/4092de07ce3ed88389d77c0d623b7af89b40ac0e/.cursor/skills/i-have-adhd |
+| Pinned commit | [`839872f9d1cd`](https://github.com/ayghri/i-have-adhd/commit/839872f9d1cd634fed642b4589ce7226199cc15f) |
+| Permalink | https://github.com/ayghri/i-have-adhd/tree/839872f9d1cd634fed642b4589ce7226199cc15f/.cursor/skills/i-have-adhd |
 | Original author | Ayoub Ghriss (@ayghri) |
 | Upstream licence | MIT |
 | Licence copy | [`../LICENSE.upstream`](../LICENSE.upstream) |
