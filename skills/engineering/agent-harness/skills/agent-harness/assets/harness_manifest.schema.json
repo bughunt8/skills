@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "agent-harness domain manifest (agent-harness/manifest.v1)",
+  "title": "agent-harness domain manifest (agent-harness/manifest.v2)",
   "description": "Machine-readable inventory of one domain folder: every skill, its tools, its verification checks, and its agentic signals. Produced by harness_manifest_builder.py; consumed by goal_compiler.py. Regenerate after any skill change — never hand-edit.",
   "type": "object",
   "required": ["schema", "domain", "skill_count", "loop_defaults", "skills"],
   "properties": {
-    "schema": { "const": "agent-harness/manifest.v1" },
-    "domain": { "type": "string", "description": "Domain folder relative to repo root, e.g. 'engineering-team'." },
+    "schema": { "const": "agent-harness/manifest.v2" },
+    "domain": { "type": "string", "description": "Existing domain name under checkout-root/skills, e.g. 'engineering-team'." },
     "skill_count": { "type": "integer", "minimum": 0 },
     "generated_at": { "type": "string", "description": "UTC ISO-8601; omitted when built with --no-timestamp for diff-stable commits." },
     "loop_defaults": {
@@ -22,18 +22,21 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "path", "description", "tools", "agentic_signals"],
+        "required": ["name", "path", "invocation", "provider_binding", "description", "tools", "agentic_signals"],
         "properties": {
           "name": { "type": "string" },
-          "path": { "type": "string", "description": "Skill dir (contains SKILL.md) relative to repo root." },
+          "path": { "type": "string", "pattern": "^skills/", "description": "Exact skill directory relative to the actual checkout root." },
+          "invocation": { "enum": ["user_only", "model_or_user"] },
+          "provider_binding": { "$ref": "#/$defs/provider_binding" },
           "description": { "type": "string", "maxLength": 600 },
           "tools": {
             "type": "array",
             "items": {
               "type": "object",
-              "required": ["script", "wired", "supports_sample", "verification"],
+              "required": ["script", "sha256", "wired", "supports_sample", "verification"],
               "properties": {
-                "script": { "type": "string" },
+                "script": { "type": "string", "pattern": "^skills/" },
+                "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
                 "wired": { "type": "boolean", "description": "True if the script basename appears in the skill's SKILL.md (A3 wiring)." },
                 "supports_sample": { "type": "boolean" },
                 "verification": {
@@ -58,6 +61,31 @@
             "additionalProperties": { "type": "boolean" }
           },
           "references": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "provider_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "name", "skill_path", "invocation", "files"],
+      "properties": {
+        "schema": { "const": "agent-harness/provider.v1" },
+        "name": { "type": "string" },
+        "skill_path": { "type": "string", "pattern": "^skills/" },
+        "invocation": { "enum": ["user_only", "model_or_user"] },
+        "files": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["path", "sha256", "role"],
+            "properties": {
+              "path": { "type": "string", "pattern": "^skills/" },
+              "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+              "role": { "enum": ["skill_body", "codex_invocation_metadata", "owned_resource"] }
+            }
+          }
         }
       }
     }

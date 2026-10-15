@@ -1,7 +1,7 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "productivity",
-  "skill_count": 11,
+  "skill_count": 22,
   "loop_defaults": {
     "max_attempts_per_task": 3,
     "max_loop_iterations": 12,
@@ -14,56 +14,205 @@
   },
   "skills": [
     {
+      "name": "agile-prd-creator",
+      "path": "skills/productivity/agile-prd-creator",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "agile-prd-creator",
+        "skill_path": "skills/productivity/agile-prd-creator",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/agile-prd-creator/ATTRIBUTION.md",
+            "sha256": "a62cf74d976adfc09c54fa6d7e9c0033f45bad1e4030c69ae6655916d79dd5a2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/agile-prd-creator/LICENSE",
+            "sha256": "7ff4a6e855de05480c69087a01322168b81ae5c4d5e84f807a9723adc8d575c4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/agile-prd-creator/SKILL.md",
+            "sha256": "d3ea0965d5af9fbe78e848b2249220021f194a1b7303618f1749a9a0882292f0",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/agile-prd-creator/references/metrics_frameworks.md",
+            "sha256": "a814edd717c8b12c0b0a14182aecab460936b4ed0f9570c9c58e8a45c4954116",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/agile-prd-creator/references/prd_template.md",
+            "sha256": "b4406dae888d9f5c30a321dc685ae74450dc7e33d8d1bded406292250b8b6af1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/agile-prd-creator/references/user_story_examples.md",
+            "sha256": "bb135dfcce969426c24d570f9be2e3b9b31687ba01db74d5c6231aff1c28b980",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/agile-prd-creator/scripts/generate_prd.sh",
+            "sha256": "01fc80d2506a31144784fab605535d2a80b10355c82d09296e12c02d30794e5e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/agile-prd-creator/scripts/validate_prd.sh",
+            "sha256": "56716da5eb03caddd3dd1f2c1e5d019acbd5f0e829ad9c6fc5db5883d6b6e486",
+            "role": "owned_resource"
+          }
+        ]
+      },
+      "description": "Generate comprehensive Product Requirements Documents (PRDs) for product managers. Use this skill when users ask to \"create an agile PRD\", \"write product requirements\", \"document a feature\", \"plan a sprint\", or need help structuring product specifications.",
+      "tools": [],
+      "agentic_signals": {
+        "goal_intake": false,
+        "refusal_gate": false,
+        "verification": true,
+        "loop_discipline": true,
+        "close_out": true
+      },
+      "references": [
+        "skills/productivity/agile-prd-creator/references/metrics_frameworks.md",
+        "skills/productivity/agile-prd-creator/references/prd_template.md",
+        "skills/productivity/agile-prd-creator/references/user_story_examples.md"
+      ]
+    },
+    {
       "name": "andreessen",
-      "path": "productivity/andreessen/skills/andreessen",
+      "path": "skills/productivity/andreessen/skills/andreessen",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "andreessen",
+        "skill_path": "skills/productivity/andreessen/skills/andreessen",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/andreessen/skills/andreessen/README.md",
+            "sha256": "81ff253ca1af1f6743a8e988cf5b57030bc93d8871234194a804f098c0a0d54e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/andreessen/skills/andreessen/SKILL.md",
+            "sha256": "fa4dec4ebe56d407e8ef794ab96a86336718bf3e92517aec5de87e35e0a0e65e",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/andreessen/skills/andreessen/assets/blank_3x5_card.md",
+            "sha256": "2db4e14dc9b7c3f01d22c3ec9eb1397b86bcbae6ba764a5d4b1c0be71b78b0c6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/andreessen/skills/andreessen/assets/example_3x5_card.md",
+            "sha256": "e9d8b0e078aa3110a186c150581edfc9709907e80552311ae1da866c764543e2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/andreessen/skills/andreessen/assets/example_market_verdict.md",
+            "sha256": "f90d6df7cb0bac7e06d1de42a3f2f6aed76a89ce655d88977eb1f6ee9a2f0597",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/andreessen/skills/andreessen/assets/example_pmf_check.md",
+            "sha256": "5df977c6bf5fcb370dc6178071a861301d77d066c64c921dd4b0e809a32cb737",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/andreessen/skills/andreessen/assets/forcing_question_worksheet.md",
+            "sha256": "5c316cefc9f5fb7e53852047414ee51ae562811b05c8fc0c32c4927bf9c6b527",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/andreessen/skills/andreessen/references/market_first_canon.md",
+            "sha256": "7de793cff7b7048aa97e7989f7c6ccc63ad2738ee950fd18b490b70fa6a9f1d2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/andreessen/skills/andreessen/references/operating_prompt.md",
+            "sha256": "a6e3869898e16332d574b169e57e012c1ede4cc3ae7bc86b2bc6997f9bddc3fb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/andreessen/skills/andreessen/references/personal_productivity_system.md",
+            "sha256": "8ff6168843abc32fec5f9be335cb0355ab2c9821819c727921e76828030dda0a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/andreessen/skills/andreessen/references/pmf_and_build_canon.md",
+            "sha256": "ab4201f91ed653b96e40b6e170c97284d1cee9b99409fe4bc10638b9565a485f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/andreessen/skills/andreessen/scripts/anti_todo_card.py",
+            "sha256": "f8c9d6d09c024e7c0857fabce773b3b285eb70f00ad9e0794bd18fe5e43a1c9a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/andreessen/skills/andreessen/scripts/market_first_evaluator.py",
+            "sha256": "7f395b13f7c8936fa7913a8d864b1fe03c9110de5ff6a672f036b337e3a82729",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/andreessen/skills/andreessen/scripts/pmf_signal_scorer.py",
+            "sha256": "862fbfcfceff3f8c4f2f99d86a54f0275c2ad9a66f80f951a474314e816005bd",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Marc Andreessen-mode decision and productivity skill. A blunt, market-first operator that pressure-tests ideas, ventures, features, and career bets through Andreessen's actual frameworks \u2014 market dominates team and product; the only milestone that matters is product/market fit; bias to build over deliberate. Use when the user says 'andreessen', 'pmarca mode', 'should I build this', 'is there a market', 'are we at product/market fit', 'pmf check', 'pressure-test this idea', 'be brutal about this venture', 'market-first take', or wants a no-disclaimers, no-hedging, confidence-leveled verdict \u2026",
       "tools": [
         {
-          "script": "productivity/andreessen/skills/andreessen/scripts/anti_todo_card.py",
+          "script": "skills/productivity/andreessen/skills/andreessen/scripts/anti_todo_card.py",
+          "sha256": "f8c9d6d09c024e7c0857fabce773b3b285eb70f00ad9e0794bd18fe5e43a1c9a",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/andreessen/skills/andreessen/scripts/anti_todo_card.py --help",
+              "cmd": "python3 skills/productivity/andreessen/skills/andreessen/scripts/anti_todo_card.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/andreessen/skills/andreessen/scripts/anti_todo_card.py --sample",
+              "cmd": "python3 skills/productivity/andreessen/skills/andreessen/scripts/anti_todo_card.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/andreessen/skills/andreessen/scripts/market_first_evaluator.py",
+          "script": "skills/productivity/andreessen/skills/andreessen/scripts/market_first_evaluator.py",
+          "sha256": "7f395b13f7c8936fa7913a8d864b1fe03c9110de5ff6a672f036b337e3a82729",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/andreessen/skills/andreessen/scripts/market_first_evaluator.py --help",
+              "cmd": "python3 skills/productivity/andreessen/skills/andreessen/scripts/market_first_evaluator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/andreessen/skills/andreessen/scripts/market_first_evaluator.py --sample",
+              "cmd": "python3 skills/productivity/andreessen/skills/andreessen/scripts/market_first_evaluator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/andreessen/skills/andreessen/scripts/pmf_signal_scorer.py",
+          "script": "skills/productivity/andreessen/skills/andreessen/scripts/pmf_signal_scorer.py",
+          "sha256": "862fbfcfceff3f8c4f2f99d86a54f0275c2ad9a66f80f951a474314e816005bd",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/andreessen/skills/andreessen/scripts/pmf_signal_scorer.py --help",
+              "cmd": "python3 skills/productivity/andreessen/skills/andreessen/scripts/pmf_signal_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/andreessen/skills/andreessen/scripts/pmf_signal_scorer.py --sample",
+              "cmd": "python3 skills/productivity/andreessen/skills/andreessen/scripts/pmf_signal_scorer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -78,63 +227,110 @@
         "close_out": false
       },
       "references": [
-        "market_first_canon.md",
-        "operating_prompt.md",
-        "personal_productivity_system.md",
-        "pmf_and_build_canon.md"
+        "skills/productivity/andreessen/skills/andreessen/references/market_first_canon.md",
+        "skills/productivity/andreessen/skills/andreessen/references/operating_prompt.md",
+        "skills/productivity/andreessen/skills/andreessen/references/personal_productivity_system.md",
+        "skills/productivity/andreessen/skills/andreessen/references/pmf_and_build_canon.md"
       ]
     },
     {
       "name": "capture",
-      "path": "productivity/capture/skills/capture",
+      "path": "skills/productivity/capture/skills/capture",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "capture",
+        "skill_path": "skills/productivity/capture/skills/capture",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/capture/skills/capture/SKILL.md",
+            "sha256": "fd4232fa8ae704fadd92f57ebd698efe616e64a6d5fabcaafa45802347736965",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/capture/skills/capture/references/complexity_matching.md",
+            "sha256": "125468961c4150e80f18b7e423af5fad51fbb0a7e661a26626f6f378f7c1fe69",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/capture/skills/capture/references/voice_preservation.md",
+            "sha256": "c0e03cdbfccda4663efa4f289d5096c5ad1f283ea7d52954a84ef5d8a01f4bd6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/capture/skills/capture/references/workspace_detection.md",
+            "sha256": "36f47df2a927268fe060d159a3d020ed9bb4e3c9a1c5cc66cb468c230d4081b0",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/capture/skills/capture/scripts/complexity_estimator.py",
+            "sha256": "e22353441d35452b1406b8398ae4ad3c288606979dfc2139a2bb3ff369dcc308",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/capture/skills/capture/scripts/dump_classifier.py",
+            "sha256": "cb788c95e3ce9bd7ad21fd8be5bf8b52a319c5bd86602e8df3d063d455f9e3c4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/capture/skills/capture/scripts/workspace_inventory.py",
+            "sha256": "f97e19dc6ddd6cec9c12d3e6947475e3c215e780b8101d104de7f35b04e3ef80",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Captures and organizes chaotic brain dumps into a structured, actionable system with zero information loss. Use this skill whenever the user says 'capture this', 'brain dump', 'let me dump some ideas', 'I've got a bunch of thoughts', 'here's everything on my mind', 'idea dump', 'let me get this out of my head', 'I need to organize my thoughts', 'here's what I'm thinking', or any variation where someone is unloading a messy stream of ideas, tasks, thoughts, and plans wanting them turned into something coherent. Also trigger when the user pastes or dictates a long, unstructured block of mixed \u2026",
       "tools": [
         {
-          "script": "productivity/capture/skills/capture/scripts/complexity_estimator.py",
+          "script": "skills/productivity/capture/skills/capture/scripts/complexity_estimator.py",
+          "sha256": "e22353441d35452b1406b8398ae4ad3c288606979dfc2139a2bb3ff369dcc308",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/capture/skills/capture/scripts/complexity_estimator.py --help",
+              "cmd": "python3 skills/productivity/capture/skills/capture/scripts/complexity_estimator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/capture/skills/capture/scripts/complexity_estimator.py --sample",
+              "cmd": "python3 skills/productivity/capture/skills/capture/scripts/complexity_estimator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/capture/skills/capture/scripts/dump_classifier.py",
+          "script": "skills/productivity/capture/skills/capture/scripts/dump_classifier.py",
+          "sha256": "cb788c95e3ce9bd7ad21fd8be5bf8b52a319c5bd86602e8df3d063d455f9e3c4",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/capture/skills/capture/scripts/dump_classifier.py --help",
+              "cmd": "python3 skills/productivity/capture/skills/capture/scripts/dump_classifier.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/capture/skills/capture/scripts/dump_classifier.py --sample",
+              "cmd": "python3 skills/productivity/capture/skills/capture/scripts/dump_classifier.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/capture/skills/capture/scripts/workspace_inventory.py",
+          "script": "skills/productivity/capture/skills/capture/scripts/workspace_inventory.py",
+          "sha256": "f97e19dc6ddd6cec9c12d3e6947475e3c215e780b8101d104de7f35b04e3ef80",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/capture/skills/capture/scripts/workspace_inventory.py --help",
+              "cmd": "python3 skills/productivity/capture/skills/capture/scripts/workspace_inventory.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/capture/skills/capture/scripts/workspace_inventory.py --sample",
+              "cmd": "python3 skills/productivity/capture/skills/capture/scripts/workspace_inventory.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -149,62 +345,119 @@
         "close_out": false
       },
       "references": [
-        "complexity_matching.md",
-        "voice_preservation.md",
-        "workspace_detection.md"
+        "skills/productivity/capture/skills/capture/references/complexity_matching.md",
+        "skills/productivity/capture/skills/capture/references/voice_preservation.md",
+        "skills/productivity/capture/skills/capture/references/workspace_detection.md"
       ]
     },
     {
       "name": "deep-work",
-      "path": "productivity/deep-work/skills/deep-work",
+      "path": "skills/productivity/deep-work/skills/deep-work",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "deep-work",
+        "skill_path": "skills/productivity/deep-work/skills/deep-work",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/deep-work/skills/deep-work/SKILL.md",
+            "sha256": "ed801572d6e8c24b795383950b2b20139a455d4d9f157d8a5d2383863ae2f499",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/deep-work/skills/deep-work/assets/example_time_block_plan.md",
+            "sha256": "33c5830a93034c80f4f5f716d7b1b720a7d9e2de25d50dd0d5a14523404690ac",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/deep-work/skills/deep-work/assets/shutdown_checklist.md",
+            "sha256": "3691af0c2c8fc6e320f81ed4c70e1bf11f1f63fb6a1d186789d51689f707a60a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/deep-work/skills/deep-work/references/deep_work_canon.md",
+            "sha256": "5e69530063315e18ddfa24b282f1dd4719312f10973c6ca690e4de4ba0e5c84c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/deep-work/skills/deep-work/references/shallow_work_budget.md",
+            "sha256": "d1ccf2ead7dceefbc3163d7bad9b5f9840c266ad420934311831e1edb6ac366d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/deep-work/skills/deep-work/references/time_blocking_method.md",
+            "sha256": "619881a190f9e0c8217416c3c6c7932f2d0ea99fab49164f829deaea6abe6712",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/deep-work/skills/deep-work/scripts/focus_session_logger.py",
+            "sha256": "031eab211bdb0a3f3e6b40e6c9bbcffd434be260db5f95f5340b1d776148906f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/deep-work/skills/deep-work/scripts/shallow_work_auditor.py",
+            "sha256": "b63c2169db29c191cf0873cae1f44656ff5814a61de617d893bdb54f090b0511",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/deep-work/skills/deep-work/scripts/time_block_planner.py",
+            "sha256": "2138c565beb963b1ffab3292039cf27aef43a737cf1fa31f725ca499f69248ec",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when someone wants to plan a deep work day, time-block their calendar or task list, budget or cut shallow work, protect focus hours, track deep-work sessions and streaks, run an end-of-day shutdown ritual, or says \"/deep-work\" or \"/time-block\". Classifies tasks deep vs shallow, builds an energy-first time-blocked schedule that refuses deep demand past the 4-hour ceiling, batches shallow work into at most two windows, and logs focus sessions against a weekly target.",
       "tools": [
         {
-          "script": "productivity/deep-work/skills/deep-work/scripts/focus_session_logger.py",
+          "script": "skills/productivity/deep-work/skills/deep-work/scripts/focus_session_logger.py",
+          "sha256": "031eab211bdb0a3f3e6b40e6c9bbcffd434be260db5f95f5340b1d776148906f",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/deep-work/skills/deep-work/scripts/focus_session_logger.py --help",
+              "cmd": "python3 skills/productivity/deep-work/skills/deep-work/scripts/focus_session_logger.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/deep-work/skills/deep-work/scripts/focus_session_logger.py --sample",
+              "cmd": "python3 skills/productivity/deep-work/skills/deep-work/scripts/focus_session_logger.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/deep-work/skills/deep-work/scripts/shallow_work_auditor.py",
+          "script": "skills/productivity/deep-work/skills/deep-work/scripts/shallow_work_auditor.py",
+          "sha256": "b63c2169db29c191cf0873cae1f44656ff5814a61de617d893bdb54f090b0511",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/deep-work/skills/deep-work/scripts/shallow_work_auditor.py --help",
+              "cmd": "python3 skills/productivity/deep-work/skills/deep-work/scripts/shallow_work_auditor.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/deep-work/skills/deep-work/scripts/shallow_work_auditor.py --sample",
+              "cmd": "python3 skills/productivity/deep-work/skills/deep-work/scripts/shallow_work_auditor.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/deep-work/skills/deep-work/scripts/time_block_planner.py",
+          "script": "skills/productivity/deep-work/skills/deep-work/scripts/time_block_planner.py",
+          "sha256": "2138c565beb963b1ffab3292039cf27aef43a737cf1fa31f725ca499f69248ec",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/deep-work/skills/deep-work/scripts/time_block_planner.py --help",
+              "cmd": "python3 skills/productivity/deep-work/skills/deep-work/scripts/time_block_planner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/deep-work/skills/deep-work/scripts/time_block_planner.py --sample",
+              "cmd": "python3 skills/productivity/deep-work/skills/deep-work/scripts/time_block_planner.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -219,57 +472,104 @@
         "close_out": false
       },
       "references": [
-        "deep_work_canon.md",
-        "shallow_work_budget.md",
-        "time_blocking_method.md"
+        "skills/productivity/deep-work/skills/deep-work/references/deep_work_canon.md",
+        "skills/productivity/deep-work/skills/deep-work/references/shallow_work_budget.md",
+        "skills/productivity/deep-work/skills/deep-work/references/time_blocking_method.md"
       ]
     },
     {
       "name": "inbox-setup",
-      "path": "productivity/email/skills/inbox-setup",
+      "path": "skills/productivity/email/skills/inbox-setup",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "inbox-setup",
+        "skill_path": "skills/productivity/email/skills/inbox-setup",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/email/skills/inbox-setup/SKILL.md",
+            "sha256": "554986a87189951b7d388cced80edad9f4abaf32d383bb582ba474d33268de60",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/email/skills/inbox-setup/references/grill_me_section_walk.md",
+            "sha256": "b18540dced67339edf126619e3dba7c5f3f9b64798ac8f1b6015b65bf1099fc0",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/email/skills/inbox-setup/references/kb_file_contract.md",
+            "sha256": "f9162d2a1e5d0865c0c989faabb1ec4b7b14ce0ab0224ba160e439ec938ea90e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/email/skills/inbox-setup/references/voice_calibration.md",
+            "sha256": "b0e4fb93de47e2aaca89b4fa54fda87893fc14c5e11f0f1e4d89807d14860310",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/email/skills/inbox-setup/scripts/kb_validator.py",
+            "sha256": "46e75783845a0110e7a6081f6bd344730213155d7fbcc1b2c92fc31942c85b3c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/email/skills/inbox-setup/scripts/section_progress_tracker.py",
+            "sha256": "0931080cdf0f72c8e51954cab7d495dbde3695f80b6c8add2606ae0bb4ae68a2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/email/skills/inbox-setup/scripts/voice_sample_analyzer.py",
+            "sha256": "b59c150f5e5803213cc0e8720365e7501bf5be105cbcd53594bba9b85d096ce3",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "One-time setup skill that builds a personalized inbox triage knowledge base via interactive interview. Interviews the user about their email patterns, business context, reply style, and priorities using grill-me discipline (one question at a time, forcing format where possible, dependency-ordered, each question explains why I'm asking), then generates the knowledge base files that power the companion 'inbox-triage' skill. Run this once before using inbox-triage for the first time. Re-run when business, pricing, or priorities change significantly. Triggers: 'set up my inbox', 'configure \u2026",
       "tools": [
         {
-          "script": "productivity/email/skills/inbox-setup/scripts/kb_validator.py",
+          "script": "skills/productivity/email/skills/inbox-setup/scripts/kb_validator.py",
+          "sha256": "46e75783845a0110e7a6081f6bd344730213155d7fbcc1b2c92fc31942c85b3c",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/email/skills/inbox-setup/scripts/kb_validator.py --help",
+              "cmd": "python3 skills/productivity/email/skills/inbox-setup/scripts/kb_validator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/email/skills/inbox-setup/scripts/kb_validator.py --sample",
+              "cmd": "python3 skills/productivity/email/skills/inbox-setup/scripts/kb_validator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/email/skills/inbox-setup/scripts/section_progress_tracker.py",
+          "script": "skills/productivity/email/skills/inbox-setup/scripts/section_progress_tracker.py",
+          "sha256": "0931080cdf0f72c8e51954cab7d495dbde3695f80b6c8add2606ae0bb4ae68a2",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 productivity/email/skills/inbox-setup/scripts/section_progress_tracker.py --help",
+              "cmd": "python3 skills/productivity/email/skills/inbox-setup/scripts/section_progress_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "productivity/email/skills/inbox-setup/scripts/voice_sample_analyzer.py",
+          "script": "skills/productivity/email/skills/inbox-setup/scripts/voice_sample_analyzer.py",
+          "sha256": "b59c150f5e5803213cc0e8720365e7501bf5be105cbcd53594bba9b85d096ce3",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/email/skills/inbox-setup/scripts/voice_sample_analyzer.py --help",
+              "cmd": "python3 skills/productivity/email/skills/inbox-setup/scripts/voice_sample_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/email/skills/inbox-setup/scripts/voice_sample_analyzer.py --sample",
+              "cmd": "python3 skills/productivity/email/skills/inbox-setup/scripts/voice_sample_analyzer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -284,57 +584,104 @@
         "close_out": true
       },
       "references": [
-        "grill_me_section_walk.md",
-        "kb_file_contract.md",
-        "voice_calibration.md"
+        "skills/productivity/email/skills/inbox-setup/references/grill_me_section_walk.md",
+        "skills/productivity/email/skills/inbox-setup/references/kb_file_contract.md",
+        "skills/productivity/email/skills/inbox-setup/references/voice_calibration.md"
       ]
     },
     {
       "name": "inbox-triage",
-      "path": "productivity/email/skills/inbox-triage",
+      "path": "skills/productivity/email/skills/inbox-triage",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "inbox-triage",
+        "skill_path": "skills/productivity/email/skills/inbox-triage",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/email/skills/inbox-triage/SKILL.md",
+            "sha256": "bf871f9e6f32ac4c251e03acc3da6dc789c60ff54b37e14f6b6ca5f30a000532",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/email/skills/inbox-triage/references/drafts_only_safety.md",
+            "sha256": "e0a5c473421bb6ce6da26193d91d480a0a0d84e11bb10816e6d025b03e11e754",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/email/skills/inbox-triage/references/kb_file_contract.md",
+            "sha256": "8e164b1b034a3614d7a77fdc49d02939f5bf5d8db5c5405d1829979382e50bd1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/email/skills/inbox-triage/references/triage_decision_framework.md",
+            "sha256": "834311527e985581d3da93e3c5943e23406ab6be14f7b44ac76f40977bfa0213",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/email/skills/inbox-triage/scripts/draft_safety_validator.py",
+            "sha256": "87955daf82fa9fc5c247c084e155c89b22fb4912eb2a2d326a9d20ab97d7c558",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/email/skills/inbox-triage/scripts/kb_reader.py",
+            "sha256": "6cd04475aeb1f0883881f51dac0576e8e4c9129e350d375ff75811e25e265fd5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/email/skills/inbox-triage/scripts/search_window_calculator.py",
+            "sha256": "cae2e994c1dff7d2676c2fb46e4b7b13ee7af8bd71ba5d612cb00b1b658530e1",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Runs a full inbox triage using the knowledge base created by the 'inbox-setup' skill. Light-intake by design (most invocations skip questions and run with KB-default preferences); asks at most 2 grill-me override questions when invocation is outside normal cadence or includes category-skip intent. Searches recent emails, classifies them via the user's taxonomy, researches new senders, generates recommendations, drafts replies (NEVER sends), delivers a report in the user's preferred format, and updates the knowledge base with learnings. Designed to run on a recurring schedule (1-3x daily) or \u2026",
       "tools": [
         {
-          "script": "productivity/email/skills/inbox-triage/scripts/draft_safety_validator.py",
+          "script": "skills/productivity/email/skills/inbox-triage/scripts/draft_safety_validator.py",
+          "sha256": "87955daf82fa9fc5c247c084e155c89b22fb4912eb2a2d326a9d20ab97d7c558",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/email/skills/inbox-triage/scripts/draft_safety_validator.py --help",
+              "cmd": "python3 skills/productivity/email/skills/inbox-triage/scripts/draft_safety_validator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/email/skills/inbox-triage/scripts/draft_safety_validator.py --sample",
+              "cmd": "python3 skills/productivity/email/skills/inbox-triage/scripts/draft_safety_validator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/email/skills/inbox-triage/scripts/kb_reader.py",
+          "script": "skills/productivity/email/skills/inbox-triage/scripts/kb_reader.py",
+          "sha256": "6cd04475aeb1f0883881f51dac0576e8e4c9129e350d375ff75811e25e265fd5",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/email/skills/inbox-triage/scripts/kb_reader.py --help",
+              "cmd": "python3 skills/productivity/email/skills/inbox-triage/scripts/kb_reader.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/email/skills/inbox-triage/scripts/kb_reader.py --sample",
+              "cmd": "python3 skills/productivity/email/skills/inbox-triage/scripts/kb_reader.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/email/skills/inbox-triage/scripts/search_window_calculator.py",
+          "script": "skills/productivity/email/skills/inbox-triage/scripts/search_window_calculator.py",
+          "sha256": "cae2e994c1dff7d2676c2fb46e4b7b13ee7af8bd71ba5d612cb00b1b658530e1",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 productivity/email/skills/inbox-triage/scripts/search_window_calculator.py --help",
+              "cmd": "python3 skills/productivity/email/skills/inbox-triage/scripts/search_window_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -349,28 +696,86 @@
         "close_out": false
       },
       "references": [
-        "drafts_only_safety.md",
-        "kb_file_contract.md",
-        "triage_decision_framework.md"
+        "skills/productivity/email/skills/inbox-triage/references/drafts_only_safety.md",
+        "skills/productivity/email/skills/inbox-triage/references/kb_file_contract.md",
+        "skills/productivity/email/skills/inbox-triage/references/triage_decision_framework.md"
       ]
     },
     {
+      "name": "explainer-graphic",
+      "path": "skills/productivity/explainer-graphic",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "explainer-graphic",
+        "skill_path": "skills/productivity/explainer-graphic",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/explainer-graphic/LICENSE",
+            "sha256": "968ab66963d0ad355fc13a92950cb8eecfb85c5bcfc2d9a70804f496cdedd324",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/explainer-graphic/SKILL.md",
+            "sha256": "5c91335a1a88f879357b9c2977e858e3c6cbc31f3ba130df166e9913ab1c9e54",
+            "role": "skill_body"
+          }
+        ]
+      },
+      "description": "Build one self-contained HTML page that explains a complex thing as a drawn mechanism with labeled parts, not decorated text. Trigger on \"explainer graphic\", \"explain this visually\", \"make an infographic\", \"draw how this works\", \"one diagram that explains it\", \"visual breakdown of\", or when someone is stuck on how a system works and a picture would do the job faster than prose.",
+      "tools": [],
+      "agentic_signals": {
+        "goal_intake": false,
+        "refusal_gate": false,
+        "verification": true,
+        "loop_discipline": false,
+        "close_out": false
+      },
+      "references": []
+    },
+    {
       "name": "fable-goal",
-      "path": "productivity/fable-goal/skills/fable-goal",
+      "path": "skills/productivity/fable-goal/skills/fable-goal",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "fable-goal",
+        "skill_path": "skills/productivity/fable-goal/skills/fable-goal",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/fable-goal/skills/fable-goal/SKILL.md",
+            "sha256": "3764113250bad205848a2b68f15c6d577b249eb3a7a491b365acf362b8e4df48",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/fable-goal/skills/fable-goal/references/goal_prompt_patterns.md",
+            "sha256": "8d423bf2f0c8b7eb91c416077d57f9ecdfd8962e4da4f435cb8c345ae4f28160",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/fable-goal/skills/fable-goal/scripts/goal_prompt_self_check.py",
+            "sha256": "f0ae906e30abcf0902b41b21bdfec9a99807fefab2ff4276eecd233965df25c2",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Convert a rambling description of a desired outcome into one polished, autonomous /goal prompt ready to paste into a fresh session. Use when the user says \"/fable-goal\", \"turn this into a goal prompt\", \"write me a fable prompt\", \"write the prompt that builds X\", or rambles about something they want made and asks for the prompt that makes it happen. The output is a single copy-paste prompt, never the build itself. Do NOT use when the user wants the thing built right now in this session \u2014 only when they want the PROMPT that will make it happen in a fresh session.",
       "tools": [
         {
-          "script": "productivity/fable-goal/skills/fable-goal/scripts/goal_prompt_self_check.py",
+          "script": "skills/productivity/fable-goal/skills/fable-goal/scripts/goal_prompt_self_check.py",
+          "sha256": "f0ae906e30abcf0902b41b21bdfec9a99807fefab2ff4276eecd233965df25c2",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/fable-goal/skills/fable-goal/scripts/goal_prompt_self_check.py --help",
+              "cmd": "python3 skills/productivity/fable-goal/skills/fable-goal/scripts/goal_prompt_self_check.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/fable-goal/skills/fable-goal/scripts/goal_prompt_self_check.py --sample",
+              "cmd": "python3 skills/productivity/fable-goal/skills/fable-goal/scripts/goal_prompt_self_check.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -385,200 +790,1292 @@
         "close_out": true
       },
       "references": [
-        "goal_prompt_patterns.md"
+        "skills/productivity/fable-goal/skills/fable-goal/references/goal_prompt_patterns.md"
       ]
     },
     {
-      "name": "handoff",
-      "path": "productivity/handoff/skills/handoff",
-      "description": "Compact the current conversation into a handoff document for another agent to pick up. Save to a user-configured location (OS temp, home folder, or per-project .handoff/), redact secrets before write, suggest skills for the next session, and auto-load the latest handoff on the next SessionStart. First-run setup asks where to save so the project folder never gets cluttered. Use when the user says 'hand this off', 'handoff doc', 'summarize this for a new session', 'compact this conversation', 'I'm ending this session', 'pick this up later', or any variation signaling intent to pass work to a \u2026",
-      "tools": [
-        {
-          "script": "productivity/handoff/skills/handoff/scripts/cleanup.py",
-          "wired": true,
-          "supports_sample": true,
-          "verification": [
-            {
-              "cmd": "python3 productivity/handoff/skills/handoff/scripts/cleanup.py --help",
-              "expect_exit": 0,
-              "kind": "smoke"
-            },
-            {
-              "cmd": "python3 productivity/handoff/skills/handoff/scripts/cleanup.py --sample",
-              "expect_exit": 0,
-              "kind": "sample"
-            }
-          ]
-        },
-        {
-          "script": "productivity/handoff/skills/handoff/scripts/config_loader.py",
-          "wired": true,
-          "supports_sample": true,
-          "verification": [
-            {
-              "cmd": "python3 productivity/handoff/skills/handoff/scripts/config_loader.py --help",
-              "expect_exit": 0,
-              "kind": "smoke"
-            },
-            {
-              "cmd": "python3 productivity/handoff/skills/handoff/scripts/config_loader.py --sample",
-              "expect_exit": 0,
-              "kind": "sample"
-            }
-          ]
-        },
-        {
-          "script": "productivity/handoff/skills/handoff/scripts/handoff_self_check.py",
-          "wired": true,
-          "supports_sample": true,
-          "verification": [
-            {
-              "cmd": "python3 productivity/handoff/skills/handoff/scripts/handoff_self_check.py --help",
-              "expect_exit": 0,
-              "kind": "smoke"
-            },
-            {
-              "cmd": "python3 productivity/handoff/skills/handoff/scripts/handoff_self_check.py --sample",
-              "expect_exit": 0,
-              "kind": "sample"
-            }
-          ]
-        },
-        {
-          "script": "productivity/handoff/skills/handoff/scripts/handoff_template_generator.py",
-          "wired": true,
-          "supports_sample": true,
-          "verification": [
-            {
-              "cmd": "python3 productivity/handoff/skills/handoff/scripts/handoff_template_generator.py --help",
-              "expect_exit": 0,
-              "kind": "smoke"
-            },
-            {
-              "cmd": "python3 productivity/handoff/skills/handoff/scripts/handoff_template_generator.py --sample",
-              "expect_exit": 0,
-              "kind": "sample"
-            }
-          ]
-        },
-        {
-          "script": "productivity/handoff/skills/handoff/scripts/redaction_linter.py",
-          "wired": true,
-          "supports_sample": true,
-          "verification": [
-            {
-              "cmd": "python3 productivity/handoff/skills/handoff/scripts/redaction_linter.py --help",
-              "expect_exit": 0,
-              "kind": "smoke"
-            },
-            {
-              "cmd": "python3 productivity/handoff/skills/handoff/scripts/redaction_linter.py --sample",
-              "expect_exit": 0,
-              "kind": "sample"
-            }
-          ]
-        },
-        {
-          "script": "productivity/handoff/skills/handoff/scripts/setup.py",
-          "wired": true,
-          "supports_sample": true,
-          "verification": [
-            {
-              "cmd": "python3 productivity/handoff/skills/handoff/scripts/setup.py --help",
-              "expect_exit": 0,
-              "kind": "smoke"
-            },
-            {
-              "cmd": "python3 productivity/handoff/skills/handoff/scripts/setup.py --sample",
-              "expect_exit": 0,
-              "kind": "sample"
-            }
-          ]
-        },
-        {
-          "script": "productivity/handoff/skills/handoff/scripts/skill_recommender.py",
-          "wired": true,
-          "supports_sample": true,
-          "verification": [
-            {
-              "cmd": "python3 productivity/handoff/skills/handoff/scripts/skill_recommender.py --help",
-              "expect_exit": 0,
-              "kind": "smoke"
-            },
-            {
-              "cmd": "python3 productivity/handoff/skills/handoff/scripts/skill_recommender.py --sample",
-              "expect_exit": 0,
-              "kind": "sample"
-            }
-          ]
-        }
-      ],
+      "name": "grill-me",
+      "path": "skills/productivity/grill-me",
+      "invocation": "user_only",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "grill-me",
+        "skill_path": "skills/productivity/grill-me",
+        "invocation": "user_only",
+        "files": [
+          {
+            "path": "skills/productivity/grill-me/.vendor-owned.json",
+            "sha256": "c2f4b6699f0621503fc30da59e5194c4400c3ddfeb9ceb1cf3c9789642d16968",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/grill-me/ATTRIBUTION.md",
+            "sha256": "db01c80fa17f6478a40f8b6caea9f338ccf50d019cd4470879cd380350c3581a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/grill-me/LICENSE.upstream",
+            "sha256": "461ed8a4bdb048a3472ac2a43060e96e326770d595645d54b940b594c0aae674",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/grill-me/PROVENANCE.md",
+            "sha256": "b2bba3832c72ef07767eff2144d533dca873522163fe4825dd2c8ad9024e9bee",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/grill-me/SKILL.md",
+            "sha256": "caaf8b8de1684f96e26b28f3c29189db5c89cce4b73e1c93d86164f66ef88637",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/grill-me/agents/openai.yaml",
+            "sha256": "c061e39c3e0f9d865fb1b97556d485704af2a8a58f4b8221a8917a5c2074a32b",
+            "role": "codex_invocation_metadata"
+          }
+        ]
+      },
+      "description": "A relentless interview to sharpen a plan or design.",
+      "tools": [],
       "agentic_signals": {
         "goal_intake": false,
-        "refusal_gate": true,
-        "verification": true,
+        "refusal_gate": false,
+        "verification": false,
+        "loop_discipline": false,
+        "close_out": false
+      },
+      "references": []
+    },
+    {
+      "name": "grilling",
+      "path": "skills/productivity/grilling",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "grilling",
+        "skill_path": "skills/productivity/grilling",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/grilling/.vendor-owned.json",
+            "sha256": "4f69decb4f3b93742943a0ec5a19f6d0c35146a5987e8646cf000661cf067461",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/grilling/ATTRIBUTION.md",
+            "sha256": "436ebe0b7de2fd1e417a3cdfb59503a7499f980ca511710488e2a0185657d319",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/grilling/LICENSE.upstream",
+            "sha256": "461ed8a4bdb048a3472ac2a43060e96e326770d595645d54b940b594c0aae674",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/grilling/PROVENANCE.md",
+            "sha256": "56f8ed72df34a9e64ac938cf140c60daa9b41c43da87230593f2a04f62112260",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/grilling/SKILL.md",
+            "sha256": "10ff989e7498b23b5acb49d5048f11dcd906757d2f79c5cdf8a00001381296f2",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/grilling/agents/openai.yaml",
+            "sha256": "1411d7df7d99b7e621a1ff8283c8133cc2464be63d064e52d8ce169c6800ee9b",
+            "role": "codex_invocation_metadata"
+          }
+        ]
+      },
+      "description": "Grill the user relentlessly about a plan, decision, or idea. Use when the user wants to stress-test their thinking, or uses any 'grill' trigger phrases.",
+      "tools": [],
+      "agentic_signals": {
+        "goal_intake": false,
+        "refusal_gate": false,
+        "verification": false,
+        "loop_discipline": true,
+        "close_out": true
+      },
+      "references": []
+    },
+    {
+      "name": "handoff",
+      "path": "skills/productivity/handoff",
+      "invocation": "user_only",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "handoff",
+        "skill_path": "skills/productivity/handoff",
+        "invocation": "user_only",
+        "files": [
+          {
+            "path": "skills/productivity/handoff/.vendor-owned.json",
+            "sha256": "a6c8d244a32e0a0b6bb8e4f2638bc5e40834c268c8124f26ab2e8d273dad7a47",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/handoff/ATTRIBUTION.md",
+            "sha256": "f3d2b1d87d291b02a93138c263a3050e832096722441291271bfb2fb19d5a17c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/handoff/LICENSE.upstream",
+            "sha256": "461ed8a4bdb048a3472ac2a43060e96e326770d595645d54b940b594c0aae674",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/handoff/PROVENANCE.md",
+            "sha256": "68cd75bb8efd8b5b965901370c54bc07daeb8e207dcb663928f53323cbd946fd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/handoff/SKILL.md",
+            "sha256": "7c62de979fdc7ac32fb5ddb2146156c917f80ee070d30fadc9d40343c4b6ed25",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/handoff/agents/openai.yaml",
+            "sha256": "5c479fd562c691851690e8b18c8501045bef0943c10743d636b2fae26add1d28",
+            "role": "codex_invocation_metadata"
+          }
+        ]
+      },
+      "description": "Compact the current conversation into a handoff document for another agent to pick up.",
+      "tools": [],
+      "agentic_signals": {
+        "goal_intake": false,
+        "refusal_gate": false,
+        "verification": false,
         "loop_discipline": false,
         "close_out": true
       },
+      "references": []
+    },
+    {
+      "name": "management-consultant",
+      "path": "skills/productivity/management-consultant",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "management-consultant",
+        "skill_path": "skills/productivity/management-consultant",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/management-consultant/CITATION.cff",
+            "sha256": "1eebb074cdda12a8577ececa5698302cb5034f908ec559dc097807e912603ad2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/LICENSE",
+            "sha256": "88cff4934d3821799714329ac2ac7dabe50701d3ded5c8e2e2e10bdde14a1ca0",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/NOTICE",
+            "sha256": "6ca55e149a7d689d98d66c0709f6c092529266fbcea0068acceefa5f7798f75d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/SKILL.md",
+            "sha256": "c973279f04b5c0c2b44557f8bd443b937736765f184883c520395ebf9a036266",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/gov-harshad-mehta-market-manipulation.md",
+            "sha256": "4e0ac3951f48bfbacf1a718df7f866d6dffcc8dc39e9f3608d51819105dab1b9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/gov-ilfs-shadow-bank-collapse.md",
+            "sha256": "b6985931559b4d9a5f7fd67e79fae8841cbbb2ed6c490a4bd63d9ce596187b1d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/gov-insider-trading-and-front-running-india.md",
+            "sha256": "332c6ea3dd2009dc898c9806a0631db5a7730b166a0d039e2b64802e726248e4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/gov-kingfisher-willful-default.md",
+            "sha256": "0c0bdded1067a34674abaf1856e5985c672e6ec28d0fae907b04d644d2603bd7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/gov-satyam-accounting-fraud.md",
+            "sha256": "03b863c4b8e34bdc355b4f2d236e58ea24f3996f385f45f7f2e396ac2bd2926e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/ma-apollo-athene-merger.md",
+            "sha256": "19832edb3b7042fd06a3711080a3132db07b7acfbf5e90f2d424d4b196b1d172",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/ma-bofa-merrill-lynch.md",
+            "sha256": "1d759bc74ba94279952e2939e549b235a3eaac7be04a9c9082836f23daf35734",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/ma-broadcom-qualcomm-national-security-block.md",
+            "sha256": "b97fcd1e64cf35af2ebc51f8c09aa8b0db13b3048dd419e0d866f2190f4bbd4d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/ma-inbev-anheuser-busch-hostile-takeover.md",
+            "sha256": "4394f45fe4591aae654dd219a0aaf713c7148d2e715da4c1310fa52c4423efa4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/ma-kraft-heinz-merger.md",
+            "sha256": "1cfc7d8d09141d26d3882c55e085b0924fc028ec4efae0ac674355c1181bfd75",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/ma-mars-kellanova.md",
+            "sha256": "ec60726e2fe8a21d2986f078800c08ea2c11ef83bb07111e5d9e5ed556e00178",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/ma-microsoft-activision-blizzard.md",
+            "sha256": "661d3acd68e79675e23a4d58ce83b8b164c244b80c4d152d11c4061d9f2a9aed",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/ma-salesforce-slack.md",
+            "sha256": "4ace477d75d2819e981e42b475b520183d75bfd56f142fd695b42285659173f7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/ma-takeda-shire.md",
+            "sha256": "6615bf9d351a912c50282c132733a74855e55f36b52fa287cef600a74db84af4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/ma-valeant-allergan-hostile-takeover.md",
+            "sha256": "c9327feeb6bcc677ac06c3ace12e808791cfd165e50b3eb293e59731589687a7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/case-studies/ma-vodafone-mannesmann-hostile-takeover.md",
+            "sha256": "4b5ba802ae9d7dbbdd03765fb25532b0dba9d70271ef710d8fa4f3017d090313",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/ai-ml-analytics.md",
+            "sha256": "228dda0d0c1255d0443c3eaa74ea392451836b60a60993d46d62b18466b5708b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/ai-orchestration.md",
+            "sha256": "05d5a1f03097c147df9ce02cd4b159c3d3e9dddb5fb8c4c4bd0ca50147460f15",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/behavioral-change-design.md",
+            "sha256": "50b5d511099bc8ca985fa6f57dc0c695a3650740475dae091297acbae1ffdf91",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/behavioral-fit-interview.md",
+            "sha256": "c14603711f834198be9fd77cf7c14c001560d2e3a6c497613a28a9b61c29a770",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/benefits-realization-tracking.md",
+            "sha256": "227de8c05fc1795663cf73abcf2499606babb8dbd5bb230cb0e93cbee4bd9545",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/board-communication-and-decision-support.md",
+            "sha256": "595ddc7ffaa18f5a2ef1a7840cf522f91c97ff799e1d166c7ed6487d85f1c871",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/board-governance-future.md",
+            "sha256": "ed54a530d189e15edd3e83bbd78cb34fd5389961d38194c28296ea8125b80bce",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/business-development.md",
+            "sha256": "c18414b4782dd769e5133705dfb57caf4ea3972b7f4b8f109f23213f7571e1cc",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/capability-assessment-talent.md",
+            "sha256": "e05e0e076ee7e950480ea975bd7d730c884782a10007edc9e24486016e1d1392",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/case-bank-interview-classics.md",
+            "sha256": "d272ccbcfedcb360320e5f2f81c364ef62e8e238cddb85fb6a41f39fde627280",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/case-cracking-drills.md",
+            "sha256": "b5cb3e3ceee03eaf2faeb941eff28762fbfba7f0639e73715ee4598c0a2bfaf1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/case-facilitation-and-scoring.md",
+            "sha256": "8dac536f62fcef97b1d9285e5f954c4ba34c4e126cd2cc1e455a2cd1ac17a9c3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/case-interview.md",
+            "sha256": "e8b7b7b76a2db5e6159f3049159ef651bac523a9dc4f19d5c3eb4c0d23528da1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/case-pattern-library.md",
+            "sha256": "93040b55aaafcf6b506b7fc885aea03f01f1d9568cf25d650dec742f19fd71ed",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/case-types.md",
+            "sha256": "3599fd58e7cb92850d9bfb2e8cdb9c3f3fd6c07222693f06cc303c3461bf15e6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/ceo-board-agenda.md",
+            "sha256": "75ad1bd61a7a6e895ee2c0e8f88097e3cc14e6c69272a16e7e47358c9c874736",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/change-management.md",
+            "sha256": "1a19715437a16e4be0cb1b8f4de4a8df1e99dae78dd384aa61ee7afd6a0e8486",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/client-management.md",
+            "sha256": "2ce9842e5a4047c1626394f6d393869bbf41a71b48224e5fee429ba30133c39f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/client-political-mapping.md",
+            "sha256": "cc21a40e7b724f92a6ff65a93852d5fc9cf875b5d35d9eb26ed81d175985bc97",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/climate-netzero-implementation.md",
+            "sha256": "ce9100ce25c009243300a766cdfb6f2298359e844aa39fa2c8b0845d168c1fa8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/commercial-contracting.md",
+            "sha256": "fead90490dbfd12f762c028d9d5893cd62c1750b473b0d40bb9ca2f5c39b53dd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/commercial-dd-market-sizing-shortcuts.md",
+            "sha256": "0bdd5ff3ec3f5bacb7294a051af72153080ab7a6a0bdbbd7c92e8caede3c6763",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/communication-under-pressure.md",
+            "sha256": "1c406151f2e9c03ca7a99ba0e0f8fb2712266ad784a6b84113813626db5ee4a1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/competitive-intelligence.md",
+            "sha256": "3a866f6654b725e915e3051145ed6a982ceebef39575eab48d8a5b5fb0aa2b48",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/consulting-career.md",
+            "sha256": "5627c4d6eb679bc68fddbbe68532d0d8aa0c58b88f4bc3352f5f550a869d35c4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/consulting-negotiation-fee-anchoring.md",
+            "sha256": "4ad5380951834967cd3870aaa0631431bd0f683b9624a05d5d6002edaaedf697",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/consumer-retail-cpg.md",
+            "sha256": "3c970e2411f5bdddce2831bbb657584bd6e0263775e6f7691851348f61008246",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/context-adaptation.md",
+            "sha256": "1e3a2f7a7a1dd520a6340a179bab8009d8041f6bb3f390ba1a0a1019b59e3aaf",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/corporate-restructuring-financial-distress.md",
+            "sha256": "3ae5e37924ea9b235c93202d0aaf0dfbdf2dcaf266a1363ae49cdb28f8242ed0",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/corporate-strategy.md",
+            "sha256": "9018a5a7f508fafb26ef9519cdbb7ff6278e6d8b91e72c93e614b252aea81519",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/cost-restructuring-anatomy.md",
+            "sha256": "92b77761b6135989340b22a23eef199ffe83caaf06c1a0f710140bcd9fb91646",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/cross-border-ma-execution.md",
+            "sha256": "6cbc7e17fe4b8ce43cf33f0f4babdab1403d5c351f28e7c259e20142d6f26bb5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/cross-industry-pattern-recognition.md",
+            "sha256": "cc225bfe4f861f1fd05840b3f6059d478f7041800073beaab3547ea0385962aa",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/data-room-speed-reading.md",
+            "sha256": "782aa212caf801f23117c5e840430af88db76281350063d086f2b4276e7def9b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/data-visualization.md",
+            "sha256": "b45191ddf72e4fdbcef516f9e887afb37c9c6415462dd6e8f811e64e8b71cbf5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/decision-making-under-uncertainty.md",
+            "sha256": "5542c633f5b3a19c20ae3819212b830908457eac4ad9f3820ceedbe280b648c4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/decision-rights-architecture.md",
+            "sha256": "5449efc3db70795675ee86f170c0d7517c216c1d542f7f5453e560127a546c4f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/deliverables.md",
+            "sha256": "d7cb88a8f200ece041782cf47533273a12391b04f4e3fde98caf77f80be572c9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/due-diligence-deep-dive.md",
+            "sha256": "ee15c20c6508e08ff9b368df730b25483455a35b4cbdee5a2d783c7e7f469914",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/ecosystem-alliance-strategy.md",
+            "sha256": "20e4db5784a951f44a682d0975030f79430d7b4761c81fb53d42b3829addaf0b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/email-written-communication.md",
+            "sha256": "9444c85d9bde197eae9398224585ba9909807559bd082718f57e9f048dd4aa9b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/emerging-demand-archetypes.md",
+            "sha256": "d80ff68986ff7d224be8568ea954f78e7815c6f4489162fe0809a3773d87a0e2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/emerging-markets.md",
+            "sha256": "b5791e4eb3b46b1e49988dbfcdd549df61fe2ca01741dab1e30fcfa710bf59dd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/energy-resources-utilities.md",
+            "sha256": "2e938bbe4b0dff4c0e17008b54452ffbd12bd45a9a918fae80608fbc62e46079",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/engagement-management.md",
+            "sha256": "fc9230f20dcb940da2b8914fdc9f04b5e73487e3d4f4adf3ee1a5117e077e001",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/erm-quantitative-risk.md",
+            "sha256": "41d016b73ff2d18bd0a382bbf042a02ecceb6c38d4c0b1f3c340ae436b18a663",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/esg-sustainability.md",
+            "sha256": "300dfc47a8733fe5d9cba6af49da5c167ff6dab16dee0e12ba7de226d42b2a79",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/executive-presence-senior-room.md",
+            "sha256": "2c3f8837187a9b92c2e3da9f1df297b5c1391ac3a0ecfd8b98ce9143a0e0a0fb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/executive-presence.md",
+            "sha256": "78859a104d77ba07eec6dde03484d0099822438280258913ddd7ac49dff1bc6b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/expert-networks-primary-research.md",
+            "sha256": "59f4a915aa248d3ff1bff63378a37414cbf6cfab8fef73e374dd635be05ff27a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/financial-services.md",
+            "sha256": "438dd760b628a8af3d7cf731233756819b495f879df57cd3280653d88ebebe01",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/first-principles-thinking.md",
+            "sha256": "cf771ff8f2a6f13f5d95176b8f71530b0a7fac4d2b23ccd516e2917479ac2449",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/fit-pei-drill-bank.md",
+            "sha256": "773de05b8b1106e28fb88768a1aaf3a43280d91ac0f510dbec2b4c5238c3b9de",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/frameworks.md",
+            "sha256": "1d8e0860187cea11265379e55d75490e26e4334840b368dc1f71b03ce9f86985",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/functional-deep-dives.md",
+            "sha256": "03ad2d5f8750a05e6c87e8e78ee5652282641caee830e948e7594143cd6e8db6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/genai-enterprise-strategy.md",
+            "sha256": "b16ba02ab852e2be92a1fce7a99bf6d806709d29ac2017213252e557f3ad8e5d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/guesstimates-and-frameworks-quantified.md",
+            "sha256": "b3a0c3ff4ac6a7042dfd15ab8600e2d26665238b949cedd9268cdcc563fc8c49",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/guesstimation.md",
+            "sha256": "b349ce9e7b64454ce90040d2b89a2854885dda1477393f630fffd94a619cb796",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/healthcare-life-sciences.md",
+            "sha256": "c5f0d5b4dc7b06e99ecdec8a602ba4fa065384fe7510ab3bc8e38e39393261bb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/hospitality-travel-leisure.md",
+            "sha256": "5d54d98d66544003e00bda2543309190670865f0d59e93dca1500f7b3aea6c91",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/hypothesis-invalidation-discipline.md",
+            "sha256": "ef1b5a136237ac87129e8ced3760f1e0c1d90fb7ac22392aa827b69036cdd44f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/implementation-pmo.md",
+            "sha256": "e01ff73ec29f0d08d3a62081e75b794d39324d763f8c35c3f53c78df2e014db3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/implementation-practitioner.md",
+            "sha256": "8ce08e2b1995fb54076503a89d9e705092c49ee1a3ea43957133d61abcbe9e15",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/india-corporate-houses.md",
+            "sha256": "e64e3f4c7f02d4517e9c9054166955b0fa00a45f633025ca3ea4199e46a5e5e4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/india-guesstimates-and-cases.md",
+            "sha256": "e73e5c5b49228e6f08a1369df75b55ffcffede0b9e3e24ccf8498ade0eaa1b5b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/india-pm-cases.md",
+            "sha256": "a0d39f15c9d8f9e927fca1f59857e2701b48ceaf19aa14b46779ec808c35476c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/india-sector-primers.md",
+            "sha256": "0f44e713b1f9cf3dde79413865a10268859f944555fb86d9c62d8331114f3c51",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/industrial-manufacturing.md",
+            "sha256": "0465cd603ae50d88eec5ecb926ee0e3db727a798f7e25f0c4d9c7939b36e3e37",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/industry-heuristics.md",
+            "sha256": "5b3b28503298c42f912fc2543ad2ff6af34b341ff85019bafb4ef368ff4b89bc",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/industry-intelligence.md",
+            "sha256": "e4fdf3dfeffab5eeeed603808a5035ea71e224b7569c45ad77988a1f2845f9ae",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/insight-to-action-translation.md",
+            "sha256": "5992b5cfb2629d0fdaf3b8b1819021f511da0be39c938b0c32cfa5f4cb61669f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/issue-hypothesis-trees.md",
+            "sha256": "482148d416beccf742931fdf1c9a72bee6a80a89acaa57cb409d96bf75e024a7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/knowledge-management-pkm.md",
+            "sha256": "31e35d9219f42a36d5b216774a543964809f6a24c2852e34e0b36817a8ab0428",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/learning-flywheel.md",
+            "sha256": "2f8a64272e0774c1009de6495a49592e2efe86aebf50221f0160069555fc6b47",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/logic-and-synthesis.md",
+            "sha256": "6bb68b03784ad9ca1c9f920ac29db7916d86f9e04a41bf8a0c12b67e07dea5fa",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/managing-analysts.md",
+            "sha256": "2f68f246db0b994648828f55a2dcfbdb01b45b6a915676679187c76b0ceaa092",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/managing-up.md",
+            "sha256": "1275a3af65ee034563c3a626e50f407a945d345d76cb82227209237af97e8dbf",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/mckinsey-style-problem-solving.md",
+            "sha256": "95cc6336d8ecf7a93deb25e6f9db6f6ef08f9fe65538307a25819b77467c1a23",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/mental-models.md",
+            "sha256": "dc319ac54ef4007743a02a87aaf5b3583e5e3eacdeab72b87f23c8b40f0aa5e8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/mergers-acquisitions-fundamentals.md",
+            "sha256": "280f973418db7f13deae3e0e9ad47d9b63c71acab60dc186637a615df5f1776f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/micro-skills-executive-presence.md",
+            "sha256": "3134201a86da8e90038c5e92d64eddeedb0eab06b2fa6f83ba45e728ccf52426",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/negotiation-practitioner.md",
+            "sha256": "4734794fbd6b8a5fb21f13c710770dc4a9d4b3d4e5959eb51db9cac6b0b8212d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/negotiations.md",
+            "sha256": "134edf7f6ade3e78b22adfe56469867664d63b7ff9b01d044f7aea3cb20c61dd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/operating-model-translation.md",
+            "sha256": "77c304fa0af03ccea348785f6183fabdd54aa65790cb4e5293f4f701ebfbb8e3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/org-design-workforce.md",
+            "sha256": "a6b19cecbabfb2f53632315e433121e762aad6df64cbaf73e869fbf7cec2e8e2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/output-craft.md",
+            "sha256": "4c87f5354e959e3edb3b0befe99598e25ea229ab1716f882d4ef5e4c0e9514ea",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/pe-context.md",
+            "sha256": "05a292869fb8077d5cfc910e7ea46c520a339aa3dbd19618dc7642cc1cf2c70d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/post-merger-integration.md",
+            "sha256": "cd2e88d613f65fb45389362d93d87925f84325997935bb9506a8b8604b6f9234",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/practice-cases-quantified.md",
+            "sha256": "36b32040a97b41bf84747c0abf7d42a4ea538abe8730ebc9a092d8b084ae215a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/pricing-architecture-consulting.md",
+            "sha256": "155b061a88e0cc4333d52b7fdaf3d449e98afa83c73c262d1027060df46e6e60",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/pricing-revenue-management.md",
+            "sha256": "43ab0684fdd4770182e85664667e7b86f7fd314ebf1e472db019454e84f8c70e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/pricing-strategy.md",
+            "sha256": "807476381255185d1d471ca6ad4eefbe9a4938bf98954d2ad04bea1b431bf043",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/problem-playbooks.md",
+            "sha256": "2306d42b620d7c0f298ce4406dadba709509f2773629bf511ea8a147aac76418",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/problem-solving.md",
+            "sha256": "b2148cfa6adf2fff1146c6b5ab8e516bf7af4e2d52dbc8a1286b2f539076d1e6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/process-mining-operational-intelligence.md",
+            "sha256": "8f69cc477e6da486507393ad49a04729eb17bb3cce562f8be9010c74260e0f81",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/product-management-toolkit.md",
+            "sha256": "9479d78841d8d3fed2af4050e03c00a1f523dd932c20ac1f001a708bf798bb4c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/product-thinking-digital.md",
+            "sha256": "492c5cdd0d446814d6e7afb3813ae2a26abad800c3fe0ac68d640e51b66f82e2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/proposal-writing.md",
+            "sha256": "032afedde6e7b6d76c908f6bbecc7dae191ebc4cc512e269d641ee41adf6d728",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/public-sector-government-defense.md",
+            "sha256": "94057d353ec5d82976172b42cb17438bc558a61809bdc8aa506a21c3e1d3c875",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/pyramid-principle-and-scqa.md",
+            "sha256": "63f6d2311ffbef019c0be57d09b11d6ac6792ed032074d6001c8bf61fda70e89",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/pyramid-to-diamond.md",
+            "sha256": "1926ea80cde9063d313f2df2f67d319cf9e6becbfe3c017e4524529576f9cd63",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/qualitative-analysis.md",
+            "sha256": "70dc9261f83e1d55d11a9d91c3dc2d62d34c965d5cd5d2c39ac6b92fa30a050f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/quantitative-analysis.md",
+            "sha256": "9227206729a689aa3d21263083b84b6e7239059217574fa8779ccd3adca05730",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/quantitative-toolkit.md",
+            "sha256": "bbad63346cbcd2961d6c265449795e69e8e0d66f7933a3a040bd8b6c62267be9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/real-estate-infrastructure.md",
+            "sha256": "bdaef3d48ff6905e2cbd060f1a26f4c48aa534a3f8bbecd8dc47e91d233b3868",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/regulatory-intelligence-horizon-scanning.md",
+            "sha256": "0a38f70655426454c3dc37134326068e50517b95a9ccd263119d7de7ae876044",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/research-and-interviewing.md",
+            "sha256": "bfd53f05c71d6f048419b2df5629dcf387f6256e69219613f3f4e201fd3715a3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/sales-force-effectiveness.md",
+            "sha256": "2c0e4df908adb4cf68bc910dd98564527caa17bdd9720199f21ff563f5d67a87",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/scenario-planning.md",
+            "sha256": "c93a90be8bb85caf3b4c89be5f2c0978e19a62839e41cac37311acd02e4806eb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/scope-creep-advanced-governance.md",
+            "sha256": "081e358607443024b8da0cbc9820b923bd035e6180eec44fa062701d8b437f94",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/situation-room-facilitation.md",
+            "sha256": "5fe226e24f80a65c5da1b62a690b8474a1f8a959d1fe529210510f6606ed8ea5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/spa-deal-terms-benchmarking.md",
+            "sha256": "f21ecd00b1c8a97d501321026ddda72deb6a0f8e480439674c8b0418ce71e7a9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/sql-for-pm-analysts.md",
+            "sha256": "62343c57babbfb69ba79c011be23d2626eaf89b3ef4667d032e35fe5796ec623",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/stakeholder-interviewing.md",
+            "sha256": "33fe8ebf9e3186728f4c72a13153ea6e4eeb03734c3c78867e21dcc373cef6a0",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/stakeholder-mapping.md",
+            "sha256": "8ac5ebaa8b1f2612da6f425a9d28efd1855744ec4fd6775065f0a57474673966",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/storylining.md",
+            "sha256": "d9ca5ccc6114bab436ed62b0bf280497d95e3122457ccbf20f86757dc4bf9694",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/structured-case-approach.md",
+            "sha256": "13f3c1c6e3527de1280826d77f4647e07cf01271c15952c17f224fe72135877d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/structured-verbal-communication.md",
+            "sha256": "5425198d05de13fe58ef972178c15e7ef05a0495c2f925e41ee2a9c73ba9e874",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/synergy-modeling-validation.md",
+            "sha256": "04cda1b6f49f8f70fd5cf25760aa595f450271447ff7e6c377648ae5b9fab631",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/tactical-empathy-trust.md",
+            "sha256": "98fb1854db47b29b129b7684ea202045d3a433d6c28e0f78976a2a8bf18da6c6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/technology-media-telecommunications.md",
+            "sha256": "3e54c12f9a7dc1391d1f11ac33271e4b3197d81dbfd91d9e1d2ca69712d47a4d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/technology-vendor-selection.md",
+            "sha256": "ebac5ee6d1e7407ca218ff9f638eba47129b4c4703a5e4a77c92b7e626565a79",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/tools-and-analysis.md",
+            "sha256": "1aeb0495d8fa7b9e383f27da989f95bc3ced7f88430ba49f09fc0beceed80d50",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/transformation-program-architecture.md",
+            "sha256": "b8c77af5d47430ffc1283f26657d709f1244b084d482d7458c23ab5ad5340f89",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/universal-business-analysis.md",
+            "sha256": "a32445eb0fbef185e1cd5584f2f56e69ef0203721a66960d45c02195ec26ee03",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/value-creation-measurement.md",
+            "sha256": "418f501eb897ec6d43884092fb77503646f5a588d1ae1f676fc250201336ef88",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/wellness-resilience.md",
+            "sha256": "b43f565f91475a1d63c5e806610d1a5d37ab5d657776e65033ea007190f77a86",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/workshop-facilitation.md",
+            "sha256": "b633113d33d00a0339127f8273f28e579a19b659d5919dc4c55c999e6bbf9fc5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/management-consultant/references/zero-based-org-design.md",
+            "sha256": "3a7537196fa8817a1d9aed6712658c8d50b6a2fb756e7384879d1368d9d849ba",
+            "role": "owned_resource"
+          }
+        ]
+      },
+      "description": "MBB-level management consultant with mastery over structured thinking, frameworks, guesstimation, industry analysis, and executive-grade deliverables. Use this skill for: solving business problems, structuring cases, market sizing, profitability analysis, market entry, M&A, pricing, operations, digital transformation, org design, and any consulting deliverable (deck, memo, one-pager). Trigger on: \"consulting framework\", \"MECE\", \"issue tree\", \"hypothesis-driven\", \"80/20\", \"McKinsey\", \"Bain\", \"BCG\", \"strategy consulting\", \"management consulting\", \"problem statement\", \"root cause\", \"executive \u2026",
+      "tools": [],
+      "agentic_signals": {
+        "goal_intake": true,
+        "refusal_gate": false,
+        "verification": true,
+        "loop_discipline": true,
+        "close_out": true
+      },
       "references": [
-        "configuration.md",
-        "deduplication_discipline.md",
-        "handoff_prompt.md",
-        "handoff_structure.md",
-        "redaction_checklist.md"
+        "skills/productivity/management-consultant/references/ai-ml-analytics.md",
+        "skills/productivity/management-consultant/references/ai-orchestration.md",
+        "skills/productivity/management-consultant/references/behavioral-change-design.md",
+        "skills/productivity/management-consultant/references/behavioral-fit-interview.md",
+        "skills/productivity/management-consultant/references/benefits-realization-tracking.md",
+        "skills/productivity/management-consultant/references/board-communication-and-decision-support.md",
+        "skills/productivity/management-consultant/references/board-governance-future.md",
+        "skills/productivity/management-consultant/references/business-development.md",
+        "skills/productivity/management-consultant/references/capability-assessment-talent.md",
+        "skills/productivity/management-consultant/references/case-bank-interview-classics.md",
+        "skills/productivity/management-consultant/references/case-cracking-drills.md",
+        "skills/productivity/management-consultant/references/case-facilitation-and-scoring.md",
+        "skills/productivity/management-consultant/references/case-interview.md",
+        "skills/productivity/management-consultant/references/case-pattern-library.md",
+        "skills/productivity/management-consultant/references/case-types.md",
+        "skills/productivity/management-consultant/references/ceo-board-agenda.md",
+        "skills/productivity/management-consultant/references/change-management.md",
+        "skills/productivity/management-consultant/references/client-management.md",
+        "skills/productivity/management-consultant/references/client-political-mapping.md",
+        "skills/productivity/management-consultant/references/climate-netzero-implementation.md",
+        "skills/productivity/management-consultant/references/commercial-contracting.md",
+        "skills/productivity/management-consultant/references/commercial-dd-market-sizing-shortcuts.md",
+        "skills/productivity/management-consultant/references/communication-under-pressure.md",
+        "skills/productivity/management-consultant/references/competitive-intelligence.md",
+        "skills/productivity/management-consultant/references/consulting-career.md",
+        "skills/productivity/management-consultant/references/consulting-negotiation-fee-anchoring.md",
+        "skills/productivity/management-consultant/references/consumer-retail-cpg.md",
+        "skills/productivity/management-consultant/references/context-adaptation.md",
+        "skills/productivity/management-consultant/references/corporate-restructuring-financial-distress.md",
+        "skills/productivity/management-consultant/references/corporate-strategy.md",
+        "skills/productivity/management-consultant/references/cost-restructuring-anatomy.md",
+        "skills/productivity/management-consultant/references/cross-border-ma-execution.md",
+        "skills/productivity/management-consultant/references/cross-industry-pattern-recognition.md",
+        "skills/productivity/management-consultant/references/data-room-speed-reading.md",
+        "skills/productivity/management-consultant/references/data-visualization.md",
+        "skills/productivity/management-consultant/references/decision-making-under-uncertainty.md",
+        "skills/productivity/management-consultant/references/decision-rights-architecture.md",
+        "skills/productivity/management-consultant/references/deliverables.md",
+        "skills/productivity/management-consultant/references/due-diligence-deep-dive.md",
+        "skills/productivity/management-consultant/references/ecosystem-alliance-strategy.md",
+        "skills/productivity/management-consultant/references/email-written-communication.md",
+        "skills/productivity/management-consultant/references/emerging-demand-archetypes.md",
+        "skills/productivity/management-consultant/references/emerging-markets.md",
+        "skills/productivity/management-consultant/references/energy-resources-utilities.md",
+        "skills/productivity/management-consultant/references/engagement-management.md",
+        "skills/productivity/management-consultant/references/erm-quantitative-risk.md",
+        "skills/productivity/management-consultant/references/esg-sustainability.md",
+        "skills/productivity/management-consultant/references/executive-presence-senior-room.md",
+        "skills/productivity/management-consultant/references/executive-presence.md",
+        "skills/productivity/management-consultant/references/expert-networks-primary-research.md",
+        "skills/productivity/management-consultant/references/financial-services.md",
+        "skills/productivity/management-consultant/references/first-principles-thinking.md",
+        "skills/productivity/management-consultant/references/fit-pei-drill-bank.md",
+        "skills/productivity/management-consultant/references/frameworks.md",
+        "skills/productivity/management-consultant/references/functional-deep-dives.md",
+        "skills/productivity/management-consultant/references/genai-enterprise-strategy.md",
+        "skills/productivity/management-consultant/references/guesstimates-and-frameworks-quantified.md",
+        "skills/productivity/management-consultant/references/guesstimation.md",
+        "skills/productivity/management-consultant/references/healthcare-life-sciences.md",
+        "skills/productivity/management-consultant/references/hospitality-travel-leisure.md",
+        "skills/productivity/management-consultant/references/hypothesis-invalidation-discipline.md",
+        "skills/productivity/management-consultant/references/implementation-pmo.md",
+        "skills/productivity/management-consultant/references/implementation-practitioner.md",
+        "skills/productivity/management-consultant/references/india-corporate-houses.md",
+        "skills/productivity/management-consultant/references/india-guesstimates-and-cases.md",
+        "skills/productivity/management-consultant/references/india-pm-cases.md",
+        "skills/productivity/management-consultant/references/india-sector-primers.md",
+        "skills/productivity/management-consultant/references/industrial-manufacturing.md",
+        "skills/productivity/management-consultant/references/industry-heuristics.md",
+        "skills/productivity/management-consultant/references/industry-intelligence.md",
+        "skills/productivity/management-consultant/references/insight-to-action-translation.md",
+        "skills/productivity/management-consultant/references/issue-hypothesis-trees.md",
+        "skills/productivity/management-consultant/references/knowledge-management-pkm.md",
+        "skills/productivity/management-consultant/references/learning-flywheel.md",
+        "skills/productivity/management-consultant/references/logic-and-synthesis.md",
+        "skills/productivity/management-consultant/references/managing-analysts.md",
+        "skills/productivity/management-consultant/references/managing-up.md",
+        "skills/productivity/management-consultant/references/mckinsey-style-problem-solving.md",
+        "skills/productivity/management-consultant/references/mental-models.md",
+        "skills/productivity/management-consultant/references/mergers-acquisitions-fundamentals.md",
+        "skills/productivity/management-consultant/references/micro-skills-executive-presence.md",
+        "skills/productivity/management-consultant/references/negotiation-practitioner.md",
+        "skills/productivity/management-consultant/references/negotiations.md",
+        "skills/productivity/management-consultant/references/operating-model-translation.md",
+        "skills/productivity/management-consultant/references/org-design-workforce.md",
+        "skills/productivity/management-consultant/references/output-craft.md",
+        "skills/productivity/management-consultant/references/pe-context.md",
+        "skills/productivity/management-consultant/references/post-merger-integration.md",
+        "skills/productivity/management-consultant/references/practice-cases-quantified.md",
+        "skills/productivity/management-consultant/references/pricing-architecture-consulting.md",
+        "skills/productivity/management-consultant/references/pricing-revenue-management.md",
+        "skills/productivity/management-consultant/references/pricing-strategy.md",
+        "skills/productivity/management-consultant/references/problem-playbooks.md",
+        "skills/productivity/management-consultant/references/problem-solving.md",
+        "skills/productivity/management-consultant/references/process-mining-operational-intelligence.md",
+        "skills/productivity/management-consultant/references/product-management-toolkit.md",
+        "skills/productivity/management-consultant/references/product-thinking-digital.md",
+        "skills/productivity/management-consultant/references/proposal-writing.md",
+        "skills/productivity/management-consultant/references/public-sector-government-defense.md",
+        "skills/productivity/management-consultant/references/pyramid-principle-and-scqa.md",
+        "skills/productivity/management-consultant/references/pyramid-to-diamond.md",
+        "skills/productivity/management-consultant/references/qualitative-analysis.md",
+        "skills/productivity/management-consultant/references/quantitative-analysis.md",
+        "skills/productivity/management-consultant/references/quantitative-toolkit.md",
+        "skills/productivity/management-consultant/references/real-estate-infrastructure.md",
+        "skills/productivity/management-consultant/references/regulatory-intelligence-horizon-scanning.md",
+        "skills/productivity/management-consultant/references/research-and-interviewing.md",
+        "skills/productivity/management-consultant/references/sales-force-effectiveness.md",
+        "skills/productivity/management-consultant/references/scenario-planning.md",
+        "skills/productivity/management-consultant/references/scope-creep-advanced-governance.md",
+        "skills/productivity/management-consultant/references/situation-room-facilitation.md",
+        "skills/productivity/management-consultant/references/spa-deal-terms-benchmarking.md",
+        "skills/productivity/management-consultant/references/sql-for-pm-analysts.md",
+        "skills/productivity/management-consultant/references/stakeholder-interviewing.md",
+        "skills/productivity/management-consultant/references/stakeholder-mapping.md",
+        "skills/productivity/management-consultant/references/storylining.md",
+        "skills/productivity/management-consultant/references/structured-case-approach.md",
+        "skills/productivity/management-consultant/references/structured-verbal-communication.md",
+        "skills/productivity/management-consultant/references/synergy-modeling-validation.md",
+        "skills/productivity/management-consultant/references/tactical-empathy-trust.md",
+        "skills/productivity/management-consultant/references/technology-media-telecommunications.md",
+        "skills/productivity/management-consultant/references/technology-vendor-selection.md",
+        "skills/productivity/management-consultant/references/tools-and-analysis.md",
+        "skills/productivity/management-consultant/references/transformation-program-architecture.md",
+        "skills/productivity/management-consultant/references/universal-business-analysis.md",
+        "skills/productivity/management-consultant/references/value-creation-measurement.md",
+        "skills/productivity/management-consultant/references/wellness-resilience.md",
+        "skills/productivity/management-consultant/references/workshop-facilitation.md",
+        "skills/productivity/management-consultant/references/zero-based-org-design.md"
+      ]
+    },
+    {
+      "name": "market-research-pro",
+      "path": "skills/productivity/market-research-pro",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "market-research-pro",
+        "skill_path": "skills/productivity/market-research-pro",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/market-research-pro/ATTRIBUTION.md",
+            "sha256": "39a2d69abed32365f7e883c78f30020ced976bc469f008e62e231bd3ab643f30",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/SKILL.md",
+            "sha256": "10463ffaf7867e91b9c1ad55d000b8f7db2681cc148c36ef499c0dbd7cb03442",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/references/anti-patterns.md",
+            "sha256": "9715fd60231a1cf4880f6cd9c315ce71dc0ea71d69bfdb8e566ce00431c55065",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/references/competitor-and-positioning.md",
+            "sha256": "a4dd722f42918350ea17cb6f7d63af3e8d65a06e1cd07b581422af825d9f9874",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/references/decision-framework-and-trade-offs.md",
+            "sha256": "e5425a4142b351a56ba61c3fa583d6811c5ab3a255bcf0e8e7aa34fa6c94fb81",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/references/decision-tree.md",
+            "sha256": "ba038d00696f8cd20168e57fb3e56cf15076ad7aa9968e1a91a37ad06dc4ca6f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/references/edge-cases.md",
+            "sha256": "56ce8e48132b5b482fde31e894f6d63ce2113acd90b19a0c5d73f2aae9936837",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/references/failure-modes-detection-mitigation.md",
+            "sha256": "38360304a09fc1d459202e8a82de49ed8e5fd942a8ac77e88dca256bc48e7c07",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/references/integration-map.md",
+            "sha256": "265a123f27330611cd8d12dde279cb2e2f61fc0bd0cf0d4499a685c47edce239",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/references/market-signal-and-evidence-system-model.md",
+            "sha256": "17884b1176a3b2be1a9631cbbf5e9ed43d8c5d24d781deed031014a02f3895e7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/references/market-sizing-and-assumptions.md",
+            "sha256": "4d2a9934d47bca634ac2812c44e69d2130360b7762a290343ccd28efadddd65f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/references/quality-validation-and-guardrails.md",
+            "sha256": "2c27035f980893b0ce73f2b42d269eeea4817fb45e40fa24e426e3896f9799bb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/references/reporting-and-evidence-quality.md",
+            "sha256": "c36f79826b8dee3ecc73532007682afd47a53d95c4c63f77cbe6510c765d5f03",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/references/segment-prioritization-and-gtm.md",
+            "sha256": "cffe8046d30646fe7ff19c683f72c5f51fd1921cd4f04046ea368ca4ab29ec3a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/references/tips-and-tricks.md",
+            "sha256": "52f99b409e41248100e8001ca5ffb8e3ec28d1124992c99a2a978813f6b30d01",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/market-research-pro/references/versions.md",
+            "sha256": "c2362b41c9240a3a4fdf57fbd617844f3b2d1b5b48dcca22791a8bb58366f354",
+            "role": "owned_resource"
+          }
+        ]
+      },
+      "description": "Production-grade market research: evidence and sizing system model, failure modes (single-source TAM, spurious precision, stale data), decision trade-offs (top-down vs bottom-up, breadth vs depth, speed vs rigor), quality guardrails (no fabricated market sizes; cite source+date+geo).\n\nUse when the user asks to validate market opportunity, compare competitors, estimate market size with assumptions, identify ICP segments, prioritize expansion, or produce an executive market brief with citations and confidence levels.\n\nPair with `web-research-pro` for official current sources \u2026",
+      "tools": [],
+      "agentic_signals": {
+        "goal_intake": false,
+        "refusal_gate": false,
+        "verification": true,
+        "loop_discipline": true,
+        "close_out": false
+      },
+      "references": [
+        "skills/productivity/market-research-pro/references/anti-patterns.md",
+        "skills/productivity/market-research-pro/references/competitor-and-positioning.md",
+        "skills/productivity/market-research-pro/references/decision-framework-and-trade-offs.md",
+        "skills/productivity/market-research-pro/references/decision-tree.md",
+        "skills/productivity/market-research-pro/references/edge-cases.md",
+        "skills/productivity/market-research-pro/references/failure-modes-detection-mitigation.md",
+        "skills/productivity/market-research-pro/references/integration-map.md",
+        "skills/productivity/market-research-pro/references/market-signal-and-evidence-system-model.md",
+        "skills/productivity/market-research-pro/references/market-sizing-and-assumptions.md",
+        "skills/productivity/market-research-pro/references/quality-validation-and-guardrails.md",
+        "skills/productivity/market-research-pro/references/reporting-and-evidence-quality.md",
+        "skills/productivity/market-research-pro/references/segment-prioritization-and-gtm.md",
+        "skills/productivity/market-research-pro/references/tips-and-tricks.md",
+        "skills/productivity/market-research-pro/references/versions.md"
       ]
     },
     {
       "name": "meetings",
-      "path": "productivity/meetings/skills/meetings",
+      "path": "skills/productivity/meetings/skills/meetings",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "meetings",
+        "skill_path": "skills/productivity/meetings/skills/meetings",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/meetings/skills/meetings/SKILL.md",
+            "sha256": "c990f9c02f47da992739d68773ce9d6a33ca7d4cdcc462d0adf9ca962a674c5d",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/meetings/skills/meetings/assets/example_agenda.md",
+            "sha256": "9da73554d7eae3c0391578be73c41cacfc659222f357efb992c3560bab5f4413",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/meetings/skills/meetings/assets/meeting_gate_worksheet.md",
+            "sha256": "d5752a5d44b8a1dccd7926d8d935a8e69c4365c293c8c119b6a1536eab564eb9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/meetings/skills/meetings/references/action_item_discipline.md",
+            "sha256": "8f2b7b1b9fd9395de930e71a78e77efba5094c33cea1cd5a0959ac762b5476a8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/meetings/skills/meetings/references/agenda_discipline.md",
+            "sha256": "777b34f49d40cfc6c57bae88cbf4627e765d83ac26b3dd2d8f40aab11be7ff98",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/meetings/skills/meetings/references/meeting_cost_canon.md",
+            "sha256": "a2b60e785da23fdf6421b3d94a56141081455dcabad0dee103a9c674fe9447ac",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/meetings/skills/meetings/scripts/action_item_extractor.py",
+            "sha256": "ba4cbec7171c4c628905765e4ebb8cca0627bc9b6b0caf0c07e3e5c01b60bf51",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/meetings/skills/meetings/scripts/agenda_builder.py",
+            "sha256": "92ed7fea32de0eb919abea12474fd888fdd81af3b222bab5acd4562c5e8f2b26",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/meetings/skills/meetings/scripts/meeting_cost_calculator.py",
+            "sha256": "12372c4c8e55b5c8731457c988e426dfb2b9fcbc9ecb5a0311d8c4f17a8ee83f",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when someone wants to decide whether a meeting is worth calling, price a meeting in dollars, build a timeboxed agenda with desired outcomes, or turn messy meeting notes into owned action items \u2014 or says \"should this be a meeting\", \"/cs:meeting-prep\", or \"/cs:meeting-actions\". Runs a cost gate (ASYNC / NOT-READY / MEET), builds a decision-first agenda, and extracts an owner + due-date checklist that flags every orphan.",
       "tools": [
         {
-          "script": "productivity/meetings/skills/meetings/scripts/action_item_extractor.py",
+          "script": "skills/productivity/meetings/skills/meetings/scripts/action_item_extractor.py",
+          "sha256": "ba4cbec7171c4c628905765e4ebb8cca0627bc9b6b0caf0c07e3e5c01b60bf51",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/meetings/skills/meetings/scripts/action_item_extractor.py --help",
+              "cmd": "python3 skills/productivity/meetings/skills/meetings/scripts/action_item_extractor.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/meetings/skills/meetings/scripts/action_item_extractor.py --sample",
+              "cmd": "python3 skills/productivity/meetings/skills/meetings/scripts/action_item_extractor.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/meetings/skills/meetings/scripts/agenda_builder.py",
+          "script": "skills/productivity/meetings/skills/meetings/scripts/agenda_builder.py",
+          "sha256": "92ed7fea32de0eb919abea12474fd888fdd81af3b222bab5acd4562c5e8f2b26",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/meetings/skills/meetings/scripts/agenda_builder.py --help",
+              "cmd": "python3 skills/productivity/meetings/skills/meetings/scripts/agenda_builder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/meetings/skills/meetings/scripts/agenda_builder.py --sample",
+              "cmd": "python3 skills/productivity/meetings/skills/meetings/scripts/agenda_builder.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/meetings/skills/meetings/scripts/meeting_cost_calculator.py",
+          "script": "skills/productivity/meetings/skills/meetings/scripts/meeting_cost_calculator.py",
+          "sha256": "12372c4c8e55b5c8731457c988e426dfb2b9fcbc9ecb5a0311d8c4f17a8ee83f",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/meetings/skills/meetings/scripts/meeting_cost_calculator.py --help",
+              "cmd": "python3 skills/productivity/meetings/skills/meetings/scripts/meeting_cost_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/meetings/skills/meetings/scripts/meeting_cost_calculator.py --sample",
+              "cmd": "python3 skills/productivity/meetings/skills/meetings/scripts/meeting_cost_calculator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -593,62 +2090,109 @@
         "close_out": true
       },
       "references": [
-        "action_item_discipline.md",
-        "agenda_discipline.md",
-        "meeting_cost_canon.md"
+        "skills/productivity/meetings/skills/meetings/references/action_item_discipline.md",
+        "skills/productivity/meetings/skills/meetings/references/agenda_discipline.md",
+        "skills/productivity/meetings/skills/meetings/references/meeting_cost_canon.md"
       ]
     },
     {
       "name": "reflect",
-      "path": "productivity/reflect/skills/reflect",
+      "path": "skills/productivity/reflect/skills/reflect",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "reflect",
+        "skill_path": "skills/productivity/reflect/skills/reflect",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/reflect/skills/reflect/SKILL.md",
+            "sha256": "3cab25624bf5c975a8632775ccd3857fdbb3e4b2c928c5b712f5f824de5de259",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/reflect/skills/reflect/references/cognitive_bias_canon.md",
+            "sha256": "1d201d611819248b00cf17e3af2732ea74a5fb80add1f7efec09b4edf61be691",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/reflect/skills/reflect/references/conversation_reflection_practice.md",
+            "sha256": "23bbe922521b61009b10c69dda407bc27cec7fb188f2319fe227872ec039b11f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/reflect/skills/reflect/references/honest_output_discipline.md",
+            "sha256": "3efcbd34ea705d238cf4a9768826c7d6b0c02423fe2a0d4aaed53db71809df0e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/reflect/skills/reflect/scripts/bias_pattern_detector.py",
+            "sha256": "7584678dcda1476dbb96ca50d104df1b11270a15866198a3e996f6580e17a815",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/reflect/skills/reflect/scripts/conversation_depth_analyzer.py",
+            "sha256": "27591aa5eb299432c8e87bcfc6c21afee4e1c5eeffac3ee3ff6904e3b5f42bf8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/reflect/skills/reflect/scripts/directional_recommendation_validator.py",
+            "sha256": "8e3b75e297d9646e3341a55f542492ecb48574d1167c40be93d1165cfdda0cba",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Mid-conversation reflection skill that pauses execution and zooms out from detail-mode to honestly reassess direction, assumptions, and bias. Use when the user says 'reflect', 'take a step back', 'step back', 'zoom out', 'are we missing something', 'bigger picture', 'sanity check this', 'are we on track', 'are we overthinking this', 'forest for the trees', or any variation signaling intent to break out of detail-mode and reassess. Also trigger when the conversation has gone deep on implementation details without strategic check-in, or when the user shows signs of being stuck \u2014 that's often \u2026",
       "tools": [
         {
-          "script": "productivity/reflect/skills/reflect/scripts/bias_pattern_detector.py",
+          "script": "skills/productivity/reflect/skills/reflect/scripts/bias_pattern_detector.py",
+          "sha256": "7584678dcda1476dbb96ca50d104df1b11270a15866198a3e996f6580e17a815",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/reflect/skills/reflect/scripts/bias_pattern_detector.py --help",
+              "cmd": "python3 skills/productivity/reflect/skills/reflect/scripts/bias_pattern_detector.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/reflect/skills/reflect/scripts/bias_pattern_detector.py --sample",
+              "cmd": "python3 skills/productivity/reflect/skills/reflect/scripts/bias_pattern_detector.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/reflect/skills/reflect/scripts/conversation_depth_analyzer.py",
+          "script": "skills/productivity/reflect/skills/reflect/scripts/conversation_depth_analyzer.py",
+          "sha256": "27591aa5eb299432c8e87bcfc6c21afee4e1c5eeffac3ee3ff6904e3b5f42bf8",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/reflect/skills/reflect/scripts/conversation_depth_analyzer.py --help",
+              "cmd": "python3 skills/productivity/reflect/skills/reflect/scripts/conversation_depth_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/reflect/skills/reflect/scripts/conversation_depth_analyzer.py --sample",
+              "cmd": "python3 skills/productivity/reflect/skills/reflect/scripts/conversation_depth_analyzer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/reflect/skills/reflect/scripts/directional_recommendation_validator.py",
+          "script": "skills/productivity/reflect/skills/reflect/scripts/directional_recommendation_validator.py",
+          "sha256": "8e3b75e297d9646e3341a55f542492ecb48574d1167c40be93d1165cfdda0cba",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/reflect/skills/reflect/scripts/directional_recommendation_validator.py --help",
+              "cmd": "python3 skills/productivity/reflect/skills/reflect/scripts/directional_recommendation_validator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/reflect/skills/reflect/scripts/directional_recommendation_validator.py --sample",
+              "cmd": "python3 skills/productivity/reflect/skills/reflect/scripts/directional_recommendation_validator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -663,62 +2207,124 @@
         "close_out": false
       },
       "references": [
-        "cognitive_bias_canon.md",
-        "conversation_reflection_practice.md",
-        "honest_output_discipline.md"
+        "skills/productivity/reflect/skills/reflect/references/cognitive_bias_canon.md",
+        "skills/productivity/reflect/skills/reflect/references/conversation_reflection_practice.md",
+        "skills/productivity/reflect/skills/reflect/references/honest_output_discipline.md"
       ]
     },
     {
       "name": "roast",
-      "path": "productivity/roast/skills/roast",
+      "path": "skills/productivity/roast/skills/roast",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "roast",
+        "skill_path": "skills/productivity/roast/skills/roast",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/roast/skills/roast/README.md",
+            "sha256": "6267234d932e3ae311de52b936729162cd4fc168dd651bc1af04d85a598a646b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/roast/skills/roast/SKILL.md",
+            "sha256": "aa9e60b4e107cc0fccdd2b534a7caf6a9c837d3ac424b1d9b0cd48e1f7e0004c",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/roast/skills/roast/assets/example_roast_verdict.md",
+            "sha256": "75ca8dbfce09924df99657fbad503779a4b851287e2d4898b3cd61b8ad132dac",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/roast/skills/roast/assets/roast_brief_worksheet.md",
+            "sha256": "c63b97358b861b7af4612883e52da28d05b6e6ce1c3361893b3cae240e40c541",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/roast/skills/roast/references/adversarial_panel_canon.md",
+            "sha256": "2f36d8f976173d751afcb3b5674b7429b40b2be222b9e9ed2975019bfbdc0bf7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/roast/skills/roast/references/cheapest_test_canon.md",
+            "sha256": "9806eae199972bc11e294b5af9b4ed5da6ac902e566a9fc86184ea75a6ff31bd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/roast/skills/roast/references/verdict_synthesis_method.md",
+            "sha256": "f276ff61752140978fd01aa7f4fe00de62028adee9d2330b0088f93ce0ad1d9d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/roast/skills/roast/scripts/brief_builder.py",
+            "sha256": "1dbb91620de14e1d220c9bc937aa31ccc5e5b001094dc0382ccf16ef4f6f234e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/roast/skills/roast/scripts/cheapest_test_designer.py",
+            "sha256": "09c6ee24b492c60da5339f4a7b998afc30f2e1a104238672ddab34b97befad47",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/roast/skills/roast/scripts/verdict_synthesizer.py",
+            "sha256": "9b1a067dde00a0e9595afd9f2980dfdbec97ab1165179067b26f3ebd3a1333a1",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when someone asks to roast an idea, pressure-test or stress-test an idea, validate a business idea, \"convene the panel\", get a brutal second opinion before building something, or says \"/roast\". Spins up a 5-angle panel (Critic, Champion, Analyst, Investigator, Customer) that attacks the idea from every angle, then a Judge returns one GO / RESHAPE / KILL verdict with the cheapest test to de-risk it.",
       "tools": [
         {
-          "script": "productivity/roast/skills/roast/scripts/brief_builder.py",
+          "script": "skills/productivity/roast/skills/roast/scripts/brief_builder.py",
+          "sha256": "1dbb91620de14e1d220c9bc937aa31ccc5e5b001094dc0382ccf16ef4f6f234e",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/roast/skills/roast/scripts/brief_builder.py --help",
+              "cmd": "python3 skills/productivity/roast/skills/roast/scripts/brief_builder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/roast/skills/roast/scripts/brief_builder.py --sample",
+              "cmd": "python3 skills/productivity/roast/skills/roast/scripts/brief_builder.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/roast/skills/roast/scripts/cheapest_test_designer.py",
+          "script": "skills/productivity/roast/skills/roast/scripts/cheapest_test_designer.py",
+          "sha256": "09c6ee24b492c60da5339f4a7b998afc30f2e1a104238672ddab34b97befad47",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/roast/skills/roast/scripts/cheapest_test_designer.py --help",
+              "cmd": "python3 skills/productivity/roast/skills/roast/scripts/cheapest_test_designer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/roast/skills/roast/scripts/cheapest_test_designer.py --sample",
+              "cmd": "python3 skills/productivity/roast/skills/roast/scripts/cheapest_test_designer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/roast/skills/roast/scripts/verdict_synthesizer.py",
+          "script": "skills/productivity/roast/skills/roast/scripts/verdict_synthesizer.py",
+          "sha256": "9b1a067dde00a0e9595afd9f2980dfdbec97ab1165179067b26f3ebd3a1333a1",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/roast/skills/roast/scripts/verdict_synthesizer.py --help",
+              "cmd": "python3 skills/productivity/roast/skills/roast/scripts/verdict_synthesizer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/roast/skills/roast/scripts/verdict_synthesizer.py --sample",
+              "cmd": "python3 skills/productivity/roast/skills/roast/scripts/verdict_synthesizer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -733,62 +2339,298 @@
         "close_out": false
       },
       "references": [
-        "adversarial_panel_canon.md",
-        "cheapest_test_canon.md",
-        "verdict_synthesis_method.md"
+        "skills/productivity/roast/skills/roast/references/adversarial_panel_canon.md",
+        "skills/productivity/roast/skills/roast/references/cheapest_test_canon.md",
+        "skills/productivity/roast/skills/roast/references/verdict_synthesis_method.md"
       ]
     },
     {
+      "name": "teach",
+      "path": "skills/productivity/teach",
+      "invocation": "user_only",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "teach",
+        "skill_path": "skills/productivity/teach",
+        "invocation": "user_only",
+        "files": [
+          {
+            "path": "skills/productivity/teach/.vendor-owned.json",
+            "sha256": "d52764a506b92fab7363371b69cb6c0c97c946dd5b2b2b252ed84f2d277e6e8c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/teach/ATTRIBUTION.md",
+            "sha256": "edbf950bc486f60a201e2d7126c6df277ead64ebacb23e5acf6caaa2098e9d2e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/teach/GLOSSARY-FORMAT.md",
+            "sha256": "9b99859ec28437668130d8f2ce5a342938970f8a1ed4fd38c3eab4f4b5fff210",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/teach/LEARNING-RECORD-FORMAT.md",
+            "sha256": "701fa34b6748aa89e6c960ffb815257f481a7d77fb2900f9028f7edf3fdd6052",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/teach/LICENSE.upstream",
+            "sha256": "461ed8a4bdb048a3472ac2a43060e96e326770d595645d54b940b594c0aae674",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/teach/MISSION-FORMAT.md",
+            "sha256": "8cacbb3c0644d3ae0ea4965564797099401a6930a23f7cf462918576587f2418",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/teach/PROVENANCE.md",
+            "sha256": "db59a98eb436ea2424b9e277352716aa379e7309c302ff0f21cd9549d776d429",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/teach/RESOURCES-FORMAT.md",
+            "sha256": "e9cacf34026e11a8d1c8f9de88abe5bcbf654f4ebdb25cae8c0de0d5f48f44ec",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/teach/SKILL.md",
+            "sha256": "a32df9dcdfc0c4fdc1c98e1ed3940c5f56b84c1aa90ff60346f32b8b53915b43",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/teach/agents/openai.yaml",
+            "sha256": "5856f3ae8aec742f1499c640aecdd5f1d6af5fa210a7c6ec794de8263a6f733f",
+            "role": "codex_invocation_metadata"
+          }
+        ]
+      },
+      "description": "Teach the user a new skill or concept, within this workspace.",
+      "tools": [],
+      "agentic_signals": {
+        "goal_intake": false,
+        "refusal_gate": false,
+        "verification": false,
+        "loop_discipline": true,
+        "close_out": false
+      },
+      "references": []
+    },
+    {
+      "name": "to-questionnaire",
+      "path": "skills/productivity/to-questionnaire",
+      "invocation": "user_only",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "to-questionnaire",
+        "skill_path": "skills/productivity/to-questionnaire",
+        "invocation": "user_only",
+        "files": [
+          {
+            "path": "skills/productivity/to-questionnaire/.vendor-owned.json",
+            "sha256": "ba32a14d4f4583a54f4157198276adea8e0301bd81119832d47fcde45681f042",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/to-questionnaire/ATTRIBUTION.md",
+            "sha256": "cf98f230d23e629726b1e272ecebfb423a1a6859e449ebc591a07beebf6c2951",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/to-questionnaire/LICENSE.upstream",
+            "sha256": "461ed8a4bdb048a3472ac2a43060e96e326770d595645d54b940b594c0aae674",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/to-questionnaire/PROVENANCE.md",
+            "sha256": "03e228632a1cd190569df5f2817816af0b34d58d3f2db03a5012971d8d78aa59",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/to-questionnaire/SKILL.md",
+            "sha256": "b5eb929842ee0e93d867c5e906d183d350f2f2d149eaeaa86967d94d8eda1d3b",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/to-questionnaire/agents/openai.yaml",
+            "sha256": "9e8a06c38c8842eea8d4922cb9d1ead8e3ace647bab259b943c994a1b4742bc2",
+            "role": "codex_invocation_metadata"
+          }
+        ]
+      },
+      "description": "Turn a decision you can't fully answer into a questionnaire for someone else to fill in.",
+      "tools": [],
+      "agentic_signals": {
+        "goal_intake": false,
+        "refusal_gate": false,
+        "verification": false,
+        "loop_discipline": false,
+        "close_out": true
+      },
+      "references": []
+    },
+    {
+      "name": "wait-what",
+      "path": "skills/productivity/wait-what",
+      "invocation": "user_only",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "wait-what",
+        "skill_path": "skills/productivity/wait-what",
+        "invocation": "user_only",
+        "files": [
+          {
+            "path": "skills/productivity/wait-what/.vendor-owned.json",
+            "sha256": "ad3da3f16da39f56295add8bbba8ba9a415832887f4dcb89c1706e09f5fe62e6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/wait-what/ATTRIBUTION.md",
+            "sha256": "9233bb8df8e87d9a6da77c1fc94d171f763a1f3614f8a9a6cde3b8bc29e131c4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/wait-what/LICENSE.upstream",
+            "sha256": "461ed8a4bdb048a3472ac2a43060e96e326770d595645d54b940b594c0aae674",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/wait-what/PROVENANCE.md",
+            "sha256": "bf1a601df8b8c4363609578da6f0448f093a72625b41bae746aa2fc3215b6289",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/wait-what/SKILL.md",
+            "sha256": "d961bb37defd975c539427edb8f450cdbccdcdd552e213c1ece46676a7970905",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/wait-what/agents/openai.yaml",
+            "sha256": "b41faadf741d51e4ea184148b2d1854d93f947aaf754c7844f70a00f04194999",
+            "role": "codex_invocation_metadata"
+          }
+        ]
+      },
+      "description": "Stop. That last message did not land: re-pitch it.",
+      "tools": [],
+      "agentic_signals": {
+        "goal_intake": false,
+        "refusal_gate": false,
+        "verification": false,
+        "loop_discipline": false,
+        "close_out": false
+      },
+      "references": []
+    },
+    {
       "name": "weekly-review",
-      "path": "productivity/weekly-review/skills/weekly-review",
+      "path": "skills/productivity/weekly-review/skills/weekly-review",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "weekly-review",
+        "skill_path": "skills/productivity/weekly-review/skills/weekly-review",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/weekly-review/skills/weekly-review/SKILL.md",
+            "sha256": "3df151a1102d44eb45f131637119a02e03e4e9719f23e7130327a299e7a18f17",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/weekly-review/skills/weekly-review/assets/example_weekly_review.md",
+            "sha256": "c366bf59c54e3ea71ee6db372b04ccb8d6923c9ac5d6318861f01a55ccb0d761",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/weekly-review/skills/weekly-review/assets/weekly_review_checklist.md",
+            "sha256": "34fd63216d9dc5524cae199e4203cb515af9d1c23590185204ade346420654f9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/weekly-review/skills/weekly-review/references/gtd_weekly_review_canon.md",
+            "sha256": "25eb8b9f0558e607c93bed8fe7e97ab0f2d76f692c783f397bbcc881e67bf26c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/weekly-review/skills/weekly-review/references/open_loop_psychology.md",
+            "sha256": "54b9acc9c8643435792386b8e814520251cfed1cebe77779e712d1b01c643d3d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/weekly-review/skills/weekly-review/references/review_cadence_design.md",
+            "sha256": "b87e5c673eff3f853127719ad0d3655650858c273702cf78919bafa8c65518ca",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/weekly-review/skills/weekly-review/scripts/commitment_auditor.py",
+            "sha256": "98521736ad3c392ba4b89057b715bf94195a83d7b7c28d6b88ce57f1442ac47a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/weekly-review/skills/weekly-review/scripts/open_loop_scanner.py",
+            "sha256": "3c2be20fd34536e83971cb4abbd1a2114ad3725d267fea0120e1e08e4e01b24d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/weekly-review/skills/weekly-review/scripts/weekly_review_gate.py",
+            "sha256": "5847089a2a0f1077b0b11dc09be50978adeaf47ed22c0ab950b1881789690ace",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when someone wants to run a weekly review, close open loops, audit stalled projects and commitments, get their system back to trusted, restart a lapsed review habit, or says \"/cs:weekly-review\". Walks David Allen's three-phase loop \u2014 GET CLEAR, GET CURRENT, GET CREATIVE \u2014 with deterministic scripts that inventory open loops, gate the checklist with named gaps, and score commitment health 0-100.",
       "tools": [
         {
-          "script": "productivity/weekly-review/skills/weekly-review/scripts/commitment_auditor.py",
+          "script": "skills/productivity/weekly-review/skills/weekly-review/scripts/commitment_auditor.py",
+          "sha256": "98521736ad3c392ba4b89057b715bf94195a83d7b7c28d6b88ce57f1442ac47a",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/weekly-review/skills/weekly-review/scripts/commitment_auditor.py --help",
+              "cmd": "python3 skills/productivity/weekly-review/skills/weekly-review/scripts/commitment_auditor.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/weekly-review/skills/weekly-review/scripts/commitment_auditor.py --sample",
+              "cmd": "python3 skills/productivity/weekly-review/skills/weekly-review/scripts/commitment_auditor.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/weekly-review/skills/weekly-review/scripts/open_loop_scanner.py",
+          "script": "skills/productivity/weekly-review/skills/weekly-review/scripts/open_loop_scanner.py",
+          "sha256": "3c2be20fd34536e83971cb4abbd1a2114ad3725d267fea0120e1e08e4e01b24d",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/weekly-review/skills/weekly-review/scripts/open_loop_scanner.py --help",
+              "cmd": "python3 skills/productivity/weekly-review/skills/weekly-review/scripts/open_loop_scanner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/weekly-review/skills/weekly-review/scripts/open_loop_scanner.py --sample",
+              "cmd": "python3 skills/productivity/weekly-review/skills/weekly-review/scripts/open_loop_scanner.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "productivity/weekly-review/skills/weekly-review/scripts/weekly_review_gate.py",
+          "script": "skills/productivity/weekly-review/skills/weekly-review/scripts/weekly_review_gate.py",
+          "sha256": "5847089a2a0f1077b0b11dc09be50978adeaf47ed22c0ab950b1881789690ace",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 productivity/weekly-review/skills/weekly-review/scripts/weekly_review_gate.py --help",
+              "cmd": "python3 skills/productivity/weekly-review/skills/weekly-review/scripts/weekly_review_gate.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 productivity/weekly-review/skills/weekly-review/scripts/weekly_review_gate.py --sample",
+              "cmd": "python3 skills/productivity/weekly-review/skills/weekly-review/scripts/weekly_review_gate.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -803,10 +2645,106 @@
         "close_out": true
       },
       "references": [
-        "gtd_weekly_review_canon.md",
-        "open_loop_psychology.md",
-        "review_cadence_design.md"
+        "skills/productivity/weekly-review/skills/weekly-review/references/gtd_weekly_review_canon.md",
+        "skills/productivity/weekly-review/skills/weekly-review/references/open_loop_psychology.md",
+        "skills/productivity/weekly-review/skills/weekly-review/references/review_cadence_design.md"
       ]
+    },
+    {
+      "name": "writing-for-agents",
+      "path": "skills/productivity/writing-for-agents",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "writing-for-agents",
+        "skill_path": "skills/productivity/writing-for-agents",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/productivity/writing-for-agents/.vendor-owned.json",
+            "sha256": "b2d8ef677bf3ec4ec5ca059d3f7677927687034c94fdc0cb94ac4cbf5e951ed1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/writing-for-agents/ATTRIBUTION.md",
+            "sha256": "853285ac202e6b1846d0f13a8adad54b3b5611105bea3919504ad1a3e55f6e80",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/writing-for-agents/LICENSE.upstream",
+            "sha256": "461ed8a4bdb048a3472ac2a43060e96e326770d595645d54b940b594c0aae674",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/writing-for-agents/PROVENANCE.md",
+            "sha256": "9e6aafbcf8a2983e6a2d058a63441a6bae0b7c0db9c5c2fd90d143116f069f52",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/writing-for-agents/SKILL-MECHANICS.md",
+            "sha256": "c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/writing-for-agents/SKILL.md",
+            "sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/productivity/writing-for-agents/agents/openai.yaml",
+            "sha256": "eacb24b2a618cfb81dacb0416f4fdd75ddf3a8060f8ddb99aae1b1e301907e4b",
+            "role": "codex_invocation_metadata"
+          }
+        ]
+      },
+      "description": "Writing documents for agents. Use when creating or editing skills, or modifying AGENTS.md or CLAUDE.md.",
+      "tools": [],
+      "agentic_signals": {
+        "goal_intake": false,
+        "refusal_gate": false,
+        "verification": false,
+        "loop_discipline": true,
+        "close_out": true
+      },
+      "references": []
+    },
+    {
+      "name": "xero-chart-of-accounts-manager",
+      "path": "skills/productivity/xero-chart-of-accounts-manager",
+      "invocation": "user_only",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "xero-chart-of-accounts-manager",
+        "skill_path": "skills/productivity/xero-chart-of-accounts-manager",
+        "invocation": "user_only",
+        "files": [
+          {
+            "path": "skills/productivity/xero-chart-of-accounts-manager/ATTRIBUTION.md",
+            "sha256": "528ffbc29c2499f18dd5227148c12e3072b576384dc3493271d98a2b05584b5d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/xero-chart-of-accounts-manager/LICENSE",
+            "sha256": "ffca8afa45b2535a5c698168733ad0b4e8717ad6d92e0c71ba20275c9f1cf773",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/productivity/xero-chart-of-accounts-manager/SKILL.md",
+            "sha256": "4628ca07e8548d541000294d7a4a41b73e9e1b253cac3b3fdea4a21bebafb31d",
+            "role": "skill_body"
+          }
+        ]
+      },
+      "description": "Safely inspect and manage a Xero Chart of Accounts. Use when listing accounts, finding account codes, preparing new accounts, or creating accounts through an authenticated Xero integration.",
+      "tools": [],
+      "agentic_signals": {
+        "goal_intake": false,
+        "refusal_gate": false,
+        "verification": true,
+        "loop_discipline": true,
+        "close_out": false
+      },
+      "references": []
     }
   ]
 }

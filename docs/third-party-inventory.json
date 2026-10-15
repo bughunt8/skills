@@ -100,30 +100,14 @@
       "repo": "https://github.com/mattpocock/skills",
       "author": "Matt Pocock (@mattpocock)",
       "license": "MIT",
-      "upstream_commit": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
       "notice": "skills/engineering/MATTPOCOCK_SKILLS_ATTRIBUTION.md",
       "license_file": "skills/engineering/MATTPOCOCK_SKILLS_LICENSE",
       "paths": [
-        "skills/engineering/ask-matt",
         "skills/engineering/caveman",
-        "skills/engineering/code-review",
-        "skills/engineering/grill-with-docs",
-        "skills/engineering/implement",
-        "skills/engineering/improve-codebase-architecture",
-        "skills/engineering/setup-matt-pocock-skills",
-        "skills/engineering/to-spec",
-        "skills/engineering/to-tickets",
-        "skills/engineering/triage",
-        "skills/engineering/wayfinder",
         "skills/engineering/write-a-skill",
-        "skills/productivity/grill-me",
-        "skills/productivity/grilling",
-        "skills/productivity/handoff",
-        "skills/productivity/to-questionnaire",
-        "skills/productivity/wait-what",
-        "skills/productivity/writing-for-agents"
+        "docs/migrations/matt-v1.3.1/legacy"
       ],
-      "notes": "Several of these state in prose that Matt Pocock's content or voice is 'preserved verbatim' under MIT, but no copy of the upstream MIT notice existed anywhere in the repository. MIT requires the copyright and permission notice to travel with copies, so the notice and licence files above were added. An independent adversarial review found this; it was the most serious licensing defect in the repository."
+      "notes": "The stable 27 are now managed by vendor.manifest.json. These remaining derivatives preserve real local additions; their originating upstream pins are unresolved, not the formerly claimed 6654f6b snapshot. The importer archives 24 complete historical native trees before adoption. Exact historical body matches and URLs are recorded in docs/migrations/matt-v1.3.1/dependency-audit.json."
     },
     {
       "id": "impeccable",

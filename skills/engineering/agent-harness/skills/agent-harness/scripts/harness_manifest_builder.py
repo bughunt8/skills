@@ -3,7 +3,7 @@
 machine-readable inventory (skills, tools, verification checks, agentic signals)
 that goal_compiler.py and loop_controller.py consume.
 
-Stdlib-only. Deterministic: same tree in, same manifest out (modulo the
+Requires PyYAML. Deterministic: same tree in, same manifest out (modulo the
 generated_at stamp, which --no-timestamp suppresses for diff-stable output).
 
 Usage:
@@ -18,12 +18,15 @@ import json
 import os
 import re
 import sys
+import shlex
+import yaml
+from pathlib import Path
 
-SCHEMA = "agent-harness/manifest.v1"
+from provider_bindings import (BindingError, MANIFEST_SCHEMA, TARGETS,
+                               checkout_root, checked_path, find_skills,
+                               frontmatter, live_binding)
 
-# Folders that are never skill content.
-SKIP_DIRS = {".git", ".github", "node_modules", "__pycache__", ".claude-plugin",
-             "expected_outputs", ".codex", ".gemini", ".hermes", ".vibe"}
+SCHEMA = MANIFEST_SCHEMA
 
 # Signal regexes: cheap, static evidence that a skill already carries agentic
 # structure. Matched case-insensitively against the SKILL.md body.
@@ -48,11 +51,7 @@ LOOP_DEFAULTS = {
 
 
 def read_text(path):
-    try:
-        with open(path, encoding="utf-8", errors="replace") as f:
-            return f.read()
-    except OSError:
-        return ""
+    return Path(path).read_text(encoding="utf-8")
 
 
 def truncate_words(text, limit):
@@ -66,46 +65,16 @@ def truncate_words(text, limit):
 
 
 def parse_frontmatter(text):
-    """Extract name/description from YAML frontmatter without a YAML dep."""
-    meta = {"name": "", "description": ""}
-    if not text.startswith("---"):
-        return meta
-    end = text.find("\n---", 3)
-    if end == -1:
-        return meta
-    block = text[3:end]
-    m = re.search(r"^name:\s*(.+)$", block, re.MULTILINE)
-    if m:
-        meta["name"] = m.group(1).strip().strip("\"'")
-    m = re.search(r"^description:\s*(.+)$", block, re.MULTILINE)
-    if m:
-        desc = m.group(1).strip()
-        # Fold simple multi-line continuations (indented lines).
-        idx = block.find(m.group(0)) + len(m.group(0))
-        for line in block[idx:].splitlines():
-            if line.startswith(("  ", "\t")) and not re.match(r"^\s*\w+:", line):
-                desc += " " + line.strip()
-            elif line.strip():
-                break
-        meta["description"] = desc.strip().strip("\"'")
-    return meta
-
-
-def find_skills(domain_path):
-    """Yield (skill_dir, skill_md_path) for every SKILL.md under the domain."""
-    hits = []
-    for root, dirs, files in os.walk(domain_path):
-        dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS)
-        if "SKILL.md" in files:
-            hits.append((root, os.path.join(root, "SKILL.md")))
-    return sorted(hits)
+    return frontmatter(text)
 
 
 def scan_skill(skill_dir, skill_md, repo_root):
+    rel_dir = Path(skill_dir).relative_to(repo_root).as_posix()
+    binding = live_binding(Path(repo_root), rel_dir)
     text = read_text(skill_md)
     meta = parse_frontmatter(text)
     body = text.lower()
-    rel_dir = os.path.relpath(skill_dir, repo_root)
+    hashes = {f["path"]: f["sha256"] for f in binding["files"]}
 
     tools = []
     scripts_dir = os.path.join(skill_dir, "scripts")
@@ -120,10 +89,14 @@ def scan_skill(skill_dir, skill_md, repo_root):
             script_paths.append(os.path.join(skill_dir, fn))
 
     for sp in script_paths:
-        rel = os.path.relpath(sp, repo_root)
+        rel = Path(sp).relative_to(repo_root).as_posix()
+        if (rel_dir == "skills/engineering/agent-harness/skills/agent-harness"
+                and Path(sp).name == "provider_bindings.py"):
+            continue  # Bound module resource, not an executable CLI tool.
         src = read_text(sp)
         tools.append({
             "script": rel,
+            "sha256": hashes[rel],
             "wired": os.path.basename(sp) in text,
             "supports_sample": "--sample" in src,
             "verification": build_checks(rel, src),
@@ -131,27 +104,29 @@ def scan_skill(skill_dir, skill_md, repo_root):
 
     signals = {k: bool(re.search(rx, body)) for k, rx in SIGNALS.items()}
     return {
-        "name": meta["name"] or os.path.basename(skill_dir),
+        "name": meta["name"],
         "path": rel_dir,
+        "invocation": binding["invocation"],
+        "provider_binding": binding,
         "description": truncate_words(meta["description"], 600),
         "tools": tools,
         "agentic_signals": signals,
-        "references": sorted(os.listdir(os.path.join(skill_dir, "references")))
-        if os.path.isdir(os.path.join(skill_dir, "references")) else [],
+        "references": [f["path"] for f in binding["files"]
+                       if f["path"].startswith(rel_dir + "/references/")],
     }
 
 
 def build_checks(rel_script, src):
-    checks = [{"cmd": "python3 %s --help" % rel_script, "expect_exit": 0,
+    checks = [{"cmd": "python3 %s --help" % shlex.quote(rel_script), "expect_exit": 0,
                "kind": "smoke"}]
     if "--sample" in src:
-        checks.append({"cmd": "python3 %s --sample" % rel_script,
+        checks.append({"cmd": "python3 %s --sample" % shlex.quote(rel_script),
                        "expect_exit": 0, "kind": "sample"})
     return checks
 
 
 def build_manifest(domain_path, repo_root, timestamp=True):
-    domain = os.path.relpath(domain_path, repo_root)
+    domain = Path(domain_path).relative_to(Path(repo_root) / "skills").as_posix()
     skills = [scan_skill(d, s, repo_root) for d, s in find_skills(domain_path)]
     manifest = {
         "schema": SCHEMA,
@@ -174,16 +149,28 @@ SAMPLE_MANIFEST = {
     "loop_defaults": LOOP_DEFAULTS,
     "skills": [{
         "name": "slo-architect",
-        "path": "engineering/slo-architect/skills/slo-architect",
+        "path": "skills/engineering/slo-architect/skills/slo-architect",
+        "invocation": "model_or_user",
+        "provider_binding": {
+            "schema": "agent-harness/provider.v1",
+            "name": "slo-architect",
+            "skill_path": "skills/engineering/slo-architect/skills/slo-architect",
+            "invocation": "model_or_user",
+            "files": [{
+                "path": "skills/engineering/slo-architect/skills/slo-architect/SKILL.md",
+                "sha256": "0" * 64, "role": "skill_body",
+            }],
+        },
         "description": "Design SLOs/SLIs and error budgets per the Google SRE Workbook...",
         "tools": [{
-            "script": "engineering/slo-architect/skills/slo-architect/scripts/error_budget_calculator.py",
+            "script": "skills/engineering/slo-architect/skills/slo-architect/scripts/error_budget_calculator.py",
+            "sha256": "0" * 64,
             "wired": True,
             "supports_sample": True,
             "verification": [
-                {"cmd": "python3 .../error_budget_calculator.py --help",
+                {"cmd": "python3 skills/engineering/slo-architect/skills/slo-architect/scripts/error_budget_calculator.py --help",
                  "expect_exit": 0, "kind": "smoke"},
-                {"cmd": "python3 .../error_budget_calculator.py --sample",
+                {"cmd": "python3 skills/engineering/slo-architect/skills/slo-architect/scripts/error_budget_calculator.py --sample",
                  "expect_exit": 0, "kind": "sample"},
             ],
         }],
@@ -191,7 +178,7 @@ SAMPLE_MANIFEST = {
             "goal_intake": True, "refusal_gate": True, "verification": True,
             "loop_discipline": True, "close_out": True,
         },
-        "references": ["slo_canon.md"],
+        "references": ["skills/engineering/slo-architect/skills/slo-architect/references/error_budget.md"],
     }],
 }
 
@@ -200,45 +187,51 @@ def main():
     ap = argparse.ArgumentParser(
         description="Scan a domain folder and emit its agent-harness manifest.")
     ap.add_argument("--domain", action="append", default=[],
-                    help="Domain folder relative to --repo-root (repeatable).")
+                    help="Domain name under checkout-root/skills (repeatable).")
     ap.add_argument("--all", action="store_true",
-                    help="Build manifests for every top-level domain folder "
-                         "containing at least one SKILL.md.")
+                    help="Build the 18 existing committed domain targets.")
     ap.add_argument("--repo-root", default=".")
     ap.add_argument("--out-dir", help="Write <domain>.json per domain here.")
     ap.add_argument("--json", action="store_true",
                     help="Print manifest(s) to stdout as JSON.")
     ap.add_argument("--no-timestamp", action="store_true",
                     help="Omit generated_at for diff-stable committed manifests.")
+    ap.add_argument("--check", action="store_true",
+                    help="Read-only comparison with committed assets; never writes.")
     ap.add_argument("--sample", action="store_true",
                     help="Print an example manifest and exit 0.")
     args = ap.parse_args()
 
     if args.sample:
+        # Illustrative inventory only, not a dispatchable binding.
+        SAMPLE_MANIFEST["example_only"] = True
         print(json.dumps(SAMPLE_MANIFEST, indent=2))
         return 0
 
-    repo_root = os.path.abspath(args.repo_root)
+    repo_root = checkout_root(args.repo_root)
     targets = list(args.domain)
     if args.all:
-        for entry in sorted(os.listdir(repo_root)):
-            p = os.path.join(repo_root, entry)
-            if (os.path.isdir(p) and entry not in SKIP_DIRS
-                    and not entry.startswith(".")
-                    and find_skills(p)):
-                targets.append(entry)
+        targets.extend(TARGETS)
+    if args.check and not targets:
+        targets.extend(TARGETS)
     if not targets:
         ap.error("provide --domain, --all, or --sample")
 
     results = []
     for t in sorted(set(targets)):
-        dp = os.path.join(repo_root, t)
-        if not os.path.isdir(dp):
-            print("ERROR: no such domain folder: %s" % t, file=sys.stderr)
-            return 2
-        manifest = build_manifest(dp, repo_root, timestamp=not args.no_timestamp)
+        if t not in TARGETS:
+            raise BindingError("unsupported domain name: %s" % t)
+        dp = checked_path(repo_root, "skills/" + t, directory=True)
+        manifest = build_manifest(dp, repo_root, timestamp=not (args.no_timestamp or args.check))
         results.append(manifest)
-        if args.out_dir:
+        if args.check:
+            out_dir = Path(args.out_dir) if args.out_dir else (
+                repo_root / "skills/engineering/agent-harness/skills/agent-harness/assets/harnesses")
+            out = out_dir / (t + ".json")
+            if out.is_symlink() or not out.is_file() or out.read_text(encoding="utf-8") != (
+                    json.dumps(manifest, indent=2) + "\n"):
+                raise BindingError("committed manifest drift: %s; regenerate with --all --no-timestamp" % out)
+        elif args.out_dir:
             os.makedirs(args.out_dir, exist_ok=True)
             slug = t.rstrip("/").replace(os.sep, "-")
             out = os.path.join(args.out_dir, "%s.json" % slug)
@@ -248,10 +241,16 @@ def main():
             print("wrote %s (%d skills)" % (out, manifest["skill_count"]),
                   file=sys.stderr)
 
-    if args.json or not args.out_dir:
+    if args.check:
+        print("checked %d manifests: no drift" % len(results))
+    elif args.json or not args.out_dir:
         print(json.dumps(results if len(results) > 1 else results[0], indent=2))
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except (BindingError, OSError, ValueError, yaml.YAMLError) as exc:
+        print("ERROR: %s" % exc, file=sys.stderr)
+        sys.exit(7)

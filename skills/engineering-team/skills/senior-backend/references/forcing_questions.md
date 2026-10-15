@@ -2,6 +2,8 @@
 
 **Discipline (Matt Pocock, derived from `engineering/grill-me`, MIT):** walk these one at a time. Do not skip ahead. Do not bundle. Answers must be written down. If the user cannot answer one, **that is your next investigation** — stop and surface the gap.
 
+This attribution describes the historical local intake, not permission to call a human-only provider. Model preflight uses the explicitly qualified native grilling route and its different frontier-round protocol in [composition_map.md](composition_map.md). Keep this library one-question-per-turn.
+
 These seven questions gate every meaningful backend decision: pattern pick (monolith / modular / services / serverless), database choice, sync vs. async, tenancy model, SLO commitment.
 
 ---
@@ -48,7 +50,7 @@ These seven questions gate every meaningful backend decision: pattern pick (mono
 
 **Why it matters:** data sensitivity changes the floor of every other decision. PHI + a single shared-tenant Postgres + no audit logging = enforcement risk. PCI in scope + handing card data to a startup-built API = avoidable scope. Stripe / Plaid / Auth0 exist specifically to remove scope.
 
-**Kill criterion:** PHI or PCI in scope + no named compliance owner + no encryption-at-rest plan — STOP. Bring in `ra-qm-team` skill (HIPAA / FDA) or escalate to `cs-ciso-advisor`.
+**Kill criterion:** PHI or PCI in scope + no named compliance owner + no encryption-at-rest plan — STOP. The `ra-qm-team` domain has no single skill entrypoint, so compliance dispatch is BLOCKED until the user and named compliance owner select an exact HIPAA / FDA provider. For separate strategic security review, use [cs-ciso-advisor](../../../../c-level-advisor/c-level-agents/agents/cs-ciso-advisor.md) only with its authorized native agent-role binding. CISO review does not replace compliance evidence or resolve the owner/encryption kill criterion.
 
 **Canon:** HIPAA Security Rule (45 CFR § 164); PCI-DSS v4.0 (2024); GDPR Articles 5, 25, 32 (EU 2016/679); NIST SP 800-53 rev. 5 (security controls); CISA *Secure by Design* guidance (2023+).
 

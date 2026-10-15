@@ -1,3 +1,8 @@
+## Summary
+
+Use domain glossary terms. Show the smallest useful diagram, pseudocode,
+diff-sketch, call tree or file tree, then state scope and excluded work.
+
 ## Ticket and outcome
 
 Refs #ISSUE_NUMBER
@@ -5,8 +10,6 @@ Refs #ISSUE_NUMBER
 <!-- Replace the example reference with a real issue.
 For non-default-branch PRs, keep Refs and add a Development link where available.
 Use Closes only when default-branch merge satisfies the agreed completion policy. -->
-
-State the change, scope, and excluded work.
 
 ## Acceptance and traceability
 
@@ -19,8 +22,10 @@ List affected architecture coverage IDs, NFR thresholds and decision changes.
 Separate accepted, implemented and verified status; link the reviewed impact
 set and disclose unresolved/deferred dependencies instead of claiming readiness.
 
-## Verification evidence
+## Evidence
 
+- Before, actual failing run/output or screenshot:
+- After, actual passing run/output or screenshot:
 - Tested head SHA:
 - Commands and exit codes:
 - Actual output or sanitized durable artifact/run URL:
@@ -29,7 +34,10 @@ set and disclose unresolved/deferred dependencies instead of claiming readiness.
 - Evidence environment and revision; stale evidence requiring renewal:
 - Integration/deployment verification still required:
 
-## Architecture and risk
+## Merge Danger
+
+- Door, one-way or two-way, with reversibility rationale:
+- Blast Radius, a short scope label and concrete affected users/modules:
 
 State affected boundaries, security/data impact, ADR changes, migration risks,
 and rollback steps. Use not applicable with a reason where appropriate.

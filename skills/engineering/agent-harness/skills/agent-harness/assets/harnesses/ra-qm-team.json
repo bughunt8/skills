@@ -1,5 +1,5 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "ra-qm-team",
   "skill_count": 19,
   "loop_defaults": {
@@ -15,40 +15,92 @@
   "skills": [
     {
       "name": "eu-ai-act-specialist",
-      "path": "ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist",
+      "path": "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "eu-ai-act-specialist",
+        "skill_path": "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/SKILL.md",
+            "sha256": "fe5d4ea4f5c03bc49302f06b7a09b9ff263fe4a3ae5d9434f3bfa081b6c414fd",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/references/cross_framework_mapping_ai_act.md",
+            "sha256": "aa8be6b2d6830152e686e9204a77218d83c0899637d81f7581f3e9f1869333da",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/references/eu_ai_act_titles.md",
+            "sha256": "bbef145061d8119dfba79ab17fd1ec0d2b5b287a0abe9ae81f1d7c773e14dc3b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/references/gpai_obligations.md",
+            "sha256": "317d6615a01966fbe4a6172b0b7f5cc75624edc8ab9fbc2b583fbea881ac018b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/references/high_risk_systems_annex_iii.md",
+            "sha256": "9899f4413a369d99720b8bc9e590955eab1367093756ac2669e67cfd06d92391",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/ai_act_obligation_tracker.py",
+            "sha256": "5ee92ea2d35a9e478a8e7097089f6919cd5689b7e1489fc55de3b4387b2a15f4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/ai_system_risk_classifier.py",
+            "sha256": "561958f4137af6f103e7e3795652bcc2e30df737edb0776096896a1d181b82f5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/conformity_assessment_planner.py",
+            "sha256": "4a3d484b9a6fa1e33bf3a04142b629e6be513019be0785fe93bf9f1f6645a1a0",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "EU AI Act (Regulation (EU) 2024/1689) operational compliance for compliance teams. Three Article-level decisions: (1) What's the risk tier of this AI system \u2014 prohibited (Art. 5), high-risk (Art. 6 + Annex III), limited-risk (Art. 50), or minimal-risk? (2) For high-risk systems, what's the Article 43 conformity assessment route (Module A internal control vs Module H full QMS + notified body) and what goes in the Annex IV technical documentation? (3) Per organizational role (provider / deployer / importer / distributor / authorized representative), what are the active obligations and \u2026",
       "tools": [
         {
-          "script": "ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/ai_act_obligation_tracker.py",
+          "script": "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/ai_act_obligation_tracker.py",
+          "sha256": "5ee92ea2d35a9e478a8e7097089f6919cd5689b7e1489fc55de3b4387b2a15f4",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/ai_act_obligation_tracker.py --help",
+              "cmd": "python3 skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/ai_act_obligation_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/ai_system_risk_classifier.py",
+          "script": "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/ai_system_risk_classifier.py",
+          "sha256": "561958f4137af6f103e7e3795652bcc2e30df737edb0776096896a1d181b82f5",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/ai_system_risk_classifier.py --help",
+              "cmd": "python3 skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/ai_system_risk_classifier.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/conformity_assessment_planner.py",
+          "script": "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/conformity_assessment_planner.py",
+          "sha256": "4a3d484b9a6fa1e33bf3a04142b629e6be513019be0785fe93bf9f1f6645a1a0",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/conformity_assessment_planner.py --help",
+              "cmd": "python3 skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/scripts/conformity_assessment_planner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -63,48 +115,100 @@
         "close_out": false
       },
       "references": [
-        "cross_framework_mapping_ai_act.md",
-        "eu_ai_act_titles.md",
-        "gpai_obligations.md",
-        "high_risk_systems_annex_iii.md"
+        "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/references/cross_framework_mapping_ai_act.md",
+        "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/references/eu_ai_act_titles.md",
+        "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/references/gpai_obligations.md",
+        "skills/ra-qm-team/compliance-team-eu-ai-act/skills/eu-ai-act-specialist/references/high_risk_systems_annex_iii.md"
       ]
     },
     {
       "name": "iso42001-specialist",
-      "path": "ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist",
+      "path": "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "iso42001-specialist",
+        "skill_path": "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/SKILL.md",
+            "sha256": "96b964d4bbae3f94c9dd48c5a3decc467bb07e8ce5b4c1765c2214d48c76933a",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/references/aims_controls_annex_a.md",
+            "sha256": "4cbb50b5911ab5c37486fade6d29c8c5bfba93046fb707ee4389e28ac4ee3c0e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/references/aims_implementation_guide.md",
+            "sha256": "94318013d71e3b10c301bcad3405ade58dd99528cfc1dbbcef42a447be358a1b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/references/cross_framework_mapping_ai.md",
+            "sha256": "f740944dceed5f343a649d92444cad6be7d7567a4004981038aaac42612f1561",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/references/iso42001_clauses.md",
+            "sha256": "d35819ac5313e95b3b668194590afbc56b427740b8b6c7978de3872223a9a46a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/ai_risk_register_builder.py",
+            "sha256": "3a3d020363cdd25af128c964f506f6ef9d3cd20df7d820caabb631ac2766dfc3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/aims_audit_scheduler.py",
+            "sha256": "166c3cf0ec4a578d1af977db0b81a0473e4c0eba8cc3cb8197741e22d59d9d22",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/aims_gap_analyzer.py",
+            "sha256": "b0b69124e1799f9f189ba8355eff76364b4de4a3bbcdb2f7e02ee9aab0488e74",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "ISO/IEC 42001:2023 AI Management System (AIMS) specialist for compliance teams running internal audits. Three decisions: (1) Where are the gaps against Clauses 4-10 and what do we close first? (2) What goes in the AI risk register and which Annex A controls treat each risk? (3) What's the 12-month internal audit plan that satisfies Clause 9.2? Use when preparing for certification, scoping internal audit cycles, or onboarding AI systems into an existing ISMS (27001) / QMS (13485) program. NOT an executive AI strategy skill (see chief-ai-officer-advisor). NOT EU AI Act compliance (see \u2026",
       "tools": [
         {
-          "script": "ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/ai_risk_register_builder.py",
+          "script": "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/ai_risk_register_builder.py",
+          "sha256": "3a3d020363cdd25af128c964f506f6ef9d3cd20df7d820caabb631ac2766dfc3",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/ai_risk_register_builder.py --help",
+              "cmd": "python3 skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/ai_risk_register_builder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/aims_audit_scheduler.py",
+          "script": "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/aims_audit_scheduler.py",
+          "sha256": "166c3cf0ec4a578d1af977db0b81a0473e4c0eba8cc3cb8197741e22d59d9d22",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/aims_audit_scheduler.py --help",
+              "cmd": "python3 skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/aims_audit_scheduler.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/aims_gap_analyzer.py",
+          "script": "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/aims_gap_analyzer.py",
+          "sha256": "b0b69124e1799f9f189ba8355eff76364b4de4a3bbcdb2f7e02ee9aab0488e74",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/aims_gap_analyzer.py --help",
+              "cmd": "python3 skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/scripts/aims_gap_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -119,24 +223,49 @@
         "close_out": false
       },
       "references": [
-        "aims_controls_annex_a.md",
-        "aims_implementation_guide.md",
-        "cross_framework_mapping_ai.md",
-        "iso42001_clauses.md"
+        "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/references/aims_controls_annex_a.md",
+        "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/references/aims_implementation_guide.md",
+        "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/references/cross_framework_mapping_ai.md",
+        "skills/ra-qm-team/compliance-team-iso42001/skills/iso42001-specialist/references/iso42001_clauses.md"
       ]
     },
     {
       "name": "agent-decision-receipts",
-      "path": "ra-qm-team/skills/agent-decision-receipts",
+      "path": "skills/ra-qm-team/skills/agent-decision-receipts",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "agent-decision-receipts",
+        "skill_path": "skills/ra-qm-team/skills/agent-decision-receipts",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/agent-decision-receipts/SKILL.md",
+            "sha256": "61834517519a01472bf729b9e5c5b5ba9d3f434b306299746cb6378afb47ce70",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/agent-decision-receipts/references/receipt-fields.md",
+            "sha256": "bf9ff7b5f66d86a9aeecc7d8d92f5abb94cb56eb61ed0bb6a9af63cef7b2d82c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/agent-decision-receipts/scripts/build_action_manifest.py",
+            "sha256": "b17f71a54eb3f62248fe4acfa1a2b72529ef40f8859e929a8cd89b61bfed7d99",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Mint a tamper-evident, post-quantum-signed receipt for a consequential agent action (deploy, delete, pay, grant-access, model decision) so it can be verified later from the certificate alone. Use when an autonomous agent takes a side-effecting action that may need to be proven later, or when satisfying EU AI Act Article 12 record-keeping. Three decisions: whether an action needs a receipt, minting it, verifying it. Signing is delegated to the open-source OpenAgentOntology package. Not after-the-fact log analysis; not a hosted notary; not a legal opinion.",
       "tools": [
         {
-          "script": "ra-qm-team/skills/agent-decision-receipts/scripts/build_action_manifest.py",
+          "script": "skills/ra-qm-team/skills/agent-decision-receipts/scripts/build_action_manifest.py",
+          "sha256": "b17f71a54eb3f62248fe4acfa1a2b72529ef40f8859e929a8cd89b61bfed7d99",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/agent-decision-receipts/scripts/build_action_manifest.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/agent-decision-receipts/scripts/build_action_manifest.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -151,38 +280,74 @@
         "close_out": false
       },
       "references": [
-        "receipt-fields.md"
+        "skills/ra-qm-team/skills/agent-decision-receipts/references/receipt-fields.md"
       ]
     },
     {
       "name": "capa-officer",
-      "path": "ra-qm-team/skills/capa-officer",
+      "path": "skills/ra-qm-team/skills/capa-officer",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "capa-officer",
+        "skill_path": "skills/ra-qm-team/skills/capa-officer",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/capa-officer/SKILL.md",
+            "sha256": "6c6ca18e86128fcfbffbe5b216b500984f94ef156c8183d518afab606c7eb74e",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/capa-officer/references/effectiveness-verification-guide.md",
+            "sha256": "982d53c7af9244cc787a90021ea6dd1dfb9afd2a951563ad8203fa3b9283a8ca",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/capa-officer/references/rca-methodologies.md",
+            "sha256": "4c9ecf1a0acc2eabda508716bcc0b5910c70e7d1868b262daebb502665067dc8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/capa-officer/scripts/capa_tracker.py",
+            "sha256": "3c5e90d454773c127cdfb72e1daaaefe679486cc13c8b4dca0e0f8320a71689a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/capa-officer/scripts/root_cause_analyzer.py",
+            "sha256": "9bbde0298d1c56b88a351d9286c9a99192affb0a28923c9f10ca961655c3563a",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "CAPA system management for medical device QMS. Covers root cause analysis, corrective action planning, effectiveness verification, and CAPA metrics. Use when running CAPA investigations, 5-Why analysis, fishbone diagrams, root cause determination, corrective action tracking, effectiveness verification, or CAPA program optimization.",
       "tools": [
         {
-          "script": "ra-qm-team/skills/capa-officer/scripts/capa_tracker.py",
+          "script": "skills/ra-qm-team/skills/capa-officer/scripts/capa_tracker.py",
+          "sha256": "3c5e90d454773c127cdfb72e1daaaefe679486cc13c8b4dca0e0f8320a71689a",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/capa-officer/scripts/capa_tracker.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/capa-officer/scripts/capa_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 ra-qm-team/skills/capa-officer/scripts/capa_tracker.py --sample",
+              "cmd": "python3 skills/ra-qm-team/skills/capa-officer/scripts/capa_tracker.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/capa-officer/scripts/root_cause_analyzer.py",
+          "script": "skills/ra-qm-team/skills/capa-officer/scripts/root_cause_analyzer.py",
+          "sha256": "9bbde0298d1c56b88a351d9286c9a99192affb0a28923c9f10ca961655c3563a",
           "wired": false,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/capa-officer/scripts/root_cause_analyzer.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/capa-officer/scripts/root_cause_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -197,46 +362,98 @@
         "close_out": false
       },
       "references": [
-        "effectiveness-verification-guide.md",
-        "rca-methodologies.md"
+        "skills/ra-qm-team/skills/capa-officer/references/effectiveness-verification-guide.md",
+        "skills/ra-qm-team/skills/capa-officer/references/rca-methodologies.md"
       ]
     },
     {
       "name": "eu-ai-act-specialist",
-      "path": "ra-qm-team/skills/eu-ai-act-specialist",
+      "path": "skills/ra-qm-team/skills/eu-ai-act-specialist",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "eu-ai-act-specialist",
+        "skill_path": "skills/ra-qm-team/skills/eu-ai-act-specialist",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/eu-ai-act-specialist/SKILL.md",
+            "sha256": "fe5d4ea4f5c03bc49302f06b7a09b9ff263fe4a3ae5d9434f3bfa081b6c414fd",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/eu-ai-act-specialist/references/cross_framework_mapping_ai_act.md",
+            "sha256": "aa8be6b2d6830152e686e9204a77218d83c0899637d81f7581f3e9f1869333da",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/eu-ai-act-specialist/references/eu_ai_act_titles.md",
+            "sha256": "bbef145061d8119dfba79ab17fd1ec0d2b5b287a0abe9ae81f1d7c773e14dc3b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/eu-ai-act-specialist/references/gpai_obligations.md",
+            "sha256": "317d6615a01966fbe4a6172b0b7f5cc75624edc8ab9fbc2b583fbea881ac018b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/eu-ai-act-specialist/references/high_risk_systems_annex_iii.md",
+            "sha256": "9899f4413a369d99720b8bc9e590955eab1367093756ac2669e67cfd06d92391",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/eu-ai-act-specialist/scripts/ai_act_obligation_tracker.py",
+            "sha256": "5ee92ea2d35a9e478a8e7097089f6919cd5689b7e1489fc55de3b4387b2a15f4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/eu-ai-act-specialist/scripts/ai_system_risk_classifier.py",
+            "sha256": "561958f4137af6f103e7e3795652bcc2e30df737edb0776096896a1d181b82f5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/eu-ai-act-specialist/scripts/conformity_assessment_planner.py",
+            "sha256": "4a3d484b9a6fa1e33bf3a04142b629e6be513019be0785fe93bf9f1f6645a1a0",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "EU AI Act (Regulation (EU) 2024/1689) operational compliance for compliance teams. Three Article-level decisions: (1) What's the risk tier of this AI system \u2014 prohibited (Art. 5), high-risk (Art. 6 + Annex III), limited-risk (Art. 50), or minimal-risk? (2) For high-risk systems, what's the Article 43 conformity assessment route (Module A internal control vs Module H full QMS + notified body) and what goes in the Annex IV technical documentation? (3) Per organizational role (provider / deployer / importer / distributor / authorized representative), what are the active obligations and \u2026",
       "tools": [
         {
-          "script": "ra-qm-team/skills/eu-ai-act-specialist/scripts/ai_act_obligation_tracker.py",
+          "script": "skills/ra-qm-team/skills/eu-ai-act-specialist/scripts/ai_act_obligation_tracker.py",
+          "sha256": "5ee92ea2d35a9e478a8e7097089f6919cd5689b7e1489fc55de3b4387b2a15f4",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/eu-ai-act-specialist/scripts/ai_act_obligation_tracker.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/eu-ai-act-specialist/scripts/ai_act_obligation_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/eu-ai-act-specialist/scripts/ai_system_risk_classifier.py",
+          "script": "skills/ra-qm-team/skills/eu-ai-act-specialist/scripts/ai_system_risk_classifier.py",
+          "sha256": "561958f4137af6f103e7e3795652bcc2e30df737edb0776096896a1d181b82f5",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/eu-ai-act-specialist/scripts/ai_system_risk_classifier.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/eu-ai-act-specialist/scripts/ai_system_risk_classifier.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/eu-ai-act-specialist/scripts/conformity_assessment_planner.py",
+          "script": "skills/ra-qm-team/skills/eu-ai-act-specialist/scripts/conformity_assessment_planner.py",
+          "sha256": "4a3d484b9a6fa1e33bf3a04142b629e6be513019be0785fe93bf9f1f6645a1a0",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/eu-ai-act-specialist/scripts/conformity_assessment_planner.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/eu-ai-act-specialist/scripts/conformity_assessment_planner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -251,48 +468,105 @@
         "close_out": false
       },
       "references": [
-        "cross_framework_mapping_ai_act.md",
-        "eu_ai_act_titles.md",
-        "gpai_obligations.md",
-        "high_risk_systems_annex_iii.md"
+        "skills/ra-qm-team/skills/eu-ai-act-specialist/references/cross_framework_mapping_ai_act.md",
+        "skills/ra-qm-team/skills/eu-ai-act-specialist/references/eu_ai_act_titles.md",
+        "skills/ra-qm-team/skills/eu-ai-act-specialist/references/gpai_obligations.md",
+        "skills/ra-qm-team/skills/eu-ai-act-specialist/references/high_risk_systems_annex_iii.md"
       ]
     },
     {
       "name": "fda-consultant-specialist",
-      "path": "ra-qm-team/skills/fda-consultant-specialist",
+      "path": "skills/ra-qm-team/skills/fda-consultant-specialist",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "fda-consultant-specialist",
+        "skill_path": "skills/ra-qm-team/skills/fda-consultant-specialist",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/fda-consultant-specialist/SKILL.md",
+            "sha256": "eabacba02030144b65ca466aa7f7e91571a1275431a166f0083100153363f6e0",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/fda-consultant-specialist/references/device_cybersecurity_guidance.md",
+            "sha256": "bdd5de91b998b38ee8923cc97a458b0f838bbe7abd17ccdae18e3d59124faf3c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/fda-consultant-specialist/references/fda_capa_requirements.md",
+            "sha256": "69fa23af5d56ef07837519e5476c70a75d79244c1f09c919581df0d05a84f145",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/fda-consultant-specialist/references/fda_submission_guide.md",
+            "sha256": "051bca77ac582e31458a4680cde393e00e264e16c099a583796c321a4adcf12c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/fda-consultant-specialist/references/hipaa_compliance_framework.md",
+            "sha256": "307b4ac3d02254e6961bfa5cc01e36a9baa0947cad1d2518d8c288be0568a703",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/fda-consultant-specialist/references/qsr_compliance_requirements.md",
+            "sha256": "5c85f8d6b26ac67f346fcef8c90f004f276373ee2cdba633ddfd5d069b1a9aa3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/fda-consultant-specialist/scripts/fda_submission_tracker.py",
+            "sha256": "2cea258fea55fb5894f46e1cde260e9b27e1c9b03042cddb1c3389884f4f61c0",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/fda-consultant-specialist/scripts/hipaa_risk_assessment.py",
+            "sha256": "54b3b000b0c870b2c363dfbbe63f37154ec40c44bedd7ab150076d1e67d30911",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/fda-consultant-specialist/scripts/qsr_compliance_checker.py",
+            "sha256": "def67b0502f06c928e4e70011886d5704c069c57db50bdb4a797cc96a1623fca",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "FDA regulatory consultant for medical device companies. Provides 510(k)/PMA/De Novo pathway guidance, QMSR (21 CFR 820, which incorporates ISO 13485:2016 by reference since 2026-02-02; formerly QSR) compliance, HIPAA assessments, and device cybersecurity. Use when user mentions FDA submission, 510(k), PMA, De Novo, QMSR, QSR, ISO 13485 for FDA, premarket, predicate device, substantial equivalence, HIPAA medical device, or FDA cybersecurity.",
       "tools": [
         {
-          "script": "ra-qm-team/skills/fda-consultant-specialist/scripts/fda_submission_tracker.py",
+          "script": "skills/ra-qm-team/skills/fda-consultant-specialist/scripts/fda_submission_tracker.py",
+          "sha256": "2cea258fea55fb5894f46e1cde260e9b27e1c9b03042cddb1c3389884f4f61c0",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/fda-consultant-specialist/scripts/fda_submission_tracker.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/fda-consultant-specialist/scripts/fda_submission_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/fda-consultant-specialist/scripts/hipaa_risk_assessment.py",
+          "script": "skills/ra-qm-team/skills/fda-consultant-specialist/scripts/hipaa_risk_assessment.py",
+          "sha256": "54b3b000b0c870b2c363dfbbe63f37154ec40c44bedd7ab150076d1e67d30911",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/fda-consultant-specialist/scripts/hipaa_risk_assessment.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/fda-consultant-specialist/scripts/hipaa_risk_assessment.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/fda-consultant-specialist/scripts/qsr_compliance_checker.py",
+          "script": "skills/ra-qm-team/skills/fda-consultant-specialist/scripts/qsr_compliance_checker.py",
+          "sha256": "def67b0502f06c928e4e70011886d5704c069c57db50bdb4a797cc96a1623fca",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/fda-consultant-specialist/scripts/qsr_compliance_checker.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/fda-consultant-specialist/scripts/qsr_compliance_checker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -307,49 +581,101 @@
         "close_out": false
       },
       "references": [
-        "device_cybersecurity_guidance.md",
-        "fda_capa_requirements.md",
-        "fda_submission_guide.md",
-        "hipaa_compliance_framework.md",
-        "qsr_compliance_requirements.md"
+        "skills/ra-qm-team/skills/fda-consultant-specialist/references/device_cybersecurity_guidance.md",
+        "skills/ra-qm-team/skills/fda-consultant-specialist/references/fda_capa_requirements.md",
+        "skills/ra-qm-team/skills/fda-consultant-specialist/references/fda_submission_guide.md",
+        "skills/ra-qm-team/skills/fda-consultant-specialist/references/hipaa_compliance_framework.md",
+        "skills/ra-qm-team/skills/fda-consultant-specialist/references/qsr_compliance_requirements.md"
       ]
     },
     {
       "name": "gdpr-dsgvo-expert",
-      "path": "ra-qm-team/skills/gdpr-dsgvo-expert",
+      "path": "skills/ra-qm-team/skills/gdpr-dsgvo-expert",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "gdpr-dsgvo-expert",
+        "skill_path": "skills/ra-qm-team/skills/gdpr-dsgvo-expert",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/gdpr-dsgvo-expert/SKILL.md",
+            "sha256": "e38fb1b48caa820bb00a8d978d59c6b38d38e150590795f4a662ce0ed4604f50",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/gdpr-dsgvo-expert/references/dpia_methodology.md",
+            "sha256": "61a12d5fc062de4b8c6cf2c619b1ea196b564efd790f8bf6907c2a2ddda8c1cd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/gdpr-dsgvo-expert/references/gdpr_audit_playbook.md",
+            "sha256": "4e8b185f3cf38b3db7a348dcdebb0f136aac951bf9fe09f4927e1a92660d32c7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/gdpr-dsgvo-expert/references/gdpr_compliance_guide.md",
+            "sha256": "553c7b24b429d956a4e656fccdda3464692a58599b757dc2a90f3e72e1346c0a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/gdpr-dsgvo-expert/references/german_bdsg_requirements.md",
+            "sha256": "c61e760afb31faa8712420ac1d9b32e31f6ad94c1d5d44325330d2d7f7f39691",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/gdpr-dsgvo-expert/scripts/data_subject_rights_tracker.py",
+            "sha256": "18c29eb6190557b06cffaa02e2db9153f9999a478ade611c31c86eb359eccef1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/gdpr-dsgvo-expert/scripts/dpia_generator.py",
+            "sha256": "d2d8b7608d576bde6485fd4cb4e7ec86e8ec982b1712186b9bb2cd88dfb8d78c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/gdpr-dsgvo-expert/scripts/gdpr_compliance_checker.py",
+            "sha256": "3c63d2562eaae91a4235f83a2ba0a41ba95f2417c996f26e9c2b39a035450faf",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "GDPR and German DSGVO compliance automation. Scans codebases for privacy risks, generates DPIA documentation, tracks data subject rights requests with Art. 12(3) one-month deadlines. Use when running GDPR compliance assessments, privacy audits, data protection planning, DPIA generation, or data subject rights (DSAR) management (e.g., 'check this service for GDPR risks', 'track an access request deadline'). Final compliance determinations route to the DPO or legal counsel.",
       "tools": [
         {
-          "script": "ra-qm-team/skills/gdpr-dsgvo-expert/scripts/data_subject_rights_tracker.py",
+          "script": "skills/ra-qm-team/skills/gdpr-dsgvo-expert/scripts/data_subject_rights_tracker.py",
+          "sha256": "18c29eb6190557b06cffaa02e2db9153f9999a478ade611c31c86eb359eccef1",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/gdpr-dsgvo-expert/scripts/data_subject_rights_tracker.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/gdpr-dsgvo-expert/scripts/data_subject_rights_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/gdpr-dsgvo-expert/scripts/dpia_generator.py",
+          "script": "skills/ra-qm-team/skills/gdpr-dsgvo-expert/scripts/dpia_generator.py",
+          "sha256": "d2d8b7608d576bde6485fd4cb4e7ec86e8ec982b1712186b9bb2cd88dfb8d78c",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/gdpr-dsgvo-expert/scripts/dpia_generator.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/gdpr-dsgvo-expert/scripts/dpia_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/gdpr-dsgvo-expert/scripts/gdpr_compliance_checker.py",
+          "script": "skills/ra-qm-team/skills/gdpr-dsgvo-expert/scripts/gdpr_compliance_checker.py",
+          "sha256": "3c63d2562eaae91a4235f83a2ba0a41ba95f2417c996f26e9c2b39a035450faf",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/gdpr-dsgvo-expert/scripts/gdpr_compliance_checker.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/gdpr-dsgvo-expert/scripts/gdpr_compliance_checker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -364,36 +690,77 @@
         "close_out": false
       },
       "references": [
-        "dpia_methodology.md",
-        "gdpr_audit_playbook.md",
-        "gdpr_compliance_guide.md",
-        "german_bdsg_requirements.md"
+        "skills/ra-qm-team/skills/gdpr-dsgvo-expert/references/dpia_methodology.md",
+        "skills/ra-qm-team/skills/gdpr-dsgvo-expert/references/gdpr_audit_playbook.md",
+        "skills/ra-qm-team/skills/gdpr-dsgvo-expert/references/gdpr_compliance_guide.md",
+        "skills/ra-qm-team/skills/gdpr-dsgvo-expert/references/german_bdsg_requirements.md"
       ]
     },
     {
       "name": "information-security-manager-iso27001",
-      "path": "ra-qm-team/skills/information-security-manager-iso27001",
+      "path": "skills/ra-qm-team/skills/information-security-manager-iso27001",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "information-security-manager-iso27001",
+        "skill_path": "skills/ra-qm-team/skills/information-security-manager-iso27001",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/information-security-manager-iso27001/SKILL.md",
+            "sha256": "ea00ebeff008acc2b94359ac15912823417d0784f4132acfa02002128da7d101",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/information-security-manager-iso27001/references/incident-response.md",
+            "sha256": "266db8e691d501512b60fdf948332601b44ce45577f13c284fef64507ec5b9a1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/information-security-manager-iso27001/references/iso27001-controls.md",
+            "sha256": "6a43451521d4d438dde3f7d1fc6338d9f312e49212291c460998aa2061f2a1c2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/information-security-manager-iso27001/references/risk-assessment-guide.md",
+            "sha256": "618090fcb9c94b0705bd0f89cc3fe9014f15fac79dac23edc0714354b86b3af1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/information-security-manager-iso27001/scripts/compliance_checker.py",
+            "sha256": "cdef6b2dda8eaeb5d35f53e26f7ec9921077bddea6937335b5f4ee0daf0d653d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/information-security-manager-iso27001/scripts/risk_assessment.py",
+            "sha256": "9e8adf14ae3a157667d40f8a6d3c77a9113a39be6485ba76c527d8da30850bd7",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "ISO 27001 ISMS implementation and cybersecurity governance for HealthTech and MedTech companies. Use when designing an ISMS, running security risk assessments, implementing controls, pursuing ISO 27001 certification, preparing security audits, responding to security incidents, or verifying compliance. Covers ISO 27001, ISO 27002, healthcare security, and medical device cybersecurity.",
       "tools": [
         {
-          "script": "ra-qm-team/skills/information-security-manager-iso27001/scripts/compliance_checker.py",
+          "script": "skills/ra-qm-team/skills/information-security-manager-iso27001/scripts/compliance_checker.py",
+          "sha256": "cdef6b2dda8eaeb5d35f53e26f7ec9921077bddea6937335b5f4ee0daf0d653d",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/information-security-manager-iso27001/scripts/compliance_checker.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/information-security-manager-iso27001/scripts/compliance_checker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/information-security-manager-iso27001/scripts/risk_assessment.py",
+          "script": "skills/ra-qm-team/skills/information-security-manager-iso27001/scripts/risk_assessment.py",
+          "sha256": "9e8adf14ae3a157667d40f8a6d3c77a9113a39be6485ba76c527d8da30850bd7",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/information-security-manager-iso27001/scripts/risk_assessment.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/information-security-manager-iso27001/scripts/risk_assessment.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -408,23 +775,63 @@
         "close_out": true
       },
       "references": [
-        "incident-response.md",
-        "iso27001-controls.md",
-        "risk-assessment-guide.md"
+        "skills/ra-qm-team/skills/information-security-manager-iso27001/references/incident-response.md",
+        "skills/ra-qm-team/skills/information-security-manager-iso27001/references/iso27001-controls.md",
+        "skills/ra-qm-team/skills/information-security-manager-iso27001/references/risk-assessment-guide.md"
       ]
     },
     {
       "name": "isms-audit-expert",
-      "path": "ra-qm-team/skills/isms-audit-expert",
+      "path": "skills/ra-qm-team/skills/isms-audit-expert",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "isms-audit-expert",
+        "skill_path": "skills/ra-qm-team/skills/isms-audit-expert",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/isms-audit-expert/SKILL.md",
+            "sha256": "99fddd2db9f85167eeb47474bf3b30eea28062377c8e14dc2f188c2607062e8e",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/isms-audit-expert/references/cloud-security-audit.md",
+            "sha256": "85d755a19bfa26d446aaba6cb4dcfac41f8edb35e97ca394a48e4fa136c8d236",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/isms-audit-expert/references/iso27001-audit-methodology.md",
+            "sha256": "52095d18f769d04753fd27758126916fc1e3e15d816ec23472080b7441f34fdd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/isms-audit-expert/references/iso27001_audit_playbook.md",
+            "sha256": "ba4d562e71f9085e394dd0fe15a118d492086c1e74325abedd89bd8a05bdda5b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/isms-audit-expert/references/security-control-testing.md",
+            "sha256": "535d048d4ff23b4364b48bf2be409d7f2408041d75ae2b13296be16e7100e7e3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/isms-audit-expert/scripts/isms_audit_scheduler.py",
+            "sha256": "e9b55b6e5dabb8e400ace8dbff2dea48ace645aa300e0e92e6e973ee1be881bd",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Information Security Management System (ISMS) audit expert for ISO 27001 compliance verification, security control assessment, and certification support. Use when the user mentions ISO 27001, ISMS audit, Annex A controls, Statement of Applicability (SOA), gap analysis, nonconformity management, internal audit, surveillance audit, or security certification preparation. Helps review control implementation evidence, document audit findings, classify nonconformities, generate risk-based audit plans, map controls to Annex A requirements, prepare Stage 1 and Stage 2 audit documentation, and \u2026",
       "tools": [
         {
-          "script": "ra-qm-team/skills/isms-audit-expert/scripts/isms_audit_scheduler.py",
+          "script": "skills/ra-qm-team/skills/isms-audit-expert/scripts/isms_audit_scheduler.py",
+          "sha256": "e9b55b6e5dabb8e400ace8dbff2dea48ace645aa300e0e92e6e973ee1be881bd",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/isms-audit-expert/scripts/isms_audit_scheduler.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/isms-audit-expert/scripts/isms_audit_scheduler.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -439,48 +846,100 @@
         "close_out": true
       },
       "references": [
-        "cloud-security-audit.md",
-        "iso27001-audit-methodology.md",
-        "iso27001_audit_playbook.md",
-        "security-control-testing.md"
+        "skills/ra-qm-team/skills/isms-audit-expert/references/cloud-security-audit.md",
+        "skills/ra-qm-team/skills/isms-audit-expert/references/iso27001-audit-methodology.md",
+        "skills/ra-qm-team/skills/isms-audit-expert/references/iso27001_audit_playbook.md",
+        "skills/ra-qm-team/skills/isms-audit-expert/references/security-control-testing.md"
       ]
     },
     {
       "name": "iso42001-specialist",
-      "path": "ra-qm-team/skills/iso42001-specialist",
+      "path": "skills/ra-qm-team/skills/iso42001-specialist",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "iso42001-specialist",
+        "skill_path": "skills/ra-qm-team/skills/iso42001-specialist",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/iso42001-specialist/SKILL.md",
+            "sha256": "96b964d4bbae3f94c9dd48c5a3decc467bb07e8ce5b4c1765c2214d48c76933a",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/iso42001-specialist/references/aims_controls_annex_a.md",
+            "sha256": "4cbb50b5911ab5c37486fade6d29c8c5bfba93046fb707ee4389e28ac4ee3c0e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/iso42001-specialist/references/aims_implementation_guide.md",
+            "sha256": "94318013d71e3b10c301bcad3405ade58dd99528cfc1dbbcef42a447be358a1b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/iso42001-specialist/references/cross_framework_mapping_ai.md",
+            "sha256": "f740944dceed5f343a649d92444cad6be7d7567a4004981038aaac42612f1561",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/iso42001-specialist/references/iso42001_clauses.md",
+            "sha256": "d35819ac5313e95b3b668194590afbc56b427740b8b6c7978de3872223a9a46a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/iso42001-specialist/scripts/ai_risk_register_builder.py",
+            "sha256": "3a3d020363cdd25af128c964f506f6ef9d3cd20df7d820caabb631ac2766dfc3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/iso42001-specialist/scripts/aims_audit_scheduler.py",
+            "sha256": "166c3cf0ec4a578d1af977db0b81a0473e4c0eba8cc3cb8197741e22d59d9d22",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/iso42001-specialist/scripts/aims_gap_analyzer.py",
+            "sha256": "b0b69124e1799f9f189ba8355eff76364b4de4a3bbcdb2f7e02ee9aab0488e74",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "ISO/IEC 42001:2023 AI Management System (AIMS) specialist for compliance teams running internal audits. Three decisions: (1) Where are the gaps against Clauses 4-10 and what do we close first? (2) What goes in the AI risk register and which Annex A controls treat each risk? (3) What's the 12-month internal audit plan that satisfies Clause 9.2? Use when preparing for certification, scoping internal audit cycles, or onboarding AI systems into an existing ISMS (27001) / QMS (13485) program. NOT an executive AI strategy skill (see chief-ai-officer-advisor). NOT EU AI Act compliance (see \u2026",
       "tools": [
         {
-          "script": "ra-qm-team/skills/iso42001-specialist/scripts/ai_risk_register_builder.py",
+          "script": "skills/ra-qm-team/skills/iso42001-specialist/scripts/ai_risk_register_builder.py",
+          "sha256": "3a3d020363cdd25af128c964f506f6ef9d3cd20df7d820caabb631ac2766dfc3",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/iso42001-specialist/scripts/ai_risk_register_builder.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/iso42001-specialist/scripts/ai_risk_register_builder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/iso42001-specialist/scripts/aims_audit_scheduler.py",
+          "script": "skills/ra-qm-team/skills/iso42001-specialist/scripts/aims_audit_scheduler.py",
+          "sha256": "166c3cf0ec4a578d1af977db0b81a0473e4c0eba8cc3cb8197741e22d59d9d22",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/iso42001-specialist/scripts/aims_audit_scheduler.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/iso42001-specialist/scripts/aims_audit_scheduler.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/iso42001-specialist/scripts/aims_gap_analyzer.py",
+          "script": "skills/ra-qm-team/skills/iso42001-specialist/scripts/aims_gap_analyzer.py",
+          "sha256": "b0b69124e1799f9f189ba8355eff76364b4de4a3bbcdb2f7e02ee9aab0488e74",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/iso42001-specialist/scripts/aims_gap_analyzer.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/iso42001-specialist/scripts/aims_gap_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -495,24 +954,59 @@
         "close_out": false
       },
       "references": [
-        "aims_controls_annex_a.md",
-        "aims_implementation_guide.md",
-        "cross_framework_mapping_ai.md",
-        "iso42001_clauses.md"
+        "skills/ra-qm-team/skills/iso42001-specialist/references/aims_controls_annex_a.md",
+        "skills/ra-qm-team/skills/iso42001-specialist/references/aims_implementation_guide.md",
+        "skills/ra-qm-team/skills/iso42001-specialist/references/cross_framework_mapping_ai.md",
+        "skills/ra-qm-team/skills/iso42001-specialist/references/iso42001_clauses.md"
       ]
     },
     {
       "name": "mdr-745-specialist",
-      "path": "ra-qm-team/skills/mdr-745-specialist",
+      "path": "skills/ra-qm-team/skills/mdr-745-specialist",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "mdr-745-specialist",
+        "skill_path": "skills/ra-qm-team/skills/mdr-745-specialist",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/mdr-745-specialist/SKILL.md",
+            "sha256": "054682d1d6cd2eeb0f783845589ba498c3fc8770d4edd23792e2b2cf616aad1d",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/mdr-745-specialist/references/clinical-evidence-requirements.md",
+            "sha256": "d9c8dd9a59f77c3e377c866b3bcb5e9493c50b32adb13f4563ff199912f5de73",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/mdr-745-specialist/references/mdr-classification-guide.md",
+            "sha256": "27c00614d9d9cd1c74f15bef440f8074e867527ddd0383251ef5df2e6164c303",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/mdr-745-specialist/references/technical-documentation-templates.md",
+            "sha256": "131f6d091667dc8ee28e87f37d53f86f10d67279916ed0f06a042cd4cd8269fd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/mdr-745-specialist/scripts/mdr_gap_analyzer.py",
+            "sha256": "5fae41a949ba40900a4ba9460a113ae03e72781b4964b1132884718089089e6e",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "EU MDR 2017/745 compliance specialist for medical device classification, technical documentation, clinical evidence, and post-market surveillance. Covers Annex VIII classification rules, Annex II/III technical files, Annex XIV clinical evaluation, Art. 86 PSUR schedules, and EUDAMED integration. Use when classifying a medical device under MDR, building or gap-checking a technical file, planning clinical evaluation or PMS/PSUR cadence, or preparing for notified body review (e.g., 'what class is my device under MDR', 'review my PSUR schedule').",
       "tools": [
         {
-          "script": "ra-qm-team/skills/mdr-745-specialist/scripts/mdr_gap_analyzer.py",
+          "script": "skills/ra-qm-team/skills/mdr-745-specialist/scripts/mdr_gap_analyzer.py",
+          "sha256": "5fae41a949ba40900a4ba9460a113ae03e72781b4964b1132884718089089e6e",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/mdr-745-specialist/scripts/mdr_gap_analyzer.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/mdr-745-specialist/scripts/mdr_gap_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -527,23 +1021,58 @@
         "close_out": false
       },
       "references": [
-        "clinical-evidence-requirements.md",
-        "mdr-classification-guide.md",
-        "technical-documentation-templates.md"
+        "skills/ra-qm-team/skills/mdr-745-specialist/references/clinical-evidence-requirements.md",
+        "skills/ra-qm-team/skills/mdr-745-specialist/references/mdr-classification-guide.md",
+        "skills/ra-qm-team/skills/mdr-745-specialist/references/technical-documentation-templates.md"
       ]
     },
     {
       "name": "qms-audit-expert",
-      "path": "ra-qm-team/skills/qms-audit-expert",
+      "path": "skills/ra-qm-team/skills/qms-audit-expert",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "qms-audit-expert",
+        "skill_path": "skills/ra-qm-team/skills/qms-audit-expert",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/qms-audit-expert/SKILL.md",
+            "sha256": "118f50d21ef29b6945fd3b6a5e1edbe5b3c7966fa6c995b94b2a3b97e00bbd92",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/qms-audit-expert/references/iso13485-audit-guide.md",
+            "sha256": "ecdb052b2068f48d1272375df42e4702091dcf85d8b986a93160b8a6d67add97",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/qms-audit-expert/references/iso13485_audit_playbook.md",
+            "sha256": "2ecd175165001e9437cd3c54f922f2e130ecec7eab319246e13776e9c203194d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/qms-audit-expert/references/nonconformity-classification.md",
+            "sha256": "416d87f50788e0f706b0840ad7dde7d3b93662b6132e245a4265441bb0dc1d9c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/qms-audit-expert/scripts/audit_schedule_optimizer.py",
+            "sha256": "2ace9b9f864ad65aa8c61c5a9fa768a7d69dbe11026ab6a65803264684748eed",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "ISO 13485 internal audit expertise for medical device QMS. Covers audit planning, execution, nonconformity classification, and CAPA verification. Use when planning internal audits, executing audits, classifying findings, preparing for external audits, or managing an audit program.",
       "tools": [
         {
-          "script": "ra-qm-team/skills/qms-audit-expert/scripts/audit_schedule_optimizer.py",
+          "script": "skills/ra-qm-team/skills/qms-audit-expert/scripts/audit_schedule_optimizer.py",
+          "sha256": "2ace9b9f864ad65aa8c61c5a9fa768a7d69dbe11026ab6a65803264684748eed",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/qms-audit-expert/scripts/audit_schedule_optimizer.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/qms-audit-expert/scripts/audit_schedule_optimizer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -558,40 +1087,76 @@
         "close_out": false
       },
       "references": [
-        "iso13485-audit-guide.md",
-        "iso13485_audit_playbook.md",
-        "nonconformity-classification.md"
+        "skills/ra-qm-team/skills/qms-audit-expert/references/iso13485-audit-guide.md",
+        "skills/ra-qm-team/skills/qms-audit-expert/references/iso13485_audit_playbook.md",
+        "skills/ra-qm-team/skills/qms-audit-expert/references/nonconformity-classification.md"
       ]
     },
     {
       "name": "quality-documentation-manager",
-      "path": "ra-qm-team/skills/quality-documentation-manager",
+      "path": "skills/ra-qm-team/skills/quality-documentation-manager",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "quality-documentation-manager",
+        "skill_path": "skills/ra-qm-team/skills/quality-documentation-manager",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/quality-documentation-manager/SKILL.md",
+            "sha256": "8b677b83f5f9ad0c1f4a1dbe0691a1193c41a531fb20381872a8be5f5f0fd355",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/quality-documentation-manager/references/21cfr11-compliance-guide.md",
+            "sha256": "bb36253b1af256180fe3d1ab939a070dded01dee1440f8fb618ebe60cc82f4b5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/quality-documentation-manager/references/document-control-procedures.md",
+            "sha256": "0c3e52a11fbce4d28ca0cd9e83543b68d7df231948433a757d4ce7ecfa97b56e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/quality-documentation-manager/scripts/document_validator.py",
+            "sha256": "e63e6a4c1a7929e3694c040ad6e1c677ac73912e6c0eb179dc89f09185af72d7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/quality-documentation-manager/scripts/document_version_control.py",
+            "sha256": "1b7842a64164a445b6bc365e1553bd0c5cd1dcbaaa1e35e5202255a650befd68",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Document control system management for medical device QMS. Covers document numbering, version control, change management, and 21 CFR Part 11 compliance. Use when working on document control procedures, change control workflows, document numbering, version management, electronic signature compliance, or regulatory documentation review.",
       "tools": [
         {
-          "script": "ra-qm-team/skills/quality-documentation-manager/scripts/document_validator.py",
+          "script": "skills/ra-qm-team/skills/quality-documentation-manager/scripts/document_validator.py",
+          "sha256": "e63e6a4c1a7929e3694c040ad6e1c677ac73912e6c0eb179dc89f09185af72d7",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/quality-documentation-manager/scripts/document_validator.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/quality-documentation-manager/scripts/document_validator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 ra-qm-team/skills/quality-documentation-manager/scripts/document_validator.py --sample",
+              "cmd": "python3 skills/ra-qm-team/skills/quality-documentation-manager/scripts/document_validator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/quality-documentation-manager/scripts/document_version_control.py",
+          "script": "skills/ra-qm-team/skills/quality-documentation-manager/scripts/document_version_control.py",
+          "sha256": "1b7842a64164a445b6bc365e1553bd0c5cd1dcbaaa1e35e5202255a650befd68",
           "wired": false,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/quality-documentation-manager/scripts/document_version_control.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/quality-documentation-manager/scripts/document_version_control.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -606,39 +1171,75 @@
         "close_out": true
       },
       "references": [
-        "21cfr11-compliance-guide.md",
-        "document-control-procedures.md"
+        "skills/ra-qm-team/skills/quality-documentation-manager/references/21cfr11-compliance-guide.md",
+        "skills/ra-qm-team/skills/quality-documentation-manager/references/document-control-procedures.md"
       ]
     },
     {
       "name": "quality-manager-qmr",
-      "path": "ra-qm-team/skills/quality-manager-qmr",
+      "path": "skills/ra-qm-team/skills/quality-manager-qmr",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "quality-manager-qmr",
+        "skill_path": "skills/ra-qm-team/skills/quality-manager-qmr",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/quality-manager-qmr/SKILL.md",
+            "sha256": "8ff6dfdfdbe2361c5a1f4a37a9d1a635cc42c010693dcad4ffd697845bb4afe1",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/quality-manager-qmr/references/management-review-guide.md",
+            "sha256": "0041456401b1f4715a6865222e200af04e28b9a103792fdd5943a88e22fde75f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/quality-manager-qmr/references/quality-kpi-framework.md",
+            "sha256": "f671eacf709f1c51f54df04f88d8528c3f63f183671775f0525677bfb47d2c7b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/quality-manager-qmr/scripts/management_review_tracker.py",
+            "sha256": "38a90b2a3e9383663a9ea3b13cbee1ce5362bce5cd74ec4c1fa66c7147e5be56",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/quality-manager-qmr/scripts/quality_effectiveness_monitor.py",
+            "sha256": "8f8f884daecfc7c75cce78c4031963ce8448aaf820a6d299379953ee91f1a399",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Senior Quality Manager Responsible Person (QMR) for HealthTech and MedTech companies. Provides quality system governance, management review leadership, regulatory compliance oversight, and quality performance monitoring per ISO 13485 Clause 5.5.2. Use when leading management reviews, setting quality policy and objectives, monitoring quality KPIs and cost of quality, or exercising QMR governance and regulatory oversight responsibilities.",
       "tools": [
         {
-          "script": "ra-qm-team/skills/quality-manager-qmr/scripts/management_review_tracker.py",
+          "script": "skills/ra-qm-team/skills/quality-manager-qmr/scripts/management_review_tracker.py",
+          "sha256": "38a90b2a3e9383663a9ea3b13cbee1ce5362bce5cd74ec4c1fa66c7147e5be56",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/quality-manager-qmr/scripts/management_review_tracker.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/quality-manager-qmr/scripts/management_review_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 ra-qm-team/skills/quality-manager-qmr/scripts/management_review_tracker.py --sample",
+              "cmd": "python3 skills/ra-qm-team/skills/quality-manager-qmr/scripts/management_review_tracker.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/quality-manager-qmr/scripts/quality_effectiveness_monitor.py",
+          "script": "skills/ra-qm-team/skills/quality-manager-qmr/scripts/quality_effectiveness_monitor.py",
+          "sha256": "8f8f884daecfc7c75cce78c4031963ce8448aaf820a6d299379953ee91f1a399",
           "wired": false,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/quality-manager-qmr/scripts/quality_effectiveness_monitor.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/quality-manager-qmr/scripts/quality_effectiveness_monitor.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -653,22 +1254,52 @@
         "close_out": true
       },
       "references": [
-        "management-review-guide.md",
-        "quality-kpi-framework.md"
+        "skills/ra-qm-team/skills/quality-manager-qmr/references/management-review-guide.md",
+        "skills/ra-qm-team/skills/quality-manager-qmr/references/quality-kpi-framework.md"
       ]
     },
     {
       "name": "quality-manager-qms-iso13485",
-      "path": "ra-qm-team/skills/quality-manager-qms-iso13485",
+      "path": "skills/ra-qm-team/skills/quality-manager-qms-iso13485",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "quality-manager-qms-iso13485",
+        "skill_path": "skills/ra-qm-team/skills/quality-manager-qms-iso13485",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/quality-manager-qms-iso13485/SKILL.md",
+            "sha256": "be426a7fa7c7b64988e836dcb388adcc8399beba86769aad71b4103c034f8833",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/quality-manager-qms-iso13485/references/iso13485-clause-requirements.md",
+            "sha256": "f094cd6c882264f40e36c703fa4a78ce6b7d5544b8d4d457cb4d53448e239921",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/quality-manager-qms-iso13485/references/qms-process-templates.md",
+            "sha256": "a8133506175daefd14d0fd705c76c7cab98e5ce590bfbf2d93de8c98a2218fee",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/quality-manager-qms-iso13485/scripts/qms_audit_checklist.py",
+            "sha256": "dc55b83ccb49a1e4aa23f61239bbdac7dfa4215f2fff8ebb940ead37f811cab9",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "ISO 13485 Quality Management System implementation and maintenance for medical device organizations. Provides QMS design, documentation control, internal auditing, CAPA management, and certification support. Use when working with medical device quality systems, preparing for ISO 13485 audits, managing regulatory compliance documentation, setting up corrective actions, or building audit preparation programs. Useful for quality management, audit preparation, regulatory compliance, medical device documentation, and corrective action workflows.",
       "tools": [
         {
-          "script": "ra-qm-team/skills/quality-manager-qms-iso13485/scripts/qms_audit_checklist.py",
+          "script": "skills/ra-qm-team/skills/quality-manager-qms-iso13485/scripts/qms_audit_checklist.py",
+          "sha256": "dc55b83ccb49a1e4aa23f61239bbdac7dfa4215f2fff8ebb940ead37f811cab9",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/quality-manager-qms-iso13485/scripts/qms_audit_checklist.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/quality-manager-qms-iso13485/scripts/qms_audit_checklist.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -683,13 +1314,27 @@
         "close_out": true
       },
       "references": [
-        "iso13485-clause-requirements.md",
-        "qms-process-templates.md"
+        "skills/ra-qm-team/skills/quality-manager-qms-iso13485/references/iso13485-clause-requirements.md",
+        "skills/ra-qm-team/skills/quality-manager-qms-iso13485/references/qms-process-templates.md"
       ]
     },
     {
       "name": "ra-qm-skills",
-      "path": "ra-qm-team/skills/ra-qm-skills",
+      "path": "skills/ra-qm-team/skills/ra-qm-skills",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "ra-qm-skills",
+        "skill_path": "skills/ra-qm-team/skills/ra-qm-skills",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/ra-qm-skills/SKILL.md",
+            "sha256": "0567bc2c021733109eb87b227069bdf1070c4311470ab92fbf7c4375edebb308",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Router/index for the 15 regulatory & quality-management skills bundled in this plugin (ISO 13485 QMS, EU MDR 2017/745, FDA submissions under QMSR, ISO 14971 risk, CAPA, document control, ISO 27001/ISMS, ISO 42001 AIMS, EU AI Act, GDPR/DSGVO, SOC 2, auditing). Use when a compliance request doesn't obviously match one skill and you need to pick the right one (e.g., 'prepare us for an ISO 13485 audit', 'is my AI system high-risk under the AI Act').",
       "tools": [],
       "agentic_signals": {
@@ -703,28 +1348,74 @@
     },
     {
       "name": "regulatory-affairs-head",
-      "path": "ra-qm-team/skills/regulatory-affairs-head",
+      "path": "skills/ra-qm-team/skills/regulatory-affairs-head",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "regulatory-affairs-head",
+        "skill_path": "skills/ra-qm-team/skills/regulatory-affairs-head",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/regulatory-affairs-head/SKILL.md",
+            "sha256": "e2e4fa920a82cbc24f437fc5e2a8a1b1a219c61b81dbc5a5d9f7c86e56b08b4c",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/regulatory-affairs-head/references/eu-mdr-submission-guide.md",
+            "sha256": "e3b65624ccb289814e779816e8f161ecb65994c09b9934b55800ef29fb75c1e2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/regulatory-affairs-head/references/fda-submission-guide.md",
+            "sha256": "3c2b03f6f0965d0584e9c611a25d78ab5c2c49ef913ef476daecb6f5a82c24c7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/regulatory-affairs-head/references/global-regulatory-pathways.md",
+            "sha256": "a271cb0e359dd06a94b34f9c95a75e5286e9d34328a99129b2bc84c73d9eba8f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/regulatory-affairs-head/references/iso-regulatory-requirements.md",
+            "sha256": "62c831f2c60b0545b411648a2a6160a919cf9cb66eed633d82084529cc75e5c2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/regulatory-affairs-head/scripts/regulatory_pathway_analyzer.py",
+            "sha256": "69778b34ce6e5de709a2cae77bdfb2aa013a820e2341bb0f6205b5c0e29e52c4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/regulatory-affairs-head/scripts/regulatory_tracker.py",
+            "sha256": "f56e00b5670996f9f746f1f61d95871a380621ba24787b40ea27eb3ed315c1c3",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Senior Regulatory Affairs Manager for HealthTech and MedTech companies. Prepares FDA 510(k), De Novo, and PMA submission packages; analyzes regulatory pathways for new medical devices; drafts responses to FDA deficiency letters and Notified Body queries; develops CE marking technical documentation under EU MDR 2017/745; coordinates multi-market approval strategies across FDA, EU, Health Canada, PMDA, and NMPA; and maintains regulatory intelligence on evolving standards. Use when users need to plan or execute FDA submissions, navigate 510(k) or PMA approval processes, achieve CE marking \u2026",
       "tools": [
         {
-          "script": "ra-qm-team/skills/regulatory-affairs-head/scripts/regulatory_pathway_analyzer.py",
+          "script": "skills/ra-qm-team/skills/regulatory-affairs-head/scripts/regulatory_pathway_analyzer.py",
+          "sha256": "69778b34ce6e5de709a2cae77bdfb2aa013a820e2341bb0f6205b5c0e29e52c4",
           "wired": false,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/regulatory-affairs-head/scripts/regulatory_pathway_analyzer.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/regulatory-affairs-head/scripts/regulatory_pathway_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/regulatory-affairs-head/scripts/regulatory_tracker.py",
+          "script": "skills/ra-qm-team/skills/regulatory-affairs-head/scripts/regulatory_tracker.py",
+          "sha256": "f56e00b5670996f9f746f1f61d95871a380621ba24787b40ea27eb3ed315c1c3",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/regulatory-affairs-head/scripts/regulatory_tracker.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/regulatory-affairs-head/scripts/regulatory_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -739,36 +1430,77 @@
         "close_out": true
       },
       "references": [
-        "eu-mdr-submission-guide.md",
-        "fda-submission-guide.md",
-        "global-regulatory-pathways.md",
-        "iso-regulatory-requirements.md"
+        "skills/ra-qm-team/skills/regulatory-affairs-head/references/eu-mdr-submission-guide.md",
+        "skills/ra-qm-team/skills/regulatory-affairs-head/references/fda-submission-guide.md",
+        "skills/ra-qm-team/skills/regulatory-affairs-head/references/global-regulatory-pathways.md",
+        "skills/ra-qm-team/skills/regulatory-affairs-head/references/iso-regulatory-requirements.md"
       ]
     },
     {
       "name": "risk-management-specialist",
-      "path": "ra-qm-team/skills/risk-management-specialist",
+      "path": "skills/ra-qm-team/skills/risk-management-specialist",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "risk-management-specialist",
+        "skill_path": "skills/ra-qm-team/skills/risk-management-specialist",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/risk-management-specialist/SKILL.md",
+            "sha256": "8d46b54a8d7c896a921f1df4a9976b8921560b44602891deb3553b4012d6b72f",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/risk-management-specialist/references/iso14971-implementation-guide.md",
+            "sha256": "4d02762c50670cdf40287a98864530deeb495929f4bba8fdeb449b61f60cfb7c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/risk-management-specialist/references/risk-analysis-methods.md",
+            "sha256": "46b56d1105df8661294cb794c1f3ab47a20ede241e71f1b555748ae2c151bd9b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/risk-management-specialist/references/risk-assessment-templates.md",
+            "sha256": "53dd3f1750b67e5bc770f8458b7cbcd3aef68397d4b3443d16995cfefc8d7585",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/risk-management-specialist/scripts/fmea_analyzer.py",
+            "sha256": "105b8b0c3446c0ca5dd6e8fa353c5e73aea2ac27dacaa133d72c5914df292215",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/risk-management-specialist/scripts/risk_matrix_calculator.py",
+            "sha256": "396b53cd4a96efed6167c87b66154a1576dbbe37aee8374db27e75e4b06d3c90",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Medical device risk management specialist implementing ISO 14971 throughout product lifecycle. Provides risk analysis, risk evaluation, risk control, and post-production information analysis. Use when user mentions risk management, ISO 14971, risk analysis, FMEA, fault tree analysis, hazard identification, risk control, risk matrix, benefit-risk analysis, residual risk, risk acceptability, or post-market risk.",
       "tools": [
         {
-          "script": "ra-qm-team/skills/risk-management-specialist/scripts/fmea_analyzer.py",
+          "script": "skills/ra-qm-team/skills/risk-management-specialist/scripts/fmea_analyzer.py",
+          "sha256": "105b8b0c3446c0ca5dd6e8fa353c5e73aea2ac27dacaa133d72c5914df292215",
           "wired": false,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/risk-management-specialist/scripts/fmea_analyzer.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/risk-management-specialist/scripts/fmea_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/risk-management-specialist/scripts/risk_matrix_calculator.py",
+          "script": "skills/ra-qm-team/skills/risk-management-specialist/scripts/risk_matrix_calculator.py",
+          "sha256": "396b53cd4a96efed6167c87b66154a1576dbbe37aee8374db27e75e4b06d3c90",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/risk-management-specialist/scripts/risk_matrix_calculator.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/risk-management-specialist/scripts/risk_matrix_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -783,47 +1515,99 @@
         "close_out": false
       },
       "references": [
-        "iso14971-implementation-guide.md",
-        "risk-analysis-methods.md",
-        "risk-assessment-templates.md"
+        "skills/ra-qm-team/skills/risk-management-specialist/references/iso14971-implementation-guide.md",
+        "skills/ra-qm-team/skills/risk-management-specialist/references/risk-analysis-methods.md",
+        "skills/ra-qm-team/skills/risk-management-specialist/references/risk-assessment-templates.md"
       ]
     },
     {
       "name": "soc2-compliance",
-      "path": "ra-qm-team/skills/soc2-compliance",
+      "path": "skills/ra-qm-team/skills/soc2-compliance",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "soc2-compliance",
+        "skill_path": "skills/ra-qm-team/skills/soc2-compliance",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/ra-qm-team/skills/soc2-compliance/SKILL.md",
+            "sha256": "10f4ff429805eef06e53a4f72c94001481c2c0ac2c4bd98c463d46e5351af6c9",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/soc2-compliance/references/evidence_collection_guide.md",
+            "sha256": "ad448c21b8b8a7e340a12cba4827a5bf5e22bef5a1334895ff7a8da5ac845c8b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/soc2-compliance/references/soc2_audit_playbook.md",
+            "sha256": "a9fe1db6c63bdc9f5799c3013a46249307fc81f7e7311ace5099f1bd94c6045d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/soc2-compliance/references/trust_service_criteria.md",
+            "sha256": "89789508f7a0d64b6a69a3663c5edaac5a71dca7543e6093baaa5c0cb793618b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/soc2-compliance/references/type1_vs_type2.md",
+            "sha256": "4c437f3caeea0d9259a1af0cd0dc6a43e59cc31c05b74323e61c4b84c963ba8e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/soc2-compliance/scripts/control_matrix_builder.py",
+            "sha256": "a09d4dba6f297b1733f82d011d1ea90e3ca2a57a66569dd0199f794f031068c6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/soc2-compliance/scripts/evidence_tracker.py",
+            "sha256": "6ea76e61354090ffe47ac8f605833714cc1ebc3d674ca5debdd98081c7077e86",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/ra-qm-team/skills/soc2-compliance/scripts/gap_analyzer.py",
+            "sha256": "11719f37d54f8cce1b0508fccca4fdd63e15d977b3a94d1abd72018886723268",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when the user asks to prepare for SOC 2 audits, map Trust Service Criteria, build control matrices, collect audit evidence, perform gap analysis, or assess SOC 2 Type I vs Type II readiness.",
       "tools": [
         {
-          "script": "ra-qm-team/skills/soc2-compliance/scripts/control_matrix_builder.py",
+          "script": "skills/ra-qm-team/skills/soc2-compliance/scripts/control_matrix_builder.py",
+          "sha256": "a09d4dba6f297b1733f82d011d1ea90e3ca2a57a66569dd0199f794f031068c6",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/soc2-compliance/scripts/control_matrix_builder.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/soc2-compliance/scripts/control_matrix_builder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/soc2-compliance/scripts/evidence_tracker.py",
+          "script": "skills/ra-qm-team/skills/soc2-compliance/scripts/evidence_tracker.py",
+          "sha256": "6ea76e61354090ffe47ac8f605833714cc1ebc3d674ca5debdd98081c7077e86",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/soc2-compliance/scripts/evidence_tracker.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/soc2-compliance/scripts/evidence_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "ra-qm-team/skills/soc2-compliance/scripts/gap_analyzer.py",
+          "script": "skills/ra-qm-team/skills/soc2-compliance/scripts/gap_analyzer.py",
+          "sha256": "11719f37d54f8cce1b0508fccca4fdd63e15d977b3a94d1abd72018886723268",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 ra-qm-team/skills/soc2-compliance/scripts/gap_analyzer.py --help",
+              "cmd": "python3 skills/ra-qm-team/skills/soc2-compliance/scripts/gap_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -838,10 +1622,10 @@
         "close_out": true
       },
       "references": [
-        "evidence_collection_guide.md",
-        "soc2_audit_playbook.md",
-        "trust_service_criteria.md",
-        "type1_vs_type2.md"
+        "skills/ra-qm-team/skills/soc2-compliance/references/evidence_collection_guide.md",
+        "skills/ra-qm-team/skills/soc2-compliance/references/soc2_audit_playbook.md",
+        "skills/ra-qm-team/skills/soc2-compliance/references/trust_service_criteria.md",
+        "skills/ra-qm-team/skills/soc2-compliance/references/type1_vs_type2.md"
       ]
     }
   ]

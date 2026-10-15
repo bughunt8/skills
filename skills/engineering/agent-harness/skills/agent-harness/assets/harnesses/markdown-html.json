@@ -1,5 +1,5 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "markdown-html",
   "skill_count": 5,
   "loop_defaults": {
@@ -15,50 +15,102 @@
   "skills": [
     {
       "name": "design-system",
-      "path": "markdown-html/skills/design-system",
+      "path": "skills/markdown-html/skills/design-system",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "design-system",
+        "skill_path": "skills/markdown-html/skills/design-system",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/markdown-html/skills/design-system/SKILL.md",
+            "sha256": "8f19d92d008b3bf2a8e83263a657c339303459ee98c02423b6250c30cd1fa5cf",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/markdown-html/skills/design-system/assets/design_system_schema.json",
+            "sha256": "d83aed55e9cf4ca137845bd045f7e8006bdf71077334f94a2d85defe5ccd8cf9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/design-system/references/design_token_canon.md",
+            "sha256": "9dad86298f22ad23659e72afb0da4a1ad474d09ae9c24790cd44973ed871edb3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/design-system/references/typography_pairing.md",
+            "sha256": "5ce049f44e2f6fc53b779ac64aba82569b320124b3a47c9140696bc1e57bcdfa",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/design-system/references/wcag_accessibility.md",
+            "sha256": "a49f0faf0404db5d55b2a91631b22c5e53608bd7f8b81ee7a1f8aec015e0ece9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/design-system/scripts/brand_palette_validator.py",
+            "sha256": "877bcc4af9496abe8dba48f1fe43614504475eab1b8dab8201d03c3809accc8d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/design-system/scripts/config_loader.py",
+            "sha256": "f4188621b5572effccb1d3f040e19540303629ec36bdb19adebe811bee743eab",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/design-system/scripts/onboard.py",
+            "sha256": "74551ca30e90fedd3e78d3d3ccdc37d042574d3a9ac65d67a17748a2222414ed",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Captures the user's brand identity once via a 10-question onboarding wizard (primary/accent HEX + heading + body Google Fonts + design style editorial/technical/minimal/playful + default output directory + syntax theme + TOC behavior + optional logo/company), validates body-text and link contrast against WCAG 2.2 AA, derives 12 CSS custom properties in HSL space, and stores the result for every markdown-html converter to consume. Use before any markdown-html conversion. Triggers on first-run onboarding (\"set up the brand\", \"configure markdown-html\", \"run onboarding\"), on explicit reset \u2026",
       "tools": [
         {
-          "script": "markdown-html/skills/design-system/scripts/brand_palette_validator.py",
+          "script": "skills/markdown-html/skills/design-system/scripts/brand_palette_validator.py",
+          "sha256": "877bcc4af9496abe8dba48f1fe43614504475eab1b8dab8201d03c3809accc8d",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/design-system/scripts/brand_palette_validator.py --help",
+              "cmd": "python3 skills/markdown-html/skills/design-system/scripts/brand_palette_validator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 markdown-html/skills/design-system/scripts/brand_palette_validator.py --sample",
+              "cmd": "python3 skills/markdown-html/skills/design-system/scripts/brand_palette_validator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "markdown-html/skills/design-system/scripts/config_loader.py",
+          "script": "skills/markdown-html/skills/design-system/scripts/config_loader.py",
+          "sha256": "f4188621b5572effccb1d3f040e19540303629ec36bdb19adebe811bee743eab",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/design-system/scripts/config_loader.py --help",
+              "cmd": "python3 skills/markdown-html/skills/design-system/scripts/config_loader.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 markdown-html/skills/design-system/scripts/config_loader.py --sample",
+              "cmd": "python3 skills/markdown-html/skills/design-system/scripts/config_loader.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "markdown-html/skills/design-system/scripts/onboard.py",
+          "script": "skills/markdown-html/skills/design-system/scripts/onboard.py",
+          "sha256": "74551ca30e90fedd3e78d3d3ccdc37d042574d3a9ac65d67a17748a2222414ed",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/design-system/scripts/onboard.py --help",
+              "cmd": "python3 skills/markdown-html/skills/design-system/scripts/onboard.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -73,57 +125,104 @@
         "close_out": false
       },
       "references": [
-        "design_token_canon.md",
-        "typography_pairing.md",
-        "wcag_accessibility.md"
+        "skills/markdown-html/skills/design-system/references/design_token_canon.md",
+        "skills/markdown-html/skills/design-system/references/typography_pairing.md",
+        "skills/markdown-html/skills/design-system/references/wcag_accessibility.md"
       ]
     },
     {
       "name": "markdown-html-orchestrator",
-      "path": "markdown-html/skills/markdown-html-orchestrator",
+      "path": "skills/markdown-html/skills/markdown-html-orchestrator",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "markdown-html-orchestrator",
+        "skill_path": "skills/markdown-html/skills/markdown-html-orchestrator",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/markdown-html/skills/markdown-html-orchestrator/SKILL.md",
+            "sha256": "a7e7c18f92b03927d52e89f05a0ae52ae8d595681baab80dbcf9d58ddd3006fb",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/markdown-html/skills/markdown-html-orchestrator/references/information_density_canon.md",
+            "sha256": "d4e4ab97db469b3948602fcebe9a8440694a3e3998e9097a1cc3cd9dee8adf34",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/markdown-html-orchestrator/references/orchestrator_routing_patterns.md",
+            "sha256": "a9ffa52c4b78d46b539c4885fe64af88dd9738bcdc32482f8a1ff0edc2446ecb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/markdown-html-orchestrator/references/single_file_html_discipline.md",
+            "sha256": "7bae6302c977580e9769e4df75450f067fb3817cdf9553472e6613a3e3d989d1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/markdown-html-orchestrator/scripts/doctype_classifier.py",
+            "sha256": "871296a9dde9b0c678541c7a212a1834af88121956a32373bbefc08a0411b1d6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/markdown-html-orchestrator/scripts/output_path_resolver.py",
+            "sha256": "a1199fa699da4e0ce925424596d893ae437f7b6bfd7cb773d9b93c8ee4a95a8c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/markdown-html-orchestrator/scripts/route_explainer.py",
+            "sha256": "6b664756c8ff8433baeca45598ae9322a1e64a9bda07b106bc14f7b3376b2698",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when a user wants to convert any markdown file in their Claude project into a single-file, lightly-interactive HTML \u2014 long-form documents (specs, plans, RFCs, reports, explainers), code reviews with diffs and severity-tagged annotations, or slide decks. Triggers on \"convert this markdown to HTML\", \"make this an HTML file\", \"turn this into an interactive document\", \"render this report as HTML\", \"PR writeup as HTML\", \"slides from this markdown\". Forks context to route to one of three converter sub-skills (md-document, md-review, md-slides) based on a deterministic doctype classifier \u2026",
       "tools": [
         {
-          "script": "markdown-html/skills/markdown-html-orchestrator/scripts/doctype_classifier.py",
+          "script": "skills/markdown-html/skills/markdown-html-orchestrator/scripts/doctype_classifier.py",
+          "sha256": "871296a9dde9b0c678541c7a212a1834af88121956a32373bbefc08a0411b1d6",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/markdown-html-orchestrator/scripts/doctype_classifier.py --help",
+              "cmd": "python3 skills/markdown-html/skills/markdown-html-orchestrator/scripts/doctype_classifier.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 markdown-html/skills/markdown-html-orchestrator/scripts/doctype_classifier.py --sample",
+              "cmd": "python3 skills/markdown-html/skills/markdown-html-orchestrator/scripts/doctype_classifier.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "markdown-html/skills/markdown-html-orchestrator/scripts/output_path_resolver.py",
+          "script": "skills/markdown-html/skills/markdown-html-orchestrator/scripts/output_path_resolver.py",
+          "sha256": "a1199fa699da4e0ce925424596d893ae437f7b6bfd7cb773d9b93c8ee4a95a8c",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/markdown-html-orchestrator/scripts/output_path_resolver.py --help",
+              "cmd": "python3 skills/markdown-html/skills/markdown-html-orchestrator/scripts/output_path_resolver.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 markdown-html/skills/markdown-html-orchestrator/scripts/output_path_resolver.py --sample",
+              "cmd": "python3 skills/markdown-html/skills/markdown-html-orchestrator/scripts/output_path_resolver.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "markdown-html/skills/markdown-html-orchestrator/scripts/route_explainer.py",
+          "script": "skills/markdown-html/skills/markdown-html-orchestrator/scripts/route_explainer.py",
+          "sha256": "6b664756c8ff8433baeca45598ae9322a1e64a9bda07b106bc14f7b3376b2698",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/markdown-html-orchestrator/scripts/route_explainer.py --help",
+              "cmd": "python3 skills/markdown-html/skills/markdown-html-orchestrator/scripts/route_explainer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -138,62 +237,114 @@
         "close_out": true
       },
       "references": [
-        "information_density_canon.md",
-        "orchestrator_routing_patterns.md",
-        "single_file_html_discipline.md"
+        "skills/markdown-html/skills/markdown-html-orchestrator/references/information_density_canon.md",
+        "skills/markdown-html/skills/markdown-html-orchestrator/references/orchestrator_routing_patterns.md",
+        "skills/markdown-html/skills/markdown-html-orchestrator/references/single_file_html_discipline.md"
       ]
     },
     {
       "name": "md-document",
-      "path": "markdown-html/skills/md-document",
+      "path": "skills/markdown-html/skills/md-document",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "md-document",
+        "skill_path": "skills/markdown-html/skills/md-document",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/markdown-html/skills/md-document/SKILL.md",
+            "sha256": "1b008228609e23dad425ddf8c9351fec427a94126abc9c7f80f16cbd79a7f336",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-document/assets/md_document_template.html",
+            "sha256": "a1c3828f0cfc24e7ebe7261cfe5a0aa184763189fed26b8e44a0f87066733f3e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-document/references/information_density_patterns.md",
+            "sha256": "04da58e28738b30608d1273b43d0eebed79cf8f03384fbeca73c61ea71ffd0ab",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-document/references/single_file_html_discipline.md",
+            "sha256": "2697c0daaa78325ff5f9b84df2ac5e471c499b3ddb329171710761fb77285a71",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-document/references/toc_and_nav_ux.md",
+            "sha256": "df41c7a092307627ca3d3dc165d92d10051e793f9bc59d864f0858c29d497d10",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-document/scripts/html_renderer.py",
+            "sha256": "c600ece5dc61a51ff7b24b9d5d1e072f17b0dabe7c2c85210b0a1a38cf8de789",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-document/scripts/interactivity_injector.py",
+            "sha256": "85ef78d347571d85df82a78a406d5eefa2974a506ee50eb378caaf8d8768209e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-document/scripts/markdown_parser.py",
+            "sha256": "94fe74d559a9ceecb59689d17209272b7ccd328f26f0ab6654616313018d2670",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Converts long-form markdown (specs, RFCs, reports, plans, explainers) into a single-file, lightly-interactive HTML document with sticky TOC, scrollspy, search filter, code-copy buttons, and design-system-driven brand tokens. Triggers when the markdown-html-orchestrator classifies an input as DOCUMENT, or when invoked directly via /cs:md-document. Reads the design-system config via config_loader.py and inlines the user's 12 derived CSS custom properties; refuses to render if onboarding hasn't run. Single-file output \u2014 Google Fonts + Prism.js CDN are the only externals; no framework runtime \u2026",
       "tools": [
         {
-          "script": "markdown-html/skills/md-document/scripts/html_renderer.py",
+          "script": "skills/markdown-html/skills/md-document/scripts/html_renderer.py",
+          "sha256": "c600ece5dc61a51ff7b24b9d5d1e072f17b0dabe7c2c85210b0a1a38cf8de789",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/md-document/scripts/html_renderer.py --help",
+              "cmd": "python3 skills/markdown-html/skills/md-document/scripts/html_renderer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 markdown-html/skills/md-document/scripts/html_renderer.py --sample",
+              "cmd": "python3 skills/markdown-html/skills/md-document/scripts/html_renderer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "markdown-html/skills/md-document/scripts/interactivity_injector.py",
+          "script": "skills/markdown-html/skills/md-document/scripts/interactivity_injector.py",
+          "sha256": "85ef78d347571d85df82a78a406d5eefa2974a506ee50eb378caaf8d8768209e",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/md-document/scripts/interactivity_injector.py --help",
+              "cmd": "python3 skills/markdown-html/skills/md-document/scripts/interactivity_injector.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 markdown-html/skills/md-document/scripts/interactivity_injector.py --sample",
+              "cmd": "python3 skills/markdown-html/skills/md-document/scripts/interactivity_injector.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "markdown-html/skills/md-document/scripts/markdown_parser.py",
+          "script": "skills/markdown-html/skills/md-document/scripts/markdown_parser.py",
+          "sha256": "94fe74d559a9ceecb59689d17209272b7ccd328f26f0ab6654616313018d2670",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/md-document/scripts/markdown_parser.py --help",
+              "cmd": "python3 skills/markdown-html/skills/md-document/scripts/markdown_parser.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 markdown-html/skills/md-document/scripts/markdown_parser.py --sample",
+              "cmd": "python3 skills/markdown-html/skills/md-document/scripts/markdown_parser.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -208,62 +359,114 @@
         "close_out": false
       },
       "references": [
-        "information_density_patterns.md",
-        "single_file_html_discipline.md",
-        "toc_and_nav_ux.md"
+        "skills/markdown-html/skills/md-document/references/information_density_patterns.md",
+        "skills/markdown-html/skills/md-document/references/single_file_html_discipline.md",
+        "skills/markdown-html/skills/md-document/references/toc_and_nav_ux.md"
       ]
     },
     {
       "name": "md-review",
-      "path": "markdown-html/skills/md-review",
+      "path": "skills/markdown-html/skills/md-review",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "md-review",
+        "skill_path": "skills/markdown-html/skills/md-review",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/markdown-html/skills/md-review/SKILL.md",
+            "sha256": "35bc4f00511cdb9996745841014ff8792cb3e38a3682b0890a461920b7839a62",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-review/assets/md_review_template.html",
+            "sha256": "e7105ae18f2dd479bd6c7531b8206c8490bf6933600e415392421a8b22a6e2f6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-review/references/diff_rendering_canon.md",
+            "sha256": "9364fb6aa75fe4322c0d26b4943bbcac4000cbb71d2373a599327a24ed6c1752",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-review/references/pr_annotation_ux.md",
+            "sha256": "60058ea423e72b654a539021189773b1d47a916a4d6cc4c7790ebebdfbb8c80f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-review/references/severity_coding.md",
+            "sha256": "4ea9637cf0f86cdb52eebc9641e6a203f0afac11f13d5c7436c108254629ebf4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-review/scripts/annotation_extractor.py",
+            "sha256": "810fe4992eba98d9dc08625dcdc5312577ec236a65b79627b3b12b2636891dbb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-review/scripts/diff_parser.py",
+            "sha256": "be165678573be8847cada3c32088935cd2cb11f5da39bfb3a6d4e28d89e2fcc4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-review/scripts/review_html_renderer.py",
+            "sha256": "2e9a0b20ef8b58ac7436de41455158245283b4ca364d9cd908ec949870561cbe",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Converts a markdown PR writeup or code review (one with ```diff fenced blocks and severity-tagged > [!BLOCKER]/[!MAJOR]/[!MINOR]/[!NIT] callouts) into a single-file 2-column HTML review \u2014 unified-diff on the left, severity-tagged annotation cards on the right, top jump-nav listing every finding, mandatory named reviewer footer. Triggers when the markdown-html-orchestrator classifies an input as REVIEW, or when invoked directly via /cs:md-review. Refuses without explicit --reviewer (a code review must name a human), refuses if no diff hunks present (route to md-document instead), and refuses \u2026",
       "tools": [
         {
-          "script": "markdown-html/skills/md-review/scripts/annotation_extractor.py",
+          "script": "skills/markdown-html/skills/md-review/scripts/annotation_extractor.py",
+          "sha256": "810fe4992eba98d9dc08625dcdc5312577ec236a65b79627b3b12b2636891dbb",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/md-review/scripts/annotation_extractor.py --help",
+              "cmd": "python3 skills/markdown-html/skills/md-review/scripts/annotation_extractor.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 markdown-html/skills/md-review/scripts/annotation_extractor.py --sample",
+              "cmd": "python3 skills/markdown-html/skills/md-review/scripts/annotation_extractor.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "markdown-html/skills/md-review/scripts/diff_parser.py",
+          "script": "skills/markdown-html/skills/md-review/scripts/diff_parser.py",
+          "sha256": "be165678573be8847cada3c32088935cd2cb11f5da39bfb3a6d4e28d89e2fcc4",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/md-review/scripts/diff_parser.py --help",
+              "cmd": "python3 skills/markdown-html/skills/md-review/scripts/diff_parser.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 markdown-html/skills/md-review/scripts/diff_parser.py --sample",
+              "cmd": "python3 skills/markdown-html/skills/md-review/scripts/diff_parser.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "markdown-html/skills/md-review/scripts/review_html_renderer.py",
+          "script": "skills/markdown-html/skills/md-review/scripts/review_html_renderer.py",
+          "sha256": "2e9a0b20ef8b58ac7436de41455158245283b4ca364d9cd908ec949870561cbe",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/md-review/scripts/review_html_renderer.py --help",
+              "cmd": "python3 skills/markdown-html/skills/md-review/scripts/review_html_renderer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 markdown-html/skills/md-review/scripts/review_html_renderer.py --sample",
+              "cmd": "python3 skills/markdown-html/skills/md-review/scripts/review_html_renderer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -278,62 +481,114 @@
         "close_out": false
       },
       "references": [
-        "diff_rendering_canon.md",
-        "pr_annotation_ux.md",
-        "severity_coding.md"
+        "skills/markdown-html/skills/md-review/references/diff_rendering_canon.md",
+        "skills/markdown-html/skills/md-review/references/pr_annotation_ux.md",
+        "skills/markdown-html/skills/md-review/references/severity_coding.md"
       ]
     },
     {
       "name": "md-slides",
-      "path": "markdown-html/skills/md-slides",
+      "path": "skills/markdown-html/skills/md-slides",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "md-slides",
+        "skill_path": "skills/markdown-html/skills/md-slides",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/markdown-html/skills/md-slides/SKILL.md",
+            "sha256": "ac8d8c9b09b2ad72544412279d03673c36b6e2fee024ccddc9463272d62c46ab",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-slides/assets/md_slides_template.html",
+            "sha256": "d648170a1e787fd1f63d47e936257f064679620dc0b260f108c0466243dd632a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-slides/references/keyboard_nav_patterns.md",
+            "sha256": "3ba729cd061c55b7d1c25ac18c4eb897c1608a82f47cb1e446b2e4e3569c4ee7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-slides/references/presentation_ux.md",
+            "sha256": "afa1f7442f5e43239ff5a9bdedb590cc9091f45955dd4afec837f699b54c4d22",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-slides/references/single_file_deck_conventions.md",
+            "sha256": "73b7389338dea42e4356f6519f6aa2839eec62665639bc2e8c17510ee5df4b4f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-slides/scripts/deck_html_renderer.py",
+            "sha256": "9f795302f9473873e250daa1f5c76ebe1203022935bfd715d42e7bcc817d24e8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-slides/scripts/presenter_notes_parser.py",
+            "sha256": "fb437bc0c66b4b8848c0ec2c45096b4a9f8b3ccef0e1cac165c7fbbd6e11ce0f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/markdown-html/skills/md-slides/scripts/slide_splitter.py",
+            "sha256": "089f26a5d87ab9b988288b5994847992dad433afb2177490b7e1406debda05d0",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Converts a markdown deck (slides separated by `---` HR boundaries or by `# ` H1 headings, with optional `<!-- notes: ... -->` presenter notes blocks) into a single-file HTML presentation with arrow-key / space / PgDn / PgUp / Home / End / P / Esc keyboard navigation, presenter mode (split view with current slide + speaker notes + clock + next-slide preview), URL-hash deep linking, and `@media print` page-per-slide for PDF export. Triggers when the markdown-html-orchestrator classifies an input as SLIDES, or when invoked directly via /cs:md-slides. Reuses md-document's markdown parser for \u2026",
       "tools": [
         {
-          "script": "markdown-html/skills/md-slides/scripts/deck_html_renderer.py",
+          "script": "skills/markdown-html/skills/md-slides/scripts/deck_html_renderer.py",
+          "sha256": "9f795302f9473873e250daa1f5c76ebe1203022935bfd715d42e7bcc817d24e8",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/md-slides/scripts/deck_html_renderer.py --help",
+              "cmd": "python3 skills/markdown-html/skills/md-slides/scripts/deck_html_renderer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 markdown-html/skills/md-slides/scripts/deck_html_renderer.py --sample",
+              "cmd": "python3 skills/markdown-html/skills/md-slides/scripts/deck_html_renderer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "markdown-html/skills/md-slides/scripts/presenter_notes_parser.py",
+          "script": "skills/markdown-html/skills/md-slides/scripts/presenter_notes_parser.py",
+          "sha256": "fb437bc0c66b4b8848c0ec2c45096b4a9f8b3ccef0e1cac165c7fbbd6e11ce0f",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/md-slides/scripts/presenter_notes_parser.py --help",
+              "cmd": "python3 skills/markdown-html/skills/md-slides/scripts/presenter_notes_parser.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 markdown-html/skills/md-slides/scripts/presenter_notes_parser.py --sample",
+              "cmd": "python3 skills/markdown-html/skills/md-slides/scripts/presenter_notes_parser.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "markdown-html/skills/md-slides/scripts/slide_splitter.py",
+          "script": "skills/markdown-html/skills/md-slides/scripts/slide_splitter.py",
+          "sha256": "089f26a5d87ab9b988288b5994847992dad433afb2177490b7e1406debda05d0",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 markdown-html/skills/md-slides/scripts/slide_splitter.py --help",
+              "cmd": "python3 skills/markdown-html/skills/md-slides/scripts/slide_splitter.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 markdown-html/skills/md-slides/scripts/slide_splitter.py --sample",
+              "cmd": "python3 skills/markdown-html/skills/md-slides/scripts/slide_splitter.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -348,9 +603,9 @@
         "close_out": false
       },
       "references": [
-        "keyboard_nav_patterns.md",
-        "presentation_ux.md",
-        "single_file_deck_conventions.md"
+        "skills/markdown-html/skills/md-slides/references/keyboard_nav_patterns.md",
+        "skills/markdown-html/skills/md-slides/references/presentation_ux.md",
+        "skills/markdown-html/skills/md-slides/references/single_file_deck_conventions.md"
       ]
     }
   ]

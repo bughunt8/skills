@@ -1,5 +1,5 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "product-team",
   "skill_count": 17,
   "loop_defaults": {
@@ -15,21 +15,61 @@
   "skills": [
     {
       "name": "agile-product-owner",
-      "path": "product-team/agile-product-owner/skills/agile-product-owner",
+      "path": "skills/product-team/agile-product-owner/skills/agile-product-owner",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "agile-product-owner",
+        "skill_path": "skills/product-team/agile-product-owner/skills/agile-product-owner",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/agile-product-owner/skills/agile-product-owner/SKILL.md",
+            "sha256": "b378f4d66707ac272f1840aed944b93b263183b8314b096028e0c9968b1b5cbd",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/agile-product-owner/skills/agile-product-owner/assets/sprint_planning_template.md",
+            "sha256": "e7dabd41aa865d500f3f2d6b2a0033c0cd716c5a9de77807f7b40f167dd9ba99",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/agile-product-owner/skills/agile-product-owner/assets/user_story_template.md",
+            "sha256": "3046b947057f1a4b4718bc4d89448809593e0cfee8eb36b31b9615c53ff38ad8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/agile-product-owner/skills/agile-product-owner/references/sprint-planning-guide.md",
+            "sha256": "2ae5bb3c6ae2013621d81a13df3f595a9828026f655c0c663e1bee2a87791354",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/agile-product-owner/skills/agile-product-owner/references/user-story-templates.md",
+            "sha256": "2c5cc3626566c66e85c35d34da1784dfc10ce05f840fd38d5556f6bcce46dc08",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/agile-product-owner/skills/agile-product-owner/scripts/user_story_generator.py",
+            "sha256": "f88f759e2a7657908a77c28ef823de7a6dd7a8474347e128a753753889a39e6e",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Agile product ownership for backlog management and sprint execution. Covers user story writing, acceptance criteria, sprint planning, and velocity tracking. Use when writing user stories, creating acceptance criteria, planning sprints, estimating story points, breaking down epics, or prioritizing the backlog.",
       "tools": [
         {
-          "script": "product-team/agile-product-owner/skills/agile-product-owner/scripts/user_story_generator.py",
+          "script": "skills/product-team/agile-product-owner/skills/agile-product-owner/scripts/user_story_generator.py",
+          "sha256": "f88f759e2a7657908a77c28ef823de7a6dd7a8474347e128a753753889a39e6e",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 product-team/agile-product-owner/skills/agile-product-owner/scripts/user_story_generator.py --help",
+              "cmd": "python3 skills/product-team/agile-product-owner/skills/agile-product-owner/scripts/user_story_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 product-team/agile-product-owner/skills/agile-product-owner/scripts/user_story_generator.py --sample",
+              "cmd": "python3 skills/product-team/agile-product-owner/skills/agile-product-owner/scripts/user_story_generator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -44,22 +84,62 @@
         "close_out": false
       },
       "references": [
-        "sprint-planning-guide.md",
-        "user-story-templates.md"
+        "skills/product-team/agile-product-owner/skills/agile-product-owner/references/sprint-planning-guide.md",
+        "skills/product-team/agile-product-owner/skills/agile-product-owner/references/user-story-templates.md"
       ]
     },
     {
       "name": "apple-hig-expert",
-      "path": "product-team/apple-hig-expert/skills/apple-hig-expert",
+      "path": "skills/product-team/apple-hig-expert/skills/apple-hig-expert",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "apple-hig-expert",
+        "skill_path": "skills/product-team/apple-hig-expert/skills/apple-hig-expert",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/apple-hig-expert/skills/apple-hig-expert/SKILL.md",
+            "sha256": "85c5aaa9653aeb9671b7047a9ea64063bdaee81955a918bc627aa38b307eb68c",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/apple-hig-expert/skills/apple-hig-expert/references/accessibility.md",
+            "sha256": "90a404c83c39f06d2e271f127532069fab01a94a68becc6d9ada3c7e5e89acd8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/apple-hig-expert/skills/apple-hig-expert/references/platform-specifics.md",
+            "sha256": "f35d12a4a53d99d0c807c6001aae54ef2be286e9f2a30b7f5942545ad03ef0ae",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/apple-hig-expert/skills/apple-hig-expert/references/visual-design.md",
+            "sha256": "03a788f65e7787e06769e1b7cfbacc1d1d340c906439bc3ce5a4a769cbf54fab",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/apple-hig-expert/skills/apple-hig-expert/scripts/hig_checker.py",
+            "sha256": "437568fd8d4b2cc55a9975ff30be516733ee1c5d215a860b24f501fe581fc8b1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/apple-hig-expert/skills/apple-hig-expert/templates/hig-audit-template.md",
+            "sha256": "a6578946bc276483f2654e59226cfc84c6dbce3187d78c15419f4762c3b12a66",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Audits and designs iOS/macOS/watchOS/visionOS interfaces against the Apple Human Interface Guidelines, including the Liquid Glass design language (announced WWDC25, shipped with iOS 26/macOS Tahoe, Sept 2025). Use when reviewing an Apple-platform mockup or app for HIG compliance, checking contrast or tap-target sizes, or designing native-feeling Apple UI (e.g., 'audit my iOS app against the HIG', 'is this text readable on Liquid Glass?').",
       "tools": [
         {
-          "script": "product-team/apple-hig-expert/skills/apple-hig-expert/scripts/hig_checker.py",
+          "script": "skills/product-team/apple-hig-expert/skills/apple-hig-expert/scripts/hig_checker.py",
+          "sha256": "437568fd8d4b2cc55a9975ff30be516733ee1c5d215a860b24f501fe581fc8b1",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/apple-hig-expert/skills/apple-hig-expert/scripts/hig_checker.py --help",
+              "cmd": "python3 skills/product-team/apple-hig-expert/skills/apple-hig-expert/scripts/hig_checker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -74,35 +154,81 @@
         "close_out": false
       },
       "references": [
-        "accessibility.md",
-        "platform-specifics.md",
-        "visual-design.md"
+        "skills/product-team/apple-hig-expert/skills/apple-hig-expert/references/accessibility.md",
+        "skills/product-team/apple-hig-expert/skills/apple-hig-expert/references/platform-specifics.md",
+        "skills/product-team/apple-hig-expert/skills/apple-hig-expert/references/visual-design.md"
       ]
     },
     {
       "name": "code-to-prd",
-      "path": "product-team/code-to-prd/skills/code-to-prd",
+      "path": "skills/product-team/code-to-prd/skills/code-to-prd",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "code-to-prd",
+        "skill_path": "skills/product-team/code-to-prd/skills/code-to-prd",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/code-to-prd/skills/code-to-prd/SKILL.md",
+            "sha256": "7a11ba564076b882d8d67f26bdd1ed115b3bb2281f029581c384357b82425305",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/code-to-prd/skills/code-to-prd/assets/sample-analysis.json",
+            "sha256": "db88ba2cb560173db5d83155ee9a064e70154248407ee0d2d10e14a87f873016",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/code-to-prd/skills/code-to-prd/references/framework-patterns.md",
+            "sha256": "d8884d2fb08712a72978f40e31dc57ee9d5d0408b066041c8a47d4f82515fef1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/code-to-prd/skills/code-to-prd/references/prd-quality-checklist.md",
+            "sha256": "97a2cbc04b4a19b218433e9e1ea4e59575461a3895a53b88f67bcaa8cdb4ef24",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/code-to-prd/skills/code-to-prd/scripts/.gitignore",
+            "sha256": "24a61d0aeb0e7d506ed5982f22a81701d88f942b705810301ad1403844a97fa7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/code-to-prd/skills/code-to-prd/scripts/codebase_analyzer.py",
+            "sha256": "a282e67b5f5fdcdee7264b704ccb4ccae2a1fd136ba6405e0ee6949941cb2148",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/code-to-prd/skills/code-to-prd/scripts/prd_scaffolder.py",
+            "sha256": "87b443cc8abe3f1689432163d723c8bf4c667925f9ee88433dfa9ec83518d230",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Reverse-engineer any codebase into a complete Product Requirements Document (PRD). Analyzes routes, components, state management, API integrations, and user interactions to produce business-readable documentation detailed enough for engineers or AI agents to fully reconstruct every page and endpoint. Works with frontend frameworks (React, Vue, Angular, Svelte, Next.js, Nuxt), backend frameworks (NestJS, Django, Express, FastAPI), and fullstack applications. Use when users mention: generate PRD, reverse-engineer requirements, code to documentation, extract product specs from code, document \u2026",
       "tools": [
         {
-          "script": "product-team/code-to-prd/skills/code-to-prd/scripts/codebase_analyzer.py",
+          "script": "skills/product-team/code-to-prd/skills/code-to-prd/scripts/codebase_analyzer.py",
+          "sha256": "a282e67b5f5fdcdee7264b704ccb4ccae2a1fd136ba6405e0ee6949941cb2148",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/code-to-prd/skills/code-to-prd/scripts/codebase_analyzer.py --help",
+              "cmd": "python3 skills/product-team/code-to-prd/skills/code-to-prd/scripts/codebase_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "product-team/code-to-prd/skills/code-to-prd/scripts/prd_scaffolder.py",
+          "script": "skills/product-team/code-to-prd/skills/code-to-prd/scripts/prd_scaffolder.py",
+          "sha256": "87b443cc8abe3f1689432163d723c8bf4c667925f9ee88433dfa9ec83518d230",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/code-to-prd/skills/code-to-prd/scripts/prd_scaffolder.py --help",
+              "cmd": "python3 skills/product-team/code-to-prd/skills/code-to-prd/scripts/prd_scaffolder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -117,34 +243,70 @@
         "close_out": false
       },
       "references": [
-        "framework-patterns.md",
-        "prd-quality-checklist.md"
+        "skills/product-team/code-to-prd/skills/code-to-prd/references/framework-patterns.md",
+        "skills/product-team/code-to-prd/skills/code-to-prd/references/prd-quality-checklist.md"
       ]
     },
     {
       "name": "research-summarizer",
-      "path": "product-team/research-summarizer/skills/research-summarizer",
+      "path": "skills/product-team/research-summarizer/skills/research-summarizer",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "research-summarizer",
+        "skill_path": "skills/product-team/research-summarizer/skills/research-summarizer",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/research-summarizer/skills/research-summarizer/SKILL.md",
+            "sha256": "057b410fd89b3a0dc982c61eae22db89da3480e2e738f1333b8001d20ada3eb0",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/research-summarizer/skills/research-summarizer/references/citation-formats.md",
+            "sha256": "8cd7a5d83bd3fabc3c96c4c09ed98fa256b2c9386b696e7f959c92d0565f100d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/research-summarizer/skills/research-summarizer/references/summary-templates.md",
+            "sha256": "fb33626a2352325c4b03ef41f103952cb2c5ebc9802a8e4f543f56bac2bb927d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/research-summarizer/skills/research-summarizer/scripts/extract_citations.py",
+            "sha256": "4a6c28af504ac8ceaf9b21acf58836d152c199057bc94645caa1f5911a51cf20",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/research-summarizer/skills/research-summarizer/scripts/format_summary.py",
+            "sha256": "a50533a8adbf8732eb8f5c98f05e6b49a3fab9448692d43445fcc4adc4622144",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Structured research summarization agent skill for non-dev users. Handles academic papers, web articles, reports, and documentation. Extracts key findings, generates comparative analyses, and produces properly formatted citations. Use when: user wants to summarize a research paper, compare multiple sources, extract citations from documents, or create structured research briefs. Plugin for Claude Code, Codex, Gemini CLI, and OpenClaw.",
       "tools": [
         {
-          "script": "product-team/research-summarizer/skills/research-summarizer/scripts/extract_citations.py",
+          "script": "skills/product-team/research-summarizer/skills/research-summarizer/scripts/extract_citations.py",
+          "sha256": "4a6c28af504ac8ceaf9b21acf58836d152c199057bc94645caa1f5911a51cf20",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/research-summarizer/skills/research-summarizer/scripts/extract_citations.py --help",
+              "cmd": "python3 skills/product-team/research-summarizer/skills/research-summarizer/scripts/extract_citations.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "product-team/research-summarizer/skills/research-summarizer/scripts/format_summary.py",
+          "script": "skills/product-team/research-summarizer/skills/research-summarizer/scripts/format_summary.py",
+          "sha256": "a50533a8adbf8732eb8f5c98f05e6b49a3fab9448692d43445fcc4adc4622144",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/research-summarizer/skills/research-summarizer/scripts/format_summary.py --help",
+              "cmd": "python3 skills/product-team/research-summarizer/skills/research-summarizer/scripts/format_summary.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -159,22 +321,62 @@
         "close_out": false
       },
       "references": [
-        "citation-formats.md",
-        "summary-templates.md"
+        "skills/product-team/research-summarizer/skills/research-summarizer/references/citation-formats.md",
+        "skills/product-team/research-summarizer/skills/research-summarizer/references/summary-templates.md"
       ]
     },
     {
       "name": "competitive-teardown",
-      "path": "product-team/skills/competitive-teardown",
+      "path": "skills/product-team/skills/competitive-teardown",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "competitive-teardown",
+        "skill_path": "skills/product-team/skills/competitive-teardown",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/skills/competitive-teardown/SKILL.md",
+            "sha256": "e7df2e7aa6afdbdf7fcdd0b755364a21b7ff726d64a57af1dd153e0e8a35134a",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/skills/competitive-teardown/references/analysis-templates.md",
+            "sha256": "a15c1f0ec1082d631dad4d3f71cba55d279b67c7bc1e28cece94348ce7d497ea",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/competitive-teardown/references/competitive-analysis-frameworks.md",
+            "sha256": "1623daccd60e95c1269524118f9559508f04f55cb907d139692fb4d43a4b12cf",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/competitive-teardown/references/data-collection-guide.md",
+            "sha256": "f004177f6a328b38210b84f2e92f1757785881758ba2ec2d2b35ab0a6c419c9c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/competitive-teardown/references/scoring-rubric.md",
+            "sha256": "b330021fee37ff5404ae55570982bbd054d359a1115cdf0595ad11f47c9f5d55",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/competitive-teardown/scripts/competitive_matrix_builder.py",
+            "sha256": "dd5fab0a157d1013b17d2620bb6c7a9704ba8ad27ed2bd92c924117f9c7644e7",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Analyzes competitor products and companies by synthesizing data from pricing pages, app store reviews, job postings, SEO signals, and social media into structured competitive intelligence. Produces feature comparison matrices scored across 12 dimensions, SWOT analyses, positioning maps, UX audits, pricing model breakdowns, action item roadmaps, and stakeholder presentation templates. Use when conducting competitor analysis, comparing products against competitors, researching the competitive landscape, building battle cards for sales, preparing for a product strategy or roadmap session \u2026",
       "tools": [
         {
-          "script": "product-team/skills/competitive-teardown/scripts/competitive_matrix_builder.py",
+          "script": "skills/product-team/skills/competitive-teardown/scripts/competitive_matrix_builder.py",
+          "sha256": "dd5fab0a157d1013b17d2620bb6c7a9704ba8ad27ed2bd92c924117f9c7644e7",
           "wired": false,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/competitive-teardown/scripts/competitive_matrix_builder.py --help",
+              "cmd": "python3 skills/product-team/skills/competitive-teardown/scripts/competitive_matrix_builder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -189,24 +391,54 @@
         "close_out": false
       },
       "references": [
-        "analysis-templates.md",
-        "competitive-analysis-frameworks.md",
-        "data-collection-guide.md",
-        "scoring-rubric.md"
+        "skills/product-team/skills/competitive-teardown/references/analysis-templates.md",
+        "skills/product-team/skills/competitive-teardown/references/competitive-analysis-frameworks.md",
+        "skills/product-team/skills/competitive-teardown/references/data-collection-guide.md",
+        "skills/product-team/skills/competitive-teardown/references/scoring-rubric.md"
       ]
     },
     {
       "name": "experiment-designer",
-      "path": "product-team/skills/experiment-designer",
+      "path": "skills/product-team/skills/experiment-designer",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "experiment-designer",
+        "skill_path": "skills/product-team/skills/experiment-designer",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/skills/experiment-designer/SKILL.md",
+            "sha256": "c686e366cd57d0c8e7458a10e9e5ad9348dd3132b7176af6d25015d9842b1793",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/skills/experiment-designer/references/experiment-playbook.md",
+            "sha256": "ff4593085405c2f0cb3520f2d119fba7feceb7992d96767e33be3eca3339371e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/experiment-designer/references/statistics-reference.md",
+            "sha256": "0d177b53dcdf1bef0005e170cbd696ea8917e24128d9ca3868aa7b4dd31ab9aa",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/experiment-designer/scripts/sample_size_calculator.py",
+            "sha256": "dd62f18aa2f8e5d7ae757e9685434c4a52cc6f91671065b5ad6ea6168b914e16",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when planning product experiments, writing testable hypotheses, estimating sample size, prioritizing tests, or interpreting A/B outcomes with practical statistical rigor.",
       "tools": [
         {
-          "script": "product-team/skills/experiment-designer/scripts/sample_size_calculator.py",
+          "script": "skills/product-team/skills/experiment-designer/scripts/sample_size_calculator.py",
+          "sha256": "dd62f18aa2f8e5d7ae757e9685434c4a52cc6f91671065b5ad6ea6168b914e16",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/experiment-designer/scripts/sample_size_calculator.py --help",
+              "cmd": "python3 skills/product-team/skills/experiment-designer/scripts/sample_size_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -221,22 +453,62 @@
         "close_out": false
       },
       "references": [
-        "experiment-playbook.md",
-        "statistics-reference.md"
+        "skills/product-team/skills/experiment-designer/references/experiment-playbook.md",
+        "skills/product-team/skills/experiment-designer/references/statistics-reference.md"
       ]
     },
     {
       "name": "landing-page-generator",
-      "path": "product-team/skills/landing-page-generator",
+      "path": "skills/product-team/skills/landing-page-generator",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "landing-page-generator",
+        "skill_path": "skills/product-team/skills/landing-page-generator",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/skills/landing-page-generator/SKILL.md",
+            "sha256": "c5c07fa98752269c1158c20cc777c19476b7614fef30a0526785cc09aea82444",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/skills/landing-page-generator/references/conversion-patterns.md",
+            "sha256": "6dd90cb5c8ce62cae2ccb6dd983b96ae549ec3c137059bb5c5f93433bde9e1e5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/landing-page-generator/references/copy-frameworks.md",
+            "sha256": "ed238c8627a7e379bdf1ce44ef68c7278dfac5bf75e2e57dd2925fb260ae0812",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/landing-page-generator/references/landing-page-patterns.md",
+            "sha256": "51b1b82fd53922960bb7c5b49f9963357f0dd389ac0cc954bafe19e2293502af",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/landing-page-generator/references/seo-checklist.md",
+            "sha256": "6172f2059c0bebb7789112e7a6da149f5869fcd3140fc48c64aed98f8436e5e7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/landing-page-generator/scripts/landing_page_scaffolder.py",
+            "sha256": "cfa4f2f633976a5ad316aa7ab93cd38288e3788157c4e32e5ed2a77160f68755",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Generates high-converting landing pages as complete Next.js/React (TSX) components with Tailwind CSS. Creates hero sections, feature grids, pricing tables, FAQ accordions, testimonial blocks, and CTA sections using proven copy frameworks (PAS, AIDA, BAB). Outputs SEO meta tags, structured data, and performance-optimised code targeting Core Web Vitals (LCP < 1s, CLS < 0.1). Use when the user asks to create a landing page, marketing page, homepage, single-page site, lead capture page, campaign page, promo page, or conversion-optimised web page \u2014 or when they want to A/B test landing page \u2026",
       "tools": [
         {
-          "script": "product-team/skills/landing-page-generator/scripts/landing_page_scaffolder.py",
+          "script": "skills/product-team/skills/landing-page-generator/scripts/landing_page_scaffolder.py",
+          "sha256": "cfa4f2f633976a5ad316aa7ab93cd38288e3788157c4e32e5ed2a77160f68755",
           "wired": false,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/landing-page-generator/scripts/landing_page_scaffolder.py --help",
+              "cmd": "python3 skills/product-team/skills/landing-page-generator/scripts/landing_page_scaffolder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -251,24 +523,54 @@
         "close_out": false
       },
       "references": [
-        "conversion-patterns.md",
-        "copy-frameworks.md",
-        "landing-page-patterns.md",
-        "seo-checklist.md"
+        "skills/product-team/skills/landing-page-generator/references/conversion-patterns.md",
+        "skills/product-team/skills/landing-page-generator/references/copy-frameworks.md",
+        "skills/product-team/skills/landing-page-generator/references/landing-page-patterns.md",
+        "skills/product-team/skills/landing-page-generator/references/seo-checklist.md"
       ]
     },
     {
       "name": "product-analytics",
-      "path": "product-team/skills/product-analytics",
+      "path": "skills/product-team/skills/product-analytics",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "product-analytics",
+        "skill_path": "skills/product-team/skills/product-analytics",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/skills/product-analytics/SKILL.md",
+            "sha256": "1c459548d5209d83b97a19bdfbf1add985284a39a806d9c5ed471d01e811a250",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/skills/product-analytics/references/dashboard-templates.md",
+            "sha256": "b2bcaf22a6e2e5fe89a0655a07d28d66a00d4c8e943ac2cc73e606f5927d26fd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-analytics/references/metrics-frameworks.md",
+            "sha256": "b753304d18865cbbbc900cc35077a93a4dde694a02257a8279256bbc311cc9fa",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-analytics/scripts/metrics_calculator.py",
+            "sha256": "377b1db289f0cd17f330d7dc5d34ee1d7201d22ec940c789adc03b4efe93c9e1",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when defining product KPIs, building metric dashboards, running cohort or retention analysis, or interpreting feature adoption trends across product stages.",
       "tools": [
         {
-          "script": "product-team/skills/product-analytics/scripts/metrics_calculator.py",
+          "script": "skills/product-team/skills/product-analytics/scripts/metrics_calculator.py",
+          "sha256": "377b1db289f0cd17f330d7dc5d34ee1d7201d22ec940c789adc03b4efe93c9e1",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/product-analytics/scripts/metrics_calculator.py --help",
+              "cmd": "python3 skills/product-team/skills/product-analytics/scripts/metrics_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -283,22 +585,47 @@
         "close_out": false
       },
       "references": [
-        "dashboard-templates.md",
-        "metrics-frameworks.md"
+        "skills/product-team/skills/product-analytics/references/dashboard-templates.md",
+        "skills/product-team/skills/product-analytics/references/metrics-frameworks.md"
       ]
     },
     {
       "name": "product-discovery",
-      "path": "product-team/skills/product-discovery",
+      "path": "skills/product-team/skills/product-discovery",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "product-discovery",
+        "skill_path": "skills/product-team/skills/product-discovery",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/skills/product-discovery/SKILL.md",
+            "sha256": "52d492cb9eefe2136b21a295a9041bc60e11d7261f3f8ce84f3b58d83c8e75e4",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/skills/product-discovery/references/discovery-frameworks.md",
+            "sha256": "2d1e59f597c9d1f09a201ec7c12bdc9a816c0707b585f32080db31dfd6b44bab",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-discovery/scripts/assumption_mapper.py",
+            "sha256": "158e0348d347f8877b6e791e20920596f45bcef1269cc836fdb68ccd83e9503d",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when validating product opportunities, mapping assumptions, planning discovery sprints, or testing problem-solution fit before committing delivery resources.",
       "tools": [
         {
-          "script": "product-team/skills/product-discovery/scripts/assumption_mapper.py",
+          "script": "skills/product-team/skills/product-discovery/scripts/assumption_mapper.py",
+          "sha256": "158e0348d347f8877b6e791e20920596f45bcef1269cc836fdb68ccd83e9503d",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/product-discovery/scripts/assumption_mapper.py --help",
+              "cmd": "python3 skills/product-team/skills/product-discovery/scripts/assumption_mapper.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -313,33 +640,84 @@
         "close_out": false
       },
       "references": [
-        "discovery-frameworks.md"
+        "skills/product-team/skills/product-discovery/references/discovery-frameworks.md"
       ]
     },
     {
       "name": "product-manager-toolkit",
-      "path": "product-team/skills/product-manager-toolkit",
+      "path": "skills/product-team/skills/product-manager-toolkit",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "product-manager-toolkit",
+        "skill_path": "skills/product-team/skills/product-manager-toolkit",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/skills/product-manager-toolkit/SKILL.md",
+            "sha256": "cb8e692dc9f0c51a64ed592e093af4aeabd999751ff0012d6d4beee59b74df77",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/skills/product-manager-toolkit/assets/prd_template.md",
+            "sha256": "8cca95e7a6d7cbdd75cbad2d7c545fc9651b50ee8ec133f8f288d9b44255f186",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-manager-toolkit/assets/rice_input_template.csv",
+            "sha256": "e112d1f5b1cfddffeb753cc6209f9c319fca9a353d410d0675a0ef7a3511ed71",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-manager-toolkit/references/frameworks.md",
+            "sha256": "6ce2eb6a15bc67040d16fdd4bcc0f2ef3c37f384d19b7dcdfa2065c7f4ee324d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-manager-toolkit/references/input-output-examples.md",
+            "sha256": "2bd22268392286df74a35a1be774dfd9bb632a0a369e6a90ad1bd1cef32471fe",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-manager-toolkit/references/prd_templates.md",
+            "sha256": "cd0d50ea82142ad801e2cd5a9c1a7ce88ce024259df7da15923b9d6bf2d3c85d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-manager-toolkit/scripts/customer_interview_analyzer.py",
+            "sha256": "ccf0efcca639b2506f6205da759df6171f4df338ac09c64ea8f5e3776645c7c5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-manager-toolkit/scripts/rice_prioritizer.py",
+            "sha256": "9ceb1964ebb949f6aaa7afda9651cd8d4ea1502df2fe58ed9e8cceb080a3f043",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Comprehensive toolkit for product managers including RICE prioritization, customer interview analysis, PRD templates, discovery frameworks, and go-to-market strategies. Use when prioritizing features, synthesizing user research, writing requirement documentation, or developing product strategy.",
       "tools": [
         {
-          "script": "product-team/skills/product-manager-toolkit/scripts/customer_interview_analyzer.py",
+          "script": "skills/product-team/skills/product-manager-toolkit/scripts/customer_interview_analyzer.py",
+          "sha256": "ccf0efcca639b2506f6205da759df6171f4df338ac09c64ea8f5e3776645c7c5",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/product-manager-toolkit/scripts/customer_interview_analyzer.py --help",
+              "cmd": "python3 skills/product-team/skills/product-manager-toolkit/scripts/customer_interview_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "product-team/skills/product-manager-toolkit/scripts/rice_prioritizer.py",
+          "script": "skills/product-team/skills/product-manager-toolkit/scripts/rice_prioritizer.py",
+          "sha256": "9ceb1964ebb949f6aaa7afda9651cd8d4ea1502df2fe58ed9e8cceb080a3f043",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/product-manager-toolkit/scripts/rice_prioritizer.py --help",
+              "cmd": "python3 skills/product-team/skills/product-manager-toolkit/scripts/rice_prioritizer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -354,62 +732,119 @@
         "close_out": false
       },
       "references": [
-        "frameworks.md",
-        "input-output-examples.md",
-        "prd_templates.md"
+        "skills/product-team/skills/product-manager-toolkit/references/frameworks.md",
+        "skills/product-team/skills/product-manager-toolkit/references/input-output-examples.md",
+        "skills/product-team/skills/product-manager-toolkit/references/prd_templates.md"
       ]
     },
     {
       "name": "product-skills",
-      "path": "product-team/skills/product-skills",
+      "path": "skills/product-team/skills/product-skills",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "product-skills",
+        "skill_path": "skills/product-team/skills/product-skills",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/skills/product-skills/SKILL.md",
+            "sha256": "50493409784ab8d70c66a7823ffce61b0758efd72a479a0273d41c2d88c9e6cb",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/skills/product-skills/assets/sample_discovery_log.json",
+            "sha256": "726ede99ba66e29844dc8d6516302b3c1ce03e66dfba9bad48a5822e9915becb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-skills/assets/sample_ost.json",
+            "sha256": "8f033cde26a22b7929130fe78beee4585e99f46ac4dacd7b0d097ca83c1e14fe",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-skills/references/ai_product_evals.md",
+            "sha256": "d9f14731028298b5682334235c397ca10cd9d5bb16968f70ee2b42349610e86b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-skills/references/continuous_discovery_canon.md",
+            "sha256": "c6bbb496ef1c3cc5fb83e1b4096c2d1fdf78a4b0e4becb90bd260c2bd2648c07",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-skills/references/product_operating_model.md",
+            "sha256": "1dd0fe274061343ad9f64a25a9b09c74404269f6cf283d29811ba487b5d3a26b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-skills/scripts/discovery_cadence_tracker.py",
+            "sha256": "2ab9e2e043b430c399f00fb6291a0f529bbcc6c55649a917cf1fe4bc04f532b8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-skills/scripts/ost_linter.py",
+            "sha256": "da3dba199da81f003d940c28b561da9a436e6ceffe7d5f00430cce682a6483f6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-skills/scripts/product_goal_router.py",
+            "sha256": "e255aec05dd2060f12b1584a89f4cfcb8b856ac3804753c608c229e42cf0b6b3",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when coordinating product work across the 12 bundled product sub-skills (RICE, OKRs, UX research, design tokens, competitive teardown, analytics, experiments, discovery, roadmaps, spec-to-repo, landing pages, SaaS scaffolding) or the 4 standalone product-team plugins (user stories, Apple HIG, code-to-PRD, research summarizer). Triggers on 'help me prioritize', 'plan a product experiment', 'we ship features nobody uses', 'run the discovery loop', 'is our OST sound'. Forks context to route to one sub-skill via a deterministic signal router and returns a digest; can also drive a \u2026",
       "tools": [
         {
-          "script": "product-team/skills/product-skills/scripts/discovery_cadence_tracker.py",
+          "script": "skills/product-team/skills/product-skills/scripts/discovery_cadence_tracker.py",
+          "sha256": "2ab9e2e043b430c399f00fb6291a0f529bbcc6c55649a917cf1fe4bc04f532b8",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/product-skills/scripts/discovery_cadence_tracker.py --help",
+              "cmd": "python3 skills/product-team/skills/product-skills/scripts/discovery_cadence_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 product-team/skills/product-skills/scripts/discovery_cadence_tracker.py --sample",
+              "cmd": "python3 skills/product-team/skills/product-skills/scripts/discovery_cadence_tracker.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "product-team/skills/product-skills/scripts/ost_linter.py",
+          "script": "skills/product-team/skills/product-skills/scripts/ost_linter.py",
+          "sha256": "da3dba199da81f003d940c28b561da9a436e6ceffe7d5f00430cce682a6483f6",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/product-skills/scripts/ost_linter.py --help",
+              "cmd": "python3 skills/product-team/skills/product-skills/scripts/ost_linter.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 product-team/skills/product-skills/scripts/ost_linter.py --sample",
+              "cmd": "python3 skills/product-team/skills/product-skills/scripts/ost_linter.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "product-team/skills/product-skills/scripts/product_goal_router.py",
+          "script": "skills/product-team/skills/product-skills/scripts/product_goal_router.py",
+          "sha256": "e255aec05dd2060f12b1584a89f4cfcb8b856ac3804753c608c229e42cf0b6b3",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/product-skills/scripts/product_goal_router.py --help",
+              "cmd": "python3 skills/product-team/skills/product-skills/scripts/product_goal_router.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 product-team/skills/product-skills/scripts/product_goal_router.py --sample",
+              "cmd": "python3 skills/product-team/skills/product-skills/scripts/product_goal_router.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -424,23 +859,63 @@
         "close_out": true
       },
       "references": [
-        "ai_product_evals.md",
-        "continuous_discovery_canon.md",
-        "product_operating_model.md"
+        "skills/product-team/skills/product-skills/references/ai_product_evals.md",
+        "skills/product-team/skills/product-skills/references/continuous_discovery_canon.md",
+        "skills/product-team/skills/product-skills/references/product_operating_model.md"
       ]
     },
     {
       "name": "product-strategist",
-      "path": "product-team/skills/product-strategist",
+      "path": "skills/product-team/skills/product-strategist",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "product-strategist",
+        "skill_path": "skills/product-team/skills/product-strategist",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/skills/product-strategist/SKILL.md",
+            "sha256": "96762613353ca78815f60b316dbd63eca0a4269e36d2e611bb9d3c9a351953e5",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/skills/product-strategist/assets/okr_template.md",
+            "sha256": "1a15349e3dbb5a46d0b0be50444ba504a3dbd728aabe61aed603e6b98c71e8cd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-strategist/references/examples/sample_growth_okrs.json",
+            "sha256": "2cd15f94c44de6df32731746e5082e26fc5626cbdf75fe6bc27b60c7cc6168df",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-strategist/references/okr_framework.md",
+            "sha256": "f2893540bf149085df11fb7578c389ee5fb1b00ef0b57be0b2f9621cc8f58d57",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-strategist/references/strategy_types.md",
+            "sha256": "03c0c85181412c43bc8089d835b19e8a89c9128c478e9f4f4796cd871d4acef6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/product-strategist/scripts/okr_cascade_generator.py",
+            "sha256": "c6e9f1426267c726067e18d29dcc9273854fb57e9ec431e57202662ce4132e45",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Strategic product leadership toolkit for Head of Product covering OKR cascade generation, quarterly planning, competitive landscape analysis, product vision documents, and team scaling proposals. Use when creating quarterly OKR documents, defining product goals or KPIs, building product roadmaps, running competitive analysis, drafting team structure or hiring plans, aligning product strategy across engineering and design, or generating cascaded goal hierarchies from company to team level.",
       "tools": [
         {
-          "script": "product-team/skills/product-strategist/scripts/okr_cascade_generator.py",
+          "script": "skills/product-team/skills/product-strategist/scripts/okr_cascade_generator.py",
+          "sha256": "c6e9f1426267c726067e18d29dcc9273854fb57e9ec431e57202662ce4132e45",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/product-strategist/scripts/okr_cascade_generator.py --help",
+              "cmd": "python3 skills/product-team/skills/product-strategist/scripts/okr_cascade_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -455,23 +930,53 @@
         "close_out": false
       },
       "references": [
-        "examples",
-        "okr_framework.md",
-        "strategy_types.md"
+        "skills/product-team/skills/product-strategist/references/examples/sample_growth_okrs.json",
+        "skills/product-team/skills/product-strategist/references/okr_framework.md",
+        "skills/product-team/skills/product-strategist/references/strategy_types.md"
       ]
     },
     {
       "name": "roadmap-communicator",
-      "path": "product-team/skills/roadmap-communicator",
+      "path": "skills/product-team/skills/roadmap-communicator",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "roadmap-communicator",
+        "skill_path": "skills/product-team/skills/roadmap-communicator",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/skills/roadmap-communicator/SKILL.md",
+            "sha256": "d54b8192051b329d60d8258b1367f39c50c91c725ac326742c3932b91834ac64",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/skills/roadmap-communicator/references/communication-templates.md",
+            "sha256": "4e58c1ec8a77f0f895ff5fee4a0897863e67f81193cdc1f43220ff90d2c807d2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/roadmap-communicator/references/roadmap-templates.md",
+            "sha256": "19305c353c9f645882b734a4f31dc9e7461a25de38bb7ca71e6890a8fce38fb2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/roadmap-communicator/scripts/changelog_generator.py",
+            "sha256": "d670f2a18bda14c42e3f1a4729e91eef85a7283e728db0a828edb7b24e387ca7",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when preparing roadmap narratives, release notes, changelogs, or stakeholder updates tailored for executives, engineering teams, and customers.",
       "tools": [
         {
-          "script": "product-team/skills/roadmap-communicator/scripts/changelog_generator.py",
+          "script": "skills/product-team/skills/roadmap-communicator/scripts/changelog_generator.py",
+          "sha256": "d670f2a18bda14c42e3f1a4729e91eef85a7283e728db0a828edb7b24e387ca7",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/roadmap-communicator/scripts/changelog_generator.py --help",
+              "cmd": "python3 skills/product-team/skills/roadmap-communicator/scripts/changelog_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -486,22 +991,62 @@
         "close_out": false
       },
       "references": [
-        "communication-templates.md",
-        "roadmap-templates.md"
+        "skills/product-team/skills/roadmap-communicator/references/communication-templates.md",
+        "skills/product-team/skills/roadmap-communicator/references/roadmap-templates.md"
       ]
     },
     {
       "name": "saas-scaffolder",
-      "path": "product-team/skills/saas-scaffolder",
+      "path": "skills/product-team/skills/saas-scaffolder",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "saas-scaffolder",
+        "skill_path": "skills/product-team/skills/saas-scaffolder",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/skills/saas-scaffolder/SKILL.md",
+            "sha256": "7ac2dc5e06b9c7a7dfc79e4a3845109bfb18e45a20183872667e334d99ebd642",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/skills/saas-scaffolder/references/architecture-patterns.md",
+            "sha256": "cf69d872c020eabeef9234003068e5c32657d948b833eb4049a80d6b0b93e7ec",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/saas-scaffolder/references/auth-billing-guide.md",
+            "sha256": "990011b596928dbf7d4548b67f05a29f70587dd983fd27dad34bea60ccd4a4d6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/saas-scaffolder/references/saas-architecture-patterns.md",
+            "sha256": "a7a9d82101896ef1cd7ab3e5ae8aeff0d284e8e06b90a52f4a5812919ff7ac40",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/saas-scaffolder/references/tech-stack-comparison.md",
+            "sha256": "508790bd158f09da7d5a2fcb42b97b0ee8a2e4dc1df11d3ee5b171183f43fccb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/saas-scaffolder/scripts/project_bootstrapper.py",
+            "sha256": "95623f51d4595582981e2cacca8e03f174d2466393b031f129a6812b23d90701",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Generates complete, production-ready SaaS project boilerplate including authentication, database schemas, billing integration, API routes, and a working dashboard using Next.js 14+ App Router, TypeScript, Tailwind CSS, shadcn/ui, Drizzle ORM, and Stripe. Use when the user wants to create a new SaaS app, start a subscription-based web project, scaffold a Next.js application, or mentions terms like starter template, boilerplate, new project, or wiring up auth and payments.",
       "tools": [
         {
-          "script": "product-team/skills/saas-scaffolder/scripts/project_bootstrapper.py",
+          "script": "skills/product-team/skills/saas-scaffolder/scripts/project_bootstrapper.py",
+          "sha256": "95623f51d4595582981e2cacca8e03f174d2466393b031f129a6812b23d90701",
           "wired": false,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/saas-scaffolder/scripts/project_bootstrapper.py --help",
+              "cmd": "python3 skills/product-team/skills/saas-scaffolder/scripts/project_bootstrapper.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -516,24 +1061,54 @@
         "close_out": false
       },
       "references": [
-        "architecture-patterns.md",
-        "auth-billing-guide.md",
-        "saas-architecture-patterns.md",
-        "tech-stack-comparison.md"
+        "skills/product-team/skills/saas-scaffolder/references/architecture-patterns.md",
+        "skills/product-team/skills/saas-scaffolder/references/auth-billing-guide.md",
+        "skills/product-team/skills/saas-scaffolder/references/saas-architecture-patterns.md",
+        "skills/product-team/skills/saas-scaffolder/references/tech-stack-comparison.md"
       ]
     },
     {
       "name": "spec-to-repo",
-      "path": "product-team/skills/spec-to-repo",
+      "path": "skills/product-team/skills/spec-to-repo",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "spec-to-repo",
+        "skill_path": "skills/product-team/skills/spec-to-repo",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/skills/spec-to-repo/SKILL.md",
+            "sha256": "c33ffb417e85f415bec825c623eedaac65ed7b04ba090eb035fed93c77d16067",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/skills/spec-to-repo/references/spec-parsing-guide.md",
+            "sha256": "b1dc379337bfcd45f402867f38ae4f29c3046c44df624c815ab81bb4cd02d913",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/spec-to-repo/references/stack-templates.md",
+            "sha256": "8c810df71bb675f97e41a4ae644204940a1c5ae430220f9a19a48a1212095cc1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/spec-to-repo/scripts/validate_project.py",
+            "sha256": "8156ea0e1312f6a4718ca773051725173858801095953ef9f38cd9f0d6ae0cf7",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when the user says 'build me an app', 'create a project from this spec', 'scaffold a new repo', 'generate a starter', 'turn this idea into code', 'bootstrap a project', 'I have requirements and need a codebase', or provides a natural-language project specification and expects a complete, runnable repository. Stack-agnostic: Next.js, FastAPI, Rails, Go, Rust, Flutter, and more.",
       "tools": [
         {
-          "script": "product-team/skills/spec-to-repo/scripts/validate_project.py",
+          "script": "skills/product-team/skills/spec-to-repo/scripts/validate_project.py",
+          "sha256": "8156ea0e1312f6a4718ca773051725173858801095953ef9f38cd9f0d6ae0cf7",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/spec-to-repo/scripts/validate_project.py --help",
+              "cmd": "python3 skills/product-team/skills/spec-to-repo/scripts/validate_project.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -548,22 +1123,67 @@
         "close_out": false
       },
       "references": [
-        "spec-parsing-guide.md",
-        "stack-templates.md"
+        "skills/product-team/skills/spec-to-repo/references/spec-parsing-guide.md",
+        "skills/product-team/skills/spec-to-repo/references/stack-templates.md"
       ]
     },
     {
       "name": "ui-design-system",
-      "path": "product-team/skills/ui-design-system",
+      "path": "skills/product-team/skills/ui-design-system",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "ui-design-system",
+        "skill_path": "skills/product-team/skills/ui-design-system",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/skills/ui-design-system/SKILL.md",
+            "sha256": "7f8c1714af2602bcd2b3b49b6aaf0f53351fb739b26062d548f6a9c8c1b10e8d",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/skills/ui-design-system/assets/design_system_doc_template.md",
+            "sha256": "72d63dc806219b550a451564b7e10659cf643677295e4c1cfdcc0fbe0a914b5c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/ui-design-system/references/component-architecture.md",
+            "sha256": "4cf363aa2e206dc05c3e07c0f0b4ba1b11fda1fad10ba471b6e84ab9e7a85b84",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/ui-design-system/references/developer-handoff.md",
+            "sha256": "14087541aa4b8f897391c88737629dff403a6565463bdf3f5e27f5860f29a875",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/ui-design-system/references/responsive-calculations.md",
+            "sha256": "f15fcf793ef2147c9470f0b8b8b712321cd4a5bcd2f64bed3d942f30fbc20eb7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/ui-design-system/references/token-generation.md",
+            "sha256": "4a96787e57c40d7bf1a05b1f3348e3b7221cff4d4e11e0f9650f0a1681b29aa1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/ui-design-system/scripts/design_token_generator.py",
+            "sha256": "db3632fda4a1c6979262df989ab3a729e29c8f47a1423820e9579e14320b4a67",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "UI design system toolkit for Senior UI Designer including design token generation, component documentation, responsive design calculations, and developer handoff tools. Use when creating design systems, generating design tokens, maintaining visual consistency, or facilitating design-dev collaboration and developer handoff.",
       "tools": [
         {
-          "script": "product-team/skills/ui-design-system/scripts/design_token_generator.py",
+          "script": "skills/product-team/skills/ui-design-system/scripts/design_token_generator.py",
+          "sha256": "db3632fda4a1c6979262df989ab3a729e29c8f47a1423820e9579e14320b4a67",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/ui-design-system/scripts/design_token_generator.py --help",
+              "cmd": "python3 skills/product-team/skills/ui-design-system/scripts/design_token_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -578,29 +1198,74 @@
         "close_out": true
       },
       "references": [
-        "component-architecture.md",
-        "developer-handoff.md",
-        "responsive-calculations.md",
-        "token-generation.md"
+        "skills/product-team/skills/ui-design-system/references/component-architecture.md",
+        "skills/product-team/skills/ui-design-system/references/developer-handoff.md",
+        "skills/product-team/skills/ui-design-system/references/responsive-calculations.md",
+        "skills/product-team/skills/ui-design-system/references/token-generation.md"
       ]
     },
     {
       "name": "ux-researcher-designer",
-      "path": "product-team/skills/ux-researcher-designer",
+      "path": "skills/product-team/skills/ux-researcher-designer",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "ux-researcher-designer",
+        "skill_path": "skills/product-team/skills/ux-researcher-designer",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/product-team/skills/ux-researcher-designer/SKILL.md",
+            "sha256": "e19ce820e246bf34834e99ea361afcf93fb780ffbb2a4248b32a9947ae4a43ca",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/product-team/skills/ux-researcher-designer/assets/research_plan_template.md",
+            "sha256": "9ad59b152028118baf4959df2a9b981704731254849c973659074b8297493a4d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/ux-researcher-designer/references/example-personas.md",
+            "sha256": "e2f8d8a65f3c1c4d4be0edc03db3e382592b03c51946bdcba610984da99e9750",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/ux-researcher-designer/references/journey-mapping-guide.md",
+            "sha256": "27059750646dfbbc036dd5d647df70d63591afa1a5454de3326fb9ad672b81ac",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/ux-researcher-designer/references/persona-methodology.md",
+            "sha256": "a31e7a35880af5d7768f337f165dab9168a88016fed91e39f187cfa9c2fc1e5f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/ux-researcher-designer/references/usability-testing-frameworks.md",
+            "sha256": "0a71d1fc59676df7d005f6bdc42e09ed94e924b6ef98837f5877f0bf3fc31676",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/product-team/skills/ux-researcher-designer/scripts/persona_generator.py",
+            "sha256": "1bf61ff38178e605e5d553262b02e4942a52a18292c88eddb6326f82b57d2b70",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "UX research and design toolkit for Senior UX Designer/Researcher including data-driven persona generation, journey mapping, usability testing frameworks, and research synthesis. Use when conducting user research, creating personas, mapping user journeys, planning usability tests, or validating designs.",
       "tools": [
         {
-          "script": "product-team/skills/ux-researcher-designer/scripts/persona_generator.py",
+          "script": "skills/product-team/skills/ux-researcher-designer/scripts/persona_generator.py",
+          "sha256": "1bf61ff38178e605e5d553262b02e4942a52a18292c88eddb6326f82b57d2b70",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 product-team/skills/ux-researcher-designer/scripts/persona_generator.py --help",
+              "cmd": "python3 skills/product-team/skills/ux-researcher-designer/scripts/persona_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 product-team/skills/ux-researcher-designer/scripts/persona_generator.py --sample",
+              "cmd": "python3 skills/product-team/skills/ux-researcher-designer/scripts/persona_generator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -615,10 +1280,10 @@
         "close_out": true
       },
       "references": [
-        "example-personas.md",
-        "journey-mapping-guide.md",
-        "persona-methodology.md",
-        "usability-testing-frameworks.md"
+        "skills/product-team/skills/ux-researcher-designer/references/example-personas.md",
+        "skills/product-team/skills/ux-researcher-designer/references/journey-mapping-guide.md",
+        "skills/product-team/skills/ux-researcher-designer/references/persona-methodology.md",
+        "skills/product-team/skills/ux-researcher-designer/references/usability-testing-frameworks.md"
       ]
     }
   ]

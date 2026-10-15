@@ -1,0 +1,6 @@
+interface:
+  display_name: "GitHub repository setup"
+  short_description: "Plan-first GitHub repository governance and agent workflows"
+  default_prompt: "Use $github-repository-setup to inspect and plan approved repository setup."
+policy:
+  allow_implicit_invocation: false

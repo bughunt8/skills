@@ -1,8 +1,20 @@
 # mattpocock/skills attribution
 
-Skills in this repository derive from [mattpocock/skills](https://github.com/mattpocock/skills),
-at commit
-[`6654f6b`](https://github.com/mattpocock/skills/tree/6654f6b60cd9d5be8b54c6fafe44346dabeb3b76).
+Historical imports and remaining local derivatives derive from
+[mattpocock/skills](https://github.com/mattpocock/skills).
+An earlier record used the common pin
+[`6654f6b`](https://github.com/mattpocock/skills/tree/6654f6b60cd9d5be8b54c6fafe44346dabeb3b76),
+but the migration audit found that most old native bodies match other historical
+commits. The originating pins of the locally extended `caveman` and
+`write-a-skill` remain unresolved, not verified at that common pin.
+See the [migration audit](../../docs/migrations/matt-v1.3.1/dependency-audit.md)
+for exact body matches and source URLs.
+
+The 27 stable v1.3.1 skills now use per-directory importer-generated attribution,
+MIT copies and provenance at
+[`24fe0ef`](https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888).
+This historical notice remains with the preserved local derivatives and legacy
+archives; it does not override those managed records.
 
 - **Original author:** Matt Pocock ([@mattpocock](https://github.com/mattpocock))
 - **Original copyright:** Copyright (c) 2026 Matt Pocock
@@ -24,7 +36,7 @@ licence existed anywhere in this repository until an independent adversarial rev
 serious licensing defect found, and this file plus
 [MATTPOCOCK_SKILLS_LICENSE](MATTPOCOCK_SKILLS_LICENSE) is the correction.
 
-## Derived skills
+## Historical derived-skill list
 
 Under `skills/engineering/`:
 
@@ -69,6 +81,7 @@ Recorded as `mattpocock-skills` in
 [`docs/third-party-inventory.json`](../../docs/third-party-inventory.json) and rendered into
 [`THIRD_PARTY_NOTICES.md`](../../THIRD_PARTY_NOTICES.md).
 [`scripts/audit_third_party.py`](../../scripts/audit_third_party.py) fails CI if this record and
-the tree fall out of step. This import is not yet under the automated refresh in
-[`skills/vendor.manifest.json`](../vendor.manifest.json); migrating it is item 5 of the backlog
-in [`docs/ARCHITECTURE_REVIEW.md`](../../docs/ARCHITECTURE_REVIEW.md).
+the tree fall out of step. The stable suite is now managed through
+[`skills/vendor.manifest.json`](../vendor.manifest.json). The legacy inventory
+retains the two local derivatives and script-produced archives rather than
+misrepresenting them as exact current-release imports.

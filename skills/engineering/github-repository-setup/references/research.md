@@ -54,12 +54,29 @@ The inspected skills staging revision was
 [`github-repository-setup`](https://github.com/bughunt8/skills/blob/ec4e89d29d3a0dca56c809bdf7b8ba5816cf8674/skills/engineering/github-repository-setup/SKILL.md)
 and
 [`setup-matt-pocock-skills`](https://github.com/bughunt8/skills/blob/ec4e89d29d3a0dca56c809bdf7b8ba5816cf8674/skills/engineering/setup-matt-pocock-skills/SKILL.md).
-The latter defines tracker configuration, five triage roles, instruction-file
-selection, and context/ADR layout. This profile explicitly overrides its
-Claude-first selection because the user does not use Claude; AGENTS.md is
-the entry point and Claude files/configuration are excluded. Its linked seeds were absent in this
-snapshot, so this profile supplies original fallback templates without
-modifying that separate skill or importing third-party text.
+That older staging snapshot lacked linked seeds. It is historical evidence,
+not the default for current installation checks. The current
+[v1.3.1 setup skill](https://github.com/mattpocock/skills/blob/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/setup-matt-pocock-skills/SKILL.md)
+and all five seeds were inspected. This profile preserves compatible tracker,
+triage and domain configuration or supplies approved original native templates;
+it never auto-calls the user-only setup skill. The no-Claude override remains,
+with AGENTS.md as the entry point and existing unrelated files preserved.
+
+The inspected release is `24fe0ef7737efae15c87225755e9f6f5965e4888`.
+Its [invocation rules](https://github.com/mattpocock/skills/blob/24fe0ef7737efae15c87225755e9f6f5965e4888/.agents/invocation.md)
+exclude user-only skills from all skill-to-skill calls and require separate
+calls for model-invoked dependencies. Its
+[changelog](https://github.com/mattpocock/skills/blob/24fe0ef7737efae15c87225755e9f6f5965e4888/CHANGELOG.md)
+records the domain rename to GLOSSARY/GLOSSARY-MAP and promotion of pr,
+implement-spec and retro. No upstream GRAMMAR.md was found in this snapshot.
+Native governance and the generated invocation template are original profile
+instructions, not a claim that Markdown alone enforces tool permissions.
+
+Reviewed the complete setup, pr, implement-spec, retro, prototype and its
+LOGIC/UI branches, grill-me, grill-with-docs, model dependencies and linked
+formats. Companion invocation/availability and native approval overrides are
+in [Matt governance](matt-governance.md). Raw vendor import, migration, archives
+and the host dependency registry remain the repository's separate sync work.
 
 The update preserves the upstream catalog workflow in `catalog-setup.md`.
 The target remains a repository-managed skill, not an installation into a

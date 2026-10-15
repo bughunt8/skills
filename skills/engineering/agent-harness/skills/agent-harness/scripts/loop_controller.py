@@ -35,8 +35,11 @@ import os
 import subprocess
 import sys
 import tempfile
+from pathlib import Path
+import yaml
+from provider_bindings import (BindingError, PLAN_SCHEMA, STATE_SCHEMA,
+                               checkout_root, live_binding, validate_tasks)
 
-STATE_SCHEMA = "agent-harness/state.v1"
 CHECK_TIMEOUT_S = 120
 
 
@@ -48,6 +51,13 @@ def now():
 def load(path):
     with open(path, encoding="utf-8") as f:
         return json.load(f)
+
+
+def load_state(args):
+    state = load(args.state)
+    root = checkout_root(args.repo_root)
+    validate_tasks(root, state, STATE_SCHEMA)
+    return state
 
 
 def save(state, path):
@@ -72,7 +82,15 @@ def emit(obj, code=0):
 
 
 def cmd_init(args):
+    if os.path.lexists(args.state):
+        return emit({"error": "state already exists; preserve it and recompile into a NEW state file"}, 7)
     plan = load(args.plan)
+    root = checkout_root(args.repo_root)
+    if not isinstance(plan, dict):
+        raise BindingError("invalid plan; recompile into a new state file")
+    if plan.get("example_only"):
+        raise BindingError("example plan is not executable; compile a live manifest")
+    validate_tasks(root, plan, PLAN_SCHEMA)
     state = {
         "schema": STATE_SCHEMA,
         "goal": plan.get("goal"),
@@ -85,6 +103,8 @@ def cmd_init(args):
         "tasks": [{
             "id": t["id"],
             "skill": t.get("skill"),
+            "skill_path": t["skill_path"],
+            "provider_binding": t["provider_binding"],
             "objective": t.get("objective"),
             "verification": t.get("verification", []),
             "max_attempts": t.get("max_attempts", 3),
@@ -117,12 +137,18 @@ def directive(state):
     for t in state["tasks"]:
         if t["status"] in ("pending", "in_progress"):
             return {"action": "execute", "task": t["id"],
+                    "skill": t["skill"],
+                    "skill_path": t["skill_path"],
+                    "skill_file": t["skill_path"] + "/SKILL.md",
+                    "provider_binding": t["provider_binding"],
                     "objective": t["objective"],
                     "attempt": t["attempts"] + 1,
                     "max_attempts": t["max_attempts"],
                     "then": "record --phase execute --exit-code <code>"}, 0
         if t["status"] == "verifying":
             return {"action": "verify", "task": t["id"],
+                    "skill_path": t["skill_path"],
+                    "provider_binding": t["provider_binding"],
                     "checks": t["verification"],
                     "rule": "run every check; ALL must meet expect_exit; then "
                             "record --phase verify with the worst exit code "
@@ -132,13 +158,13 @@ def directive(state):
 
 
 def cmd_next(args):
-    state = load(args.state)
+    state = load_state(args)
     d, code = directive(state)
     return emit(d, code)
 
 
 def cmd_record(args):
-    state = load(args.state)
+    state = load_state(args)
     if state["status"] == "closed":
         return emit({"error": "loop is closed; no further records accepted"}, 6)
     task = next((t for t in state["tasks"] if t["id"] == args.task), None)
@@ -205,7 +231,7 @@ def cmd_verify(args):
     """Run the task's executable verification checks via subprocess — the
     controller adjudicates pass/fail itself instead of trusting a recorded
     exit code (reward-hacking guard)."""
-    state = load(args.state)
+    state = load_state(args)
     task = next((t for t in state["tasks"] if t["id"] == args.task), None)
     if task is None:
         return emit({"error": "unknown task %s" % args.task}, 6)
@@ -267,7 +293,7 @@ def cmd_verify(args):
 
 
 def cmd_close(args):
-    state = load(args.state)
+    state = load_state(args)
     waivers = dict(zip(args.waive or [], args.reason or []))
     if (args.waive or []) and len(args.waive) != len(args.reason or []):
         return emit({"error": "every --waive needs a matching --reason"}, 6)
@@ -294,6 +320,7 @@ def cmd_close(args):
         "iterations_used": state["iteration"],
         "handoff": {
             "tasks": [{"id": t["id"], "skill": t["skill"],
+                       "skill_path": t["skill_path"],
                        "status": t["status"],
                        "evidence": t["evidence"][-1] if t["evidence"] else None,
                        "waive_reason": t.get("waive_reason")}
@@ -303,7 +330,7 @@ def cmd_close(args):
 
 
 def cmd_status(args):
-    state = load(args.state)
+    state = load_state(args)
     return emit({
         "goal": state["goal"], "status": state["status"],
         "iteration": "%d/%d" % (state["iteration"],
@@ -320,12 +347,21 @@ def run_sample():
     tmp = tempfile.mkdtemp(prefix="harness-demo-")
     plan_path = os.path.join(tmp, "plan.json")
     state_path = os.path.join(tmp, "state.json")
+    root = Path(tmp)
+    (root / "AGENTS.md").write_text("# Demo checkout\n", encoding="utf-8")
+    provider = root / "skills/engineering/demo-skill"
+    provider.mkdir(parents=True)
+    (provider / "SKILL.md").write_text(
+        '---\nname: demo-skill\ndescription: "Demonstrate bounded loop transitions."\n---\n',
+        encoding="utf-8")
+    binding = live_binding(root, "skills/engineering/demo-skill")
     plan = {
-        "schema": "agent-harness/plan.v1",
+        "schema": PLAN_SCHEMA,
         "goal": "demo: ship a verified change",
         "domain": "engineering",
         "tasks": [
             {"id": "T1", "skill": "demo-skill",
+             "skill_path": binding["skill_path"], "provider_binding": binding,
              "objective": "make the change",
              "verification": [{"cmd": "true", "expect_exit": 0,
                                "kind": "smoke"}], "max_attempts": 3},
@@ -350,9 +386,12 @@ def run_sample():
         ["close", "--state", state_path],
     ]
     for s in steps:
+        s.extend(["--repo-root", tmp])
         print("\n$ loop_controller.py " + " ".join(s))
         code = main(s)
         print("(exit %d)" % code)
+        if code != 0:
+            return code
     return 0
 
 
@@ -388,6 +427,9 @@ def build_parser():
                    help="Reason for the matching --waive (repeatable).")
     p = sub.add_parser("status", help="Summarize loop state.")
     p.add_argument("--state", required=True)
+    for parser in sub.choices.values():
+        parser.add_argument("--repo-root", default=".",
+                            help="Actual checkout root used to validate live provider bindings.")
     return ap
 
 
@@ -399,9 +441,12 @@ def main(argv=None):
     if not args.cmd:
         ap.print_help()
         return 0
-    return {"init": cmd_init, "next": cmd_next, "record": cmd_record,
-            "verify": cmd_verify, "close": cmd_close,
-            "status": cmd_status}[args.cmd](args)
+    try:
+        return {"init": cmd_init, "next": cmd_next, "record": cmd_record,
+                "verify": cmd_verify, "close": cmd_close,
+                "status": cmd_status}[args.cmd](args)
+    except (BindingError, OSError, ValueError, yaml.YAMLError) as exc:
+        return emit({"verdict": "REFUSED-BINDING", "error": str(exc)}, 7)
 
 
 if __name__ == "__main__":

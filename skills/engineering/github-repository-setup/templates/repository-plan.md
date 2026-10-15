@@ -37,8 +37,12 @@ navigation, generated outputs and any approved infrastructure.
 ## Documents and traceability
 
 Map PRD.md, TRD.md, TOGAF-ADM.md, TDD.md, DESIGN.md, DESIGN-SYSTEM.md,
-UI-UX.md, WIREFRAME.md, INTENT.md, context, ADRs and seams to canonical paths.
+UI-UX.md, WIREFRAME.md, INTENT.md, GLOSSARY.md, ADRs and seams to canonical paths.
 Record draft/approved/N/A status and owners; UI exclusions require reasons.
+Inspect legacy domain CONTEXT/CONTEXT-MAP before approved glossary migration.
+If old/new authorities coexist, stop for canonical-source choice. Keep any
+existing .specs/ EARS behavior authoritative; ticket and bank/design docs link
+to it rather than maintaining competing behavior copies.
 
 Map requirement -> Epic -> Feature -> Story -> ADR/design/test -> PR -> evidence.
 Tailor Preliminary and ADM A-H plus continuous Requirements Management.
@@ -67,6 +71,11 @@ CodeGraph/LSP/GitHub MCP alone do not require AI runtime architecture.
 
 AGENTS.md is the instruction entry; Agent.md defines roles; Agent-Protocol.md
 owns or points to the one canonical execution protocol.
+Propose `.agents/invocation.md` using the original
+[invocation template](invocation.md), then link the actual generated policy
+from AGENTS.md and handoff. This is invocation governance, not GRAMMAR.md or
+a permissions-enforcement claim. Reserve CODING_STANDARDS.md for judgement;
+mechanical rules use existing deterministic checks.
 
 Record dispatcher, implementer, independent reviewer and release owners,
 claim serialization, worktree isolation, handoff, forbidden actions and
@@ -87,7 +96,13 @@ closure behavior for non-default branches.
 | REPLACE_WITH_CAPABILITY | REPLACE_WITH_NEED | REPLACE_WITH_TOOL | REPLACE_WITH_CLIENT | REFERENCE_NAME_ONLY | REPLACE_WITH_OWNER | REPLACE_WITH_TEST |
 
 Resolve CodeGraph, language/LSP tooling, GitHub CLI or MCP, conditional
-Penpot/browser tools, setup-matt-pocock-skills and any grilling dependencies.
+Penpot/browser tools and installed companion skills. Record user-only commands,
+model-invoked dependencies and verified `/grill-me-with-docs` alias availability.
+Preserve compatible agent config; approve native template edits or recommend
+independent `/setup-matt-pocock-skills`, never auto-call it.
+Verify `pr`, opt-in `implement-spec`, `prototype`, `retro` and their transitive
+dependencies. Inspect host `.agents/skill-dependencies.json` if present, without
+assuming its contents or generating a new registry.
 Never record secret values or token-bearing URLs.
 
 ## Automation and maintenance decisions

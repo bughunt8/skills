@@ -1,5 +1,5 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "business-growth",
   "skill_count": 5,
   "loop_defaults": {
@@ -15,7 +15,21 @@
   "skills": [
     {
       "name": "business-growth-skills",
-      "path": "business-growth/skills/business-growth-skills",
+      "path": "skills/business-growth/skills/business-growth-skills",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "business-growth-skills",
+        "skill_path": "skills/business-growth/skills/business-growth-skills",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/business-growth/skills/business-growth-skills/SKILL.md",
+            "sha256": "de3297ff9829a4c1360e9f01cc726a1e1c60547a2b9034a91ddd5ef9f7f800eb",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Router/index for the 4 business & growth skills bundled in this plugin: customer-success-manager (health scoring, churn risk, expansion), sales-engineer (RFP analysis, competitive matrices, PoC planning), revenue-operations (pipeline, forecast accuracy, GTM efficiency), and contract-and-proposal-writer. Use when a growth/revenue request doesn't obviously match one skill and you need to pick the right one (e.g., 'which accounts are at risk', 'should we bid on this RFP').",
       "tools": [],
       "agentic_signals": {
@@ -29,7 +43,21 @@
     },
     {
       "name": "contract-and-proposal-writer",
-      "path": "business-growth/skills/contract-and-proposal-writer",
+      "path": "skills/business-growth/skills/contract-and-proposal-writer",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "contract-and-proposal-writer",
+        "skill_path": "skills/business-growth/skills/contract-and-proposal-writer",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/business-growth/skills/contract-and-proposal-writer/SKILL.md",
+            "sha256": "a92cdbb79c691731dc017b5cbc18370a88f081cb6e54872282678c00cae4a097",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Generate professional, jurisdiction-aware business documents: freelance contracts, project proposals, SOWs, NDAs, and MSAs. Structured Markdown output with docx conversion instructions. Covers US (Delaware), EU (GDPR), UK, and DACH (German law) jurisdictions. Not a substitute for legal counsel \u2014 use as strong starting points. Use when drafting a freelance contract, preparing a client proposal, writing an SOW for a new engagement, or producing an NDA before sharing sensitive material.",
       "tools": [],
       "agentic_signals": {
@@ -43,45 +71,122 @@
     },
     {
       "name": "customer-success-manager",
-      "path": "business-growth/skills/customer-success-manager",
+      "path": "skills/business-growth/skills/customer-success-manager",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "customer-success-manager",
+        "skill_path": "skills/business-growth/skills/customer-success-manager",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/business-growth/skills/customer-success-manager/SKILL.md",
+            "sha256": "ea53629ec26895fc84229d817f91512879be54331122521b180df3a568826546",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/business-growth/skills/customer-success-manager/assets/executive_business_review_template.md",
+            "sha256": "6db74584eff31aa9056b58538f4d4fc31c56a2070c30f1425b45bd8cee1cc54c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/customer-success-manager/assets/expected_output.json",
+            "sha256": "cf4c4623bb81ffbf047e1bc0f4b3fa4838e37544ed286934cd86b996366458a8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/customer-success-manager/assets/onboarding_checklist_template.md",
+            "sha256": "238ed39d71afdc5f7db53d50f179c821f81e6c4664be13134a87ca40d01e92c3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/customer-success-manager/assets/qbr_template.md",
+            "sha256": "09f70ccd3e245cb576f2fc51846f7d65b781e3758b2f2285d65191a04d18111c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/customer-success-manager/assets/sample_customer_data.json",
+            "sha256": "4d6b0edb04c7c38c5fbc4299edd0ffc6e4e82864956dfd504bc5bbb20a2998f6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/customer-success-manager/assets/success_plan_template.md",
+            "sha256": "a57ff20ccc43144de5b4432ed571b1ae3c50f44aea6ab7a2c63eaa16c7446be4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/customer-success-manager/references/cs-metrics-benchmarks.md",
+            "sha256": "d4c1c6416162d3159ce619388b09a85728614a205b9c1ce955641fe00eb32469",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/customer-success-manager/references/cs-playbooks.md",
+            "sha256": "2cbc6f6caa69ce752a067cef4ff1366edceaba237079ea77d4f0f09ff60db670",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/customer-success-manager/references/health-scoring-framework.md",
+            "sha256": "b1029b9b89cc1d7c309404b288463c295601e376d74e5fa4fb5505cf99e66916",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/customer-success-manager/scripts/churn_risk_analyzer.py",
+            "sha256": "28f1220ce71076d7b688ba54a084f74c49dbc9c4071caad97913dcf59ea59102",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/customer-success-manager/scripts/expansion_opportunity_scorer.py",
+            "sha256": "849b133c3d6f11366ee2942f9a1a5095721e8eccc4f00ba3e55a672e2a5d9b90",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/customer-success-manager/scripts/health_score_calculator.py",
+            "sha256": "930cbf75994fe0a9050908b19293a00a26daaaef0520149d56f25c673dda6f82",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Monitors customer health, predicts churn risk, and identifies expansion opportunities using weighted scoring models for SaaS customer success. Use when analyzing customer accounts, reviewing retention metrics, scoring at-risk customers, or when the user mentions churn, customer health scores, upsell opportunities, expansion revenue, retention analysis, or customer analytics. Runs three Python CLI tools to produce deterministic health scores, churn risk tiers, and prioritized expansion recommendations across Enterprise, Mid-Market, and SMB segments.",
       "tools": [
         {
-          "script": "business-growth/skills/customer-success-manager/scripts/churn_risk_analyzer.py",
+          "script": "skills/business-growth/skills/customer-success-manager/scripts/churn_risk_analyzer.py",
+          "sha256": "28f1220ce71076d7b688ba54a084f74c49dbc9c4071caad97913dcf59ea59102",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 business-growth/skills/customer-success-manager/scripts/churn_risk_analyzer.py --help",
+              "cmd": "python3 skills/business-growth/skills/customer-success-manager/scripts/churn_risk_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "business-growth/skills/customer-success-manager/scripts/expansion_opportunity_scorer.py",
+          "script": "skills/business-growth/skills/customer-success-manager/scripts/expansion_opportunity_scorer.py",
+          "sha256": "849b133c3d6f11366ee2942f9a1a5095721e8eccc4f00ba3e55a672e2a5d9b90",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 business-growth/skills/customer-success-manager/scripts/expansion_opportunity_scorer.py --help",
+              "cmd": "python3 skills/business-growth/skills/customer-success-manager/scripts/expansion_opportunity_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "business-growth/skills/customer-success-manager/scripts/health_score_calculator.py",
+          "script": "skills/business-growth/skills/customer-success-manager/scripts/health_score_calculator.py",
+          "sha256": "930cbf75994fe0a9050908b19293a00a26daaaef0520149d56f25c673dda6f82",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-growth/skills/customer-success-manager/scripts/health_score_calculator.py --help",
+              "cmd": "python3 skills/business-growth/skills/customer-success-manager/scripts/health_score_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-growth/skills/customer-success-manager/scripts/health_score_calculator.py --sample",
+              "cmd": "python3 skills/business-growth/skills/customer-success-manager/scripts/health_score_calculator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -96,52 +201,134 @@
         "close_out": false
       },
       "references": [
-        "cs-metrics-benchmarks.md",
-        "cs-playbooks.md",
-        "health-scoring-framework.md"
+        "skills/business-growth/skills/customer-success-manager/references/cs-metrics-benchmarks.md",
+        "skills/business-growth/skills/customer-success-manager/references/cs-playbooks.md",
+        "skills/business-growth/skills/customer-success-manager/references/health-scoring-framework.md"
       ]
     },
     {
       "name": "revenue-operations",
-      "path": "business-growth/skills/revenue-operations",
+      "path": "skills/business-growth/skills/revenue-operations",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "revenue-operations",
+        "skill_path": "skills/business-growth/skills/revenue-operations",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/business-growth/skills/revenue-operations/SKILL.md",
+            "sha256": "9ba340d0b1f3ff05eef9b8beef9de35a9f9082fef6cbc8cedd09022e4735c9b0",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/business-growth/skills/revenue-operations/assets/expected_output.json",
+            "sha256": "a8517740adbf869db2cf1adee56d21b5a0ce90a9455fbe9a5590e44ee336d414",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/revenue-operations/assets/forecast_report_template.md",
+            "sha256": "d5fc7865da7090e3129947510d8e52e0e2de303b226cf449a7f6be9bb882efd4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/revenue-operations/assets/gtm_dashboard_template.md",
+            "sha256": "8028b672cd8690b5179f8c2ebe76a15af52e94226cf86d38d6613e309dfd3b2c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/revenue-operations/assets/pipeline_review_template.md",
+            "sha256": "a1a92a3804c52dadda9b848e6e6e4f839b1079a8178b752d8c287199c93dab61",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/revenue-operations/assets/sample_forecast_data.json",
+            "sha256": "7efd9309e7fa4a7758da9d3c6eded2437713255b1a1f85ef317de34ea27a8bfa",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/revenue-operations/assets/sample_gtm_data.json",
+            "sha256": "67c69e32935188cdaca4ed18644e25210d82ff957619015ca03b83c8b66f9d29",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/revenue-operations/assets/sample_pipeline_data.json",
+            "sha256": "97d8f7aabe077616c14be1121b048be473e21c83a34a199a7142ff7e1d79dcf6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/revenue-operations/references/gtm-efficiency-benchmarks.md",
+            "sha256": "26e1cc88ae8f1763ec385b05687702e0eaa21c6a0f3e757d0bdd21d7abab4487",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/revenue-operations/references/pipeline-management-framework.md",
+            "sha256": "08e6a7cde7f20f09e9d2bbd9aba627da86539cb3b8e73878c13edda2625d751a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/revenue-operations/references/revops-metrics-guide.md",
+            "sha256": "44a77dcd376dc12fba409c018f9f6f5548a73313b284ee8104cdf774f69e2b38",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/revenue-operations/scripts/forecast_accuracy_tracker.py",
+            "sha256": "6bb62c2f53a50fdc5aadd7c52347720d34ca0192d437ac1686d6b74a4bf4ab7e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/revenue-operations/scripts/gtm_efficiency_calculator.py",
+            "sha256": "141559eea539799a64cb36e0817da4c81d1f9114ee75fdcdc7cf245601450f40",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/revenue-operations/scripts/pipeline_analyzer.py",
+            "sha256": "2a400523053c099437f306b0f69e0a458dfb2bf657a0a24e812cf003d80e0654",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Analyzes sales pipeline health, revenue forecasting accuracy, and go-to-market efficiency metrics for SaaS revenue optimization. Use when analyzing sales pipeline coverage, forecasting revenue, evaluating go-to-market performance, reviewing sales metrics, assessing pipeline analysis, tracking forecast accuracy with MAPE, calculating GTM efficiency, or measuring sales efficiency and unit economics for SaaS teams.",
       "tools": [
         {
-          "script": "business-growth/skills/revenue-operations/scripts/forecast_accuracy_tracker.py",
+          "script": "skills/business-growth/skills/revenue-operations/scripts/forecast_accuracy_tracker.py",
+          "sha256": "6bb62c2f53a50fdc5aadd7c52347720d34ca0192d437ac1686d6b74a4bf4ab7e",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 business-growth/skills/revenue-operations/scripts/forecast_accuracy_tracker.py --help",
+              "cmd": "python3 skills/business-growth/skills/revenue-operations/scripts/forecast_accuracy_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "business-growth/skills/revenue-operations/scripts/gtm_efficiency_calculator.py",
+          "script": "skills/business-growth/skills/revenue-operations/scripts/gtm_efficiency_calculator.py",
+          "sha256": "141559eea539799a64cb36e0817da4c81d1f9114ee75fdcdc7cf245601450f40",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 business-growth/skills/revenue-operations/scripts/gtm_efficiency_calculator.py --help",
+              "cmd": "python3 skills/business-growth/skills/revenue-operations/scripts/gtm_efficiency_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "business-growth/skills/revenue-operations/scripts/pipeline_analyzer.py",
+          "script": "skills/business-growth/skills/revenue-operations/scripts/pipeline_analyzer.py",
+          "sha256": "2a400523053c099437f306b0f69e0a458dfb2bf657a0a24e812cf003d80e0654",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-growth/skills/revenue-operations/scripts/pipeline_analyzer.py --help",
+              "cmd": "python3 skills/business-growth/skills/revenue-operations/scripts/pipeline_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-growth/skills/revenue-operations/scripts/pipeline_analyzer.py --sample",
+              "cmd": "python3 skills/business-growth/skills/revenue-operations/scripts/pipeline_analyzer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -156,47 +343,119 @@
         "close_out": false
       },
       "references": [
-        "gtm-efficiency-benchmarks.md",
-        "pipeline-management-framework.md",
-        "revops-metrics-guide.md"
+        "skills/business-growth/skills/revenue-operations/references/gtm-efficiency-benchmarks.md",
+        "skills/business-growth/skills/revenue-operations/references/pipeline-management-framework.md",
+        "skills/business-growth/skills/revenue-operations/references/revops-metrics-guide.md"
       ]
     },
     {
       "name": "sales-engineer",
-      "path": "business-growth/skills/sales-engineer",
+      "path": "skills/business-growth/skills/sales-engineer",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "sales-engineer",
+        "skill_path": "skills/business-growth/skills/sales-engineer",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/business-growth/skills/sales-engineer/SKILL.md",
+            "sha256": "7081cae4383df30c2e4908b522ae5bbf54497bc9e7a3f4472d81c5343ea8f93e",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/business-growth/skills/sales-engineer/assets/demo_script_template.md",
+            "sha256": "beacbc2b0568eab759508174f9a51260e7357d3ad8ca2b177a1376c89843083c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/sales-engineer/assets/expected_output.json",
+            "sha256": "26f9a490888e04defc0c333dc827d1ebba4fbcd57936d7e8d1cfd10e103b6ed9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/sales-engineer/assets/poc_scorecard_template.md",
+            "sha256": "d2a4e3807cea536427a5895109a92f03b9d28a772ca4239e9839d020620239fb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/sales-engineer/assets/sample_rfp_data.json",
+            "sha256": "c59d41fcc5f4d57b14d1fa073497564a9104d8b3716fb68ad0fea2155f641592",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/sales-engineer/assets/technical_proposal_template.md",
+            "sha256": "c52e3e350c2ace56f0c73d6cd46328d6d97472791ee44bdfd465eaa38c03ad58",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/sales-engineer/references/competitive-positioning-framework.md",
+            "sha256": "d0cfbb2100bb6240444c8be0eeaa453a385fa19c26e210655096a6f3f553e2a5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/sales-engineer/references/poc-best-practices.md",
+            "sha256": "1f12e6df6e20da24587e72110dce68f3d8537e6c078d116724377c30feb70612",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/sales-engineer/references/rfp-response-guide.md",
+            "sha256": "cb6e98d932890b45fcc562900c570c06b08551420726de0372763bb537ce1ab3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/sales-engineer/scripts/competitive_matrix_builder.py",
+            "sha256": "1670ee07b4999e47bc43960879092ec670ceae6b3aea2062cbe92736601edbaa",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/sales-engineer/scripts/poc_planner.py",
+            "sha256": "25e8e7c92cebad02a518537bdc89fefa3cbd8fd189fd014f320decf5d41c6afa",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-growth/skills/sales-engineer/scripts/rfp_response_analyzer.py",
+            "sha256": "97253f3ddddab50d7e4df8e56de58509d2406cb1cca687a366f5c7ef177a8e4e",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Analyzes RFP/RFI responses for coverage gaps, builds competitive feature comparison matrices, and plans proof-of-concept (POC) engagements for pre-sales engineering. Use when responding to RFPs, bids, or proposal requests; comparing product features against competitors; planning or scoring a customer POC or sales demo; preparing a technical proposal; or performing win/loss competitor analysis. Handles tasks described as 'RFP response', 'bid response', 'proposal response', 'competitor comparison', 'feature matrix', 'POC planning', 'sales demo prep', or 'pre-sales engineering'.",
       "tools": [
         {
-          "script": "business-growth/skills/sales-engineer/scripts/competitive_matrix_builder.py",
+          "script": "skills/business-growth/skills/sales-engineer/scripts/competitive_matrix_builder.py",
+          "sha256": "1670ee07b4999e47bc43960879092ec670ceae6b3aea2062cbe92736601edbaa",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 business-growth/skills/sales-engineer/scripts/competitive_matrix_builder.py --help",
+              "cmd": "python3 skills/business-growth/skills/sales-engineer/scripts/competitive_matrix_builder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "business-growth/skills/sales-engineer/scripts/poc_planner.py",
+          "script": "skills/business-growth/skills/sales-engineer/scripts/poc_planner.py",
+          "sha256": "25e8e7c92cebad02a518537bdc89fefa3cbd8fd189fd014f320decf5d41c6afa",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 business-growth/skills/sales-engineer/scripts/poc_planner.py --help",
+              "cmd": "python3 skills/business-growth/skills/sales-engineer/scripts/poc_planner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "business-growth/skills/sales-engineer/scripts/rfp_response_analyzer.py",
+          "script": "skills/business-growth/skills/sales-engineer/scripts/rfp_response_analyzer.py",
+          "sha256": "97253f3ddddab50d7e4df8e56de58509d2406cb1cca687a366f5c7ef177a8e4e",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 business-growth/skills/sales-engineer/scripts/rfp_response_analyzer.py --help",
+              "cmd": "python3 skills/business-growth/skills/sales-engineer/scripts/rfp_response_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -211,9 +470,9 @@
         "close_out": true
       },
       "references": [
-        "competitive-positioning-framework.md",
-        "poc-best-practices.md",
-        "rfp-response-guide.md"
+        "skills/business-growth/skills/sales-engineer/references/competitive-positioning-framework.md",
+        "skills/business-growth/skills/sales-engineer/references/poc-best-practices.md",
+        "skills/business-growth/skills/sales-engineer/references/rfp-response-guide.md"
       ]
     }
   ]

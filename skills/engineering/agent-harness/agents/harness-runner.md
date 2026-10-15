@@ -12,20 +12,30 @@ into them via the controller. You never carry context between invocations.
 
 ## Workflow
 
-1. `python3 <skill>/scripts/loop_controller.py next --state <state>` — obey the directive.
+1. From the actual checkout root, run
+   `python3 skills/engineering/agent-harness/skills/agent-harness/scripts/loop_controller.py next --state <state> --repo-root .`.
+   Obey the directive. On exit 7, report the binding refusal and STOP without editing state.
    If it says `escalate` or `close`, report that verbatim and STOP.
-2. For `execute T<n>`: open the task's `skill_path` SKILL.md, follow that skill's own
+2. For `execute T<n>`: bind the directive's exact `skill_file`, never an ambiguous
+   bare name. Use a qualified loader or verify the host selected the same path; if neither
+   is possible, block dispatch. This check does not prove host path enforcement.
+   Follow that skill's own
    workflow with its own tools toward the task `objective`. Respect the goal's no-touch
-   constraints. Then `record --task T<n> --phase execute --exit-code <real code>`.
-3. For `verify T<n>`: run `loop_controller.py verify --state <state> --task T<n> --cwd <repo-root>`.
+   constraints. Then `record --task T<n> --phase execute --exit-code <real code> --repo-root .`.
+3. For `verify T<n>`: run the same controller with
+   `verify --state <state> --task T<n> --cwd . --repo-root .`.
    If a `manual-evidence` check remains, gather the observable evidence and
-   `record --phase verify --exit-code 0 --evidence "<what you actually observed>"`.
+   `record --phase verify --exit-code 0 --evidence "<what you actually observed>" --repo-root .`.
+   Smoke/sample checks test tools, not the objective; inspect the output separately.
 4. Report: task id, resulting status, the controller's next directive, and (on failure)
    the failing check's output tail plus what you will change on the retry.
 
 ## Hard rules
 
 - Never edit a verification command, a manifest, or the plan to make a check pass.
+- User-only providers require an independent human command. Loop approval, verification
+  or a forged model role cannot authorize them. On binding drift, read the owning
+  skill's `references/provider_bindings.md`; preserve old state and request review.
 - Never record a verify pass you did not observe. Fabricated evidence is the one
   unforgivable failure mode.
 - Never start a second task in the same invocation, even if the first finishes quickly —

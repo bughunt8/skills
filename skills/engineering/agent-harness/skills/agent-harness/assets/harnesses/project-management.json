@@ -1,5 +1,5 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "project-management",
   "skill_count": 9,
   "loop_defaults": {
@@ -15,16 +15,51 @@
   "skills": [
     {
       "name": "atlassian-admin",
-      "path": "project-management/skills/atlassian-admin",
+      "path": "skills/project-management/skills/atlassian-admin",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "atlassian-admin",
+        "skill_path": "skills/project-management/skills/atlassian-admin",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/project-management/skills/atlassian-admin/SKILL.md",
+            "sha256": "44933862df5559357f9220abf560788f75c515cd22ed0bfe349b166fa28018de",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/project-management/skills/atlassian-admin/assets/permission_scheme_template.json",
+            "sha256": "a082f240b7deba78c9af4cbb78a2eb153df0f282fdd2cee6687b5e450d9db9d0",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/atlassian-admin/references/security-hardening-guide.md",
+            "sha256": "7558cec32d97e3ce7285a6f6ae645262a673ad3a3c12d5f70e70c834df875c66",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/atlassian-admin/references/user-provisioning-checklist.md",
+            "sha256": "3de44a3a68e04050d5cb1b133252568bda6437a36d9dfb4f09630df77616c762",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/atlassian-admin/scripts/permission_audit_tool.py",
+            "sha256": "34c0e4e6bc6b6bfe30014ae7417d5bab8868e95397e4136ad50a2f92ba106cc6",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Atlassian Administrator for managing and organizing Atlassian products (Jira, Confluence, Bitbucket, Trello), users, permissions, security, integrations, system configuration, and org-wide governance. Use when asked to add users to Jira, change Confluence permissions, configure access control, update admin settings, manage Atlassian groups, set up SSO, install marketplace apps, review security policies, or handle any org-wide Atlassian administration task.",
       "tools": [
         {
-          "script": "project-management/skills/atlassian-admin/scripts/permission_audit_tool.py",
+          "script": "skills/project-management/skills/atlassian-admin/scripts/permission_audit_tool.py",
+          "sha256": "34c0e4e6bc6b6bfe30014ae7417d5bab8868e95397e4136ad50a2f92ba106cc6",
           "wired": false,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/atlassian-admin/scripts/permission_audit_tool.py --help",
+              "cmd": "python3 skills/project-management/skills/atlassian-admin/scripts/permission_audit_tool.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -39,22 +74,52 @@
         "close_out": true
       },
       "references": [
-        "security-hardening-guide.md",
-        "user-provisioning-checklist.md"
+        "skills/project-management/skills/atlassian-admin/references/security-hardening-guide.md",
+        "skills/project-management/skills/atlassian-admin/references/user-provisioning-checklist.md"
       ]
     },
     {
       "name": "atlassian-templates",
-      "path": "project-management/skills/atlassian-templates",
+      "path": "skills/project-management/skills/atlassian-templates",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "atlassian-templates",
+        "skill_path": "skills/project-management/skills/atlassian-templates",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/project-management/skills/atlassian-templates/SKILL.md",
+            "sha256": "7182d75bf85ce85e5c435dc7966ec3828e5e06eec167d55c3b8197c0c4b9357a",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/project-management/skills/atlassian-templates/references/governance-framework.md",
+            "sha256": "5ae24d871c632b5bcedab6851e6037f90bf3e4d9a3c73dfbb9c6e87f39426ad0",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/atlassian-templates/references/template-design-patterns.md",
+            "sha256": "7fce5c0a63c4561e7a4bfd5cd7131539f0ce1016eb9d4fe8792eee0cc2d2581c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/atlassian-templates/scripts/template_scaffolder.py",
+            "sha256": "544c0a83fdb29fb7abdbb066bb2c638249ab30e3507209070a3de2a75d1dc7e2",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Atlassian Template and Files Creator/Modifier expert for creating, modifying, and managing Jira and Confluence templates, blueprints, custom layouts, reusable components, and standardized content structures. Use when building org-wide templates, custom blueprints, page layouts, and automated content generation.",
       "tools": [
         {
-          "script": "project-management/skills/atlassian-templates/scripts/template_scaffolder.py",
+          "script": "skills/project-management/skills/atlassian-templates/scripts/template_scaffolder.py",
+          "sha256": "544c0a83fdb29fb7abdbb066bb2c638249ab30e3507209070a3de2a75d1dc7e2",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/atlassian-templates/scripts/template_scaffolder.py --help",
+              "cmd": "python3 skills/project-management/skills/atlassian-templates/scripts/template_scaffolder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -69,34 +134,75 @@
         "close_out": true
       },
       "references": [
-        "governance-framework.md",
-        "template-design-patterns.md"
+        "skills/project-management/skills/atlassian-templates/references/governance-framework.md",
+        "skills/project-management/skills/atlassian-templates/references/template-design-patterns.md"
       ]
     },
     {
       "name": "confluence-expert",
-      "path": "project-management/skills/confluence-expert",
+      "path": "skills/project-management/skills/confluence-expert",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "confluence-expert",
+        "skill_path": "skills/project-management/skills/confluence-expert",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/project-management/skills/confluence-expert/SKILL.md",
+            "sha256": "f0d5062618eaf048f5215fc6b41d19c9549132c021a504f789c8689352f37be2",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/project-management/skills/confluence-expert/references/macro-cheat-sheet.md",
+            "sha256": "462c0b3990cadb11ccc4ccb79b89b13e5b7e03e8fb95cfad31996d0ce4b53e0b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/confluence-expert/references/space-architecture-patterns.md",
+            "sha256": "8db6ab8cc4bce6dcdc9cd441e49b8eeeb72620ac25bc72bd9ebe7ca30c7a1230",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/confluence-expert/references/templates.md",
+            "sha256": "96a937b3164bf223c545cad8b2d7d89018693c31ce6aa0bfc5e39b46d6c85b11",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/confluence-expert/scripts/content_audit_analyzer.py",
+            "sha256": "2617086d668be18805a6efd047596b6be42a9340e16f548a30a945f28c422829",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/confluence-expert/scripts/space_structure_generator.py",
+            "sha256": "a95354f678aa0e2fbb6bab780258ea7511bc2ba17e299b20210f08104baeee61",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Atlassian Confluence expert for creating and managing spaces, knowledge bases, and documentation. Configures space permissions and hierarchies, creates page templates with macros, sets up documentation taxonomies, designs page layouts, and manages content governance. Use when users need to build or restructure a Confluence space, design page hierarchies with permission structures, author or standardise documentation templates, embed Jira reports in pages, run knowledge base audits, or establish documentation standards and collaborative workflows.",
       "tools": [
         {
-          "script": "project-management/skills/confluence-expert/scripts/content_audit_analyzer.py",
+          "script": "skills/project-management/skills/confluence-expert/scripts/content_audit_analyzer.py",
+          "sha256": "2617086d668be18805a6efd047596b6be42a9340e16f548a30a945f28c422829",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/confluence-expert/scripts/content_audit_analyzer.py --help",
+              "cmd": "python3 skills/project-management/skills/confluence-expert/scripts/content_audit_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "project-management/skills/confluence-expert/scripts/space_structure_generator.py",
+          "script": "skills/project-management/skills/confluence-expert/scripts/space_structure_generator.py",
+          "sha256": "a95354f678aa0e2fbb6bab780258ea7511bc2ba17e299b20210f08104baeee61",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/confluence-expert/scripts/space_structure_generator.py --help",
+              "cmd": "python3 skills/project-management/skills/confluence-expert/scripts/space_structure_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -111,35 +217,81 @@
         "close_out": true
       },
       "references": [
-        "macro-cheat-sheet.md",
-        "space-architecture-patterns.md",
-        "templates.md"
+        "skills/project-management/skills/confluence-expert/references/macro-cheat-sheet.md",
+        "skills/project-management/skills/confluence-expert/references/space-architecture-patterns.md",
+        "skills/project-management/skills/confluence-expert/references/templates.md"
       ]
     },
     {
       "name": "jira-expert",
-      "path": "project-management/skills/jira-expert",
+      "path": "skills/project-management/skills/jira-expert",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "jira-expert",
+        "skill_path": "skills/project-management/skills/jira-expert",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/project-management/skills/jira-expert/SKILL.md",
+            "sha256": "36d647d487ccad59c871d38b7b799a92a27683455909ad07b05f89a898ac608f",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/project-management/skills/jira-expert/references/AUTOMATION.md",
+            "sha256": "cacde5bddf08ccf27482810d6807b759d8b77f852f71454cd922d634d6322e77",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/jira-expert/references/WORKFLOWS.md",
+            "sha256": "678848e410c36630bfc1b748d675b1276e7604a7b679c85ef424b5df31ae6bb9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/jira-expert/references/automation-examples.md",
+            "sha256": "9690fec47336422cd89bf4c74b8863e895852867964e295c7b81738427959611",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/jira-expert/references/jql-examples.md",
+            "sha256": "b0d67616588ebc73d4459261b75046e1997664f9d8893342bb8757125c8aece7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/jira-expert/scripts/jql_query_builder.py",
+            "sha256": "83a0fd76f265f07a2f176a287ed3efdb2896a2ebcc3d17cea18aa0465eae3119",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/jira-expert/scripts/workflow_validator.py",
+            "sha256": "63e4bbf8e9109450f4cbc67df0a087340e8b46c8817e2ad6a437ad36ce269a2c",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Atlassian Jira expert for creating and managing projects, planning, product discovery, JQL queries, workflows, custom fields, automation, reporting, and all Jira features. Use when setting up or configuring Jira projects, writing JQL and advanced searches, creating dashboards, designing workflows, or performing technical Jira operations.",
       "tools": [
         {
-          "script": "project-management/skills/jira-expert/scripts/jql_query_builder.py",
+          "script": "skills/project-management/skills/jira-expert/scripts/jql_query_builder.py",
+          "sha256": "83a0fd76f265f07a2f176a287ed3efdb2896a2ebcc3d17cea18aa0465eae3119",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/jira-expert/scripts/jql_query_builder.py --help",
+              "cmd": "python3 skills/project-management/skills/jira-expert/scripts/jql_query_builder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "project-management/skills/jira-expert/scripts/workflow_validator.py",
+          "script": "skills/project-management/skills/jira-expert/scripts/workflow_validator.py",
+          "sha256": "63e4bbf8e9109450f4cbc67df0a087340e8b46c8817e2ad6a437ad36ce269a2c",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/jira-expert/scripts/workflow_validator.py --help",
+              "cmd": "python3 skills/project-management/skills/jira-expert/scripts/workflow_validator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -154,15 +306,29 @@
         "close_out": true
       },
       "references": [
-        "AUTOMATION.md",
-        "WORKFLOWS.md",
-        "automation-examples.md",
-        "jql-examples.md"
+        "skills/project-management/skills/jira-expert/references/AUTOMATION.md",
+        "skills/project-management/skills/jira-expert/references/WORKFLOWS.md",
+        "skills/project-management/skills/jira-expert/references/automation-examples.md",
+        "skills/project-management/skills/jira-expert/references/jql-examples.md"
       ]
     },
     {
       "name": "meeting-analyzer",
-      "path": "project-management/skills/meeting-analyzer",
+      "path": "skills/project-management/skills/meeting-analyzer",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "meeting-analyzer",
+        "skill_path": "skills/project-management/skills/meeting-analyzer",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/project-management/skills/meeting-analyzer/SKILL.md",
+            "sha256": "c44d4af0e91f46105dde6fbf5b63fb624872e69232344bfe64d5c84a5cc92530",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Analyzes meeting transcripts and recordings to surface behavioral patterns, communication anti-patterns, and actionable coaching feedback. Use this skill whenever the user uploads or points to meeting transcripts (.txt, .md, .vtt, .srt, .docx), asks about their communication habits, wants feedback on how they run meetings, requests speaking ratio analysis, mentions filler words or conflict avoidance, or wants to compare their communication across time periods. Also trigger when users mention tools like Granola, Otter, Fireflies, or Zoom transcripts. Even if the user just says \"look at my \u2026",
       "tools": [],
       "agentic_signals": {
@@ -176,55 +342,112 @@
     },
     {
       "name": "pm-skills",
-      "path": "project-management/skills/pm-skills",
+      "path": "skills/project-management/skills/pm-skills",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "pm-skills",
+        "skill_path": "skills/project-management/skills/pm-skills",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/project-management/skills/pm-skills/SKILL.md",
+            "sha256": "92318bad0543a35c1d6f8330783e7d751f0f478707b19ae259616e4589065059",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/project-management/skills/pm-skills/assets/expected_flow_metrics.json",
+            "sha256": "02224892bdd1c69c6ecfcaee7100c50a43250c22e73242ae52f37629808d87c7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/pm-skills/assets/sample_jira_snapshot.json",
+            "sha256": "40713d986b6c2704dff41bfe3808213ac876d3e27a31e75a7dcc8e2ae585cb6c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/pm-skills/references/agentic_delivery_governance.md",
+            "sha256": "fae5a382ae38bd89b2bc069fba39c7591342224ac69999a7c61a6fee2dde80be",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/pm-skills/references/flow_forecasting_canon.md",
+            "sha256": "2c92c6476ad81fe0f50ea850642cf783c137c7698708ca3c3c48871f05aa99eb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/pm-skills/references/pm_loop_playbook.md",
+            "sha256": "1077375bd5c1a2a8a8ed93ba6cd33b98c320be4dcb821157326ad3d54e9d6600",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/pm-skills/scripts/delivery_loop_gate.py",
+            "sha256": "34c869f227c1a62145342f0212645a8f898160f6b4589e3cec0e9baad74c692d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/pm-skills/scripts/jira_snapshot_bridge.py",
+            "sha256": "e78c239ce54086a141d1abe06961867d69e81a5c0a2384ad76b30353703b508d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/pm-skills/scripts/pm_goal_router.py",
+            "sha256": "9dd8ca1dd6228dbfed0578337fd22b17d00c37b180a7cd427c41284a8f399e25",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when coordinating project-delivery work across the 8 project-management sub-skills \u2014 sprint/velocity analytics, portfolio health, Jira/JQL, Confluence, Atlassian admin, templates, meeting analysis, team comms. Triggers on 'our sprints feel off', 'project health report', 'audit our Jira permissions', 'when will it be done', 'run the delivery loop'. Forks context to route to one sub-skill via a deterministic signal router and returns a digest; can also drive a full goal\u2192plan\u2192execute\u2192verify\u2192close delivery loop through the repo-wide agent-harness with Jira MCP data bridged into the domain's \u2026",
       "tools": [
         {
-          "script": "project-management/skills/pm-skills/scripts/delivery_loop_gate.py",
+          "script": "skills/project-management/skills/pm-skills/scripts/delivery_loop_gate.py",
+          "sha256": "34c869f227c1a62145342f0212645a8f898160f6b4589e3cec0e9baad74c692d",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/pm-skills/scripts/delivery_loop_gate.py --help",
+              "cmd": "python3 skills/project-management/skills/pm-skills/scripts/delivery_loop_gate.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 project-management/skills/pm-skills/scripts/delivery_loop_gate.py --sample",
+              "cmd": "python3 skills/project-management/skills/pm-skills/scripts/delivery_loop_gate.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "project-management/skills/pm-skills/scripts/jira_snapshot_bridge.py",
+          "script": "skills/project-management/skills/pm-skills/scripts/jira_snapshot_bridge.py",
+          "sha256": "e78c239ce54086a141d1abe06961867d69e81a5c0a2384ad76b30353703b508d",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/pm-skills/scripts/jira_snapshot_bridge.py --help",
+              "cmd": "python3 skills/project-management/skills/pm-skills/scripts/jira_snapshot_bridge.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 project-management/skills/pm-skills/scripts/jira_snapshot_bridge.py --sample",
+              "cmd": "python3 skills/project-management/skills/pm-skills/scripts/jira_snapshot_bridge.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "project-management/skills/pm-skills/scripts/pm_goal_router.py",
+          "script": "skills/project-management/skills/pm-skills/scripts/pm_goal_router.py",
+          "sha256": "9dd8ca1dd6228dbfed0578337fd22b17d00c37b180a7cd427c41284a8f399e25",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/pm-skills/scripts/pm_goal_router.py --help",
+              "cmd": "python3 skills/project-management/skills/pm-skills/scripts/pm_goal_router.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 project-management/skills/pm-skills/scripts/pm_goal_router.py --sample",
+              "cmd": "python3 skills/project-management/skills/pm-skills/scripts/pm_goal_router.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -239,47 +462,119 @@
         "close_out": true
       },
       "references": [
-        "agentic_delivery_governance.md",
-        "flow_forecasting_canon.md",
-        "pm_loop_playbook.md"
+        "skills/project-management/skills/pm-skills/references/agentic_delivery_governance.md",
+        "skills/project-management/skills/pm-skills/references/flow_forecasting_canon.md",
+        "skills/project-management/skills/pm-skills/references/pm_loop_playbook.md"
       ]
     },
     {
       "name": "scrum-master",
-      "path": "project-management/skills/scrum-master",
+      "path": "skills/project-management/skills/scrum-master",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "scrum-master",
+        "skill_path": "skills/project-management/skills/scrum-master",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/project-management/skills/scrum-master/SKILL.md",
+            "sha256": "aa2f4ffcec2439e2e8df877b7fb7b158dadfdb3ab46b95726ea78bbd0f7a280c",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/project-management/skills/scrum-master/assets/expected_output.json",
+            "sha256": "f5e7fea2ec3f3f1745390e3299e829b3f393c469fba77e0973cbed180c6a786b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/scrum-master/assets/expected_velocity_output.json",
+            "sha256": "d95cbbf2b77ba1a271e1e4733b2d8d7e85876cd6af8f00dd1f886effe387d4c6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/scrum-master/assets/sample_sprint_data.json",
+            "sha256": "820c27abb44b332aec5b0be26228a9a6d86498e82968f24a657a6647be483929",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/scrum-master/assets/sprint_report_template.md",
+            "sha256": "61ffc8bc8612db3ed6e149b615042f74fdfea2c22175032f2370ec079a57a508",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/scrum-master/assets/team_health_check_template.md",
+            "sha256": "b51dc992b561a7722a84936b4f6bc3dbe2585912769874514c59001059dccf52",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/scrum-master/references/retro-formats.md",
+            "sha256": "046b6d33388d61192e8f7f029b3c967dcc5a272bfd3f723421a1f7d42e6853ab",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/scrum-master/references/team-dynamics-framework.md",
+            "sha256": "52e31057ab3a10648b07e44ab5f6440e2a219e895d5f93ed60e6c386cc768a54",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/scrum-master/references/velocity-forecasting-guide.md",
+            "sha256": "3e7775ac42479fff57040b4e561fddd6c23b61cdeb01ae6bf4f9224e434449ec",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/scrum-master/scripts/retrospective_analyzer.py",
+            "sha256": "fa2348001f4462978840e0ea0db8f245ddfaa245abaadb22fbe2fbd0e8c44c67",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/scrum-master/scripts/sprint_health_scorer.py",
+            "sha256": "ef543801c7b1cb32baac987614ebed7809fa796c2333b39d200e9b98e9e11eba",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/scrum-master/scripts/velocity_analyzer.py",
+            "sha256": "14494721787f68ef50b1d895358b4813c247aa839cc2e3e53058d0fea855a32a",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Advanced Scrum Master skill for data-driven agile team analysis and coaching. Use when the user asks about sprint planning, velocity tracking, retrospectives, standup facilitation, backlog grooming, story points, burndown charts, blocker resolution, or agile team health. Runs Python scripts to analyse sprint JSON exports from Jira or similar tools: velocity_analyzer.py for Monte Carlo sprint forecasting, sprint_health_scorer.py for multi-dimension health scoring, and retrospective_analyzer.py for action-item and theme tracking. Produces confidence-interval forecasts, health grade reports \u2026",
       "tools": [
         {
-          "script": "project-management/skills/scrum-master/scripts/retrospective_analyzer.py",
+          "script": "skills/project-management/skills/scrum-master/scripts/retrospective_analyzer.py",
+          "sha256": "fa2348001f4462978840e0ea0db8f245ddfaa245abaadb22fbe2fbd0e8c44c67",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/scrum-master/scripts/retrospective_analyzer.py --help",
+              "cmd": "python3 skills/project-management/skills/scrum-master/scripts/retrospective_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "project-management/skills/scrum-master/scripts/sprint_health_scorer.py",
+          "script": "skills/project-management/skills/scrum-master/scripts/sprint_health_scorer.py",
+          "sha256": "ef543801c7b1cb32baac987614ebed7809fa796c2333b39d200e9b98e9e11eba",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/scrum-master/scripts/sprint_health_scorer.py --help",
+              "cmd": "python3 skills/project-management/skills/scrum-master/scripts/sprint_health_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "project-management/skills/scrum-master/scripts/velocity_analyzer.py",
+          "script": "skills/project-management/skills/scrum-master/scripts/velocity_analyzer.py",
+          "sha256": "14494721787f68ef50b1d895358b4813c247aa839cc2e3e53058d0fea855a32a",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/scrum-master/scripts/velocity_analyzer.py --help",
+              "cmd": "python3 skills/project-management/skills/scrum-master/scripts/velocity_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -294,47 +589,119 @@
         "close_out": true
       },
       "references": [
-        "retro-formats.md",
-        "team-dynamics-framework.md",
-        "velocity-forecasting-guide.md"
+        "skills/project-management/skills/scrum-master/references/retro-formats.md",
+        "skills/project-management/skills/scrum-master/references/team-dynamics-framework.md",
+        "skills/project-management/skills/scrum-master/references/velocity-forecasting-guide.md"
       ]
     },
     {
       "name": "senior-pm",
-      "path": "project-management/skills/senior-pm",
+      "path": "skills/project-management/skills/senior-pm",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "senior-pm",
+        "skill_path": "skills/project-management/skills/senior-pm",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/project-management/skills/senior-pm/SKILL.md",
+            "sha256": "60ae71507d3752a1c7504ae92e0a503a2c00cb57c1d1a025fcacdd6b9cb02a8f",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/project-management/skills/senior-pm/assets/executive_report_template.md",
+            "sha256": "dd97e08e464976ed98be38a1298429dd81e4a1873d05327942338f741ac92dd4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/senior-pm/assets/expected_output.json",
+            "sha256": "93bc519bf88393b37235c6489ee3d945dc6f105855e1c268bbc581011e6fde1a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/senior-pm/assets/project_charter_template.md",
+            "sha256": "a407af5150d5f5270708628fa66d06ae3dce705691cf7c3b125ea32b4661f45b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/senior-pm/assets/raci_matrix_template.md",
+            "sha256": "5de71bc4511b3fb6ca2df714879a9fbd63b70917172569f7c00bcaf02e89f6a1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/senior-pm/assets/sample_project_data.json",
+            "sha256": "6349aa9bdb2bae73480059b8189f3b6c87636a873ddebec0a40d403ef4c515f3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/senior-pm/references/portfolio-kpis.md",
+            "sha256": "dcd60fff32fd510792178a983b5739d39f7fe9400b5b681cb685eeb55e0283a5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/senior-pm/references/portfolio-prioritization-models.md",
+            "sha256": "f926f0231a48696f8d8dc5c08f531f19da6cc37d0193b8d381b8d187de759264",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/senior-pm/references/risk-management-framework.md",
+            "sha256": "326fdcf2826b7e44b196c261e6613f727a922f9e0f8e6e103809a49d962feb58",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/senior-pm/scripts/project_health_dashboard.py",
+            "sha256": "a93809a38723e42332337321e68a9d16b8a64fc789ea706b9203d32996132eb6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/senior-pm/scripts/resource_capacity_planner.py",
+            "sha256": "4799d7590745068c5afc9374165926a0fe0d824cde80d41ccab177e9d330ea6b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/senior-pm/scripts/risk_matrix_analyzer.py",
+            "sha256": "b30f2e5682bc56a8b24fdbdb9a9fafa4e049bc97f398eb6c7dab1813dd90ebcd",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Senior Project Manager for enterprise software, SaaS, and digital transformation projects. Specializes in portfolio management, quantitative risk analysis, resource optimization, stakeholder alignment, and executive reporting. Uses advanced methodologies including EMV analysis, Monte Carlo simulation, WSJF prioritization, and multi-dimensional health scoring. Use when a user needs help with project plans, project status reports, risk assessments, resource allocation, project roadmaps, milestone tracking, team capacity planning, portfolio health reviews, program management, or \u2026",
       "tools": [
         {
-          "script": "project-management/skills/senior-pm/scripts/project_health_dashboard.py",
+          "script": "skills/project-management/skills/senior-pm/scripts/project_health_dashboard.py",
+          "sha256": "a93809a38723e42332337321e68a9d16b8a64fc789ea706b9203d32996132eb6",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/senior-pm/scripts/project_health_dashboard.py --help",
+              "cmd": "python3 skills/project-management/skills/senior-pm/scripts/project_health_dashboard.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "project-management/skills/senior-pm/scripts/resource_capacity_planner.py",
+          "script": "skills/project-management/skills/senior-pm/scripts/resource_capacity_planner.py",
+          "sha256": "4799d7590745068c5afc9374165926a0fe0d824cde80d41ccab177e9d330ea6b",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/senior-pm/scripts/resource_capacity_planner.py --help",
+              "cmd": "python3 skills/project-management/skills/senior-pm/scripts/resource_capacity_planner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "project-management/skills/senior-pm/scripts/risk_matrix_analyzer.py",
+          "script": "skills/project-management/skills/senior-pm/scripts/risk_matrix_analyzer.py",
+          "sha256": "b30f2e5682bc56a8b24fdbdb9a9fafa4e049bc97f398eb6c7dab1813dd90ebcd",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 project-management/skills/senior-pm/scripts/risk_matrix_analyzer.py --help",
+              "cmd": "python3 skills/project-management/skills/senior-pm/scripts/risk_matrix_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -349,14 +716,48 @@
         "close_out": true
       },
       "references": [
-        "portfolio-kpis.md",
-        "portfolio-prioritization-models.md",
-        "risk-management-framework.md"
+        "skills/project-management/skills/senior-pm/references/portfolio-kpis.md",
+        "skills/project-management/skills/senior-pm/references/portfolio-prioritization-models.md",
+        "skills/project-management/skills/senior-pm/references/risk-management-framework.md"
       ]
     },
     {
       "name": "team-communications",
-      "path": "project-management/skills/team-communications",
+      "path": "skills/project-management/skills/team-communications",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "team-communications",
+        "skill_path": "skills/project-management/skills/team-communications",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/project-management/skills/team-communications/SKILL.md",
+            "sha256": "b6b7e1ce17fb86f735e9d99bdb9692f321d2a22a8a987f7821fb09c0a1f983fe",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/project-management/skills/team-communications/references/3p-updates.md",
+            "sha256": "087e4363c0f3513728a7e695eeb9ead5c3ecd12a4681b59340691180e65b68fc",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/team-communications/references/company-newsletter.md",
+            "sha256": "30f81cfbdb03858a006169c72169024089c7c5d3d32611d337782da4f38c86b5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/team-communications/references/faq-answers.md",
+            "sha256": "5ecd3356cd6666937f2ebefa753253edfdbdca15e368d07baf398bfcced72484",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/project-management/skills/team-communications/references/general-comms.md",
+            "sha256": "4d3a4bb198a77626bcf018e96b2b45a2dbabed172d4ade0fcd70d23ae8a47a47",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Write internal company communications \u2014 3P updates (Progress/Plans/Problems), company-wide newsletters, FAQ roundups, incident reports, leadership updates, status reports, project updates, and general internal comms. Use this skill any time the user asks to draft, edit, or format something meant for internal audiences. Trigger on keywords like \"3P\", \"weekly update\", \"newsletter\", \"FAQ\", \"internal comms\", \"status report\", \"company update\", \"team update\", \"incident report\", or any request to summarize work for leadership, teammates, or the broader company. Even casual requests like \"write my \u2026",
       "tools": [],
       "agentic_signals": {
@@ -367,10 +768,10 @@
         "close_out": false
       },
       "references": [
-        "3p-updates.md",
-        "company-newsletter.md",
-        "faq-answers.md",
-        "general-comms.md"
+        "skills/project-management/skills/team-communications/references/3p-updates.md",
+        "skills/project-management/skills/team-communications/references/company-newsletter.md",
+        "skills/project-management/skills/team-communications/references/faq-answers.md",
+        "skills/project-management/skills/team-communications/references/general-comms.md"
       ]
     }
   ]

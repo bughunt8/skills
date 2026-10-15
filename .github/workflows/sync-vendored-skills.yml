@@ -121,6 +121,10 @@ jobs:
           python3 scripts/lint_skills.py
           python3 scripts/generate_index.py --check
           python3 scripts/sync_vendor.py --validate-manifest
+          python3 -m unittest discover -s scripts -p 'test_*.py' -v
+          python3 scripts/check_skill_dependencies.py --include-legacy
+          HARNESS_SOURCE_ROOT="$GITHUB_WORKSPACE" python3 -m unittest discover -s skills/engineering/agent-harness/tests -p 'test_*.py' -v
+          python3 skills/engineering/agent-harness/skills/agent-harness/scripts/harness_manifest_builder.py --check --repo-root .
           python3 scripts/audit_third_party.py
           python3 scripts/check_links.py
 
@@ -148,6 +152,9 @@ jobs:
             echo '- `scripts/lint_skills.py`'
             echo '- `scripts/generate_index.py --check`'
             echo '- `scripts/sync_vendor.py --validate-manifest`'
+            echo "- \`python3 -m unittest discover -s scripts -p 'test_*.py' -v\`"
+            echo '- `scripts/check_skill_dependencies.py --include-legacy`'
+            echo '- Harness provider-binding regressions and generated-inventory drift check'
             echo '- `scripts/audit_third_party.py`'
             echo '- `scripts/check_links.py`'
             echo

@@ -2,6 +2,8 @@
 
 **Discipline (Matt Pocock, derived from `engineering/grill-me`, MIT):** walk these one at a time. Do not skip ahead. Do not bundle. Answers must be written down. If the user cannot answer one, **that is your next investigation** — stop and surface the gap.
 
+This attribution describes the historical local intake, not permission to call a human-only provider. Model preflight uses the explicitly qualified native grilling route and its different frontier-round protocol in [composition_map.md](composition_map.md). Keep this library one-question-per-turn.
+
 These seven questions gate every meaningful frontend decision: framework pick, rendering model, bundle budget, design-system investment, a11y target. Each has a recommended answer with canon citation and a **kill criterion**.
 
 ---
@@ -86,7 +88,7 @@ These seven questions gate every meaningful frontend decision: framework pick, r
 
 **Why it matters:** a11y is a regulatory baseline in 2026 (European Accessibility Act enforcement began 2025; US ADA Title III litigation surged 2018–2024). "We'll fix it later" is the most expensive a11y strategy — retrofitting costs 5–10× building it in. AND without a named owner, no one is accountable.
 
-**Kill criterion:** customer-facing surface + no named a11y owner — STOP. Assign one before scaffolding. Run `engineering-team/skills/a11y-audit` as part of CI.
+**Kill criterion:** customer-facing surface + no named a11y owner — STOP. Assign one before scaffolding. Use the qualified [a11y-audit provider](../../../../engineering-team/a11y-audit/skills/a11y-audit/SKILL.md) to define the approved CI checks; the provider file is not itself a CI command.
 
 **Canon:** W3C WCAG 2.2 (2023); Marcy Sutton, *Accessibility in JavaScript Applications* (2017+); Adrian Roselli's blog on a11y testing (a-roselli.com, 2015–2024); European Accessibility Act (EU 2019/882, enforced 2025).
 

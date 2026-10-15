@@ -1,5 +1,5 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "c-level-advisor",
   "skill_count": 68,
   "loop_defaults": {
@@ -15,55 +15,142 @@
   "skills": [
     {
       "name": "arquiteto-de-empresa",
-      "path": "c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa",
-      "description": "Arquiteto de Empresa: constr\u00f3i um neg\u00f3cio do zero como bundle OKF (Open Knowledge Format) \u2014 uma \u00e1rvore de arquivos .md version\u00e1veis com frontmatter type, links formando grafo, e index.md/log.md reservados, leg\u00edvel por humanos e por agentes. Conduz o fundador por uma entrevista de 12 fases (funda\u00e7\u00e3o, estrat\u00e9gia, mercado, financeiro, comercial, marketing, produto, opera\u00e7\u00f5es, tech, pessoas, jur\u00eddico, governan\u00e7a), uma fase por vez, poucas perguntas por bloco, e gera os conceitos como markdown conformante. Acione quando o usu\u00e1rio quiser criar, estruturar ou documentar uma empresa inteira em \u2026",
+      "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "arquiteto-de-empresa",
+        "skill_path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/SKILL.md",
+            "sha256": "a04aeacb1b74531e84569aa01b947185d106f567a8a550817e61fcf6e642a322",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/assets/exemplo-bundle/00-fundacao/identidade.md",
+            "sha256": "045fa2549ecee85cf6260563b5b7dbd87928013a6af9a590988b4ab205f1a514",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/assets/exemplo-bundle/00-fundacao/index.md",
+            "sha256": "85fc352a9e87b8209361e683d98b72342a2573e45225b9ba04c0105e47914288",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/assets/exemplo-bundle/00-fundacao/problema-solucao.md",
+            "sha256": "3144d1526f5ef85ccb658d94806ba57b95c38bc55af928896786fe4a094fc9f1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/assets/exemplo-bundle/index.md",
+            "sha256": "c70d3fd649518ad7abd60b01f6a1d15bb34f01a6bcecac159b78ca7fa7b076f9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/assets/exemplo-bundle/log.md",
+            "sha256": "85cad1398e99e5060161571c6c8e976c8091cc853e73f09c9af6452d02685849",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/assets/frontmatter_template.md",
+            "sha256": "1363f9fb4bd72672ed61b6142d514c24ac9085eeb57990bafef1faa05324cab9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/assets/index_template.md",
+            "sha256": "33f4f8bb5d2639f4ae4d4bcd21f3d4b16b40f85a5dc1c7bca3ff1ea80a2c998e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/assets/log_template.md",
+            "sha256": "7e09c1c13db73170d424307b9c75c46e6adcb2463d270f7e96904fbe5a36bc6e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/references/okf_conformance.md",
+            "sha256": "9cc63917bf3232b67016cc0723f126df0f518ed10d10198a5850045edc65d75c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/references/phase_playbook.md",
+            "sha256": "1e8d047af408addf303e74c066128dbd424aaf7aa694afcc34988a7cec94f6d3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/references/type_vocabulary.md",
+            "sha256": "373644f4fc2def8f93efd39e798116b6322fc8224a0012fa74f7b51834a88c4f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/index_generator.py",
+            "sha256": "8772d0e2a7c36aac7416bd893a8c5bf5ca1f5a63648949de098c00b9995ce077",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/okf_linter.py",
+            "sha256": "ddad9dc516cd4fe88ab31115d7966d6a4ed95591b81734c35dc51f2a8a108acd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/scaffold_bundle.py",
+            "sha256": "0d1bebecdc15368a6cf591c9ad7ef90615dda45e7cf85c863dd599a988825709",
+            "role": "owned_resource"
+          }
+        ]
+      },
+      "description": "Company Architect: builds a business from scratch as an OKF (Open Knowledge Format) bundle \u2014 a tree of version-controllable .md files with frontmatter type, links forming a graph, and reserved index.md/log.md, readable by humans and agents. Guides the founder through a 12-phase interview (foundation, strategy, market, financial, sales, marketing, product, operations, tech, people, legal, governance), one phase at a time, few questions per block, and generates the concepts as conformant markdown. Trigger when the user wants to create, structure, or document an entire company in folders and \u2026",
       "tools": [
         {
-          "script": "c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/index_generator.py",
+          "script": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/index_generator.py",
+          "sha256": "8772d0e2a7c36aac7416bd893a8c5bf5ca1f5a63648949de098c00b9995ce077",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/index_generator.py --help",
+              "cmd": "python3 skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/index_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/index_generator.py --sample",
+              "cmd": "python3 skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/index_generator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/okf_linter.py",
+          "script": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/okf_linter.py",
+          "sha256": "ddad9dc516cd4fe88ab31115d7966d6a4ed95591b81734c35dc51f2a8a108acd",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/okf_linter.py --help",
+              "cmd": "python3 skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/okf_linter.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/okf_linter.py --sample",
+              "cmd": "python3 skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/okf_linter.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/scaffold_bundle.py",
+          "script": "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/scaffold_bundle.py",
+          "sha256": "0d1bebecdc15368a6cf591c9ad7ef90615dda45e7cf85c863dd599a988825709",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/scaffold_bundle.py --help",
+              "cmd": "python3 skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/scaffold_bundle.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/scaffold_bundle.py --sample",
+              "cmd": "python3 skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/scripts/scaffold_bundle.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -78,14 +165,28 @@
         "close_out": false
       },
       "references": [
-        "okf_conformance.md",
-        "phase_playbook.md",
-        "type_vocabulary.md"
+        "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/references/okf_conformance.md",
+        "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/references/phase_playbook.md",
+        "skills/c-level-advisor/arquiteto-de-empresa/skills/arquiteto-de-empresa/references/type_vocabulary.md"
       ]
     },
     {
       "name": "boardroom",
-      "path": "c-level-advisor/c-level-agents/skills/boardroom",
+      "path": "skills/c-level-advisor/c-level-agents/skills/boardroom",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "boardroom",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/boardroom",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/boardroom/SKILL.md",
+            "sha256": "3ff41a2044b5af5be74bfb0c3d390d3749aedb3299c6bf23df0dc055f8ee043f",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:boardroom <brief> \u2014 6-phase multi-role deliberation across the C-suite with Phase 2 isolation, critic pre-screen, and synthesis. Outputs a board memo. Use when a decision spans multiple executive domains \u2014 e.g. a pricing change touching finance, positioning, and product, or a raise-vs-cut runway call.",
       "tools": [],
       "agentic_signals": {
@@ -99,7 +200,21 @@
     },
     {
       "name": "brief",
-      "path": "c-level-advisor/c-level-agents/skills/brief",
+      "path": "skills/c-level-advisor/c-level-agents/skills/brief",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "brief",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/brief",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/brief/SKILL.md",
+            "sha256": "547c77d5290339d719f9c8ada0f12123bb66b0e086383b7e7768afcece3cbad7",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:brief <topic> \u2014 Generate a one-page strategy brief from an office-hours intake. First step in the strategic sprint pipeline. Use when a strategic question needs to be framed before boardroom deliberation \u2014 e.g. locking options, assumptions, and success criteria for a pricing change or a market-entry decision.",
       "tools": [],
       "agentic_signals": {
@@ -113,7 +228,21 @@
     },
     {
       "name": "c-level-agents",
-      "path": "c-level-advisor/c-level-agents/skills/c-level-agents",
+      "path": "skills/c-level-advisor/c-level-agents/skills/c-level-agents",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "c-level-agents",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/c-level-agents",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/c-level-agents/SKILL.md",
+            "sha256": "b1982f39f4bf14af9737535386ddfba1ddd13fd8510bb31294d57ab88dcb1b8c",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Founder-mode executive team. 13 cs-* C-suite agents (CFO, CMO, CRO, CPO, COO, CHRO, CISO, GC, CDO, CAIO, CCO, VPE, Chief of Staff) and 21 /cs:* slash commands for forcing-question office hours, multi-role boardroom deliberation, strategic sprint pipeline, and meta routing. Use when the founder needs a virtual executive team, when invoking /cs:* commands, or when orchestrating multi-role decisions.",
       "tools": [],
       "agentic_signals": {
@@ -127,7 +256,21 @@
     },
     {
       "name": "caio-review",
-      "path": "c-level-advisor/c-level-agents/skills/caio-review",
+      "path": "skills/c-level-advisor/c-level-agents/skills/caio-review",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "caio-review",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/caio-review",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/caio-review/SKILL.md",
+            "sha256": "4082151af5f6a3966a45b8e5ac7a5e13b55065d5615574130df4f51954517e23",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:caio-review <plan> \u2014 Eval-demanding Chief AI Officer interrogation of any plan that involves AI: model selection, risk classification, cost economics, or AI hiring. Use when shipping an AI feature without an eval set, choosing between API, fine-tune, and self-hosted, or classifying a use case under the EU AI Act.",
       "tools": [],
       "agentic_signals": {
@@ -141,7 +284,21 @@
     },
     {
       "name": "cco-review",
-      "path": "c-level-advisor/c-level-agents/skills/cco-review",
+      "path": "skills/c-level-advisor/c-level-agents/skills/cco-review",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cco-review",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/cco-review",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/cco-review/SKILL.md",
+            "sha256": "03d092408f275bb3517928502bc4e5e8005f829953ec54504a15e98743ddcbf8",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:cco-review <plan> \u2014 Retention-obsessed Chief Customer Officer interrogation of any plan that touches customer retention, segmentation, CS team sizing, or CS team hiring. Use when gross retention is slipping, before approving CSM headcount, or when deciding which customer segments to keep or fire.",
       "tools": [],
       "agentic_signals": {
@@ -155,7 +312,21 @@
     },
     {
       "name": "cdo-review",
-      "path": "c-level-advisor/c-level-agents/skills/cdo-review",
+      "path": "skills/c-level-advisor/c-level-agents/skills/cdo-review",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cdo-review",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/cdo-review",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/cdo-review/SKILL.md",
+            "sha256": "0ebf435256547e30198cbd8849263a385635c4821afe9e89bf59acb0083a370d",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:cdo-review <plan> \u2014 Decision-driven Chief Data Officer interrogation of any plan that touches training data, data architecture, data productization, or data team hiring. Use when validating training-data rights before model work, choosing warehouse vs lakehouse vs mesh, or valuing data assets for productization or M&A.",
       "tools": [],
       "agentic_signals": {
@@ -169,7 +340,21 @@
     },
     {
       "name": "cfo-review",
-      "path": "c-level-advisor/c-level-agents/skills/cfo-review",
+      "path": "skills/c-level-advisor/c-level-agents/skills/cfo-review",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cfo-review",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/cfo-review",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/cfo-review/SKILL.md",
+            "sha256": "741b51b848fc83352fdd22c90df79cdadce5759bc0c2977bae46abfb57002882",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:cfo-review <plan> \u2014 Numerate-skeptic interrogation of any plan that touches money. Unit economics, runway, dilution, capital allocation. Use when a plan commits meaningful spend \u2014 e.g. a hiring wave, a fundraise decision, or a new channel budget.",
       "tools": [],
       "agentic_signals": {
@@ -183,7 +368,21 @@
     },
     {
       "name": "ciso-review",
-      "path": "c-level-advisor/c-level-agents/skills/ciso-review",
+      "path": "skills/c-level-advisor/c-level-agents/skills/ciso-review",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "ciso-review",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/ciso-review",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/ciso-review/SKILL.md",
+            "sha256": "a988c85e47350340637cec8413d9e1c7eb66e739c4e1928e7da0043ee9a1a6ad",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:ciso-review <plan> \u2014 Risk-paranoid interrogation of any plan that touches data, compliance, or production access. Use when launching features that handle customer data, before a SOC 2 / ISO audit, or after any incident or near-miss.",
       "tools": [],
       "agentic_signals": {
@@ -197,7 +396,21 @@
     },
     {
       "name": "cmo-review",
-      "path": "c-level-advisor/c-level-agents/skills/cmo-review",
+      "path": "skills/c-level-advisor/c-level-agents/skills/cmo-review",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cmo-review",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/cmo-review",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/cmo-review/SKILL.md",
+            "sha256": "9e7d423d5fb186f526ed1104cc0d7065d9fb8925867ea9b29dc6cb7353d1f779",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:cmo-review <plan> \u2014 Narrative-first interrogation of positioning, ICP, message house, and channel mix. Use when launching a campaign or repositioning, or when CAC is rising and the one-sentence positioning test fails.",
       "tools": [],
       "agentic_signals": {
@@ -211,7 +424,21 @@
     },
     {
       "name": "cpo-review",
-      "path": "c-level-advisor/c-level-agents/skills/cpo-review",
+      "path": "skills/c-level-advisor/c-level-agents/skills/cpo-review",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cpo-review",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/cpo-review",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/cpo-review/SKILL.md",
+            "sha256": "799a1e7ff538b6a4186d23ee8749b7245a6b0061da055b86e477bc4d8e837cbe",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:cpo-review <plan> \u2014 JTBD-driven interrogation of product roadmap, PMF signal, and portfolio focus. Use when committing a quarter's roadmap, deciding whether to kill a feature, or claiming PMF without a retention curve.",
       "tools": [],
       "agentic_signals": {
@@ -225,7 +452,21 @@
     },
     {
       "name": "cro-review",
-      "path": "c-level-advisor/c-level-agents/skills/cro-review",
+      "path": "skills/c-level-advisor/c-level-agents/skills/cro-review",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cro-review",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/cro-review",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/cro-review/SKILL.md",
+            "sha256": "d760170517ec9454f243265a254f0b83bc5d28d027c849256af3db64aef9a46f",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:cro-review <plan> \u2014 Pipeline-paranoid interrogation of revenue, win rate, NRR, and ramp time. Use when the forecast misses pipeline coverage, win rates drop, or before scaling the sales team.",
       "tools": [],
       "agentic_signals": {
@@ -239,7 +480,21 @@
     },
     {
       "name": "cross-eval",
-      "path": "c-level-advisor/c-level-agents/skills/cross-eval",
+      "path": "skills/c-level-advisor/c-level-agents/skills/cross-eval",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cross-eval",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/cross-eval",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/cross-eval/SKILL.md",
+            "sha256": "f57aa9559d05200f37bfa8d3ea124be0ef11c54c2f68eca4a93459c804559de2",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:cross-eval <memo> \u2014 Multi-model consensus on a board memo or strategy brief. Claude + Codex + Gemini cross-review with graceful degradation. Use when a high-stakes memo needs an independent sanity check before the boardroom \u2014 e.g. a bet-the-company pivot or fundraise terms.",
       "tools": [],
       "agentic_signals": {
@@ -253,7 +508,21 @@
     },
     {
       "name": "cto-review",
-      "path": "c-level-advisor/c-level-agents/skills/cto-review",
+      "path": "skills/c-level-advisor/c-level-agents/skills/cto-review",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cto-review",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/cto-review",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/cto-review/SKILL.md",
+            "sha256": "4dc94f7311558bd9c2ed5c7a834955411c2807b17dbca0f6d1a7b4c5bc8c0a99",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:cto-review <plan> \u2014 Architecture and scaling interrogation. Tech debt, scaling cliffs, team scaling, build-vs-buy. Use when committing to an architecture, planning for 10x load, or weighing a rebuild against a vendor.",
       "tools": [],
       "agentic_signals": {
@@ -267,7 +536,21 @@
     },
     {
       "name": "decide",
-      "path": "c-level-advisor/c-level-agents/skills/decide",
+      "path": "skills/c-level-advisor/c-level-agents/skills/decide",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "decide",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/decide",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/decide/SKILL.md",
+            "sha256": "75b9ebad65f6304d2087547324c0ab745f1d028a5f98dffb930361908a412aca",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:decide <memo> \u2014 Log a decision to two-layer memory via decision-logger. Approved memo becomes durable; raw transcripts kept for reference. Use when the founder has approved a boardroom memo and the decision must become durable company memory \u2014 e.g. right after /cs:boardroom concludes.",
       "tools": [],
       "agentic_signals": {
@@ -281,7 +564,21 @@
     },
     {
       "name": "execute",
-      "path": "c-level-advisor/c-level-agents/skills/execute",
+      "path": "skills/c-level-advisor/c-level-agents/skills/execute",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "execute",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/execute",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/execute/SKILL.md",
+            "sha256": "8e2f5bcb185c4c01fe65ddd4a75dbade26bb15e849e4110a99b940bdaf02af79",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:execute <decision> \u2014 Generate a 90-day execution plan with weekly milestones, DRIs, and check-in cadence from an approved decision. Use when a logged decision needs to become an operating plan \u2014 e.g. turning an approved market-entry call into weekly milestones with DRIs.",
       "tools": [],
       "agentic_signals": {
@@ -295,7 +592,21 @@
     },
     {
       "name": "founder-mode",
-      "path": "c-level-advisor/c-level-agents/skills/founder-mode",
+      "path": "skills/c-level-advisor/c-level-agents/skills/founder-mode",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "founder-mode",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/founder-mode",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/founder-mode/SKILL.md",
+            "sha256": "61d5ee9bbe8b7ef8f4dbf5b7b089dde07e9c77b26af227c2be776238722d1a7d",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:founder-mode <question> \u2014 Auto-routes any founder question to the right C-role advisor or to /cs:boardroom for multi-role topics. The single-command entry point. Use when a founder asks any strategic question without knowing which advisor or command fits \u2014 e.g. 'runway pressure' routes to the CFO, 'gross retention dropped' routes to the CCO.",
       "tools": [],
       "agentic_signals": {
@@ -309,7 +620,21 @@
     },
     {
       "name": "freeze",
-      "path": "c-level-advisor/c-level-agents/skills/freeze",
+      "path": "skills/c-level-advisor/c-level-agents/skills/freeze",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "freeze",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/freeze",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/freeze/SKILL.md",
+            "sha256": "151e962b330868ce12a15191da08519801f044b2e8849db8bec68493c5bb9497",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:freeze <decision> <days> \u2014 Lock a strategic decision for a cooldown period to prevent impulse reversal. Mirrors gstack's safety primitives for the business layer. Use when an irreversible decision was made under pressure \u2014 e.g. a layoff plan or multi-year contract \u2014 and deserves a cooling-off lock before execution.",
       "tools": [],
       "agentic_signals": {
@@ -323,7 +648,21 @@
     },
     {
       "name": "gc-review",
-      "path": "c-level-advisor/c-level-agents/skills/gc-review",
+      "path": "skills/c-level-advisor/c-level-agents/skills/gc-review",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "gc-review",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/gc-review",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/gc-review/SKILL.md",
+            "sha256": "7f092a139a8d385ece6a01607f412a211e4573290560821ef55da98b6ef5c451",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:gc-review <plan> \u2014 General Counsel interrogation of contracts, IP, regulatory, term sheets, and employment-law surface. Use when reviewing a term sheet before signing, redlining a customer MSA, or checking IP assignment and regulatory exposure on a new product.",
       "tools": [],
       "agentic_signals": {
@@ -337,7 +676,21 @@
     },
     {
       "name": "office-hours",
-      "path": "c-level-advisor/c-level-agents/skills/office-hours",
+      "path": "skills/c-level-advisor/c-level-agents/skills/office-hours",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "office-hours",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/office-hours",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/office-hours/SKILL.md",
+            "sha256": "250c36b8bf9f32964f2ca141a8c6956b6935eff739d8e7b61ba9062a28a0dd4a",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:office-hours <topic> \u2014 YC-style 6-question founder interrogation before any advice. Forces clarity on problem, customer, distribution, defensibility, capital, and founder fit. Use when a founder question is too vague to route \u2014 e.g. 'should we grow faster?' \u2014 or before drafting a strategy brief.",
       "tools": [],
       "agentic_signals": {
@@ -351,7 +704,21 @@
     },
     {
       "name": "onboard",
-      "path": "c-level-advisor/c-level-agents/skills/onboard",
+      "path": "skills/c-level-advisor/c-level-agents/skills/onboard",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "onboard",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/onboard",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/onboard/SKILL.md",
+            "sha256": "ebc8f16b476522b1dd6fc59fb6079a5aa550e2d312a8be3b7759c856f1952f68",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:onboard \u2014 Founder interview that populates ~/.claude/company-context.md using the canonical 7-dimension cs-onboard schema. The first command to run when starting with c-level-agents. Use when setting up the virtual C-suite for a new company, or when advisors lack company context \u2014 e.g. before a first /cs:boardroom or after a fundraise changes the numbers.",
       "tools": [],
       "agentic_signals": {
@@ -365,7 +732,21 @@
     },
     {
       "name": "post-mortem",
-      "path": "c-level-advisor/c-level-agents/skills/post-mortem",
+      "path": "skills/c-level-advisor/c-level-agents/skills/post-mortem",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "post-mortem",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/post-mortem",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/post-mortem/SKILL.md",
+            "sha256": "b9422bcb9e330848134c0486e1f0e8620039b19cc3934247bffa49e2f3f51e53",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:post-mortem <decision> \u2014 Honest retrospective on an executed decision, scored against original assumptions and dissent. Closes the strategic sprint loop. Use when a decision hits its 90-day review checkpoint or its kill criteria trigger \u2014 e.g. scoring last quarter's pricing change against its pre-committed success metrics.",
       "tools": [],
       "agentic_signals": {
@@ -379,7 +760,21 @@
     },
     {
       "name": "vpe-review",
-      "path": "c-level-advisor/c-level-agents/skills/vpe-review",
+      "path": "skills/c-level-advisor/c-level-agents/skills/vpe-review",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "vpe-review",
+        "skill_path": "skills/c-level-advisor/c-level-agents/skills/vpe-review",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/c-level-agents/skills/vpe-review/SKILL.md",
+            "sha256": "dd5682d175243b0e9d675360d1e6736d6e0cdf2be16fb19cfd85582949dba1bf",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/cs:vpe-review <plan> \u2014 Throughput-first VP of Engineering interrogation of any plan that touches delivery, eng hiring, team structure, or production discipline. Use when cycle time balloons, DORA metrics slide, or before committing to an eng hiring wave or a reorg.",
       "tools": [],
       "agentic_signals": {
@@ -393,40 +788,92 @@
     },
     {
       "name": "chief-ai-officer-advisor",
-      "path": "c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor",
+      "path": "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "chief-ai-officer-advisor",
+        "skill_path": "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/SKILL.md",
+            "sha256": "f578a33ea16493c2c981ead3215d9428f76d7770e3fb779518ca510c4f524c26",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/references/ai_cost_economics.md",
+            "sha256": "1ac84505438db050d9e14d9fe44f43bc12be840750e8fa0b00172c6c4a8003e9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/references/ai_risk_governance.md",
+            "sha256": "abc39f60988968931b774fd5c54fd5d099d36c8f1e4165ed8ad51aa6035acbce",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/references/ai_team_org_evolution.md",
+            "sha256": "63bf4b842755aa11cff814ad5b1a0d4e21ac7b73777726a0dda4fe2d9ac5d180",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/references/model_buildvsbuy_strategy.md",
+            "sha256": "01124de3c40b6072f1c0d82db48ac6b25d4c5778428b618288caa3884b558632",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/ai_cost_economics.py",
+            "sha256": "c42455d7046856d489888e2a80ab9ad6c3c8a70e444394bafbabfdd02b77d235",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/ai_risk_classifier.py",
+            "sha256": "306232de71ab420a170d018fa89f763ad6450031503835f71894c3971abc7827",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/model_buildvsbuy_calculator.py",
+            "sha256": "008d613f738e3a1f612c648da698b56ac8973ffdb1f4cabef99b8b9f718915df",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Chief AI Officer advisory for startups: model build-vs-buy decisions (API vs fine-tune vs in-house), AI risk classification under EU AI Act + US state patchwork, AI cost economics (API-to-self-hosted breakeven), and AI team org evolution. Use when deciding whether to call an API or fine-tune, classifying AI use cases for regulatory risk, calculating when self-hosting pays off, sequencing AI hires, or when user mentions CAIO, AI strategy, model selection, foundation model, fine-tuning, EU AI Act, NIST AI RMF, AI governance, model risk, or AI economics. Strategic only \u2014 does not duplicate \u2026",
       "tools": [
         {
-          "script": "c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/ai_cost_economics.py",
+          "script": "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/ai_cost_economics.py",
+          "sha256": "c42455d7046856d489888e2a80ab9ad6c3c8a70e444394bafbabfdd02b77d235",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/ai_cost_economics.py --help",
+              "cmd": "python3 skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/ai_cost_economics.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/ai_risk_classifier.py",
+          "script": "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/ai_risk_classifier.py",
+          "sha256": "306232de71ab420a170d018fa89f763ad6450031503835f71894c3971abc7827",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/ai_risk_classifier.py --help",
+              "cmd": "python3 skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/ai_risk_classifier.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/model_buildvsbuy_calculator.py",
+          "script": "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/model_buildvsbuy_calculator.py",
+          "sha256": "008d613f738e3a1f612c648da698b56ac8973ffdb1f4cabef99b8b9f718915df",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/model_buildvsbuy_calculator.py --help",
+              "cmd": "python3 skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/scripts/model_buildvsbuy_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -441,48 +888,100 @@
         "close_out": false
       },
       "references": [
-        "ai_cost_economics.md",
-        "ai_risk_governance.md",
-        "ai_team_org_evolution.md",
-        "model_buildvsbuy_strategy.md"
+        "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/references/ai_cost_economics.md",
+        "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/references/ai_risk_governance.md",
+        "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/references/ai_team_org_evolution.md",
+        "skills/c-level-advisor/chief-ai-officer-advisor/skills/chief-ai-officer-advisor/references/model_buildvsbuy_strategy.md"
       ]
     },
     {
       "name": "chief-customer-officer-advisor",
-      "path": "c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor",
+      "path": "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "chief-customer-officer-advisor",
+        "skill_path": "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/SKILL.md",
+            "sha256": "8a985a538ffdf5a31325ea757fe25fc35aba2af187763f6f6d7dd50932fc7465",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/references/cs_coverage_model.md",
+            "sha256": "ab9fc811346f780fdf6121dcc0a3770cb3e6a12403a0a60036fee7fa13859ecb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/references/cs_team_org_evolution.md",
+            "sha256": "f2b6c8d994b1be8531f9fd09f40454ad2ae0e7b28fc1da35519350ed3dfbeec7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/references/customer_segmentation_strategy.md",
+            "sha256": "f8e7aec8773f6611d0f16689f230ea58ed75cb872faeeb3bcbeb121fa7536c66",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/references/retention_decomposition.md",
+            "sha256": "ae893dacd758fc2f614db5028f7b3d430a62c45ab7077a85ea08e8f7a7abb821",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/cs_coverage_calculator.py",
+            "sha256": "d7fca426a22c5e3287e052355d3202382bfbe53de51ff42557bad6594f80f178",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/customer_segmentation_designer.py",
+            "sha256": "08254b05bfa6689e90330d2a7961afc814cf5420a8a6fb21f6645950ed45faed",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/retention_decomposition_analyzer.py",
+            "sha256": "6603bf755ae236fe425e84efcc17fa8cb2f9011d2ad3d148e3016cd1ab832587",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Chief Customer Officer advisory for startups: retention decomposition (gross retention vs NRR honesty, churn root-cause taxonomy), customer segmentation strategy (differential investment across tiers + ICP fit scoring), CS team coverage model (pooled vs named CSM thresholds + ratio math), and CS team org evolution (CS vs Support vs AM distinctions). Use when designing retention strategy, segmenting customers for differential investment, sizing CS team, or sequencing CS hires. Strategic only \u2014 does not duplicate engineering/business-growth tactical skills.",
       "tools": [
         {
-          "script": "c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/cs_coverage_calculator.py",
+          "script": "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/cs_coverage_calculator.py",
+          "sha256": "d7fca426a22c5e3287e052355d3202382bfbe53de51ff42557bad6594f80f178",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/cs_coverage_calculator.py --help",
+              "cmd": "python3 skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/cs_coverage_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/customer_segmentation_designer.py",
+          "script": "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/customer_segmentation_designer.py",
+          "sha256": "08254b05bfa6689e90330d2a7961afc814cf5420a8a6fb21f6645950ed45faed",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/customer_segmentation_designer.py --help",
+              "cmd": "python3 skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/customer_segmentation_designer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/retention_decomposition_analyzer.py",
+          "script": "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/retention_decomposition_analyzer.py",
+          "sha256": "6603bf755ae236fe425e84efcc17fa8cb2f9011d2ad3d148e3016cd1ab832587",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/retention_decomposition_analyzer.py --help",
+              "cmd": "python3 skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/scripts/retention_decomposition_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -497,48 +996,100 @@
         "close_out": false
       },
       "references": [
-        "cs_coverage_model.md",
-        "cs_team_org_evolution.md",
-        "customer_segmentation_strategy.md",
-        "retention_decomposition.md"
+        "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/references/cs_coverage_model.md",
+        "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/references/cs_team_org_evolution.md",
+        "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/references/customer_segmentation_strategy.md",
+        "skills/c-level-advisor/chief-customer-officer-advisor/skills/chief-customer-officer-advisor/references/retention_decomposition.md"
       ]
     },
     {
       "name": "chief-data-officer-advisor",
-      "path": "c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor",
+      "path": "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "chief-data-officer-advisor",
+        "skill_path": "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/SKILL.md",
+            "sha256": "bb519c5ce49415e37300d5e9d36e202a9eb25680c1fa9d9449137e67ad2b996e",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/references/ai_training_data_rights.md",
+            "sha256": "44a21820bfba7b250510d2f84dfc416ae3d1d49c1d585dc3a72f0e38731a76e4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/references/customer_data_as_asset.md",
+            "sha256": "92aaf1f7f4ca458e22905955b534a3d33b44f389334a2c2ca16fc935d7c4a8f2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/references/data_product_strategy.md",
+            "sha256": "d0d5b416b3c6df6f2c887d039935392392e5a08560ef569f765d2940c6bf7642",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/references/data_team_org_evolution.md",
+            "sha256": "ecd163ecf14de2cbb0d326099d1854ba52aa369fb8116157dae3a0da60484ceb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/ai_training_data_audit.py",
+            "sha256": "1070e9d211579e233bb9e592ff2c6d1c2174caca05a5c1f77f02b0aff5e3b104",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/data_asset_valuator.py",
+            "sha256": "e4be367bd3e500214a30add20356758e8aaeb10d53615814cd8d9b1f81acb448",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/data_product_strategy_picker.py",
+            "sha256": "25fc860a35ab6d18ea75b6d70ea30ca40ecb28d3f796b83421656e056ef18ffb",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Chief Data Officer advisory for startups: AI training data rights and consent provenance, data product strategy (warehouse vs lakehouse vs mesh, build-vs-buy), B2B customer-data-as-asset valuation and M&A readiness, data team org evolution. Use when deciding whether to train models on customer data, choosing data architecture, valuing data for fundraising or M&A, sequencing data hires, or when user mentions CDO, chief data officer, data strategy, data mesh, lakehouse, training data, data product, data monetization, or customer data asset. NOT a tactical data engineering skill \u2014 strategic \u2026",
       "tools": [
         {
-          "script": "c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/ai_training_data_audit.py",
+          "script": "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/ai_training_data_audit.py",
+          "sha256": "1070e9d211579e233bb9e592ff2c6d1c2174caca05a5c1f77f02b0aff5e3b104",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/ai_training_data_audit.py --help",
+              "cmd": "python3 skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/ai_training_data_audit.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/data_asset_valuator.py",
+          "script": "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/data_asset_valuator.py",
+          "sha256": "e4be367bd3e500214a30add20356758e8aaeb10d53615814cd8d9b1f81acb448",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/data_asset_valuator.py --help",
+              "cmd": "python3 skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/data_asset_valuator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/data_product_strategy_picker.py",
+          "script": "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/data_product_strategy_picker.py",
+          "sha256": "25fc860a35ab6d18ea75b6d70ea30ca40ecb28d3f796b83421656e056ef18ffb",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/data_product_strategy_picker.py --help",
+              "cmd": "python3 skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/scripts/data_product_strategy_picker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -553,15 +1104,29 @@
         "close_out": false
       },
       "references": [
-        "ai_training_data_rights.md",
-        "customer_data_as_asset.md",
-        "data_product_strategy.md",
-        "data_team_org_evolution.md"
+        "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/references/ai_training_data_rights.md",
+        "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/references/customer_data_as_asset.md",
+        "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/references/data_product_strategy.md",
+        "skills/c-level-advisor/chief-data-officer-advisor/skills/chief-data-officer-advisor/references/data_team_org_evolution.md"
       ]
     },
     {
       "name": "board-prep",
-      "path": "c-level-advisor/executive-mentor/skills/board-prep",
+      "path": "skills/c-level-advisor/executive-mentor/skills/board-prep",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "board-prep",
+        "skill_path": "skills/c-level-advisor/executive-mentor/skills/board-prep",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/executive-mentor/skills/board-prep/SKILL.md",
+            "sha256": "7c1d19e1114b41fee8a27b8a575c5744e613484a3067a396c743245f21ed3352",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Board meeting preparation for the adversarial scenario, not the friendly one. Forces numbers-cold mastery, anticipates hard questions, builds a narrative that acknowledges weakness without losing the room. Use when preparing for a board meeting, an investor update, fundraising presentation, or any high-stakes adversarial review where every number must live in your head not just on a slide.",
       "tools": [],
       "agentic_signals": {
@@ -575,7 +1140,21 @@
     },
     {
       "name": "challenge",
-      "path": "c-level-advisor/executive-mentor/skills/challenge",
+      "path": "skills/c-level-advisor/executive-mentor/skills/challenge",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "challenge",
+        "skill_path": "skills/c-level-advisor/executive-mentor/skills/challenge",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/executive-mentor/skills/challenge/SKILL.md",
+            "sha256": "eb04f1e49bae8a81681ad5b84c262a15798637b67aeff686f3a6da5a98f86904",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Pre-mortem plan analysis. Imagine the plan failed 12 months from now and work backwards to find the weaknesses. Surfaces assumptions, dependencies, and execution risks before committing resources. Use when before significant resource commitment, before presenting to a board or investors, when feedback has been one-sidedly positive, or when there is pressure to move fast and figure it out later.",
       "tools": [],
       "agentic_signals": {
@@ -589,38 +1168,79 @@
     },
     {
       "name": "executive-mentor",
-      "path": "c-level-advisor/executive-mentor/skills/executive-mentor",
+      "path": "skills/c-level-advisor/executive-mentor/skills/executive-mentor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "executive-mentor",
+        "skill_path": "skills/c-level-advisor/executive-mentor/skills/executive-mentor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/executive-mentor/skills/executive-mentor/SKILL.md",
+            "sha256": "8c4f6b85b37e348f0e969cf03fad1c0b7b6afaf66a2331e384e9f0d34119542a",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/executive-mentor/skills/executive-mentor/references/board_dynamics.md",
+            "sha256": "8a11ab4beebe7af68fa45d406dee7fe7eed58cf79b804e8be68bec8ee196f32c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/executive-mentor/skills/executive-mentor/references/crisis_playbook.md",
+            "sha256": "ad035e615dea0af83fc838d88cbcc5379297c5882b141b4860cca3d176d08f91",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/executive-mentor/skills/executive-mentor/references/hard_things.md",
+            "sha256": "fc596f1c8930aac118980314be4c22829990f8ad2861045f557eed450a31f573",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/executive-mentor/skills/executive-mentor/scripts/decision_matrix_scorer.py",
+            "sha256": "d3c067f0b939397c4ab766554b462fecec479b4db98202138f87ee87fce27082",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/executive-mentor/skills/executive-mentor/scripts/stakeholder_mapper.py",
+            "sha256": "4c4bd1660a08063f68fe56c01966b6b198ad79be328e860b9d7cb059b9dfae25",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Adversarial thinking partner for founders and executives. Stress-tests plans, prepares for brutal board meetings, dissects decisions with no good options, and forces honest post-mortems. Use when you need someone to find the holes before the board does, make a decision you've been avoiding, or understand what actually went wrong.",
       "tools": [
         {
-          "script": "c-level-advisor/executive-mentor/skills/executive-mentor/scripts/decision_matrix_scorer.py",
+          "script": "skills/c-level-advisor/executive-mentor/skills/executive-mentor/scripts/decision_matrix_scorer.py",
+          "sha256": "d3c067f0b939397c4ab766554b462fecec479b4db98202138f87ee87fce27082",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/executive-mentor/skills/executive-mentor/scripts/decision_matrix_scorer.py --help",
+              "cmd": "python3 skills/c-level-advisor/executive-mentor/skills/executive-mentor/scripts/decision_matrix_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 c-level-advisor/executive-mentor/skills/executive-mentor/scripts/decision_matrix_scorer.py --sample",
+              "cmd": "python3 skills/c-level-advisor/executive-mentor/skills/executive-mentor/scripts/decision_matrix_scorer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "c-level-advisor/executive-mentor/skills/executive-mentor/scripts/stakeholder_mapper.py",
+          "script": "skills/c-level-advisor/executive-mentor/skills/executive-mentor/scripts/stakeholder_mapper.py",
+          "sha256": "4c4bd1660a08063f68fe56c01966b6b198ad79be328e860b9d7cb059b9dfae25",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/executive-mentor/skills/executive-mentor/scripts/stakeholder_mapper.py --help",
+              "cmd": "python3 skills/c-level-advisor/executive-mentor/skills/executive-mentor/scripts/stakeholder_mapper.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 c-level-advisor/executive-mentor/skills/executive-mentor/scripts/stakeholder_mapper.py --sample",
+              "cmd": "python3 skills/c-level-advisor/executive-mentor/skills/executive-mentor/scripts/stakeholder_mapper.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -635,14 +1255,28 @@
         "close_out": false
       },
       "references": [
-        "board_dynamics.md",
-        "crisis_playbook.md",
-        "hard_things.md"
+        "skills/c-level-advisor/executive-mentor/skills/executive-mentor/references/board_dynamics.md",
+        "skills/c-level-advisor/executive-mentor/skills/executive-mentor/references/crisis_playbook.md",
+        "skills/c-level-advisor/executive-mentor/skills/executive-mentor/references/hard_things.md"
       ]
     },
     {
       "name": "hard-call",
-      "path": "c-level-advisor/executive-mentor/skills/hard-call",
+      "path": "skills/c-level-advisor/executive-mentor/skills/hard-call",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "hard-call",
+        "skill_path": "skills/c-level-advisor/executive-mentor/skills/hard-call",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/executive-mentor/skills/hard-call/SKILL.md",
+            "sha256": "39aaad9cd0c148de43890ac71532a39df8139beeed191b7fe261fe948670e232",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/em:hard-call \u2014 Framework for decisions with no good options. Use when every option is painful and a structured 10/10/10 + regret-minimization pass is needed \u2014 e.g. choosing between a layoff and a down round, or killing a beloved product line.",
       "tools": [],
       "agentic_signals": {
@@ -656,7 +1290,21 @@
     },
     {
       "name": "postmortem",
-      "path": "c-level-advisor/executive-mentor/skills/postmortem",
+      "path": "skills/c-level-advisor/executive-mentor/skills/postmortem",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "postmortem",
+        "skill_path": "skills/c-level-advisor/executive-mentor/skills/postmortem",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/executive-mentor/skills/postmortem/SKILL.md",
+            "sha256": "ca1b7ab332c72f523beefdf5d2be7399f475582a09fee4e36daffab51394a78e",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/em:postmortem \u2014 Honest analysis of what went wrong. Use after a failed launch, missed quarter, or bad hire to run a blameless 5-Whys retrospective with a change register \u2014 e.g. dissecting why the Q3 release slipped six weeks.",
       "tools": [],
       "agentic_signals": {
@@ -670,7 +1318,21 @@
     },
     {
       "name": "stress-test",
-      "path": "c-level-advisor/executive-mentor/skills/stress-test",
+      "path": "skills/c-level-advisor/executive-mentor/skills/stress-test",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "stress-test",
+        "skill_path": "skills/c-level-advisor/executive-mentor/skills/stress-test",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/executive-mentor/skills/stress-test/SKILL.md",
+            "sha256": "bfa5b78f085c2b7b6f72f6993b4dde409e0fd2f2b0d4183a304326c0b01646c6",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "/em:stress-test \u2014 Business assumption stress testing. Use before betting on a plan whose core assumptions are unvalidated \u2014 e.g. stress-testing 'enterprise buyers will tolerate a 6-month pilot' or a hockey-stick revenue model.",
       "tools": [],
       "agentic_signals": {
@@ -684,28 +1346,69 @@
     },
     {
       "name": "general-counsel-advisor",
-      "path": "c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor",
+      "path": "skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "general-counsel-advisor",
+        "skill_path": "skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/SKILL.md",
+            "sha256": "c91df564423cb53399e44fe5bc81b77319c18e555726e0c3c3f819c833a4ae77",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/references/contracts_playbook.md",
+            "sha256": "11e550e9beb9b39ccd93925539d05b30af268d53eb6a2e9c297ebcb75616160f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/references/ip_and_regulatory.md",
+            "sha256": "8bdaee37fc8921fa995f1c7351d825593cb8e11f5506daf74a4799990e495edd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/references/term_sheet_decoder.md",
+            "sha256": "e81217d081be863afa8d9e26968fa44d24f28f83e9533619c7c662ccf5f66ef5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/scripts/contract_risk_scanner.py",
+            "sha256": "11fcd85501461d0499a008fbbdc19efd246cf1571d1e286ad2ade8f5b97a1ddc",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/scripts/term_sheet_analyzer.py",
+            "sha256": "ff72f10b926d100d2bc20722dc7056b0d0332373ff6221e2fcefeb958cc4f93f",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "General Counsel advisory for startups: contract review (MSA, SaaS, NDA, DPA, employment), IP strategy, term sheet decoding, and regulatory landscape mapping. Use when reviewing any contract or term sheet, deciding when to engage outside counsel, defining IP strategy, evaluating regulatory exposure (HIPAA, GDPR, FDA, fintech), or when user mentions general counsel, GC, legal review, contract risk, term sheet, IP assignment, or regulatory exposure. NOT a substitute for licensed counsel \u2014 surfaces questions to bring to qualified attorneys.",
       "tools": [
         {
-          "script": "c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/scripts/contract_risk_scanner.py",
+          "script": "skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/scripts/contract_risk_scanner.py",
+          "sha256": "11fcd85501461d0499a008fbbdc19efd246cf1571d1e286ad2ade8f5b97a1ddc",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/scripts/contract_risk_scanner.py --help",
+              "cmd": "python3 skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/scripts/contract_risk_scanner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/scripts/term_sheet_analyzer.py",
+          "script": "skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/scripts/term_sheet_analyzer.py",
+          "sha256": "ff72f10b926d100d2bc20722dc7056b0d0332373ff6221e2fcefeb958cc4f93f",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/scripts/term_sheet_analyzer.py --help",
+              "cmd": "python3 skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/scripts/term_sheet_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -720,14 +1423,33 @@
         "close_out": false
       },
       "references": [
-        "contracts_playbook.md",
-        "ip_and_regulatory.md",
-        "term_sheet_decoder.md"
+        "skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/references/contracts_playbook.md",
+        "skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/references/ip_and_regulatory.md",
+        "skills/c-level-advisor/general-counsel-advisor/skills/general-counsel-advisor/references/term_sheet_decoder.md"
       ]
     },
     {
       "name": "agent-protocol",
-      "path": "c-level-advisor/skills/agent-protocol",
+      "path": "skills/c-level-advisor/skills/agent-protocol",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "agent-protocol",
+        "skill_path": "skills/c-level-advisor/skills/agent-protocol",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/agent-protocol/SKILL.md",
+            "sha256": "fda98bece66a8903d95c79fa6dab49eb4e636014626ee119264e2c0e4224154e",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/agent-protocol/references/invocation-patterns.md",
+            "sha256": "12927011ca0a9f3db0348ac5862c6e6148251446852c39e5773f2323ac6a3254",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Inter-agent communication protocol for C-suite agent teams. Defines invocation syntax, loop prevention, isolation rules, and response formats. Use when C-suite agents need to query each other, coordinate cross-functional analysis, or run board meetings with multiple agent roles.",
       "tools": [],
       "agentic_signals": {
@@ -738,60 +1460,147 @@
         "close_out": false
       },
       "references": [
-        "invocation-patterns.md"
+        "skills/c-level-advisor/skills/agent-protocol/references/invocation-patterns.md"
       ]
     },
     {
       "name": "arquiteto-de-empresa",
-      "path": "c-level-advisor/skills/arquiteto-de-empresa",
-      "description": "Arquiteto de Empresa: constr\u00f3i um neg\u00f3cio do zero como bundle OKF (Open Knowledge Format) \u2014 uma \u00e1rvore de arquivos .md version\u00e1veis com frontmatter type, links formando grafo, e index.md/log.md reservados, leg\u00edvel por humanos e por agentes. Conduz o fundador por uma entrevista de 12 fases (funda\u00e7\u00e3o, estrat\u00e9gia, mercado, financeiro, comercial, marketing, produto, opera\u00e7\u00f5es, tech, pessoas, jur\u00eddico, governan\u00e7a), uma fase por vez, poucas perguntas por bloco, e gera os conceitos como markdown conformante. Acione quando o usu\u00e1rio quiser criar, estruturar ou documentar uma empresa inteira em \u2026",
+      "path": "skills/c-level-advisor/skills/arquiteto-de-empresa",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "arquiteto-de-empresa",
+        "skill_path": "skills/c-level-advisor/skills/arquiteto-de-empresa",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/SKILL.md",
+            "sha256": "a04aeacb1b74531e84569aa01b947185d106f567a8a550817e61fcf6e642a322",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/assets/exemplo-bundle/00-fundacao/identidade.md",
+            "sha256": "045fa2549ecee85cf6260563b5b7dbd87928013a6af9a590988b4ab205f1a514",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/assets/exemplo-bundle/00-fundacao/index.md",
+            "sha256": "85fc352a9e87b8209361e683d98b72342a2573e45225b9ba04c0105e47914288",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/assets/exemplo-bundle/00-fundacao/problema-solucao.md",
+            "sha256": "3144d1526f5ef85ccb658d94806ba57b95c38bc55af928896786fe4a094fc9f1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/assets/exemplo-bundle/index.md",
+            "sha256": "c70d3fd649518ad7abd60b01f6a1d15bb34f01a6bcecac159b78ca7fa7b076f9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/assets/exemplo-bundle/log.md",
+            "sha256": "85cad1398e99e5060161571c6c8e976c8091cc853e73f09c9af6452d02685849",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/assets/frontmatter_template.md",
+            "sha256": "1363f9fb4bd72672ed61b6142d514c24ac9085eeb57990bafef1faa05324cab9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/assets/index_template.md",
+            "sha256": "33f4f8bb5d2639f4ae4d4bcd21f3d4b16b40f85a5dc1c7bca3ff1ea80a2c998e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/assets/log_template.md",
+            "sha256": "7e09c1c13db73170d424307b9c75c46e6adcb2463d270f7e96904fbe5a36bc6e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/references/okf_conformance.md",
+            "sha256": "9cc63917bf3232b67016cc0723f126df0f518ed10d10198a5850045edc65d75c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/references/phase_playbook.md",
+            "sha256": "1e8d047af408addf303e74c066128dbd424aaf7aa694afcc34988a7cec94f6d3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/references/type_vocabulary.md",
+            "sha256": "373644f4fc2def8f93efd39e798116b6322fc8224a0012fa74f7b51834a88c4f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/scripts/index_generator.py",
+            "sha256": "8772d0e2a7c36aac7416bd893a8c5bf5ca1f5a63648949de098c00b9995ce077",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/scripts/okf_linter.py",
+            "sha256": "ddad9dc516cd4fe88ab31115d7966d6a4ed95591b81734c35dc51f2a8a108acd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/arquiteto-de-empresa/scripts/scaffold_bundle.py",
+            "sha256": "0d1bebecdc15368a6cf591c9ad7ef90615dda45e7cf85c863dd599a988825709",
+            "role": "owned_resource"
+          }
+        ]
+      },
+      "description": "Company Architect: builds a business from scratch as an OKF (Open Knowledge Format) bundle \u2014 a tree of version-controllable .md files with frontmatter type, links forming a graph, and reserved index.md/log.md, readable by humans and agents. Guides the founder through a 12-phase interview (foundation, strategy, market, financial, sales, marketing, product, operations, tech, people, legal, governance), one phase at a time, few questions per block, and generates the concepts as conformant markdown. Trigger when the user wants to create, structure, or document an entire company in folders and \u2026",
       "tools": [
         {
-          "script": "c-level-advisor/skills/arquiteto-de-empresa/scripts/index_generator.py",
+          "script": "skills/c-level-advisor/skills/arquiteto-de-empresa/scripts/index_generator.py",
+          "sha256": "8772d0e2a7c36aac7416bd893a8c5bf5ca1f5a63648949de098c00b9995ce077",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/arquiteto-de-empresa/scripts/index_generator.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/arquiteto-de-empresa/scripts/index_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 c-level-advisor/skills/arquiteto-de-empresa/scripts/index_generator.py --sample",
+              "cmd": "python3 skills/c-level-advisor/skills/arquiteto-de-empresa/scripts/index_generator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/arquiteto-de-empresa/scripts/okf_linter.py",
+          "script": "skills/c-level-advisor/skills/arquiteto-de-empresa/scripts/okf_linter.py",
+          "sha256": "ddad9dc516cd4fe88ab31115d7966d6a4ed95591b81734c35dc51f2a8a108acd",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/arquiteto-de-empresa/scripts/okf_linter.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/arquiteto-de-empresa/scripts/okf_linter.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 c-level-advisor/skills/arquiteto-de-empresa/scripts/okf_linter.py --sample",
+              "cmd": "python3 skills/c-level-advisor/skills/arquiteto-de-empresa/scripts/okf_linter.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/arquiteto-de-empresa/scripts/scaffold_bundle.py",
+          "script": "skills/c-level-advisor/skills/arquiteto-de-empresa/scripts/scaffold_bundle.py",
+          "sha256": "0d1bebecdc15368a6cf591c9ad7ef90615dda45e7cf85c863dd599a988825709",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/arquiteto-de-empresa/scripts/scaffold_bundle.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/arquiteto-de-empresa/scripts/scaffold_bundle.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 c-level-advisor/skills/arquiteto-de-empresa/scripts/scaffold_bundle.py --sample",
+              "cmd": "python3 skills/c-level-advisor/skills/arquiteto-de-empresa/scripts/scaffold_bundle.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -806,14 +1615,38 @@
         "close_out": false
       },
       "references": [
-        "okf_conformance.md",
-        "phase_playbook.md",
-        "type_vocabulary.md"
+        "skills/c-level-advisor/skills/arquiteto-de-empresa/references/okf_conformance.md",
+        "skills/c-level-advisor/skills/arquiteto-de-empresa/references/phase_playbook.md",
+        "skills/c-level-advisor/skills/arquiteto-de-empresa/references/type_vocabulary.md"
       ]
     },
     {
       "name": "board-deck-builder",
-      "path": "c-level-advisor/skills/board-deck-builder",
+      "path": "skills/c-level-advisor/skills/board-deck-builder",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "board-deck-builder",
+        "skill_path": "skills/c-level-advisor/skills/board-deck-builder",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/board-deck-builder/SKILL.md",
+            "sha256": "73ca16546887edd28fe97e9c40647034f4b09dae692530d738d24b7d5bfc60a0",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/board-deck-builder/references/deck-frameworks.md",
+            "sha256": "b823760b183e37ff7fbff3886aea5a5f4df0594c522cd8509ea608b612efcab1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/board-deck-builder/templates/board-deck-template.md",
+            "sha256": "1df40f597f402f016b75d1eaf8ac3c7b05a7c5e7ba76412d294f1804347d1d49",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Assembles comprehensive board and investor update decks by pulling perspectives from all C-suite roles. Use when preparing board meetings, investor updates, quarterly business reviews, or fundraising narratives. Covers structure, narrative framework, bad news delivery, and common mistakes.",
       "tools": [],
       "agentic_signals": {
@@ -824,12 +1657,41 @@
         "close_out": false
       },
       "references": [
-        "deck-frameworks.md"
+        "skills/c-level-advisor/skills/board-deck-builder/references/deck-frameworks.md"
       ]
     },
     {
       "name": "board-meeting",
-      "path": "c-level-advisor/skills/board-meeting",
+      "path": "skills/c-level-advisor/skills/board-meeting",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "board-meeting",
+        "skill_path": "skills/c-level-advisor/skills/board-meeting",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/board-meeting/SKILL.md",
+            "sha256": "cb9bca1b04867a7e11e4aa716e0776bc787053de397ef2dacbcbf51638460e05",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/board-meeting/references/meeting-facilitation.md",
+            "sha256": "ce5db354a498be2c63d41eaeca477d9d7aa80a04c1904ab97760ce34fd8a4fd2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/board-meeting/templates/meeting-agenda.md",
+            "sha256": "79dd84e306fb035031c1954e53a35a7a79ff35bc7c28b814806fa3a2aeddeef6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/board-meeting/templates/meeting-minutes.md",
+            "sha256": "17b76419bf42f187a6e882d6282678761e1d1476a21a770574a4e787ae21a9e5",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Multi-agent board meeting protocol for strategic decisions. Runs a structured 6-phase deliberation: context loading, independent C-suite contributions (isolated, no cross-pollination), critic analysis, synthesis, founder review, and decision extraction. Use when the user invokes /cs:boardroom, calls a board meeting, or wants structured multi-perspective executive deliberation on a strategic question.",
       "tools": [],
       "agentic_signals": {
@@ -840,12 +1702,26 @@
         "close_out": false
       },
       "references": [
-        "meeting-facilitation.md"
+        "skills/c-level-advisor/skills/board-meeting/references/meeting-facilitation.md"
       ]
     },
     {
       "name": "c-level-skills",
-      "path": "c-level-advisor/skills/c-level-skills",
+      "path": "skills/c-level-advisor/skills/c-level-skills",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "c-level-skills",
+        "skill_path": "skills/c-level-advisor/skills/c-level-skills",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/c-level-skills/SKILL.md",
+            "sha256": "290e22db528854751abca8f60e0b66663621617751c0e25e9d901730051e5ad9",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Index and router for the C-level advisory bundle: 33 skills covering 14 C-suite roles, orchestration, cross-cutting capabilities, and culture. Use when exploring what the c-level-advisor bundle contains, deciding which advisor skill fits a question, or finding the entry points (cs-onboard interview, chief-of-staff routing, board-meeting protocol).",
       "tools": [],
       "agentic_signals": {
@@ -859,28 +1735,69 @@
     },
     {
       "name": "ceo-advisor",
-      "path": "c-level-advisor/skills/ceo-advisor",
+      "path": "skills/c-level-advisor/skills/ceo-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "ceo-advisor",
+        "skill_path": "skills/c-level-advisor/skills/ceo-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/ceo-advisor/SKILL.md",
+            "sha256": "df3063c65e85400d2aa877f74aedecf561a5e3b78e8b6dd316860f2c31337c4c",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/ceo-advisor/references/board_governance_investor_relations.md",
+            "sha256": "fe407f1f248734e2da1258d0caba735e5be6c9482c944aa1de1d64eadf2ed6f5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/ceo-advisor/references/executive_decision_framework.md",
+            "sha256": "54ff472908e42ea812d38b6d8ca97265cfd486fde50749ac39eb13c0c732e269",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/ceo-advisor/references/leadership_organizational_culture.md",
+            "sha256": "7b2340d3cbf3e2e3112dd65537db7d4cc6b70dc3856e1ab884b6559eea1bdb63",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/ceo-advisor/scripts/financial_scenario_analyzer.py",
+            "sha256": "8ba97794b75d0438f6d256ec935c2f8b35704f0b3db41e4e54e614318acd8267",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/ceo-advisor/scripts/strategy_analyzer.py",
+            "sha256": "db2ca449bb96f7f7bc748cb7086c16f1d62c9697d1f94fa941e954352e469c33",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Executive leadership guidance for strategic decision-making, organizational development, and stakeholder management. Use when planning strategy, preparing board presentations, managing investors, developing organizational culture, making executive decisions, fundraising, or when user mentions CEO, strategic planning, board meetings, investor updates, organizational leadership, or executive strategy.",
       "tools": [
         {
-          "script": "c-level-advisor/skills/ceo-advisor/scripts/financial_scenario_analyzer.py",
+          "script": "skills/c-level-advisor/skills/ceo-advisor/scripts/financial_scenario_analyzer.py",
+          "sha256": "8ba97794b75d0438f6d256ec935c2f8b35704f0b3db41e4e54e614318acd8267",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/ceo-advisor/scripts/financial_scenario_analyzer.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/ceo-advisor/scripts/financial_scenario_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/ceo-advisor/scripts/strategy_analyzer.py",
+          "script": "skills/c-level-advisor/skills/ceo-advisor/scripts/strategy_analyzer.py",
+          "sha256": "db2ca449bb96f7f7bc748cb7086c16f1d62c9697d1f94fa941e954352e469c33",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/ceo-advisor/scripts/strategy_analyzer.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/ceo-advisor/scripts/strategy_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -895,47 +1812,94 @@
         "close_out": false
       },
       "references": [
-        "board_governance_investor_relations.md",
-        "executive_decision_framework.md",
-        "leadership_organizational_culture.md"
+        "skills/c-level-advisor/skills/ceo-advisor/references/board_governance_investor_relations.md",
+        "skills/c-level-advisor/skills/ceo-advisor/references/executive_decision_framework.md",
+        "skills/c-level-advisor/skills/ceo-advisor/references/leadership_organizational_culture.md"
       ]
     },
     {
       "name": "cfo-advisor",
-      "path": "c-level-advisor/skills/cfo-advisor",
+      "path": "skills/c-level-advisor/skills/cfo-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cfo-advisor",
+        "skill_path": "skills/c-level-advisor/skills/cfo-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/cfo-advisor/SKILL.md",
+            "sha256": "9fcae3f3683725337b96fae510ef0c659ffc3551fca5838c2e94c576696f91f2",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cfo-advisor/references/cash_management.md",
+            "sha256": "a59cd6e86181d5cccd317cf42cca4a98652a71cdf090c1806c5d6fadf95c1ce9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cfo-advisor/references/financial_planning.md",
+            "sha256": "add005ec25556262a740c6870216a0a99ec6ae13138b95d20c1948b73c1327f6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cfo-advisor/references/fundraising_playbook.md",
+            "sha256": "6b6bae2764394bb88ecd71676b9ab8748f621b1585e84da76852e700522338d1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cfo-advisor/scripts/burn_rate_calculator.py",
+            "sha256": "c1c8b1b648f53934925c1cd8583550d1ac6990f229d2d664fafd0cf1f23b5051",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cfo-advisor/scripts/fundraising_model.py",
+            "sha256": "646d2ff1260187092651432ad198ac8922afe0574c2d30b9008324f143a8b11e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cfo-advisor/scripts/unit_economics_analyzer.py",
+            "sha256": "625315195f8ba7265223b87107df20b81b769055077d427f54cefbb625ec4336",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Financial leadership for startups and scaling companies. Financial modeling, unit economics, fundraising strategy, cash management, and board financial packages. Use when building financial models, analyzing unit economics, planning fundraising, managing cash runway, preparing board materials, or when user mentions CFO, burn rate, runway, fundraising, unit economics, LTV, CAC, term sheets, or financial strategy.",
       "tools": [
         {
-          "script": "c-level-advisor/skills/cfo-advisor/scripts/burn_rate_calculator.py",
+          "script": "skills/c-level-advisor/skills/cfo-advisor/scripts/burn_rate_calculator.py",
+          "sha256": "c1c8b1b648f53934925c1cd8583550d1ac6990f229d2d664fafd0cf1f23b5051",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/cfo-advisor/scripts/burn_rate_calculator.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/cfo-advisor/scripts/burn_rate_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/cfo-advisor/scripts/fundraising_model.py",
+          "script": "skills/c-level-advisor/skills/cfo-advisor/scripts/fundraising_model.py",
+          "sha256": "646d2ff1260187092651432ad198ac8922afe0574c2d30b9008324f143a8b11e",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/cfo-advisor/scripts/fundraising_model.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/cfo-advisor/scripts/fundraising_model.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/cfo-advisor/scripts/unit_economics_analyzer.py",
+          "script": "skills/c-level-advisor/skills/cfo-advisor/scripts/unit_economics_analyzer.py",
+          "sha256": "625315195f8ba7265223b87107df20b81b769055077d427f54cefbb625ec4336",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/cfo-advisor/scripts/unit_economics_analyzer.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/cfo-advisor/scripts/unit_economics_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -950,14 +1914,33 @@
         "close_out": false
       },
       "references": [
-        "cash_management.md",
-        "financial_planning.md",
-        "fundraising_playbook.md"
+        "skills/c-level-advisor/skills/cfo-advisor/references/cash_management.md",
+        "skills/c-level-advisor/skills/cfo-advisor/references/financial_planning.md",
+        "skills/c-level-advisor/skills/cfo-advisor/references/fundraising_playbook.md"
       ]
     },
     {
       "name": "change-management",
-      "path": "c-level-advisor/skills/change-management",
+      "path": "skills/c-level-advisor/skills/change-management",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "change-management",
+        "skill_path": "skills/c-level-advisor/skills/change-management",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/change-management/SKILL.md",
+            "sha256": "309d1563533a38d84bc13c0e32c46dcda4c9fade3ee1fad22997ed3ff0af30f6",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/change-management/references/change-playbook.md",
+            "sha256": "e7f6168ddb7ccad13c603f0365a6cc1494bfc3aa6d20aceeb2c93aaa9289c430",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Framework for rolling out organizational changes without chaos. Covers the ADKAR model adapted for startups, communication templates, resistance patterns, and change fatigue management. Handles process changes, org restructures, strategy pivots, and culture changes. Use when announcing a reorg, switching tools, pivoting strategy, killing a product, changing leadership, or when user mentions change management, change rollout, managing resistance, org change, reorg, or pivot communication.",
       "tools": [],
       "agentic_signals": {
@@ -968,45 +1951,97 @@
         "close_out": false
       },
       "references": [
-        "change-playbook.md"
+        "skills/c-level-advisor/skills/change-management/references/change-playbook.md"
       ]
     },
     {
       "name": "chief-ai-officer-advisor",
-      "path": "c-level-advisor/skills/chief-ai-officer-advisor",
+      "path": "skills/c-level-advisor/skills/chief-ai-officer-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "chief-ai-officer-advisor",
+        "skill_path": "skills/c-level-advisor/skills/chief-ai-officer-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/chief-ai-officer-advisor/SKILL.md",
+            "sha256": "f578a33ea16493c2c981ead3215d9428f76d7770e3fb779518ca510c4f524c26",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-ai-officer-advisor/references/ai_cost_economics.md",
+            "sha256": "1ac84505438db050d9e14d9fe44f43bc12be840750e8fa0b00172c6c4a8003e9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-ai-officer-advisor/references/ai_risk_governance.md",
+            "sha256": "abc39f60988968931b774fd5c54fd5d099d36c8f1e4165ed8ad51aa6035acbce",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-ai-officer-advisor/references/ai_team_org_evolution.md",
+            "sha256": "63bf4b842755aa11cff814ad5b1a0d4e21ac7b73777726a0dda4fe2d9ac5d180",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-ai-officer-advisor/references/model_buildvsbuy_strategy.md",
+            "sha256": "01124de3c40b6072f1c0d82db48ac6b25d4c5778428b618288caa3884b558632",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-ai-officer-advisor/scripts/ai_cost_economics.py",
+            "sha256": "c42455d7046856d489888e2a80ab9ad6c3c8a70e444394bafbabfdd02b77d235",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-ai-officer-advisor/scripts/ai_risk_classifier.py",
+            "sha256": "306232de71ab420a170d018fa89f763ad6450031503835f71894c3971abc7827",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-ai-officer-advisor/scripts/model_buildvsbuy_calculator.py",
+            "sha256": "008d613f738e3a1f612c648da698b56ac8973ffdb1f4cabef99b8b9f718915df",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Chief AI Officer advisory for startups: model build-vs-buy decisions (API vs fine-tune vs in-house), AI risk classification under EU AI Act + US state patchwork, AI cost economics (API-to-self-hosted breakeven), and AI team org evolution. Use when deciding whether to call an API or fine-tune, classifying AI use cases for regulatory risk, calculating when self-hosting pays off, sequencing AI hires, or when user mentions CAIO, AI strategy, model selection, foundation model, fine-tuning, EU AI Act, NIST AI RMF, AI governance, model risk, or AI economics. Strategic only \u2014 does not duplicate \u2026",
       "tools": [
         {
-          "script": "c-level-advisor/skills/chief-ai-officer-advisor/scripts/ai_cost_economics.py",
+          "script": "skills/c-level-advisor/skills/chief-ai-officer-advisor/scripts/ai_cost_economics.py",
+          "sha256": "c42455d7046856d489888e2a80ab9ad6c3c8a70e444394bafbabfdd02b77d235",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/chief-ai-officer-advisor/scripts/ai_cost_economics.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/chief-ai-officer-advisor/scripts/ai_cost_economics.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/chief-ai-officer-advisor/scripts/ai_risk_classifier.py",
+          "script": "skills/c-level-advisor/skills/chief-ai-officer-advisor/scripts/ai_risk_classifier.py",
+          "sha256": "306232de71ab420a170d018fa89f763ad6450031503835f71894c3971abc7827",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/chief-ai-officer-advisor/scripts/ai_risk_classifier.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/chief-ai-officer-advisor/scripts/ai_risk_classifier.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/chief-ai-officer-advisor/scripts/model_buildvsbuy_calculator.py",
+          "script": "skills/c-level-advisor/skills/chief-ai-officer-advisor/scripts/model_buildvsbuy_calculator.py",
+          "sha256": "008d613f738e3a1f612c648da698b56ac8973ffdb1f4cabef99b8b9f718915df",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/chief-ai-officer-advisor/scripts/model_buildvsbuy_calculator.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/chief-ai-officer-advisor/scripts/model_buildvsbuy_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1021,48 +2056,100 @@
         "close_out": false
       },
       "references": [
-        "ai_cost_economics.md",
-        "ai_risk_governance.md",
-        "ai_team_org_evolution.md",
-        "model_buildvsbuy_strategy.md"
+        "skills/c-level-advisor/skills/chief-ai-officer-advisor/references/ai_cost_economics.md",
+        "skills/c-level-advisor/skills/chief-ai-officer-advisor/references/ai_risk_governance.md",
+        "skills/c-level-advisor/skills/chief-ai-officer-advisor/references/ai_team_org_evolution.md",
+        "skills/c-level-advisor/skills/chief-ai-officer-advisor/references/model_buildvsbuy_strategy.md"
       ]
     },
     {
       "name": "chief-customer-officer-advisor",
-      "path": "c-level-advisor/skills/chief-customer-officer-advisor",
+      "path": "skills/c-level-advisor/skills/chief-customer-officer-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "chief-customer-officer-advisor",
+        "skill_path": "skills/c-level-advisor/skills/chief-customer-officer-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/chief-customer-officer-advisor/SKILL.md",
+            "sha256": "8a985a538ffdf5a31325ea757fe25fc35aba2af187763f6f6d7dd50932fc7465",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-customer-officer-advisor/references/cs_coverage_model.md",
+            "sha256": "ab9fc811346f780fdf6121dcc0a3770cb3e6a12403a0a60036fee7fa13859ecb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-customer-officer-advisor/references/cs_team_org_evolution.md",
+            "sha256": "f2b6c8d994b1be8531f9fd09f40454ad2ae0e7b28fc1da35519350ed3dfbeec7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-customer-officer-advisor/references/customer_segmentation_strategy.md",
+            "sha256": "f8e7aec8773f6611d0f16689f230ea58ed75cb872faeeb3bcbeb121fa7536c66",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-customer-officer-advisor/references/retention_decomposition.md",
+            "sha256": "ae893dacd758fc2f614db5028f7b3d430a62c45ab7077a85ea08e8f7a7abb821",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-customer-officer-advisor/scripts/cs_coverage_calculator.py",
+            "sha256": "d7fca426a22c5e3287e052355d3202382bfbe53de51ff42557bad6594f80f178",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-customer-officer-advisor/scripts/customer_segmentation_designer.py",
+            "sha256": "08254b05bfa6689e90330d2a7961afc814cf5420a8a6fb21f6645950ed45faed",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-customer-officer-advisor/scripts/retention_decomposition_analyzer.py",
+            "sha256": "6603bf755ae236fe425e84efcc17fa8cb2f9011d2ad3d148e3016cd1ab832587",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Chief Customer Officer advisory for startups: retention decomposition (gross retention vs NRR honesty, churn root-cause taxonomy), customer segmentation strategy (differential investment across tiers + ICP fit scoring), CS team coverage model (pooled vs named CSM thresholds + ratio math), and CS team org evolution (CS vs Support vs AM distinctions). Use when designing retention strategy, segmenting customers for differential investment, sizing CS team, or sequencing CS hires. Strategic only \u2014 does not duplicate engineering/business-growth tactical skills.",
       "tools": [
         {
-          "script": "c-level-advisor/skills/chief-customer-officer-advisor/scripts/cs_coverage_calculator.py",
+          "script": "skills/c-level-advisor/skills/chief-customer-officer-advisor/scripts/cs_coverage_calculator.py",
+          "sha256": "d7fca426a22c5e3287e052355d3202382bfbe53de51ff42557bad6594f80f178",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/chief-customer-officer-advisor/scripts/cs_coverage_calculator.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/chief-customer-officer-advisor/scripts/cs_coverage_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/chief-customer-officer-advisor/scripts/customer_segmentation_designer.py",
+          "script": "skills/c-level-advisor/skills/chief-customer-officer-advisor/scripts/customer_segmentation_designer.py",
+          "sha256": "08254b05bfa6689e90330d2a7961afc814cf5420a8a6fb21f6645950ed45faed",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/chief-customer-officer-advisor/scripts/customer_segmentation_designer.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/chief-customer-officer-advisor/scripts/customer_segmentation_designer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/chief-customer-officer-advisor/scripts/retention_decomposition_analyzer.py",
+          "script": "skills/c-level-advisor/skills/chief-customer-officer-advisor/scripts/retention_decomposition_analyzer.py",
+          "sha256": "6603bf755ae236fe425e84efcc17fa8cb2f9011d2ad3d148e3016cd1ab832587",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/chief-customer-officer-advisor/scripts/retention_decomposition_analyzer.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/chief-customer-officer-advisor/scripts/retention_decomposition_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1077,48 +2164,100 @@
         "close_out": false
       },
       "references": [
-        "cs_coverage_model.md",
-        "cs_team_org_evolution.md",
-        "customer_segmentation_strategy.md",
-        "retention_decomposition.md"
+        "skills/c-level-advisor/skills/chief-customer-officer-advisor/references/cs_coverage_model.md",
+        "skills/c-level-advisor/skills/chief-customer-officer-advisor/references/cs_team_org_evolution.md",
+        "skills/c-level-advisor/skills/chief-customer-officer-advisor/references/customer_segmentation_strategy.md",
+        "skills/c-level-advisor/skills/chief-customer-officer-advisor/references/retention_decomposition.md"
       ]
     },
     {
       "name": "chief-data-officer-advisor",
-      "path": "c-level-advisor/skills/chief-data-officer-advisor",
+      "path": "skills/c-level-advisor/skills/chief-data-officer-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "chief-data-officer-advisor",
+        "skill_path": "skills/c-level-advisor/skills/chief-data-officer-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/chief-data-officer-advisor/SKILL.md",
+            "sha256": "bb519c5ce49415e37300d5e9d36e202a9eb25680c1fa9d9449137e67ad2b996e",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-data-officer-advisor/references/ai_training_data_rights.md",
+            "sha256": "44a21820bfba7b250510d2f84dfc416ae3d1d49c1d585dc3a72f0e38731a76e4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-data-officer-advisor/references/customer_data_as_asset.md",
+            "sha256": "92aaf1f7f4ca458e22905955b534a3d33b44f389334a2c2ca16fc935d7c4a8f2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-data-officer-advisor/references/data_product_strategy.md",
+            "sha256": "d0d5b416b3c6df6f2c887d039935392392e5a08560ef569f765d2940c6bf7642",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-data-officer-advisor/references/data_team_org_evolution.md",
+            "sha256": "ecd163ecf14de2cbb0d326099d1854ba52aa369fb8116157dae3a0da60484ceb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-data-officer-advisor/scripts/ai_training_data_audit.py",
+            "sha256": "1070e9d211579e233bb9e592ff2c6d1c2174caca05a5c1f77f02b0aff5e3b104",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-data-officer-advisor/scripts/data_asset_valuator.py",
+            "sha256": "e4be367bd3e500214a30add20356758e8aaeb10d53615814cd8d9b1f81acb448",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-data-officer-advisor/scripts/data_product_strategy_picker.py",
+            "sha256": "25fc860a35ab6d18ea75b6d70ea30ca40ecb28d3f796b83421656e056ef18ffb",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Chief Data Officer advisory for startups: AI training data rights and consent provenance, data product strategy (warehouse vs lakehouse vs mesh, build-vs-buy), B2B customer-data-as-asset valuation and M&A readiness, data team org evolution. Use when deciding whether to train models on customer data, choosing data architecture, valuing data for fundraising or M&A, sequencing data hires, or when user mentions CDO, chief data officer, data strategy, data mesh, lakehouse, training data, data product, data monetization, or customer data asset. NOT a tactical data engineering skill \u2014 strategic \u2026",
       "tools": [
         {
-          "script": "c-level-advisor/skills/chief-data-officer-advisor/scripts/ai_training_data_audit.py",
+          "script": "skills/c-level-advisor/skills/chief-data-officer-advisor/scripts/ai_training_data_audit.py",
+          "sha256": "1070e9d211579e233bb9e592ff2c6d1c2174caca05a5c1f77f02b0aff5e3b104",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/chief-data-officer-advisor/scripts/ai_training_data_audit.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/chief-data-officer-advisor/scripts/ai_training_data_audit.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/chief-data-officer-advisor/scripts/data_asset_valuator.py",
+          "script": "skills/c-level-advisor/skills/chief-data-officer-advisor/scripts/data_asset_valuator.py",
+          "sha256": "e4be367bd3e500214a30add20356758e8aaeb10d53615814cd8d9b1f81acb448",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/chief-data-officer-advisor/scripts/data_asset_valuator.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/chief-data-officer-advisor/scripts/data_asset_valuator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/chief-data-officer-advisor/scripts/data_product_strategy_picker.py",
+          "script": "skills/c-level-advisor/skills/chief-data-officer-advisor/scripts/data_product_strategy_picker.py",
+          "sha256": "25fc860a35ab6d18ea75b6d70ea30ca40ecb28d3f796b83421656e056ef18ffb",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/chief-data-officer-advisor/scripts/data_product_strategy_picker.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/chief-data-officer-advisor/scripts/data_product_strategy_picker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1133,15 +2272,39 @@
         "close_out": false
       },
       "references": [
-        "ai_training_data_rights.md",
-        "customer_data_as_asset.md",
-        "data_product_strategy.md",
-        "data_team_org_evolution.md"
+        "skills/c-level-advisor/skills/chief-data-officer-advisor/references/ai_training_data_rights.md",
+        "skills/c-level-advisor/skills/chief-data-officer-advisor/references/customer_data_as_asset.md",
+        "skills/c-level-advisor/skills/chief-data-officer-advisor/references/data_product_strategy.md",
+        "skills/c-level-advisor/skills/chief-data-officer-advisor/references/data_team_org_evolution.md"
       ]
     },
     {
       "name": "chief-of-staff",
-      "path": "c-level-advisor/skills/chief-of-staff",
+      "path": "skills/c-level-advisor/skills/chief-of-staff",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "chief-of-staff",
+        "skill_path": "skills/c-level-advisor/skills/chief-of-staff",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/chief-of-staff/SKILL.md",
+            "sha256": "bc217ed8a294363fb61c895c54fcc70f55221f92aab16841df25c8ed8a05e9a5",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-of-staff/references/routing-matrix.md",
+            "sha256": "3e2875e272880a4b765c1b7e6a4a09f2177b673a7b9689476be29defc520cc32",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chief-of-staff/references/synthesis-framework.md",
+            "sha256": "404f6437f8de400a57c67ebf1f5466dabcb40020811f7dd3640086d503a9125f",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "C-suite orchestration layer. Routes founder questions to the right advisor role(s), triggers multi-role board meetings for complex decisions, synthesizes outputs, and tracks decisions. Every C-suite interaction starts here. Loads company context automatically. Use when a founder question needs routing to the right advisor \u2014 e.g. 'should we raise now or cut burn?' \u2014 or when a multi-domain decision needs a board meeting convened.",
       "tools": [],
       "agentic_signals": {
@@ -1152,34 +2315,75 @@
         "close_out": false
       },
       "references": [
-        "routing-matrix.md",
-        "synthesis-framework.md"
+        "skills/c-level-advisor/skills/chief-of-staff/references/routing-matrix.md",
+        "skills/c-level-advisor/skills/chief-of-staff/references/synthesis-framework.md"
       ]
     },
     {
       "name": "chro-advisor",
-      "path": "c-level-advisor/skills/chro-advisor",
+      "path": "skills/c-level-advisor/skills/chro-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "chro-advisor",
+        "skill_path": "skills/c-level-advisor/skills/chro-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/chro-advisor/SKILL.md",
+            "sha256": "efd98eaba78e41b3399006a48536df2e146c1638dd758155f46886f07070d70d",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chro-advisor/references/comp_frameworks.md",
+            "sha256": "109c3bebf02461b1552e68c78131443b0338dbea771b021e16ac9e6f09da9ccc",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chro-advisor/references/org_design.md",
+            "sha256": "80989214cf772fc2e7fbbf88bdd9045865bea05a8313a1aabcaeb4876a00f7ad",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chro-advisor/references/people_strategy.md",
+            "sha256": "159d16d9f3db6463bb398edf62951ed2e277711de091edc799d2d45bba5ac760",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chro-advisor/scripts/comp_benchmarker.py",
+            "sha256": "e748abe77e79d70d7f3e57ceda3deeddbbc3a36c546dba1a11cf506ebe3aac85",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/chro-advisor/scripts/hiring_plan_modeler.py",
+            "sha256": "79a1e7f2b5059a5c3af2d0b7b614b7d2d614673a48fda6ebb8e78533088b1d86",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "People leadership for scaling companies. Hiring strategy, compensation design, org structure, culture, and retention. Use when building hiring plans, designing comp frameworks, restructuring teams, managing performance, building culture, or when user mentions CHRO, HR, people strategy, talent, headcount, compensation, org design, retention, or performance management.",
       "tools": [
         {
-          "script": "c-level-advisor/skills/chro-advisor/scripts/comp_benchmarker.py",
+          "script": "skills/c-level-advisor/skills/chro-advisor/scripts/comp_benchmarker.py",
+          "sha256": "e748abe77e79d70d7f3e57ceda3deeddbbc3a36c546dba1a11cf506ebe3aac85",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/chro-advisor/scripts/comp_benchmarker.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/chro-advisor/scripts/comp_benchmarker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/chro-advisor/scripts/hiring_plan_modeler.py",
+          "script": "skills/c-level-advisor/skills/chro-advisor/scripts/hiring_plan_modeler.py",
+          "sha256": "79a1e7f2b5059a5c3af2d0b7b614b7d2d614673a48fda6ebb8e78533088b1d86",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/chro-advisor/scripts/hiring_plan_modeler.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/chro-advisor/scripts/hiring_plan_modeler.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1194,35 +2398,76 @@
         "close_out": false
       },
       "references": [
-        "comp_frameworks.md",
-        "org_design.md",
-        "people_strategy.md"
+        "skills/c-level-advisor/skills/chro-advisor/references/comp_frameworks.md",
+        "skills/c-level-advisor/skills/chro-advisor/references/org_design.md",
+        "skills/c-level-advisor/skills/chro-advisor/references/people_strategy.md"
       ]
     },
     {
       "name": "ciso-advisor",
-      "path": "c-level-advisor/skills/ciso-advisor",
+      "path": "skills/c-level-advisor/skills/ciso-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "ciso-advisor",
+        "skill_path": "skills/c-level-advisor/skills/ciso-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/ciso-advisor/SKILL.md",
+            "sha256": "ca2c14e65ff74b576e2d40ac39d0b26b00cca206488254ba525b78cbdb7c2b37",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/ciso-advisor/references/compliance_roadmap.md",
+            "sha256": "6e5848f48b79393a130232373b48562e9388885b455810c26f38b1316f365a1d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/ciso-advisor/references/incident_response.md",
+            "sha256": "6b6455a27db10986a7f7b9ce6a0191182566361bf6f8b80c978e86b0de034a59",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/ciso-advisor/references/security_strategy.md",
+            "sha256": "3f1cfb66fbeef8e583fa73ace07c74ff25f25626ff3638ae193b6a2af83deba5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/ciso-advisor/scripts/compliance_tracker.py",
+            "sha256": "75e860b49f43912d4ed54e36daf3482d612ffd7d0afd3d766209f0c3875eaf9f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/ciso-advisor/scripts/risk_quantifier.py",
+            "sha256": "325692069ac0ad7e81f37db4496de0c0218fe11b6d60608b318e444fbb7c09fc",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Security leadership for growth-stage companies. Risk quantification in dollars, compliance roadmap (SOC 2/ISO 27001/HIPAA/GDPR), security architecture strategy, incident response leadership, and board-level security reporting. Use when building security programs, justifying security budget, selecting compliance frameworks, managing incidents, assessing vendor risk, or when user mentions CISO, security strategy, compliance roadmap, zero trust, or board security reporting.",
       "tools": [
         {
-          "script": "c-level-advisor/skills/ciso-advisor/scripts/compliance_tracker.py",
+          "script": "skills/c-level-advisor/skills/ciso-advisor/scripts/compliance_tracker.py",
+          "sha256": "75e860b49f43912d4ed54e36daf3482d612ffd7d0afd3d766209f0c3875eaf9f",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/ciso-advisor/scripts/compliance_tracker.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/ciso-advisor/scripts/compliance_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/ciso-advisor/scripts/risk_quantifier.py",
+          "script": "skills/c-level-advisor/skills/ciso-advisor/scripts/risk_quantifier.py",
+          "sha256": "325692069ac0ad7e81f37db4496de0c0218fe11b6d60608b318e444fbb7c09fc",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/ciso-advisor/scripts/risk_quantifier.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/ciso-advisor/scripts/risk_quantifier.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1237,35 +2482,76 @@
         "close_out": false
       },
       "references": [
-        "compliance_roadmap.md",
-        "incident_response.md",
-        "security_strategy.md"
+        "skills/c-level-advisor/skills/ciso-advisor/references/compliance_roadmap.md",
+        "skills/c-level-advisor/skills/ciso-advisor/references/incident_response.md",
+        "skills/c-level-advisor/skills/ciso-advisor/references/security_strategy.md"
       ]
     },
     {
       "name": "cmo-advisor",
-      "path": "c-level-advisor/skills/cmo-advisor",
+      "path": "skills/c-level-advisor/skills/cmo-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cmo-advisor",
+        "skill_path": "skills/c-level-advisor/skills/cmo-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/cmo-advisor/SKILL.md",
+            "sha256": "aa76f8740b2384e18066e4f02950bec552e0a8b5ff17a526a51b724163592cc7",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cmo-advisor/references/brand_positioning.md",
+            "sha256": "79d4d4866c9ac34c3d21b413db33eaf1453b6fb6260c4873de99cb89c6b80396",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cmo-advisor/references/growth_frameworks.md",
+            "sha256": "d743fc97ec51bc66580e45b44045d5dcc77f4ee3bfe0b576ea1a35e20e6f1ff4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cmo-advisor/references/marketing_org.md",
+            "sha256": "a5e451e1427f42747aa35122badf3ea2e4a805b903be0823fa5cf40172efabff",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cmo-advisor/scripts/growth_model_simulator.py",
+            "sha256": "787b33f0e458218dfa3e7116069a002e05458794623dc92c655439cbee6806eb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cmo-advisor/scripts/marketing_budget_modeler.py",
+            "sha256": "b16dabc5bf454483079bf9df8658a41bc7b269bd2a0ad5232ea4e4489d152488",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Marketing leadership for scaling companies. Brand positioning, growth model design, marketing budget allocation, and marketing org design. Use when designing brand strategy, selecting growth models (PLG vs sales-led vs community-led), allocating marketing budgets, building marketing teams, or when user mentions CMO, brand strategy, growth model, CAC, LTV, channel mix, or marketing ROI.",
       "tools": [
         {
-          "script": "c-level-advisor/skills/cmo-advisor/scripts/growth_model_simulator.py",
+          "script": "skills/c-level-advisor/skills/cmo-advisor/scripts/growth_model_simulator.py",
+          "sha256": "787b33f0e458218dfa3e7116069a002e05458794623dc92c655439cbee6806eb",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/cmo-advisor/scripts/growth_model_simulator.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/cmo-advisor/scripts/growth_model_simulator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/cmo-advisor/scripts/marketing_budget_modeler.py",
+          "script": "skills/c-level-advisor/skills/cmo-advisor/scripts/marketing_budget_modeler.py",
+          "sha256": "b16dabc5bf454483079bf9df8658a41bc7b269bd2a0ad5232ea4e4489d152488",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/cmo-advisor/scripts/marketing_budget_modeler.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/cmo-advisor/scripts/marketing_budget_modeler.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1280,14 +2566,38 @@
         "close_out": false
       },
       "references": [
-        "brand_positioning.md",
-        "growth_frameworks.md",
-        "marketing_org.md"
+        "skills/c-level-advisor/skills/cmo-advisor/references/brand_positioning.md",
+        "skills/c-level-advisor/skills/cmo-advisor/references/growth_frameworks.md",
+        "skills/c-level-advisor/skills/cmo-advisor/references/marketing_org.md"
       ]
     },
     {
       "name": "company-os",
-      "path": "c-level-advisor/skills/company-os",
+      "path": "skills/c-level-advisor/skills/company-os",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "company-os",
+        "skill_path": "skills/c-level-advisor/skills/company-os",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/company-os/SKILL.md",
+            "sha256": "beb4f6dac3dc1380548230bd278664e850af7bd8930142be2e2051f97bd85b6f",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/company-os/references/implementation-guide.md",
+            "sha256": "690189c9eb8c7b6992dc1d91117138629b46485e307219f3f428f9e349f4d276",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/company-os/references/os-comparison.md",
+            "sha256": "920e137494deb472b182187551add779b452282b69fc87c3ad3a2367fef8c8d4",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "The meta-framework for how a company runs \u2014 the connective tissue between all C-suite roles. Covers operating system selection (EOS, Scaling Up, OKR-native, hybrid), accountability charts, scorecards, meeting pulse, issue resolution, and 90-day rocks. Use when setting up company operations, selecting a management framework, designing meeting rhythms, building accountability systems, implementing OKRs, or when user mentions EOS, Scaling Up, operating system, L10 meetings, rocks, scorecard, accountability chart, or quarterly planning.",
       "tools": [],
       "agentic_signals": {
@@ -1298,13 +2608,37 @@
         "close_out": false
       },
       "references": [
-        "implementation-guide.md",
-        "os-comparison.md"
+        "skills/c-level-advisor/skills/company-os/references/implementation-guide.md",
+        "skills/c-level-advisor/skills/company-os/references/os-comparison.md"
       ]
     },
     {
       "name": "competitive-intel",
-      "path": "c-level-advisor/skills/competitive-intel",
+      "path": "skills/c-level-advisor/skills/competitive-intel",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "competitive-intel",
+        "skill_path": "skills/c-level-advisor/skills/competitive-intel",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/competitive-intel/SKILL.md",
+            "sha256": "647c53414f51372dabe8323f98e65be06db5fb900d3dd30ffb783f2a977b9831",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/competitive-intel/references/ci-playbook.md",
+            "sha256": "3fc11b22280e03e056e88afa931ba79ee59b6ee0421d07f0e42a17a000304c14",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/competitive-intel/templates/battlecard-template.md",
+            "sha256": "956474644e2961f2aeb340e19b44ceccf4a5cd562e16227de5096ebdb891d16d",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Systematic competitor tracking that feeds CMO positioning, CRO battlecards, and CPO roadmap decisions. Use when analyzing competitors, building sales battlecards, tracking market moves, positioning against alternatives, or when user mentions competitive intelligence, competitive analysis, competitor research, battlecards, win/loss, or market positioning.",
       "tools": [],
       "agentic_signals": {
@@ -1315,12 +2649,31 @@
         "close_out": false
       },
       "references": [
-        "ci-playbook.md"
+        "skills/c-level-advisor/skills/competitive-intel/references/ci-playbook.md"
       ]
     },
     {
       "name": "context-engine",
-      "path": "c-level-advisor/skills/context-engine",
+      "path": "skills/c-level-advisor/skills/context-engine",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "context-engine",
+        "skill_path": "skills/c-level-advisor/skills/context-engine",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/context-engine/SKILL.md",
+            "sha256": "c42fcd0b2cbd3bfded844a990a6b8129118b63b5208b49a4b08806954a74a1b8",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/context-engine/references/anonymization-protocol.md",
+            "sha256": "bc94559523c268be4d1b0aff43f4c1825bc3ceb9a47205860be78068fb84afa7",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Loads and manages company context for all C-suite advisor skills. Reads ~/.claude/company-context.md, detects stale context (>90 days), enriches context during conversations, and enforces privacy/anonymization rules before external API calls. Use when starting any C-suite advisor session, when context looks stale or missing, or before sending company data to an external service.",
       "tools": [],
       "agentic_signals": {
@@ -1331,33 +2684,74 @@
         "close_out": false
       },
       "references": [
-        "anonymization-protocol.md"
+        "skills/c-level-advisor/skills/context-engine/references/anonymization-protocol.md"
       ]
     },
     {
       "name": "coo-advisor",
-      "path": "c-level-advisor/skills/coo-advisor",
+      "path": "skills/c-level-advisor/skills/coo-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "coo-advisor",
+        "skill_path": "skills/c-level-advisor/skills/coo-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/coo-advisor/SKILL.md",
+            "sha256": "f7f47376610ef7a280be4af34a3816adb9225a24d6af52e148a4808b13c6df64",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/coo-advisor/references/ops_cadence.md",
+            "sha256": "969b3ea9c941c734648273449d292be8a1c1494b2c1594cff5e2188056c65977",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/coo-advisor/references/process_frameworks.md",
+            "sha256": "e8dcb785c783e0f3fe53e608dab5b6ccac0b6f622060b91c257a3c4ed7b76280",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/coo-advisor/references/scaling_playbook.md",
+            "sha256": "123a4f66b5d09f9cb43aaa885ad8d90dc30dbd055374f218fb121b45499ba5fa",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/coo-advisor/scripts/okr_tracker.py",
+            "sha256": "a9fa517416e16f56ddd0e2b624e622f257e39143e47c0ed992f25559d30ead25",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/coo-advisor/scripts/ops_efficiency_analyzer.py",
+            "sha256": "e145a92aa8dd3a89a3d16fd3963b1a94f9932254e4da6600be6d552a332b96e7",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Operations leadership for scaling companies. Process design, OKR execution, operational cadence, and scaling playbooks. Use when designing operations, setting up OKRs, building processes, scaling teams, analyzing bottlenecks, planning operational cadence, or when user mentions COO, operations, process improvement, OKRs, scaling, operational efficiency, or execution.",
       "tools": [
         {
-          "script": "c-level-advisor/skills/coo-advisor/scripts/okr_tracker.py",
+          "script": "skills/c-level-advisor/skills/coo-advisor/scripts/okr_tracker.py",
+          "sha256": "a9fa517416e16f56ddd0e2b624e622f257e39143e47c0ed992f25559d30ead25",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/coo-advisor/scripts/okr_tracker.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/coo-advisor/scripts/okr_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/coo-advisor/scripts/ops_efficiency_analyzer.py",
+          "script": "skills/c-level-advisor/skills/coo-advisor/scripts/ops_efficiency_analyzer.py",
+          "sha256": "e145a92aa8dd3a89a3d16fd3963b1a94f9932254e4da6600be6d552a332b96e7",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/coo-advisor/scripts/ops_efficiency_analyzer.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/coo-advisor/scripts/ops_efficiency_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1372,40 +2766,81 @@
         "close_out": true
       },
       "references": [
-        "ops_cadence.md",
-        "process_frameworks.md",
-        "scaling_playbook.md"
+        "skills/c-level-advisor/skills/coo-advisor/references/ops_cadence.md",
+        "skills/c-level-advisor/skills/coo-advisor/references/process_frameworks.md",
+        "skills/c-level-advisor/skills/coo-advisor/references/scaling_playbook.md"
       ]
     },
     {
       "name": "cpo-advisor",
-      "path": "c-level-advisor/skills/cpo-advisor",
+      "path": "skills/c-level-advisor/skills/cpo-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cpo-advisor",
+        "skill_path": "skills/c-level-advisor/skills/cpo-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/cpo-advisor/SKILL.md",
+            "sha256": "aa60b2c210f1b0ae1b6668f285ee1dd85b21c607f236f57a7b9bb0e9417a4225",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cpo-advisor/references/pmf_playbook.md",
+            "sha256": "7608fa2d3e458d0c8a30c28501ad38e608b731513e0cecefbcea4a2fd00132ea",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cpo-advisor/references/product_org_design.md",
+            "sha256": "dc1be29ac67b904861819f1779f4e65402a9845c244435b5076649847da53dd9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cpo-advisor/references/product_strategy.md",
+            "sha256": "e57c892900f4032da5f4ca161ce3c3b0beceea0f9c2f7fad26f2f3ee49299dc0",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cpo-advisor/scripts/pmf_scorer.py",
+            "sha256": "9774282c96447f9a5855b128f31f834516c1c9e4de73ce6f4007a6f32fe5cb0b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cpo-advisor/scripts/portfolio_analyzer.py",
+            "sha256": "c291fe812790ab11c6ee703fd7428241b20c5b149d01c19b4be6ee9814345947",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Product leadership for scaling companies. Product vision, portfolio strategy, product-market fit, and product org design. Use when setting product vision, managing a product portfolio, measuring PMF, designing product teams, prioritizing at the portfolio level, reporting to the board on product, or when user mentions CPO, product strategy, product-market fit, product organization, portfolio prioritization, or roadmap strategy.",
       "tools": [
         {
-          "script": "c-level-advisor/skills/cpo-advisor/scripts/pmf_scorer.py",
+          "script": "skills/c-level-advisor/skills/cpo-advisor/scripts/pmf_scorer.py",
+          "sha256": "9774282c96447f9a5855b128f31f834516c1c9e4de73ce6f4007a6f32fe5cb0b",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/cpo-advisor/scripts/pmf_scorer.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/cpo-advisor/scripts/pmf_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 c-level-advisor/skills/cpo-advisor/scripts/pmf_scorer.py --sample",
+              "cmd": "python3 skills/c-level-advisor/skills/cpo-advisor/scripts/pmf_scorer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/cpo-advisor/scripts/portfolio_analyzer.py",
+          "script": "skills/c-level-advisor/skills/cpo-advisor/scripts/portfolio_analyzer.py",
+          "sha256": "c291fe812790ab11c6ee703fd7428241b20c5b149d01c19b4be6ee9814345947",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/cpo-advisor/scripts/portfolio_analyzer.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/cpo-advisor/scripts/portfolio_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1420,35 +2855,76 @@
         "close_out": false
       },
       "references": [
-        "pmf_playbook.md",
-        "product_org_design.md",
-        "product_strategy.md"
+        "skills/c-level-advisor/skills/cpo-advisor/references/pmf_playbook.md",
+        "skills/c-level-advisor/skills/cpo-advisor/references/product_org_design.md",
+        "skills/c-level-advisor/skills/cpo-advisor/references/product_strategy.md"
       ]
     },
     {
       "name": "cro-advisor",
-      "path": "c-level-advisor/skills/cro-advisor",
+      "path": "skills/c-level-advisor/skills/cro-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cro-advisor",
+        "skill_path": "skills/c-level-advisor/skills/cro-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/cro-advisor/SKILL.md",
+            "sha256": "cd712605d907badd29df29bd8c9cd8cb638bb845be285f3c5ecbd03c51a6bbd0",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cro-advisor/references/nrr_playbook.md",
+            "sha256": "32911edbb12348244cf5c41f122c38a3f1a4764b4df554f1330108185ece6313",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cro-advisor/references/pricing_strategy.md",
+            "sha256": "9afcdbea2b1ee7c920c04565af5c7431bb01e21fab047880521e4b2196c6f837",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cro-advisor/references/sales_playbook.md",
+            "sha256": "ba4adfcbfab175e8bac9bdd01bf6a9ec9964e4a439b6bfa4dd2e31e2039a5b5f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cro-advisor/scripts/churn_analyzer.py",
+            "sha256": "f6993329bba60b8a3eb1ea8c1dc3ac9ca43efa5705dbdc083b7578eb032f93ab",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cro-advisor/scripts/revenue_forecast_model.py",
+            "sha256": "d545233dc76f306cbbdfec45be84f426ab454c826ec1833b850c28bcb146e911",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Revenue leadership for B2B SaaS companies. Revenue forecasting, sales model design, pricing strategy, net revenue retention, and sales team scaling. Use when designing the revenue engine, setting quotas, modeling NRR, evaluating pricing, building board forecasts, or when user mentions CRO, chief revenue officer, revenue strategy, sales model, ARR growth, NRR, expansion revenue, churn, pricing strategy, or sales capacity.",
       "tools": [
         {
-          "script": "c-level-advisor/skills/cro-advisor/scripts/churn_analyzer.py",
+          "script": "skills/c-level-advisor/skills/cro-advisor/scripts/churn_analyzer.py",
+          "sha256": "f6993329bba60b8a3eb1ea8c1dc3ac9ca43efa5705dbdc083b7578eb032f93ab",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/cro-advisor/scripts/churn_analyzer.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/cro-advisor/scripts/churn_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/cro-advisor/scripts/revenue_forecast_model.py",
+          "script": "skills/c-level-advisor/skills/cro-advisor/scripts/revenue_forecast_model.py",
+          "sha256": "d545233dc76f306cbbdfec45be84f426ab454c826ec1833b850c28bcb146e911",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/cro-advisor/scripts/revenue_forecast_model.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/cro-advisor/scripts/revenue_forecast_model.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1463,14 +2939,38 @@
         "close_out": false
       },
       "references": [
-        "nrr_playbook.md",
-        "pricing_strategy.md",
-        "sales_playbook.md"
+        "skills/c-level-advisor/skills/cro-advisor/references/nrr_playbook.md",
+        "skills/c-level-advisor/skills/cro-advisor/references/pricing_strategy.md",
+        "skills/c-level-advisor/skills/cro-advisor/references/sales_playbook.md"
       ]
     },
     {
       "name": "cs-onboard",
-      "path": "c-level-advisor/skills/cs-onboard",
+      "path": "skills/c-level-advisor/skills/cs-onboard",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cs-onboard",
+        "skill_path": "skills/c-level-advisor/skills/cs-onboard",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/cs-onboard/SKILL.md",
+            "sha256": "8867e51eb0fcdfd054039aa139a55db8565a4ed14f5e14fea976b504aa33c643",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cs-onboard/references/interview-guide.md",
+            "sha256": "9f585d97e010a08cf67e414a3a8769e66909e5fccc24bf092fa7befd9692caca",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cs-onboard/templates/company-context-template.md",
+            "sha256": "6b75c487a3082f43531ef6b9911d88808d3bd60c6ea2b16193da817dd3950bf0",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Founder onboarding interview that captures company context across 7 dimensions. Invoke with /cs:setup for initial interview or /cs:update for quarterly refresh. Generates ~/.claude/company-context.md used by all C-suite advisor skills. Use when setting up the C-suite advisors for the first time, or when company context is missing or more than 90 days old \u2014 e.g. after a fundraise or pivot.",
       "tools": [],
       "agentic_signals": {
@@ -1481,38 +2981,79 @@
         "close_out": false
       },
       "references": [
-        "interview-guide.md"
+        "skills/c-level-advisor/skills/cs-onboard/references/interview-guide.md"
       ]
     },
     {
       "name": "cto-advisor",
-      "path": "c-level-advisor/skills/cto-advisor",
+      "path": "skills/c-level-advisor/skills/cto-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cto-advisor",
+        "skill_path": "skills/c-level-advisor/skills/cto-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/cto-advisor/SKILL.md",
+            "sha256": "163188fbfa003cfe593f460f814aadcfa4228c85d6de96fe7589442afbee8adb",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cto-advisor/references/architecture_decision_records.md",
+            "sha256": "9cbc68b3dbe2f4bbe7b0fcef1d93b07fa3419a5762e4a0c8ae94aa34daa9f67b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cto-advisor/references/engineering_metrics.md",
+            "sha256": "f91562f6c0b29137092be44a1759c078298528d3598d7ce0222fc72a05706e68",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cto-advisor/references/technology_evaluation_framework.md",
+            "sha256": "0ae857e7046b50df528802037c9c417c6b5f1da3ce0879ca31528fda300a554a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cto-advisor/scripts/team_scaling_calculator.py",
+            "sha256": "5f16f050b56416f924729833aa092105ebaaa7c1c2bc9d3a69b89035ee374e1a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/cto-advisor/scripts/tech_debt_analyzer.py",
+            "sha256": "224f5f66489b3a93164e6e706f2dd9c2a72fe3b33164812f57f9f24788ee39e7",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Technical leadership guidance for engineering teams, architecture decisions, and technology strategy. Use when assessing technical debt, scaling engineering teams, evaluating technologies, making architecture decisions, establishing engineering metrics, or when user mentions CTO, tech debt, technical debt, team scaling, architecture decisions, technology evaluation, engineering metrics, DORA metrics, or technology strategy.",
       "tools": [
         {
-          "script": "c-level-advisor/skills/cto-advisor/scripts/team_scaling_calculator.py",
+          "script": "skills/c-level-advisor/skills/cto-advisor/scripts/team_scaling_calculator.py",
+          "sha256": "5f16f050b56416f924729833aa092105ebaaa7c1c2bc9d3a69b89035ee374e1a",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/cto-advisor/scripts/team_scaling_calculator.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/cto-advisor/scripts/team_scaling_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 c-level-advisor/skills/cto-advisor/scripts/team_scaling_calculator.py --sample",
+              "cmd": "python3 skills/c-level-advisor/skills/cto-advisor/scripts/team_scaling_calculator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/cto-advisor/scripts/tech_debt_analyzer.py",
+          "script": "skills/c-level-advisor/skills/cto-advisor/scripts/tech_debt_analyzer.py",
+          "sha256": "224f5f66489b3a93164e6e706f2dd9c2a72fe3b33164812f57f9f24788ee39e7",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/cto-advisor/scripts/tech_debt_analyzer.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/cto-advisor/scripts/tech_debt_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1527,14 +3068,38 @@
         "close_out": false
       },
       "references": [
-        "architecture_decision_records.md",
-        "engineering_metrics.md",
-        "technology_evaluation_framework.md"
+        "skills/c-level-advisor/skills/cto-advisor/references/architecture_decision_records.md",
+        "skills/c-level-advisor/skills/cto-advisor/references/engineering_metrics.md",
+        "skills/c-level-advisor/skills/cto-advisor/references/technology_evaluation_framework.md"
       ]
     },
     {
       "name": "culture-architect",
-      "path": "c-level-advisor/skills/culture-architect",
+      "path": "skills/c-level-advisor/skills/culture-architect",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "culture-architect",
+        "skill_path": "skills/c-level-advisor/skills/culture-architect",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/culture-architect/SKILL.md",
+            "sha256": "7d057648e470951de883cc00c8078640fadc0dfc38cdaaac4e26435d2caec2a0",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/culture-architect/references/culture-playbook.md",
+            "sha256": "2c99e74f3081568e2360a2a7b33531c29b9dee1422d644d3c15374f3c0b6ff62",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/culture-architect/templates/culture-code-template.md",
+            "sha256": "3c4656908369d831874bb4e19a23300199f2b3996fbf47dbedbcf33fdd21190b",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Build, measure, and evolve company culture as operational behavior \u2014 not wall posters. Covers mission/vision/values workshops, values-to-behaviors translation, culture code creation, culture health assessment, and cultural rituals by stage. Use when building company values, assessing culture health, designing cultural rituals, creating culture codes, handling culture clashes, or when user mentions culture, values, culture debt, founder culture, or culture code.",
       "tools": [],
       "agentic_signals": {
@@ -1545,21 +3110,46 @@
         "close_out": false
       },
       "references": [
-        "culture-playbook.md"
+        "skills/c-level-advisor/skills/culture-architect/references/culture-playbook.md"
       ]
     },
     {
       "name": "decision-logger",
-      "path": "c-level-advisor/skills/decision-logger",
+      "path": "skills/c-level-advisor/skills/decision-logger",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "decision-logger",
+        "skill_path": "skills/c-level-advisor/skills/decision-logger",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/decision-logger/SKILL.md",
+            "sha256": "f7f5902cd4970015389e52e0196274146a9d334a32e90137e6f480032414697d",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/decision-logger/scripts/decision_tracker.py",
+            "sha256": "69d1a06302f8fc03bba32604f6e5c94e5c581ca4f08cf568b0653695cf1c9acd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/decision-logger/templates/decision-entry.md",
+            "sha256": "1370255a68e91bf58e2af4f9442120785a5d26db6f52d2ed64385faa0ecdd713",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Two-layer memory architecture for board meeting decisions. Manages raw transcripts (Layer 1) and approved decisions (Layer 2). Use when logging decisions after a board meeting, reviewing past decisions with /cs:decisions, or checking overdue action items with /cs:review. Invoked automatically by the board-meeting skill after Phase 5 founder approval.",
       "tools": [
         {
-          "script": "c-level-advisor/skills/decision-logger/scripts/decision_tracker.py",
+          "script": "skills/c-level-advisor/skills/decision-logger/scripts/decision_tracker.py",
+          "sha256": "69d1a06302f8fc03bba32604f6e5c94e5c581ca4f08cf568b0653695cf1c9acd",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/decision-logger/scripts/decision_tracker.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/decision-logger/scripts/decision_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1577,7 +3167,31 @@
     },
     {
       "name": "founder-coach",
-      "path": "c-level-advisor/skills/founder-coach",
+      "path": "skills/c-level-advisor/skills/founder-coach",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "founder-coach",
+        "skill_path": "skills/c-level-advisor/skills/founder-coach",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/founder-coach/SKILL.md",
+            "sha256": "5dddb18187c7bbbcb91bcbed07eff1bf739ffa20b91668e09f89743c4255a230",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/founder-coach/references/founder-toolkit.md",
+            "sha256": "2e363c579c29e0f968e75d265f4aade3030f2aa9c47995190260d030b049e457",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/founder-coach/references/leadership-growth.md",
+            "sha256": "52de3c8ca01a52c3e50b6a298904c9f484a95e290932f4975955818eae5d317a",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Personal leadership development for founders and first-time CEOs. Covers founder archetype identification, delegation frameworks, energy management, CEO calendar audits, leadership style evolution, blind spot identification, imposter syndrome, founder mental health, and succession planning. Use when a founder feels like the bottleneck, struggles to delegate, is burning out, transitioning from IC to executive, managing a board, or when user mentions founder mode, CEO growth, leadership development, delegation, burnout, or imposter syndrome.",
       "tools": [],
       "agentic_signals": {
@@ -1588,34 +3202,75 @@
         "close_out": false
       },
       "references": [
-        "founder-toolkit.md",
-        "leadership-growth.md"
+        "skills/c-level-advisor/skills/founder-coach/references/founder-toolkit.md",
+        "skills/c-level-advisor/skills/founder-coach/references/leadership-growth.md"
       ]
     },
     {
       "name": "general-counsel-advisor",
-      "path": "c-level-advisor/skills/general-counsel-advisor",
+      "path": "skills/c-level-advisor/skills/general-counsel-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "general-counsel-advisor",
+        "skill_path": "skills/c-level-advisor/skills/general-counsel-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/general-counsel-advisor/SKILL.md",
+            "sha256": "c91df564423cb53399e44fe5bc81b77319c18e555726e0c3c3f819c833a4ae77",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/general-counsel-advisor/references/contracts_playbook.md",
+            "sha256": "11e550e9beb9b39ccd93925539d05b30af268d53eb6a2e9c297ebcb75616160f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/general-counsel-advisor/references/ip_and_regulatory.md",
+            "sha256": "8bdaee37fc8921fa995f1c7351d825593cb8e11f5506daf74a4799990e495edd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/general-counsel-advisor/references/term_sheet_decoder.md",
+            "sha256": "e81217d081be863afa8d9e26968fa44d24f28f83e9533619c7c662ccf5f66ef5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/general-counsel-advisor/scripts/contract_risk_scanner.py",
+            "sha256": "11fcd85501461d0499a008fbbdc19efd246cf1571d1e286ad2ade8f5b97a1ddc",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/general-counsel-advisor/scripts/term_sheet_analyzer.py",
+            "sha256": "ff72f10b926d100d2bc20722dc7056b0d0332373ff6221e2fcefeb958cc4f93f",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "General Counsel advisory for startups: contract review (MSA, SaaS, NDA, DPA, employment), IP strategy, term sheet decoding, and regulatory landscape mapping. Use when reviewing any contract or term sheet, deciding when to engage outside counsel, defining IP strategy, evaluating regulatory exposure (HIPAA, GDPR, FDA, fintech), or when user mentions general counsel, GC, legal review, contract risk, term sheet, IP assignment, or regulatory exposure. NOT a substitute for licensed counsel \u2014 surfaces questions to bring to qualified attorneys.",
       "tools": [
         {
-          "script": "c-level-advisor/skills/general-counsel-advisor/scripts/contract_risk_scanner.py",
+          "script": "skills/c-level-advisor/skills/general-counsel-advisor/scripts/contract_risk_scanner.py",
+          "sha256": "11fcd85501461d0499a008fbbdc19efd246cf1571d1e286ad2ade8f5b97a1ddc",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/general-counsel-advisor/scripts/contract_risk_scanner.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/general-counsel-advisor/scripts/contract_risk_scanner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/general-counsel-advisor/scripts/term_sheet_analyzer.py",
+          "script": "skills/c-level-advisor/skills/general-counsel-advisor/scripts/term_sheet_analyzer.py",
+          "sha256": "ff72f10b926d100d2bc20722dc7056b0d0332373ff6221e2fcefeb958cc4f93f",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/general-counsel-advisor/scripts/term_sheet_analyzer.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/general-counsel-advisor/scripts/term_sheet_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1630,14 +3285,38 @@
         "close_out": false
       },
       "references": [
-        "contracts_playbook.md",
-        "ip_and_regulatory.md",
-        "term_sheet_decoder.md"
+        "skills/c-level-advisor/skills/general-counsel-advisor/references/contracts_playbook.md",
+        "skills/c-level-advisor/skills/general-counsel-advisor/references/ip_and_regulatory.md",
+        "skills/c-level-advisor/skills/general-counsel-advisor/references/term_sheet_decoder.md"
       ]
     },
     {
       "name": "internal-narrative",
-      "path": "c-level-advisor/skills/internal-narrative",
+      "path": "skills/c-level-advisor/skills/internal-narrative",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "internal-narrative",
+        "skill_path": "skills/c-level-advisor/skills/internal-narrative",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/internal-narrative/SKILL.md",
+            "sha256": "1c3558eddccc7547fea27a6f25875c9861e32d5899db5f027b71d3c2036d922e",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/internal-narrative/references/narrative-frameworks.md",
+            "sha256": "5758069d14bcbf44f80b73df3fe3d0af95f733a5a6ea2af81467d841729ed637",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/internal-narrative/templates/all-hands-template.md",
+            "sha256": "36a2b1a208f36a38403b2e18a86b792dfa169fdbd4d8b455c171d9f0060989cb",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Build and maintain one coherent company story across all audiences \u2014 employees, investors, customers, candidates, and partners. Detects narrative contradictions and ensures the same truth is framed for each audience's needs. Use when preparing investor updates, all-hands presentations, board communications, recruiting narratives, crisis communications, or when user mentions company narrative, messaging consistency, storytelling, all-hands, investor update, or crisis communication.",
       "tools": [],
       "agentic_signals": {
@@ -1648,12 +3327,36 @@
         "close_out": false
       },
       "references": [
-        "narrative-frameworks.md"
+        "skills/c-level-advisor/skills/internal-narrative/references/narrative-frameworks.md"
       ]
     },
     {
       "name": "intl-expansion",
-      "path": "c-level-advisor/skills/intl-expansion",
+      "path": "skills/c-level-advisor/skills/intl-expansion",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "intl-expansion",
+        "skill_path": "skills/c-level-advisor/skills/intl-expansion",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/intl-expansion/SKILL.md",
+            "sha256": "4ff404139d02174ca6151c3e0ee7f65b199fce7cf2afb16fe567709381ad390c",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/intl-expansion/references/market-entry-playbook.md",
+            "sha256": "16935e5400821298cb3cd4a978211171b87a9559f7ac271df3870f13a4a54288",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/intl-expansion/references/regional-guide.md",
+            "sha256": "9fbde9154ba15de41afe0a3a7b25eb2e772d2cf55bb314112ae3cbc52686424e",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "International market expansion strategy. Market selection, entry modes, localization, regulatory compliance, and go-to-market by region. Use when expanding to new countries, evaluating international markets, planning localization, or building regional teams.",
       "tools": [],
       "agentic_signals": {
@@ -1664,13 +3367,37 @@
         "close_out": false
       },
       "references": [
-        "market-entry-playbook.md",
-        "regional-guide.md"
+        "skills/c-level-advisor/skills/intl-expansion/references/market-entry-playbook.md",
+        "skills/c-level-advisor/skills/intl-expansion/references/regional-guide.md"
       ]
     },
     {
       "name": "ma-playbook",
-      "path": "c-level-advisor/skills/ma-playbook",
+      "path": "skills/c-level-advisor/skills/ma-playbook",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "ma-playbook",
+        "skill_path": "skills/c-level-advisor/skills/ma-playbook",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/ma-playbook/SKILL.md",
+            "sha256": "e27101055e873209979459047b94f2228e82a46240fb1da59735d54752e7f7c5",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/ma-playbook/references/due-diligence-checklist.md",
+            "sha256": "3e8a7df084662958366379c39547cfb60bdb53ed5352a9ad82d5cdfd08d86c4c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/ma-playbook/references/integration-playbook.md",
+            "sha256": "3e306631beaee1098edbcf73ad1f75632db0155580dc174c1d9222c4f2240010",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "M&A strategy for acquiring companies or being acquired. Due diligence, valuation, integration, and deal structure. Use when evaluating acquisitions, preparing for acquisition, M&A due diligence, integration planning, or deal negotiation.",
       "tools": [],
       "agentic_signals": {
@@ -1681,22 +3408,47 @@
         "close_out": false
       },
       "references": [
-        "due-diligence-checklist.md",
-        "integration-playbook.md"
+        "skills/c-level-advisor/skills/ma-playbook/references/due-diligence-checklist.md",
+        "skills/c-level-advisor/skills/ma-playbook/references/integration-playbook.md"
       ]
     },
     {
       "name": "org-health-diagnostic",
-      "path": "c-level-advisor/skills/org-health-diagnostic",
+      "path": "skills/c-level-advisor/skills/org-health-diagnostic",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "org-health-diagnostic",
+        "skill_path": "skills/c-level-advisor/skills/org-health-diagnostic",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/org-health-diagnostic/SKILL.md",
+            "sha256": "935fbe7470247d6740dccb1619bbd6c1365a8e9ff3d7b5d5239f92933da0f84c",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/org-health-diagnostic/references/health-benchmarks.md",
+            "sha256": "ee4476d0d74b1a6a9ef0aa0e597df66218d8c12bf177eb9cc3422a0066cb5419",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/org-health-diagnostic/scripts/health_scorer.py",
+            "sha256": "00dffcfb9909734c8ba16fedb2830406f4b7f0e88f9d12a595e23965606beabf",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Cross-functional organizational health check combining signals from all C-suite roles. Scores 8 dimensions on a traffic-light scale with drill-down recommendations. Use when assessing overall company health, preparing for board reviews, identifying at-risk functions, or when user mentions org health, health check, or health dashboard.",
       "tools": [
         {
-          "script": "c-level-advisor/skills/org-health-diagnostic/scripts/health_scorer.py",
+          "script": "skills/c-level-advisor/skills/org-health-diagnostic/scripts/health_scorer.py",
+          "sha256": "00dffcfb9909734c8ba16fedb2830406f4b7f0e88f9d12a595e23965606beabf",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/org-health-diagnostic/scripts/health_scorer.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/org-health-diagnostic/scripts/health_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1711,21 +3463,46 @@
         "close_out": true
       },
       "references": [
-        "health-benchmarks.md"
+        "skills/c-level-advisor/skills/org-health-diagnostic/references/health-benchmarks.md"
       ]
     },
     {
       "name": "scenario-war-room",
-      "path": "c-level-advisor/skills/scenario-war-room",
-      "description": "Cross-functional what-if modeling for cascading multi-variable scenarios. Unlike single-assumption stress testing, this models compound adversity across all business functions simultaneously. Use when facing complex risk scenarios, strategic decisions with major downside, or when the user asks 'what if X AND Y both happen?",
+      "path": "skills/c-level-advisor/skills/scenario-war-room",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "scenario-war-room",
+        "skill_path": "skills/c-level-advisor/skills/scenario-war-room",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/scenario-war-room/SKILL.md",
+            "sha256": "bbc259eb11e8ba20e3eee2c5a531ef43994685c7274514a4e3709dba2dd6bf3a",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/scenario-war-room/references/scenario-planning.md",
+            "sha256": "36666ee887908386fb6b835749e98ffe16ea7989c4189128b99de3f4354e6944",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/scenario-war-room/scripts/scenario_modeler.py",
+            "sha256": "7fcaf02add160d8edebf2f1af857afa2fde05a5b7aad599bba0f4294fa57729a",
+            "role": "owned_resource"
+          }
+        ]
+      },
+      "description": "Cross-functional what-if modeling for cascading multi-variable scenarios. Unlike single-assumption stress testing, this models compound adversity across all business functions simultaneously. Use when facing complex risk scenarios, strategic decisions with major downside, or when the user asks 'what if X AND Y both happen?'",
       "tools": [
         {
-          "script": "c-level-advisor/skills/scenario-war-room/scripts/scenario_modeler.py",
+          "script": "skills/c-level-advisor/skills/scenario-war-room/scripts/scenario_modeler.py",
+          "sha256": "7fcaf02add160d8edebf2f1af857afa2fde05a5b7aad599bba0f4294fa57729a",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/scenario-war-room/scripts/scenario_modeler.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/scenario-war-room/scripts/scenario_modeler.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1740,26 +3517,51 @@
         "close_out": false
       },
       "references": [
-        "scenario-planning.md"
+        "skills/c-level-advisor/skills/scenario-war-room/references/scenario-planning.md"
       ]
     },
     {
       "name": "strategic-alignment",
-      "path": "c-level-advisor/skills/strategic-alignment",
+      "path": "skills/c-level-advisor/skills/strategic-alignment",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "strategic-alignment",
+        "skill_path": "skills/c-level-advisor/skills/strategic-alignment",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/strategic-alignment/SKILL.md",
+            "sha256": "b6c7a58907851b103de7c46c2b9063362fc61d7d1e450fc612710f4fc04ea6ab",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/strategic-alignment/references/alignment-playbook.md",
+            "sha256": "9f4cf83270071078911a77c798598b2385cc6c3c6e86c6c1356be21c561b784e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/strategic-alignment/scripts/alignment_checker.py",
+            "sha256": "e3179c1ded4659299fbb1491fbc1546eed1c92e2d1f5e7b59f2976f79f29af35",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Cascades strategy from boardroom to individual contributor. Detects and fixes misalignment between company goals and team execution. Covers strategy articulation, cascade mapping, orphan goal detection, silo identification, communication gap analysis, and realignment protocols. Use when teams are pulling in different directions, OKRs don't connect, departments optimize locally at company expense, or when user mentions alignment, strategy cascade, silo, conflicting OKRs, or strategy communication.",
       "tools": [
         {
-          "script": "c-level-advisor/skills/strategic-alignment/scripts/alignment_checker.py",
+          "script": "skills/c-level-advisor/skills/strategic-alignment/scripts/alignment_checker.py",
+          "sha256": "e3179c1ded4659299fbb1491fbc1546eed1c92e2d1f5e7b59f2976f79f29af35",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/strategic-alignment/scripts/alignment_checker.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/strategic-alignment/scripts/alignment_checker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 c-level-advisor/skills/strategic-alignment/scripts/alignment_checker.py --sample",
+              "cmd": "python3 skills/c-level-advisor/skills/strategic-alignment/scripts/alignment_checker.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -1774,45 +3576,97 @@
         "close_out": false
       },
       "references": [
-        "alignment-playbook.md"
+        "skills/c-level-advisor/skills/strategic-alignment/references/alignment-playbook.md"
       ]
     },
     {
       "name": "vpe-advisor",
-      "path": "c-level-advisor/skills/vpe-advisor",
+      "path": "skills/c-level-advisor/skills/vpe-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "vpe-advisor",
+        "skill_path": "skills/c-level-advisor/skills/vpe-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/skills/vpe-advisor/SKILL.md",
+            "sha256": "a351ad1eb48f779a5ab63c9d3a29cea39de64997006bfdd3df2c88b2353ce7dd",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/vpe-advisor/references/delivery_throughput.md",
+            "sha256": "d2b7e099bdf42f55d62914a8b80f4d1e681040705f7489b9943c160e2a7998ba",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/vpe-advisor/references/eng_team_structure.md",
+            "sha256": "2d385d59e7381bdb846d3a9a02df9b94d51957237bde2f6768de07198ef548cd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/vpe-advisor/references/engineering_hiring_funnel.md",
+            "sha256": "aedd99032b0e4873798a66f1359a9eb80d49b7a78d2e0d1b0976a629a1fa463b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/vpe-advisor/references/production_discipline.md",
+            "sha256": "e9333c2e654a1d61463fb1aa1ba4607456b9ab79de749f0eaf8e222cea6be541",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/vpe-advisor/scripts/delivery_throughput_analyzer.py",
+            "sha256": "f2c9b0c6dde47d38e61bc8fc4a8a99027bdf688bd6cd52ef7a95bd8c427c037b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/vpe-advisor/scripts/eng_hiring_funnel_calculator.py",
+            "sha256": "a7395200b878e82481635efe27b562ba1ebbc610ad55ea3ee7bc3d129674d762",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/skills/vpe-advisor/scripts/eng_team_structure_designer.py",
+            "sha256": "7a9ee9110b39dad245afefca88b91bc475b3cb6cf0c8c1d9bf9779543c365bcc",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "VP of Engineering advisory for startups: delivery throughput (DORA 4 metrics + bottleneck identification), engineering hiring funnel (sourcing \u2192 screen \u2192 onsite \u2192 offer conversion + time-to-fill + pipeline gap), engineering team structure (squad/tribe/chapter design + tech-lead manager-trigger thresholds), and production discipline (on-call, deployment cadence, postmortem culture). Use when sprint velocity is dropping, eng hiring is broken, team structure is unclear, or deciding when to add a tech-lead manager. NOT a CTO skill (which owns architecture) \u2014 VPE owns delivery operations and how \u2026",
       "tools": [
         {
-          "script": "c-level-advisor/skills/vpe-advisor/scripts/delivery_throughput_analyzer.py",
+          "script": "skills/c-level-advisor/skills/vpe-advisor/scripts/delivery_throughput_analyzer.py",
+          "sha256": "f2c9b0c6dde47d38e61bc8fc4a8a99027bdf688bd6cd52ef7a95bd8c427c037b",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/vpe-advisor/scripts/delivery_throughput_analyzer.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/vpe-advisor/scripts/delivery_throughput_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/vpe-advisor/scripts/eng_hiring_funnel_calculator.py",
+          "script": "skills/c-level-advisor/skills/vpe-advisor/scripts/eng_hiring_funnel_calculator.py",
+          "sha256": "a7395200b878e82481635efe27b562ba1ebbc610ad55ea3ee7bc3d129674d762",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/vpe-advisor/scripts/eng_hiring_funnel_calculator.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/vpe-advisor/scripts/eng_hiring_funnel_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/skills/vpe-advisor/scripts/eng_team_structure_designer.py",
+          "script": "skills/c-level-advisor/skills/vpe-advisor/scripts/eng_team_structure_designer.py",
+          "sha256": "7a9ee9110b39dad245afefca88b91bc475b3cb6cf0c8c1d9bf9779543c365bcc",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/skills/vpe-advisor/scripts/eng_team_structure_designer.py --help",
+              "cmd": "python3 skills/c-level-advisor/skills/vpe-advisor/scripts/eng_team_structure_designer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1827,48 +3681,100 @@
         "close_out": false
       },
       "references": [
-        "delivery_throughput.md",
-        "eng_team_structure.md",
-        "engineering_hiring_funnel.md",
-        "production_discipline.md"
+        "skills/c-level-advisor/skills/vpe-advisor/references/delivery_throughput.md",
+        "skills/c-level-advisor/skills/vpe-advisor/references/eng_team_structure.md",
+        "skills/c-level-advisor/skills/vpe-advisor/references/engineering_hiring_funnel.md",
+        "skills/c-level-advisor/skills/vpe-advisor/references/production_discipline.md"
       ]
     },
     {
       "name": "vpe-advisor",
-      "path": "c-level-advisor/vpe-advisor/skills/vpe-advisor",
+      "path": "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "vpe-advisor",
+        "skill_path": "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/SKILL.md",
+            "sha256": "a351ad1eb48f779a5ab63c9d3a29cea39de64997006bfdd3df2c88b2353ce7dd",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/references/delivery_throughput.md",
+            "sha256": "d2b7e099bdf42f55d62914a8b80f4d1e681040705f7489b9943c160e2a7998ba",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/references/eng_team_structure.md",
+            "sha256": "2d385d59e7381bdb846d3a9a02df9b94d51957237bde2f6768de07198ef548cd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/references/engineering_hiring_funnel.md",
+            "sha256": "aedd99032b0e4873798a66f1359a9eb80d49b7a78d2e0d1b0976a629a1fa463b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/references/production_discipline.md",
+            "sha256": "e9333c2e654a1d61463fb1aa1ba4607456b9ab79de749f0eaf8e222cea6be541",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/delivery_throughput_analyzer.py",
+            "sha256": "f2c9b0c6dde47d38e61bc8fc4a8a99027bdf688bd6cd52ef7a95bd8c427c037b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/eng_hiring_funnel_calculator.py",
+            "sha256": "a7395200b878e82481635efe27b562ba1ebbc610ad55ea3ee7bc3d129674d762",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/eng_team_structure_designer.py",
+            "sha256": "7a9ee9110b39dad245afefca88b91bc475b3cb6cf0c8c1d9bf9779543c365bcc",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "VP of Engineering advisory for startups: delivery throughput (DORA 4 metrics + bottleneck identification), engineering hiring funnel (sourcing \u2192 screen \u2192 onsite \u2192 offer conversion + time-to-fill + pipeline gap), engineering team structure (squad/tribe/chapter design + tech-lead manager-trigger thresholds), and production discipline (on-call, deployment cadence, postmortem culture). Use when sprint velocity is dropping, eng hiring is broken, team structure is unclear, or deciding when to add a tech-lead manager. NOT a CTO skill (which owns architecture) \u2014 VPE owns delivery operations and how \u2026",
       "tools": [
         {
-          "script": "c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/delivery_throughput_analyzer.py",
+          "script": "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/delivery_throughput_analyzer.py",
+          "sha256": "f2c9b0c6dde47d38e61bc8fc4a8a99027bdf688bd6cd52ef7a95bd8c427c037b",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/delivery_throughput_analyzer.py --help",
+              "cmd": "python3 skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/delivery_throughput_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/eng_hiring_funnel_calculator.py",
+          "script": "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/eng_hiring_funnel_calculator.py",
+          "sha256": "a7395200b878e82481635efe27b562ba1ebbc610ad55ea3ee7bc3d129674d762",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/eng_hiring_funnel_calculator.py --help",
+              "cmd": "python3 skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/eng_hiring_funnel_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/eng_team_structure_designer.py",
+          "script": "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/eng_team_structure_designer.py",
+          "sha256": "7a9ee9110b39dad245afefca88b91bc475b3cb6cf0c8c1d9bf9779543c365bcc",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/eng_team_structure_designer.py --help",
+              "cmd": "python3 skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/scripts/eng_team_structure_designer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1883,10 +3789,10 @@
         "close_out": false
       },
       "references": [
-        "delivery_throughput.md",
-        "eng_team_structure.md",
-        "engineering_hiring_funnel.md",
-        "production_discipline.md"
+        "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/references/delivery_throughput.md",
+        "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/references/eng_team_structure.md",
+        "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/references/engineering_hiring_funnel.md",
+        "skills/c-level-advisor/vpe-advisor/skills/vpe-advisor/references/production_discipline.md"
       ]
     }
   ]

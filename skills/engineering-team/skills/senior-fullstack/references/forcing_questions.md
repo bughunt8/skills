@@ -2,6 +2,8 @@
 
 **Discipline (Matt Pocock, derived from `engineering/grill-me`, MIT):** walk these one at a time. Do not skip ahead. Do not bundle. Answers must be written down. If the user cannot answer one, **that is your next investigation** — stop and surface the gap.
 
+This attribution describes the historical local intake, not permission to call a human-only provider. Model preflight uses the explicitly qualified native grilling route and its different frontier-round protocol in [composition_map.md](composition_map.md). Keep this library one-question-per-turn.
+
 These seven questions are the Matt Pocock grill that gates every meaningful fullstack decision (stack pick, scale step, build-vs-buy, monolith-vs-microservices). Each has a recommended answer with canon citation and a **kill criterion** — the condition under which the plan fails the question and the work should stop until the gap is closed.
 
 ---

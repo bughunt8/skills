@@ -1,5 +1,5 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "business-operations",
   "skill_count": 7,
   "loop_defaults": {
@@ -15,7 +15,21 @@
   "skills": [
     {
       "name": "business-operations-skills",
-      "path": "business-operations/skills/business-operations-skills",
+      "path": "skills/business-operations/skills/business-operations-skills",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "business-operations-skills",
+        "skill_path": "skills/business-operations/skills/business-operations-skills",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/business-operations/skills/business-operations-skills/SKILL.md",
+            "sha256": "c4ee20e1550a604c30e7351bb48d82b4d5212f26568e7b4e588f11cd67149f52",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Use when running, diagnosing, or designing internal business operations \u2014 process documentation, vendor SLAs, capacity planning, internal comms, SOP/runbook authoring, procurement spend. Triggers on \"BizOps review\", \"where's the bottleneck\", \"vendor health\", \"internal SOP\", \"all-hands deck\", \"spend categorization\", \"capacity for Q3\", \"process mapping\". Forks context to route to one of six BizOps sub-skills (process-mapper, vendor-management, capacity-planner, internal-comms, knowledge-ops, procurement-optimizer) and returns a digest. Distinct from business-growth (external sales motion) and \u2026",
       "tools": [],
       "agentic_signals": {
@@ -29,55 +43,107 @@
     },
     {
       "name": "capacity-planner",
-      "path": "business-operations/skills/capacity-planner",
+      "path": "skills/business-operations/skills/capacity-planner",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "capacity-planner",
+        "skill_path": "skills/business-operations/skills/capacity-planner",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/business-operations/skills/capacity-planner/SKILL.md",
+            "sha256": "436f8c3586c577ca28aa05136b49c2687d8bd3bf058e49de3a173b8004968a7a",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/business-operations/skills/capacity-planner/assets/capacity_brief_template.md",
+            "sha256": "191830253eda83a951401f9c573970f6fa59fb5ea4b798c704301f8ce3b27f26",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/capacity-planner/references/capacity_anti_patterns.md",
+            "sha256": "28883aa6550a36ca2d99b89a269c3a77509f86b9e91c0f78bddec1d42f458e26",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/capacity-planner/references/ops_workforce_planning_canon.md",
+            "sha256": "c71cd9790ad04a34554f2d6645854273010acfc05447a689e4c551cd5a4bced8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/capacity-planner/references/queueing_theory_canon.md",
+            "sha256": "43635f8c6a0b7734ac45c31c1e88ebbae91ca4273043d468418604c75608e22e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/capacity-planner/scripts/capacity_modeler.py",
+            "sha256": "163becde11f95ab8693f150c6191abebeb5e8165e17adc39001b8f52fb161162",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/capacity-planner/scripts/hiring_sequencer.py",
+            "sha256": "36621f2b7e4827632f2e111e071466f909fe1227223e48473567a96758c8afbd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/capacity-planner/scripts/utilization_analyzer.py",
+            "sha256": "84cd4b10609f02d84039755c2f75265f041ac2bc8f374d8f3393294068b91c12",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when an ops leader (Director of CX, Head of Support, VP Ops, Head of BizOps, Head of IT ops, Head of Finance ops) is sizing ops capacity, building a headcount plan, modeling utilization risk, planning Q3 capacity or annual support capacity, or designing CS coverage \u2014 and needs Erlang-C queueing math, P90 demand sizing, shrinkage-adjusted FTE, manager-trigger thresholds, and a quarterly hiring sequence with ramp + attrition. Apply when sustained team utilization is above 80% or when the team is growing >50% in 12 months. Run before committing the headcount budget. This is NOT engineering \u2026",
       "tools": [
         {
-          "script": "business-operations/skills/capacity-planner/scripts/capacity_modeler.py",
+          "script": "skills/business-operations/skills/capacity-planner/scripts/capacity_modeler.py",
+          "sha256": "163becde11f95ab8693f150c6191abebeb5e8165e17adc39001b8f52fb161162",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/capacity-planner/scripts/capacity_modeler.py --help",
+              "cmd": "python3 skills/business-operations/skills/capacity-planner/scripts/capacity_modeler.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/capacity-planner/scripts/capacity_modeler.py --sample",
+              "cmd": "python3 skills/business-operations/skills/capacity-planner/scripts/capacity_modeler.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "business-operations/skills/capacity-planner/scripts/hiring_sequencer.py",
+          "script": "skills/business-operations/skills/capacity-planner/scripts/hiring_sequencer.py",
+          "sha256": "36621f2b7e4827632f2e111e071466f909fe1227223e48473567a96758c8afbd",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/capacity-planner/scripts/hiring_sequencer.py --help",
+              "cmd": "python3 skills/business-operations/skills/capacity-planner/scripts/hiring_sequencer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/capacity-planner/scripts/hiring_sequencer.py --sample",
+              "cmd": "python3 skills/business-operations/skills/capacity-planner/scripts/hiring_sequencer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "business-operations/skills/capacity-planner/scripts/utilization_analyzer.py",
+          "script": "skills/business-operations/skills/capacity-planner/scripts/utilization_analyzer.py",
+          "sha256": "84cd4b10609f02d84039755c2f75265f041ac2bc8f374d8f3393294068b91c12",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/capacity-planner/scripts/utilization_analyzer.py --help",
+              "cmd": "python3 skills/business-operations/skills/capacity-planner/scripts/utilization_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/capacity-planner/scripts/utilization_analyzer.py --sample",
+              "cmd": "python3 skills/business-operations/skills/capacity-planner/scripts/utilization_analyzer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -92,62 +158,114 @@
         "close_out": false
       },
       "references": [
-        "capacity_anti_patterns.md",
-        "ops_workforce_planning_canon.md",
-        "queueing_theory_canon.md"
+        "skills/business-operations/skills/capacity-planner/references/capacity_anti_patterns.md",
+        "skills/business-operations/skills/capacity-planner/references/ops_workforce_planning_canon.md",
+        "skills/business-operations/skills/capacity-planner/references/queueing_theory_canon.md"
       ]
     },
     {
       "name": "internal-comms",
-      "path": "business-operations/skills/internal-comms",
+      "path": "skills/business-operations/skills/internal-comms",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "internal-comms",
+        "skill_path": "skills/business-operations/skills/internal-comms",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/business-operations/skills/internal-comms/SKILL.md",
+            "sha256": "bd7cf520e647847d6add238b2c993313853519e16f8bce0d16fc5b4a57245f55",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/business-operations/skills/internal-comms/assets/comms_brief_template.md",
+            "sha256": "7fcb0f8ef5a8db799cc21b92ec3f752eb7d677c869858dd57a4d99a48d0f87d7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/internal-comms/references/announcement_anti_patterns.md",
+            "sha256": "704b9999b067195baf46d93abad9a9e31faf57a877b743be7a0c261d0bfba867",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/internal-comms/references/change_management_canon.md",
+            "sha256": "1f3a013660f8c98a63618a46115ef06df83283189cc5e04c87ef0884702e5394",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/internal-comms/references/internal_comms_canon.md",
+            "sha256": "a706914b4c59bfde72a7ab1b6e79fec3f6ddc1c37a38ef2137761794c8f574ac",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/internal-comms/scripts/change_announcement_builder.py",
+            "sha256": "d24164ae413126973fdb055a94a21fe98231c7e89a2f4524baf839f4759fe99e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/internal-comms/scripts/comms_calendar_builder.py",
+            "sha256": "fce4f9408ed9dc083f8ca7293c227cbbcb2f1505ab522bf7147cdfc2872da4ad",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/internal-comms/scripts/comms_template_filler.py",
+            "sha256": "f462824636133a2d01cc99eaa50a8968ce70b5ac3695773d1d79fb6d32147a1b",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when a Head of People Ops, BizOps lead, or Internal Communications owner needs to draft and sequence an internal-only change-management communication \u2014 a re-org announcement, a tool rollout, a policy change, a leadership transition, a layoff, an acquisition close, or an internal product launch \u2014 and the audience is employees (not customers). Pairs Prosci ADKAR and Kotter's 8-step change model with deterministic stdlib-only Python tools to produce a sequenced touchpoint calendar, a Kotter-compliant primary announcement, an audience-segmented FAQ, and manager cascade talking points \u2026",
       "tools": [
         {
-          "script": "business-operations/skills/internal-comms/scripts/change_announcement_builder.py",
+          "script": "skills/business-operations/skills/internal-comms/scripts/change_announcement_builder.py",
+          "sha256": "d24164ae413126973fdb055a94a21fe98231c7e89a2f4524baf839f4759fe99e",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/internal-comms/scripts/change_announcement_builder.py --help",
+              "cmd": "python3 skills/business-operations/skills/internal-comms/scripts/change_announcement_builder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/internal-comms/scripts/change_announcement_builder.py --sample",
+              "cmd": "python3 skills/business-operations/skills/internal-comms/scripts/change_announcement_builder.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "business-operations/skills/internal-comms/scripts/comms_calendar_builder.py",
+          "script": "skills/business-operations/skills/internal-comms/scripts/comms_calendar_builder.py",
+          "sha256": "fce4f9408ed9dc083f8ca7293c227cbbcb2f1505ab522bf7147cdfc2872da4ad",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/internal-comms/scripts/comms_calendar_builder.py --help",
+              "cmd": "python3 skills/business-operations/skills/internal-comms/scripts/comms_calendar_builder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/internal-comms/scripts/comms_calendar_builder.py --sample",
+              "cmd": "python3 skills/business-operations/skills/internal-comms/scripts/comms_calendar_builder.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "business-operations/skills/internal-comms/scripts/comms_template_filler.py",
+          "script": "skills/business-operations/skills/internal-comms/scripts/comms_template_filler.py",
+          "sha256": "f462824636133a2d01cc99eaa50a8968ce70b5ac3695773d1d79fb6d32147a1b",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/internal-comms/scripts/comms_template_filler.py --help",
+              "cmd": "python3 skills/business-operations/skills/internal-comms/scripts/comms_template_filler.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/internal-comms/scripts/comms_template_filler.py --sample",
+              "cmd": "python3 skills/business-operations/skills/internal-comms/scripts/comms_template_filler.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -162,62 +280,119 @@
         "close_out": true
       },
       "references": [
-        "announcement_anti_patterns.md",
-        "change_management_canon.md",
-        "internal_comms_canon.md"
+        "skills/business-operations/skills/internal-comms/references/announcement_anti_patterns.md",
+        "skills/business-operations/skills/internal-comms/references/change_management_canon.md",
+        "skills/business-operations/skills/internal-comms/references/internal_comms_canon.md"
       ]
     },
     {
       "name": "knowledge-ops",
-      "path": "business-operations/skills/knowledge-ops",
+      "path": "skills/business-operations/skills/knowledge-ops",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "knowledge-ops",
+        "skill_path": "skills/business-operations/skills/knowledge-ops",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/business-operations/skills/knowledge-ops/SKILL.md",
+            "sha256": "980ee103958c7a209e7598da975cd1962e83a8deede181fd20f2a6a230afdb45",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/business-operations/skills/knowledge-ops/assets/runbook_template.md",
+            "sha256": "98badbe8ed0a609e0cdda2a0247c2baa14898e0ab7d03432851ef185d45d4049",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/knowledge-ops/assets/sop_template.md",
+            "sha256": "8011cb9cdb174c534c6ab7ab7e2735de2056d94641aa7b762b2535903c90eb4f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/knowledge-ops/references/5w2h_sop_canon.md",
+            "sha256": "89038df69c0d591f91df5f17faf99c3b3953e673feba0c5acb1caa43a6916059",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/knowledge-ops/references/kb_hygiene_anti_patterns.md",
+            "sha256": "172ec9c146b2eb734a01f649a824671ada463b0ef0d976d885351350d76c69f4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/knowledge-ops/references/runbook_canon.md",
+            "sha256": "90599a3aed933751bc94d7e29febf7681520fe2d97459e7904dd57d555ebf7a3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/knowledge-ops/scripts/kb_ingester.py",
+            "sha256": "0d62d690533294937bdda72c06d5e24d9cb157eed53924a1cb265d72934f7ff5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/knowledge-ops/scripts/runbook_validator.py",
+            "sha256": "385fa0a7bb6d4fe3535411f4c6f4a4cf9c375baceba179f6e1dde60d0f055128",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/knowledge-ops/scripts/sop_generator.py",
+            "sha256": "0065d5f7c3ec358442a25e5ef13e796b6f51ddac73c28f796671ad90abe9961b",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when a Head of Ops, Knowledge Manager, or TPM-Internal needs to author, validate, or clean up company SOPs and internal runbooks (procurement intake, vendor offboarding, incident-comms cascade, employee onboarding) \u2014 including 5W2H completeness checks (Who-What-When-Where-Why-How-HowMuch), cross-link and orphan-page validation across a sprawling Notion/Confluence/Obsidian wiki, KB ingestion + hygiene reporting, and runbook step verification (named owner, expected duration, observable success signal, rollback path, escalation contact). Pairs Ishikawa's 5W2H method, Gawande's *The \u2026",
       "tools": [
         {
-          "script": "business-operations/skills/knowledge-ops/scripts/kb_ingester.py",
+          "script": "skills/business-operations/skills/knowledge-ops/scripts/kb_ingester.py",
+          "sha256": "0d62d690533294937bdda72c06d5e24d9cb157eed53924a1cb265d72934f7ff5",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/knowledge-ops/scripts/kb_ingester.py --help",
+              "cmd": "python3 skills/business-operations/skills/knowledge-ops/scripts/kb_ingester.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/knowledge-ops/scripts/kb_ingester.py --sample",
+              "cmd": "python3 skills/business-operations/skills/knowledge-ops/scripts/kb_ingester.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "business-operations/skills/knowledge-ops/scripts/runbook_validator.py",
+          "script": "skills/business-operations/skills/knowledge-ops/scripts/runbook_validator.py",
+          "sha256": "385fa0a7bb6d4fe3535411f4c6f4a4cf9c375baceba179f6e1dde60d0f055128",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/knowledge-ops/scripts/runbook_validator.py --help",
+              "cmd": "python3 skills/business-operations/skills/knowledge-ops/scripts/runbook_validator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/knowledge-ops/scripts/runbook_validator.py --sample",
+              "cmd": "python3 skills/business-operations/skills/knowledge-ops/scripts/runbook_validator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "business-operations/skills/knowledge-ops/scripts/sop_generator.py",
+          "script": "skills/business-operations/skills/knowledge-ops/scripts/sop_generator.py",
+          "sha256": "0065d5f7c3ec358442a25e5ef13e796b6f51ddac73c28f796671ad90abe9961b",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/knowledge-ops/scripts/sop_generator.py --help",
+              "cmd": "python3 skills/business-operations/skills/knowledge-ops/scripts/sop_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/knowledge-ops/scripts/sop_generator.py --sample",
+              "cmd": "python3 skills/business-operations/skills/knowledge-ops/scripts/sop_generator.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -232,62 +407,114 @@
         "close_out": true
       },
       "references": [
-        "5w2h_sop_canon.md",
-        "kb_hygiene_anti_patterns.md",
-        "runbook_canon.md"
+        "skills/business-operations/skills/knowledge-ops/references/5w2h_sop_canon.md",
+        "skills/business-operations/skills/knowledge-ops/references/kb_hygiene_anti_patterns.md",
+        "skills/business-operations/skills/knowledge-ops/references/runbook_canon.md"
       ]
     },
     {
       "name": "process-mapper",
-      "path": "business-operations/skills/process-mapper",
+      "path": "skills/business-operations/skills/process-mapper",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "process-mapper",
+        "skill_path": "skills/business-operations/skills/process-mapper",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/business-operations/skills/process-mapper/SKILL.md",
+            "sha256": "e71210a50f9d3771a64892200ed454aa3e1a6b53eaef0d2cdcd1625cede7a57c",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/business-operations/skills/process-mapper/assets/process_template.md",
+            "sha256": "bd2e6e58503f79bbf1f322cff8105b15bd3fca8eec04a160d4f3919f680b8739",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/process-mapper/references/bottleneck_anti_patterns.md",
+            "sha256": "9b82dda59f49d94b79997ea0edf1bdd3ed7ca9f2caccfdf06cfa45c6531b0e0b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/process-mapper/references/bpmn_essentials.md",
+            "sha256": "c5aa74243e1123559520824bdea0f1c1cd920bdb9a25670c6cc7db5a00af0405",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/process-mapper/references/lean_six_sigma_canon.md",
+            "sha256": "3792bccf68be1215d25ff9fcf6cbe5d18514a6e519d36f00bf2472eed338a7e7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/process-mapper/scripts/bottleneck_detector.py",
+            "sha256": "c4e8046ec5f671775186f9070019f1eaafa2aa3e28f2f1eeecd08bccf4272512",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/process-mapper/scripts/cycle_time_analyzer.py",
+            "sha256": "050841bb233e1c09ac4794457d60cf026d992ffa34f39cd61589c72c6246f446",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/process-mapper/scripts/process_documenter.py",
+            "sha256": "2cbf8c6cc7d11ac25d42dc5053770d1eefe4b339c516b9226e72999744ee144d",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when a BizOps lead, COO, or process-improvement owner needs to document an end-to-end business process (procurement, employee onboarding, incident handoff, customer-onboarding, claims adjudication) in BPMN-style notation, measure cycle times by stage, surface where work spends most of its time waiting vs. being worked, and quantify the gap between processing time and total elapsed time. Pairs Lean / Six Sigma / Theory-of-Constraints canon with deterministic stdlib-only Python tools to produce a process map, a ranked bottleneck list (with severity + root-cause hypothesis), and a \u2026",
       "tools": [
         {
-          "script": "business-operations/skills/process-mapper/scripts/bottleneck_detector.py",
+          "script": "skills/business-operations/skills/process-mapper/scripts/bottleneck_detector.py",
+          "sha256": "c4e8046ec5f671775186f9070019f1eaafa2aa3e28f2f1eeecd08bccf4272512",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/process-mapper/scripts/bottleneck_detector.py --help",
+              "cmd": "python3 skills/business-operations/skills/process-mapper/scripts/bottleneck_detector.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/process-mapper/scripts/bottleneck_detector.py --sample",
+              "cmd": "python3 skills/business-operations/skills/process-mapper/scripts/bottleneck_detector.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "business-operations/skills/process-mapper/scripts/cycle_time_analyzer.py",
+          "script": "skills/business-operations/skills/process-mapper/scripts/cycle_time_analyzer.py",
+          "sha256": "050841bb233e1c09ac4794457d60cf026d992ffa34f39cd61589c72c6246f446",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/process-mapper/scripts/cycle_time_analyzer.py --help",
+              "cmd": "python3 skills/business-operations/skills/process-mapper/scripts/cycle_time_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/process-mapper/scripts/cycle_time_analyzer.py --sample",
+              "cmd": "python3 skills/business-operations/skills/process-mapper/scripts/cycle_time_analyzer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "business-operations/skills/process-mapper/scripts/process_documenter.py",
+          "script": "skills/business-operations/skills/process-mapper/scripts/process_documenter.py",
+          "sha256": "2cbf8c6cc7d11ac25d42dc5053770d1eefe4b339c516b9226e72999744ee144d",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/process-mapper/scripts/process_documenter.py --help",
+              "cmd": "python3 skills/business-operations/skills/process-mapper/scripts/process_documenter.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/process-mapper/scripts/process_documenter.py --sample",
+              "cmd": "python3 skills/business-operations/skills/process-mapper/scripts/process_documenter.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -302,62 +529,114 @@
         "close_out": true
       },
       "references": [
-        "bottleneck_anti_patterns.md",
-        "bpmn_essentials.md",
-        "lean_six_sigma_canon.md"
+        "skills/business-operations/skills/process-mapper/references/bottleneck_anti_patterns.md",
+        "skills/business-operations/skills/process-mapper/references/bpmn_essentials.md",
+        "skills/business-operations/skills/process-mapper/references/lean_six_sigma_canon.md"
       ]
     },
     {
       "name": "procurement-optimizer",
-      "path": "business-operations/skills/procurement-optimizer",
+      "path": "skills/business-operations/skills/procurement-optimizer",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "procurement-optimizer",
+        "skill_path": "skills/business-operations/skills/procurement-optimizer",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/business-operations/skills/procurement-optimizer/SKILL.md",
+            "sha256": "308e0858ae3fd62fb1f0fdb03a9b16264897099aa48e397b152528ceec4edeea",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/business-operations/skills/procurement-optimizer/assets/spend_intake_template.md",
+            "sha256": "f8c1558fc36d2cb797213779570fd7ea7f3874b249982d699ca66d90f9463499",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/procurement-optimizer/references/procurement_anti_patterns.md",
+            "sha256": "0e8876769dd02f9a9f17d41438e2155b2b0b48f3022017b139f8dda94e978db2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/procurement-optimizer/references/saas_management_canon.md",
+            "sha256": "327398f720cfa225ab887a563c2ba38a88a988bdbb6782a24ba7d3e0467892a9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/procurement-optimizer/references/spend_management_canon.md",
+            "sha256": "8579fc7881cec0be7f0e607405170d3ef8a47336bf8f1689a0a17cf7b17db5ad",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/procurement-optimizer/scripts/purchasing_cycle_analyzer.py",
+            "sha256": "edd777baec057c336b9ea4d80069cd3f0b48763ed3b6c0036576bb7acbd983f4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/procurement-optimizer/scripts/spend_categorizer.py",
+            "sha256": "cada266be1b811418f5425107a00cf3f3b837d714f7531ddfcea059ad0dac15a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/procurement-optimizer/scripts/supplier_consolidation.py",
+            "sha256": "4918bbc449936220818c7415f329c45e3f72cade513eec1f21710abfdd58eb3d",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when running an annual SaaS audit, doing category-level spend review, or rationalizing the supplier base \u2014 when the user needs a spend audit, spend categorization (UNSPSC-aligned with Pareto breakdown and industry profiles), purchasing-cycle analysis (bottleneck categories per Goldratt's Theory of Constraints), or risk-balanced supplier consolidation that refuses single-source recommendations for tier-1 categories without a documented break-glass plan. Triggers on \"spend audit\", \"SaaS audit\", \"spend categorization\", \"supplier rationalization\", \"supplier consolidation\", \"category \u2026",
       "tools": [
         {
-          "script": "business-operations/skills/procurement-optimizer/scripts/purchasing_cycle_analyzer.py",
+          "script": "skills/business-operations/skills/procurement-optimizer/scripts/purchasing_cycle_analyzer.py",
+          "sha256": "edd777baec057c336b9ea4d80069cd3f0b48763ed3b6c0036576bb7acbd983f4",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/procurement-optimizer/scripts/purchasing_cycle_analyzer.py --help",
+              "cmd": "python3 skills/business-operations/skills/procurement-optimizer/scripts/purchasing_cycle_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/procurement-optimizer/scripts/purchasing_cycle_analyzer.py --sample",
+              "cmd": "python3 skills/business-operations/skills/procurement-optimizer/scripts/purchasing_cycle_analyzer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "business-operations/skills/procurement-optimizer/scripts/spend_categorizer.py",
+          "script": "skills/business-operations/skills/procurement-optimizer/scripts/spend_categorizer.py",
+          "sha256": "cada266be1b811418f5425107a00cf3f3b837d714f7531ddfcea059ad0dac15a",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/procurement-optimizer/scripts/spend_categorizer.py --help",
+              "cmd": "python3 skills/business-operations/skills/procurement-optimizer/scripts/spend_categorizer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/procurement-optimizer/scripts/spend_categorizer.py --sample",
+              "cmd": "python3 skills/business-operations/skills/procurement-optimizer/scripts/spend_categorizer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "business-operations/skills/procurement-optimizer/scripts/supplier_consolidation.py",
+          "script": "skills/business-operations/skills/procurement-optimizer/scripts/supplier_consolidation.py",
+          "sha256": "4918bbc449936220818c7415f329c45e3f72cade513eec1f21710abfdd58eb3d",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/procurement-optimizer/scripts/supplier_consolidation.py --help",
+              "cmd": "python3 skills/business-operations/skills/procurement-optimizer/scripts/supplier_consolidation.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/procurement-optimizer/scripts/supplier_consolidation.py --sample",
+              "cmd": "python3 skills/business-operations/skills/procurement-optimizer/scripts/supplier_consolidation.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -372,62 +651,114 @@
         "close_out": false
       },
       "references": [
-        "procurement_anti_patterns.md",
-        "saas_management_canon.md",
-        "spend_management_canon.md"
+        "skills/business-operations/skills/procurement-optimizer/references/procurement_anti_patterns.md",
+        "skills/business-operations/skills/procurement-optimizer/references/saas_management_canon.md",
+        "skills/business-operations/skills/procurement-optimizer/references/spend_management_canon.md"
       ]
     },
     {
       "name": "vendor-management",
-      "path": "business-operations/skills/vendor-management",
+      "path": "skills/business-operations/skills/vendor-management",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "vendor-management",
+        "skill_path": "skills/business-operations/skills/vendor-management",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/business-operations/skills/vendor-management/SKILL.md",
+            "sha256": "57fb2f47bfef9f3475703d05c9734a4840d68c1197923d90d68fd88ad95cb6b4",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/business-operations/skills/vendor-management/assets/vendor_catalog_template.md",
+            "sha256": "21f8b371e061dfd29c1fd8f96e0265c041e785e5c91e4038f0147c17d426d85f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/vendor-management/references/sla_design_patterns.md",
+            "sha256": "7e722c236d021f24cc7f46fbea46956a0b5dea65201ffced2f0e5f438e99ee06",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/vendor-management/references/vendor_management_canon.md",
+            "sha256": "e0da4b02151cbb665deb279565bd27c8c03495fe211e75befd5345fbdbf6bc52",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/vendor-management/references/vendor_risk_anti_patterns.md",
+            "sha256": "63ec9af49174afff1f19966f17a1fd2d424755257e6f17d8c024b71617d60355",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/vendor-management/scripts/sla_compliance_tracker.py",
+            "sha256": "3da4fc4c0a2386e11fed33fd4d4d1b019172bc849a3bdf9e7d79e7d0495e5ec1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/vendor-management/scripts/vendor_risk_classifier.py",
+            "sha256": "ec034aa7847da93499fb673a7a06aac685588b8d5e81a385ad26aacab9fb8025",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/business-operations/skills/vendor-management/scripts/vendor_scorer.py",
+            "sha256": "8eee9f5b728f999fa62e2aed205acbc80d9f72b01ca06be7ce03d7be1f917fb4",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Use when reviewing, scoring, or auditing third-party SaaS / vendor relationships \u2014 running a vendor scorecard with industry tuning, tracking SLA compliance with credit-claim flags, classifying third-party risk across 4 risk vectors, preparing a tier-1 vendor review, or auditing the SaaS portfolio. Forks context so large vendor catalogs (50-500 line items) and SLA logs don't pollute the parent thread. Triggers on \"vendor SLA\", \"vendor scorecard\", \"third-party risk\", \"TPRM\", \"vendor review\", \"supplier performance\", \"vendor health check\", \"renewal review\".",
       "tools": [
         {
-          "script": "business-operations/skills/vendor-management/scripts/sla_compliance_tracker.py",
+          "script": "skills/business-operations/skills/vendor-management/scripts/sla_compliance_tracker.py",
+          "sha256": "3da4fc4c0a2386e11fed33fd4d4d1b019172bc849a3bdf9e7d79e7d0495e5ec1",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/vendor-management/scripts/sla_compliance_tracker.py --help",
+              "cmd": "python3 skills/business-operations/skills/vendor-management/scripts/sla_compliance_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/vendor-management/scripts/sla_compliance_tracker.py --sample",
+              "cmd": "python3 skills/business-operations/skills/vendor-management/scripts/sla_compliance_tracker.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "business-operations/skills/vendor-management/scripts/vendor_risk_classifier.py",
+          "script": "skills/business-operations/skills/vendor-management/scripts/vendor_risk_classifier.py",
+          "sha256": "ec034aa7847da93499fb673a7a06aac685588b8d5e81a385ad26aacab9fb8025",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/vendor-management/scripts/vendor_risk_classifier.py --help",
+              "cmd": "python3 skills/business-operations/skills/vendor-management/scripts/vendor_risk_classifier.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/vendor-management/scripts/vendor_risk_classifier.py --sample",
+              "cmd": "python3 skills/business-operations/skills/vendor-management/scripts/vendor_risk_classifier.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "business-operations/skills/vendor-management/scripts/vendor_scorer.py",
+          "script": "skills/business-operations/skills/vendor-management/scripts/vendor_scorer.py",
+          "sha256": "8eee9f5b728f999fa62e2aed205acbc80d9f72b01ca06be7ce03d7be1f917fb4",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 business-operations/skills/vendor-management/scripts/vendor_scorer.py --help",
+              "cmd": "python3 skills/business-operations/skills/vendor-management/scripts/vendor_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 business-operations/skills/vendor-management/scripts/vendor_scorer.py --sample",
+              "cmd": "python3 skills/business-operations/skills/vendor-management/scripts/vendor_scorer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -442,9 +773,9 @@
         "close_out": false
       },
       "references": [
-        "sla_design_patterns.md",
-        "vendor_management_canon.md",
-        "vendor_risk_anti_patterns.md"
+        "skills/business-operations/skills/vendor-management/references/sla_design_patterns.md",
+        "skills/business-operations/skills/vendor-management/references/vendor_management_canon.md",
+        "skills/business-operations/skills/vendor-management/references/vendor_risk_anti_patterns.md"
       ]
     }
   ]

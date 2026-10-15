@@ -51,6 +51,20 @@ def collect_skill_names() -> dict:
     return names
 
 
+def invocation_error(step: dict, provider: dict) -> str:
+    """A Solution is a coordinator, never an implicit human command."""
+    mode = step.get("invocation", "model")
+    if mode not in ("user", "model"):
+        return "step invocation must be user or model"
+    metadata = provider.get("metadata", {})
+    disabled = (provider.get("disable-model-invocation") is True
+                or isinstance(metadata, dict)
+                and metadata.get("disable-model-invocation") is True)
+    if disabled and mode != "user":
+        return "user-only provider requires an explicit human stage, not automatic dispatch"
+    return ""
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--strict", action="store_true", help="also print every OK")
@@ -109,6 +123,10 @@ def main() -> int:
             elif len(skill_names[skill]) > 1:
                 errors.append(f"{rel}: step {i + 1} references `{skill}`, which is ambiguous — "
                               f"it matches {len(skill_names[skill])} skills")
+            else:
+                error = invocation_error(step, _frontmatter(ROOT / skill_names[skill][0]))
+                if error:
+                    errors.append(f"{rel}: step {i + 1} ({skill}): {error}")
         dupes = {s for s in step_skills if step_skills.count(s) > 1}
         for d in sorted(dupes):
             errors.append(f"{rel}: skill `{d}` appears more than once in the steps")

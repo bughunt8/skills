@@ -171,6 +171,950 @@
         "Only the complete SDD directory is imported. Adjacent skills named in the upstream prose are not bundled or claimed as available here.",
         "The snapshot records the imported commit. Scheduled updates may propose newer reference content; the integrated skill does not change automatically and requires a new integration review."
       ]
+    },
+    {
+      "id": "mattpocock-ask-matt",
+      "name": "Matt Pocock ask-matt",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/ask-matt",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/ask-matt",
+      "paths": [
+        {
+          "from": "skills/engineering/ask-matt",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "ask-matt"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "6fe30feb26d01047deda935e9473ce5998ff15666442f373f14826e32d30a25e",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/ask-matt"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-diagnosing-bugs",
+      "name": "Matt Pocock diagnosing-bugs",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/diagnosing-bugs",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/diagnosing-bugs",
+      "paths": [
+        {
+          "from": "skills/engineering/diagnosing-bugs",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "diagnosing-bugs"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "767bee0b9227029a7dd6cf79e3f20b1ed55657dc600666c62524cd164e4be54b",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/diagnosing-bugs"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-grill-with-docs",
+      "name": "Matt Pocock grill-with-docs",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/grill-with-docs",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/grill-with-docs",
+      "paths": [
+        {
+          "from": "skills/engineering/grill-with-docs",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "grill-with-docs"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "5b9ed5de0a72bdfba75fea3f69c705b50458e9b0dc1f91dc01ac84b25ee915ce",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/grill-with-docs"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-triage",
+      "name": "Matt Pocock triage",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/triage",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/triage",
+      "paths": [
+        {
+          "from": "skills/engineering/triage",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "triage"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "aeca01086da8a8832d62c4f64f1b7c096b1ffd2e184066fac9aa2ef4903ee24d",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/triage"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-improve-codebase-architecture",
+      "name": "Matt Pocock improve-codebase-architecture",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/improve-codebase-architecture",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/improve-codebase-architecture",
+      "paths": [
+        {
+          "from": "skills/engineering/improve-codebase-architecture",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "improve-codebase-architecture"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "59ec46c9aaa506646c4b2094b0428168b17201b131eeb05e0bbcc73ae705942e",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/improve-codebase-architecture"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-setup-matt-pocock-skills",
+      "name": "Matt Pocock setup-matt-pocock-skills",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/setup-matt-pocock-skills",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/setup-matt-pocock-skills",
+      "paths": [
+        {
+          "from": "skills/engineering/setup-matt-pocock-skills",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "setup-matt-pocock-skills"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "7cd90cd86692dea27a4a8be23a9b7f5d14d8bb4803183b45e23a62c6f32f9b89",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/setup-matt-pocock-skills"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-tdd",
+      "name": "Matt Pocock tdd",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/tdd",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/tdd",
+      "paths": [
+        {
+          "from": "skills/engineering/tdd",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "tdd"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "f21c7eb0d221fb2e666725a30de2507936df6912e002a33d44cb42a52f7d4829",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/tdd"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-to-spec",
+      "name": "Matt Pocock to-spec",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/to-spec",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/to-spec",
+      "paths": [
+        {
+          "from": "skills/engineering/to-spec",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "to-spec"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "f67e6864585ab95e816e24c4ecdb362d68c90e887f3a44336381575cc786b705",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/to-spec"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-to-tickets",
+      "name": "Matt Pocock to-tickets",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/to-tickets",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/to-tickets",
+      "paths": [
+        {
+          "from": "skills/engineering/to-tickets",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "to-tickets"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "84db8b4a16fc33cc9744e95ab073affdfd8130128b56747e8c9aba2092faf9c3",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/to-tickets"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-wayfinder",
+      "name": "Matt Pocock wayfinder",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/wayfinder",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/wayfinder",
+      "paths": [
+        {
+          "from": "skills/engineering/wayfinder",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "wayfinder"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "f3ff3f2b79f515d580d2b7c2654c6796c792d9e8a54ee66432fdcee752c80d5f",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/wayfinder"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-implement",
+      "name": "Matt Pocock implement",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/implement",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/implement",
+      "paths": [
+        {
+          "from": "skills/engineering/implement",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "implement"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "1efc6721426b939286d278c0b81af67e73ee62cbbb0cadbaba831e2c5631c932",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/implement"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-implement-spec",
+      "name": "Matt Pocock implement-spec",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/implement-spec",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/implement-spec",
+      "paths": [
+        {
+          "from": "skills/engineering/implement-spec",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "implement-spec"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-prototype",
+      "name": "Matt Pocock prototype",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/prototype",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/prototype",
+      "paths": [
+        {
+          "from": "skills/engineering/prototype",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "prototype"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "b5317700262e0a3a82ff12640edeb94680c2f90f1b482eb82b531a74c71ddefd",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/prototype"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-research",
+      "name": "Matt Pocock research",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/research",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/research",
+      "paths": [
+        {
+          "from": "skills/engineering/research",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "research"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "7681e229bf239bbcaad1004fe74e0919bf9b21d7a9f89751745ff3095e37d124",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/research"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-domain-modeling",
+      "name": "Matt Pocock domain-modeling",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/domain-modeling",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/domain-modeling",
+      "paths": [
+        {
+          "from": "skills/engineering/domain-modeling",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "domain-modeling"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "650f145f87880fc2f4b200b3c1943d968de6742264d7640b973d80a41863b49a",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/domain-modeling"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-codebase-design",
+      "name": "Matt Pocock codebase-design",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/codebase-design",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/codebase-design",
+      "paths": [
+        {
+          "from": "skills/engineering/codebase-design",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "codebase-design"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "5ee7415e94152c8bd84659563490b55f128fc14ac35e0d610e0c544f8812af9f",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/codebase-design"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-code-review",
+      "name": "Matt Pocock code-review",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/code-review",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/code-review",
+      "paths": [
+        {
+          "from": "skills/engineering/code-review",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "code-review"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "81d0ec1c0684cf20ec61ce9115af8f6853d00ed383df771d9a8c7e566aa2726c",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/code-review"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-pr",
+      "name": "Matt Pocock pr",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/pr",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/pr",
+      "paths": [
+        {
+          "from": "skills/engineering/pr",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "pr"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-retro",
+      "name": "Matt Pocock retro",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/retro",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/retro",
+      "paths": [
+        {
+          "from": "skills/engineering/retro",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "retro"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-wizard",
+      "name": "Matt Pocock wizard",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/engineering/wizard",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/engineering/wizard",
+      "paths": [
+        {
+          "from": "skills/engineering/wizard",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "wizard"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "49b18a86e276e3af8431ba7e996b060ac3ee8b63aa5715edd395889d762da6c6",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/engineering/wizard"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-grill-me",
+      "name": "Matt Pocock grill-me",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/productivity/grill-me",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/productivity/grill-me",
+      "paths": [
+        {
+          "from": "skills/productivity/grill-me",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "grill-me"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "3f0817eaacfbed11830aba05c43f6d1d4f2124ac1148a321ddc7176e1eb3623e",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/productivity/grill-me"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-grilling",
+      "name": "Matt Pocock grilling",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/productivity/grilling",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/productivity/grilling",
+      "paths": [
+        {
+          "from": "skills/productivity/grilling",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "grilling"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "c62317fe8e88566ab3c22914df75ab3dfb44129ec9dd05eb98b0ad58eeccd894",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/productivity/grilling"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-handoff",
+      "name": "Matt Pocock handoff",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/productivity/handoff",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/productivity/handoff",
+      "paths": [
+        {
+          "from": "skills/productivity/handoff",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "handoff"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "1906efbbc639307258c50cf451b7137a032857840dff02e515cd5e613a34628e",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/productivity/handoff"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-teach",
+      "name": "Matt Pocock teach",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/productivity/teach",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/productivity/teach",
+      "paths": [
+        {
+          "from": "skills/productivity/teach",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "teach"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "f1b9756e28cfcff9d71256b02f5fb449c675acf904c57811f2bdca3841558617",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/productivity/teach"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-to-questionnaire",
+      "name": "Matt Pocock to-questionnaire",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/productivity/to-questionnaire",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/productivity/to-questionnaire",
+      "paths": [
+        {
+          "from": "skills/productivity/to-questionnaire",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "to-questionnaire"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "4e508728476e987cc6dfd327689ecd598dd7f5ed2d205eb37a3f0622925074a4",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/productivity/to-questionnaire"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-wait-what",
+      "name": "Matt Pocock wait-what",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/productivity/wait-what",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/productivity/wait-what",
+      "paths": [
+        {
+          "from": "skills/productivity/wait-what",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "wait-what"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "1afda4194c76e346b9a97e5a1da6cfd5120d5eed0bf669aac58e16da19b96de2",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/productivity/wait-what"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-writing-for-agents",
+      "name": "Matt Pocock writing-for-agents",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/skills/productivity/writing-for-agents",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "skills/productivity/writing-for-agents",
+      "paths": [
+        {
+          "from": "skills/productivity/writing-for-agents",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [
+        "writing-for-agents"
+      ],
+      "mandatory_reason": "One complete canonical skill and all sibling resources are required.",
+      "limitations": [
+        "Invocation policy and provider bindings are checked separately by scripts/check_skill_dependencies.py. Markdown is not runtime permission enforcement.",
+        "Future releases require an explicit ref and expected_commit update; this source does not follow main."
+      ],
+      "adoption": {
+        "expected_tree_sha256": "10f2ecb5b6be9e33660198e5bd51769c459ca73513ef1ed7f1cc5eebf40e9cd7",
+        "archive_path": "docs/migrations/matt-v1.3.1/legacy/skills/productivity/writing-for-agents"
+      },
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "mattpocock-invocation-reference",
+      "name": "Matt Pocock invocation policy reference",
+      "repo": "https://github.com/mattpocock/skills",
+      "homepage": "https://github.com/mattpocock/skills/tree/24fe0ef7737efae15c87225755e9f6f5965e4888/.agents",
+      "author": "Matt Pocock (@mattpocock)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "v1.3.1",
+      "pinned_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "expected_commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+      "dest": "docs/reference-sources/mattpocock-invocation",
+      "paths": [
+        {
+          "from": ".agents",
+          "to": "source",
+          "kind": "support",
+          "file_include": [
+            "invocation.md",
+            "install-block.md",
+            "writing-docs.md",
+            "adr/0001-explicit-setup-pointer-only-for-hard-dependencies.md",
+            "adr/0002-ship-as-a-claude-code-plugin.md"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        }
+      ],
+      "mandatory": [],
+      "limitations": [
+        "Read-only reference evidence. The repository's own .agents/invocation.md and AGENTS.md govern local execution. Root steering files and plugin configuration are not imported."
+      ],
+      "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "humanlayer-pr-credit-license",
+      "name": "HumanLayer show-me credit license",
+      "repo": "https://github.com/humanlayer/skills",
+      "homepage": "https://github.com/humanlayer/skills/blob/ca7c8088db69e315a8b2deea43820270457f8f3c/LICENSE",
+      "author": "HumanLayer and contributors; show-me credited to Dex Horthy",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "main",
+      "pinned_commit": "ca7c8088db69e315a8b2deea43820270457f8f3c",
+      "expected_commit": "ca7c8088db69e315a8b2deea43820270457f8f3c",
+      "dest": "docs/reference-sources/humanlayer-pr-credit",
+      "paths": [
+        {
+          "from": "",
+          "to": "source",
+          "kind": "support",
+          "file_include": [
+            "LICENSE"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        }
+      ],
+      "mandatory": [],
+      "limitations": [
+        "License-only reference accompanying Matt pr/CREDITS.md. No show-me skill is installed or treated as a runtime dependency.",
+        "Expected-commit guard deliberately rejects a moved main until the pin is reviewed. This notice does not independently establish the ancestry of Matt's copied text."
+      ],
+      "pinned_at": "2026-10-05"
     }
   ]
 }

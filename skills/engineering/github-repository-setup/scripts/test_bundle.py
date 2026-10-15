@@ -11,6 +11,69 @@ ROOT = (pathlib.Path(sys.argv.pop(1)).resolve() if len(sys.argv) > 1
         else pathlib.Path(__file__).resolve().parents[1])
 
 
+def governance_errors(files):
+    """Inspect complete instruction postimage; mutations stay in memory."""
+    joined = " ".join(" ".join(text.split()) for text in files.values())
+    errors = []
+    forbidden = (
+        r"run the installed `setup-matt-pocock-skills` first",
+        r"(?:Call|call) the Skill tool with [`\"]setup-matt-pocock-skills",
+        r"(?:Call|call) (?:the )?(?:runtime's )?(?:native )?Skill loader with [`\"]setup-matt-pocock-skills",
+        r"\.agent/invocation\.md",
+        r"\.agents/GRAMMAR\.md",
+        r"(?:Create|create|Generate|generate) (?:a )?(?:root )?`?GRAMMAR\.md",
+        r"root `CONTEXT\.md`",
+        r"`CONTEXT-MAP\.md` mapping domains",
+        r"skip tests for production",
+        r"no tests for (?:normal|production) implementation",
+    )
+    for pattern in forbidden:
+        if re.search(pattern, joined):
+            errors.append(f"forbidden regression: {pattern}")
+    required = {
+        "SKILL.md": ("Never auto-call", "approved native templates"),
+        "references/matt-governance.md": (
+            "not a hard dependency", "All five seeds exist in v1.3.1",
+            "old and new authorities coexist", "stop for the user's canonical-source choice",
+            "Do not bulk-rename unrelated CONTEXT files",
+            "Tests may be skipped only within that approved throwaway scope",
+            "Normal implementation still requires TDD",
+            "A prototype is not a production substitute",
+            "no automatic local/global", "one approved integration branch",
+            "ready frontier", "integrated SHA", "never automatic setup execution",
+            "Preserve unfinished work", "exact destructive or publication action",
+            "grill-me-with-docs", "do not rename the vendor",
+        ),
+        "templates/invocation.md": (
+            ".agents/invocation.md", ".agents/skill-dependencies.json",
+            "one skill name per call", "explicit human command",
+            "it alone neither grants nor enforces permissions",
+            "REPLACE_WITH_CHECKED_BEHAVIOR_OR_GAP",
+        ),
+        "templates/agent-docs.md": (
+            "root `GLOSSARY.md`", "`GLOSSARY-MAP.md`",
+            "existing values", "No automatic commits",
+        ),
+        "templates/pull-request.md": (
+            "## Summary", "## Evidence", "## Merge Danger",
+            "Before", "After", "Door", "Blast Radius",
+            "## Acceptance and traceability", "Refs", "default-branch",
+        ),
+    }
+    for path, phrases in required.items():
+        normalized = " ".join(files.get(path, "").split())
+        for phrase in phrases:
+            if phrase not in normalized:
+                errors.append(f"{path}: missing {phrase}")
+    governance = files.get("references/matt-governance.md", "")
+    for name in ("pr", "implement-spec", "retro", "prototype", "grill-me",
+                 "grill-with-docs", "grilling", "domain-modeling", "tdd",
+                 "code-review", "writing-for-agents", "codebase-design", "research"):
+        if f"`{name}`" not in governance:
+            errors.append(f"missing entry point/dependency: {name}")
+    return errors
+
+
 class SetupSkillPackage(unittest.TestCase):
     def text(self, name):
         return (ROOT / name).read_text()
@@ -19,8 +82,14 @@ class SetupSkillPackage(unittest.TestCase):
         text = self.text("SKILL.md")
         frontmatter = yaml.safe_load(text.split("---", 2)[1])
         self.assertEqual(frontmatter["name"], ROOT.name)
+        self.assertIs(frontmatter["disable-model-invocation"], True)
+        self.assertNotIn("disable-model-invocation", frontmatter.get("metadata", {}))
+        self.assertEqual(frontmatter["argument-hint"],
+                         "[plan | checklist | agentic | preset | search query]")
+        policy = yaml.safe_load(self.text("agents/openai.yaml"))
+        self.assertIs(policy["policy"]["allow_implicit_invocation"], False)
         self.assertLessEqual(len(frontmatter["description"].split()), 50)
-        self.assertLess(len(text), 4300)
+        self.assertLessEqual(len(text), 4000)
         for wording in ("setup-github-repository", "agentic", "Issues", "PRs"):
             self.assertIn(wording, text)
 
@@ -126,7 +195,7 @@ class SetupSkillPackage(unittest.TestCase):
         text = self.text("references/tooling.md")
         for phrase in ("LSP", "GitHub MCP", "Penpot", "userToken", "grilling",
                        "decision frontier", "no-Claude/no-Plane",
-                       "to-spec", "draft first", "CONTEXT.md"):
+                       "to-spec", "draft first", "GLOSSARY.md"):
             self.assertIn(phrase, text)
         self.assertIn("not an MCP server", text)
 
@@ -165,6 +234,70 @@ class SetupSkillPackage(unittest.TestCase):
             self.assertIn(item.lower(), text.lower())
         self.assertIn("no CLAUDE.md/Claude.md".lower(), text.lower())
         self.assertIn("No Plane.so", text)
+
+    def instruction_files(self):
+        return {str(path.relative_to(ROOT)): path.read_text()
+                for path in ROOT.rglob("*.md")}
+
+    def test_v131_governance_complete_postimage(self):
+        self.assertEqual(governance_errors(self.instruction_files()), [])
+        for path in ROOT.rglob("*"):
+            self.assertNotEqual(path.name, "GRAMMAR.md")
+            self.assertNotEqual(path.name, ".agent")
+
+    def test_governance_negative_fixtures(self):
+        originals = self.instruction_files()
+        cases = (
+            ("SKILL.md", "Never auto-call",
+             "run the installed `setup-matt-pocock-skills` first"),
+            ("SKILL.md", "Never auto-call",
+             'Call the native Skill loader with "setup-matt-pocock-skills"'),
+            ("templates/invocation.md", ".agents/invocation.md", ".agent/invocation.md"),
+            ("templates/invocation.md", ".agents/invocation.md", ".agents/GRAMMAR.md"),
+            ("templates/invocation.md", ".agents/invocation.md", "Create GRAMMAR.md"),
+            ("templates/agent-docs.md", "root `GLOSSARY.md`", "root `CONTEXT.md`"),
+            ("references/matt-governance.md",
+             "Tests may be skipped only within that approved throwaway scope",
+             "skip tests for production"),
+            ("references/matt-governance.md", "not a hard dependency",
+             "running setup-matt is mandatory even with existing config"),
+            ("references/matt-governance.md", "`implement-spec`", "`missing-command`"),
+            ("references/matt-governance.md", "`pr`", "`missing-command`"),
+            ("references/matt-governance.md", "`writing-for-agents`", "`missing-command`"),
+        )
+        for path, before, after in cases:
+            with self.subTest(path=path, regression=after):
+                self.assertIn(before, " ".join(originals[path].split()))
+                mutated = dict(originals)
+                mutated[path] = " ".join(originals[path].split()).replace(before, after)
+                self.assertTrue(governance_errors(mutated), after)
+
+    def test_description_request_shapes(self):
+        # Human/loader discovery probes, not an LLM semantic-routing claim.
+        description = yaml.safe_load(self.text("SKILL.md").split("---", 2)[1])["description"]
+        probes = {
+            "Standardize the GitHub repo's CI and agent issue/PR workflow": ("GitHub", "CI", "agentic"),
+            "Upgrade my setup-github-repository governance": ("upgrades", "setup-github-repository"),
+            "Generate a new bundled project skeleton": ("start-github-repo", "instead"),
+        }
+        for request, cues in probes.items():
+            with self.subTest(request=request):
+                for cue in cues:
+                    self.assertIn(cue, description)
+
+    def test_human_only_client_metadata_mutations(self):
+        frontmatter = yaml.safe_load(self.text("SKILL.md").split("---", 2)[1])
+        policy = yaml.safe_load(self.text("agents/openai.yaml"))
+        def client_user_only(fm, codex):
+            return (fm.get("disable-model-invocation") is True
+                    and codex.get("policy", {}).get("allow_implicit_invocation") is False)
+        self.assertTrue(client_user_only(frontmatter, policy))
+        nested = dict(frontmatter)
+        nested.pop("disable-model-invocation")
+        nested["metadata"] = {"disable-model-invocation": True}
+        self.assertFalse(client_user_only(nested, policy))
+        self.assertFalse(client_user_only(frontmatter, {"interface": policy["interface"]}))
+        self.assertFalse(client_user_only(frontmatter, {"policy": {"allow_implicit_invocation": True}}))
 
 
 unittest.main(verbosity=2)

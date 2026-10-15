@@ -1,5 +1,5 @@
 {
-  "schema": "agent-harness/manifest.v1",
+  "schema": "agent-harness/manifest.v2",
   "domain": "marketing-skill",
   "skill_count": 48,
   "loop_defaults": {
@@ -15,16 +15,46 @@
   "skills": [
     {
       "name": "ab-test-setup",
-      "path": "marketing-skill/skills/ab-test-setup",
+      "path": "skills/marketing-skill/skills/ab-test-setup",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "ab-test-setup",
+        "skill_path": "skills/marketing-skill/skills/ab-test-setup",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/ab-test-setup/SKILL.md",
+            "sha256": "7d451f2c296c8ccabdc1441d73a5ed7bfb993b61bdacd6f569ddc6fa0c032f8d",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/ab-test-setup/references/sample-size-guide.md",
+            "sha256": "b46fb00f3d4147bc0b1dbe1be95db65c3c7e2cf092727afe864a2f7e5524f272",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/ab-test-setup/references/test-templates.md",
+            "sha256": "28ae6fe1bf777694414d5ae24cace258740271379a2f685fa135c94680a66ff4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/ab-test-setup/scripts/sample_size_calculator.py",
+            "sha256": "d8671f6892339e716334d174f8f8a6009e1a6ae2d9bfd02d3434232447269d27",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to plan, design, or implement an A/B test or experiment. Also use when the user mentions \"A/B test,\" \"split test,\" \"experiment,\" \"test this change,\" \"variant copy,\" \"multivariate test,\" \"hypothesis,\" \"conversion experiment,\" \"statistical significance,\" or \"test this.\" For tracking implementation, see analytics-tracking.",
       "tools": [
         {
-          "script": "marketing-skill/skills/ab-test-setup/scripts/sample_size_calculator.py",
+          "script": "skills/marketing-skill/skills/ab-test-setup/scripts/sample_size_calculator.py",
+          "sha256": "d8671f6892339e716334d174f8f8a6009e1a6ae2d9bfd02d3434232447269d27",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/ab-test-setup/scripts/sample_size_calculator.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/ab-test-setup/scripts/sample_size_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -39,22 +69,52 @@
         "close_out": false
       },
       "references": [
-        "sample-size-guide.md",
-        "test-templates.md"
+        "skills/marketing-skill/skills/ab-test-setup/references/sample-size-guide.md",
+        "skills/marketing-skill/skills/ab-test-setup/references/test-templates.md"
       ]
     },
     {
       "name": "ad-creative",
-      "path": "marketing-skill/skills/ad-creative",
+      "path": "skills/marketing-skill/skills/ad-creative",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "ad-creative",
+        "skill_path": "skills/marketing-skill/skills/ad-creative",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/ad-creative/SKILL.md",
+            "sha256": "598054b269d2ad4b8d509cc97e0b1a7a14489154a6fc4752916f42a5aff2ef07",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/ad-creative/references/creative-frameworks.md",
+            "sha256": "f45bb278e6b5f6e44498dfc52f46d23b785bc0b662e0743b873b02daf3842a0d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/ad-creative/references/platform-specs.md",
+            "sha256": "c8369e4c2a2e7517da2b8c511193b193dd6d008dfccac946cd739d3a19f9b4b5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/ad-creative/scripts/ad_copy_validator.py",
+            "sha256": "9e33e1aec4c040b6a334ec3eaf179877a580b2feaef52b2bf2a721adc0aa6c53",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user needs to generate, iterate, or scale ad creative for paid advertising. Use when they say 'write ad copy,' 'generate headlines,' 'create ad variations,' 'bulk creative,' 'iterate on ads,' 'ad copy validation,' 'RSA headlines,' 'Meta ad copy,' 'LinkedIn ad,' or 'creative testing.' This is pure creative production \u2014 distinct from paid-ads (campaign strategy). Use ad-creative when you need the copy, not the campaign plan.",
       "tools": [
         {
-          "script": "marketing-skill/skills/ad-creative/scripts/ad_copy_validator.py",
+          "script": "skills/marketing-skill/skills/ad-creative/scripts/ad_copy_validator.py",
+          "sha256": "9e33e1aec4c040b6a334ec3eaf179877a580b2feaef52b2bf2a721adc0aa6c53",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/ad-creative/scripts/ad_copy_validator.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/ad-creative/scripts/ad_copy_validator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -69,61 +129,118 @@
         "close_out": false
       },
       "references": [
-        "creative-frameworks.md",
-        "platform-specs.md"
+        "skills/marketing-skill/skills/ad-creative/references/creative-frameworks.md",
+        "skills/marketing-skill/skills/ad-creative/references/platform-specs.md"
       ]
     },
     {
       "name": "aeo",
-      "path": "marketing-skill/skills/aeo",
+      "path": "skills/marketing-skill/skills/aeo",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "aeo",
+        "skill_path": "skills/marketing-skill/skills/aeo",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/aeo/SKILL.md",
+            "sha256": "c2b1fe51416b7e4e951ce55072d937c4c5783b92573c88714c58e27cefa862fe",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/aeo/references/aeo_eeat_canon.md",
+            "sha256": "53268b4b3d9685fca9bec49f2d9f99aa1e6cd527493806cb015edb0032319846",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/aeo/references/aeo_vs_seo.md",
+            "sha256": "4eb3093c6a66d8404e29785e2fe61c3ba343a5fae16f8e97051289eedb8b9eb9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/aeo/references/bot_access_and_monitoring.md",
+            "sha256": "3a7dc17c980e49e6e7418bfc70df4f6b8d2ccb4f5a40938e1bacff3162474a71",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/aeo/references/extractable_content_patterns.md",
+            "sha256": "26dc0adb4764c66aaf60945ec1bfecd3a21f0d18c5f8f99c386a7778c0174f90",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/aeo/references/llm_citation_patterns.md",
+            "sha256": "5f051833bdb2bcf330db0bf62b3823f8f35c39bebb2ce27b4dec1442012b7b4a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/aeo/scripts/aeo_audit.py",
+            "sha256": "26c643fa245049e3edd798ecd3c4ce602cabc03e33acbb7cd72912b9d7334d18",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/aeo/scripts/aeo_optimizer.py",
+            "sha256": "9b5055846dcbb247624dae46257f48423baa7d6c854fb920adfaf3ec47fe041a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/aeo/scripts/citation_tracker.py",
+            "sha256": "319ee76b06b46363631f62a91707a85bbbb0f14848f68488712915cb0586a3a8",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Answer Engine Optimization (AEO) skill \u2014 optimize content to be cited by AI language models (ChatGPT, Perplexity, Claude, Gemini, Mistral) as authoritative sources. Distinct from SEO \u2014 AEO optimizes for citation in LLM-generated responses, not search rankings. Use when planning content for AI-first search audiences, auditing existing content for E-E-A-T signals, tracking which pages get cited by which LLMs, or building a citation-friendly content strategy. Triggers \u2014 'AEO audit', 'optimize for ChatGPT', 'get cited by Perplexity', 'LLM citation strategy', 'answer engine optimization' \u2026",
       "tools": [
         {
-          "script": "marketing-skill/skills/aeo/scripts/aeo_audit.py",
+          "script": "skills/marketing-skill/skills/aeo/scripts/aeo_audit.py",
+          "sha256": "26c643fa245049e3edd798ecd3c4ce602cabc03e33acbb7cd72912b9d7334d18",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/aeo/scripts/aeo_audit.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/aeo/scripts/aeo_audit.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 marketing-skill/skills/aeo/scripts/aeo_audit.py --sample",
+              "cmd": "python3 skills/marketing-skill/skills/aeo/scripts/aeo_audit.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/aeo/scripts/aeo_optimizer.py",
+          "script": "skills/marketing-skill/skills/aeo/scripts/aeo_optimizer.py",
+          "sha256": "9b5055846dcbb247624dae46257f48423baa7d6c854fb920adfaf3ec47fe041a",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/aeo/scripts/aeo_optimizer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/aeo/scripts/aeo_optimizer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 marketing-skill/skills/aeo/scripts/aeo_optimizer.py --sample",
+              "cmd": "python3 skills/marketing-skill/skills/aeo/scripts/aeo_optimizer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/aeo/scripts/citation_tracker.py",
+          "script": "skills/marketing-skill/skills/aeo/scripts/citation_tracker.py",
+          "sha256": "319ee76b06b46363631f62a91707a85bbbb0f14848f68488712915cb0586a3a8",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/aeo/scripts/citation_tracker.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/aeo/scripts/citation_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 marketing-skill/skills/aeo/scripts/citation_tracker.py --sample",
+              "cmd": "python3 skills/marketing-skill/skills/aeo/scripts/citation_tracker.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -138,25 +255,60 @@
         "close_out": false
       },
       "references": [
-        "aeo_eeat_canon.md",
-        "aeo_vs_seo.md",
-        "bot_access_and_monitoring.md",
-        "extractable_content_patterns.md",
-        "llm_citation_patterns.md"
+        "skills/marketing-skill/skills/aeo/references/aeo_eeat_canon.md",
+        "skills/marketing-skill/skills/aeo/references/aeo_vs_seo.md",
+        "skills/marketing-skill/skills/aeo/references/bot_access_and_monitoring.md",
+        "skills/marketing-skill/skills/aeo/references/extractable_content_patterns.md",
+        "skills/marketing-skill/skills/aeo/references/llm_citation_patterns.md"
       ]
     },
     {
       "name": "analytics-tracking",
-      "path": "marketing-skill/skills/analytics-tracking",
+      "path": "skills/marketing-skill/skills/analytics-tracking",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "analytics-tracking",
+        "skill_path": "skills/marketing-skill/skills/analytics-tracking",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/analytics-tracking/SKILL.md",
+            "sha256": "e5ac8c8f9826ff62727966e94231c3737de73bf12781d76ea92adc517d67b339",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/analytics-tracking/references/debugging-playbook.md",
+            "sha256": "2066378db356ed75ecb450e9d485de2b82715049689bb9cf8d97830cc45751e0",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/analytics-tracking/references/event-taxonomy-guide.md",
+            "sha256": "7b8c1075b417ca53dce9026db0c078379537474190d0ce8518a44bf99ea210cf",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/analytics-tracking/references/gtm-patterns.md",
+            "sha256": "9ba856b1ca0119f3e7ed4f4d472f38f20dfa73d6c5930cb0c558f67d1da4265d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/analytics-tracking/scripts/tracking_plan_generator.py",
+            "sha256": "c81149bbbe15a8b0278d6358f9b1a43c70252a5b9fc3674bb82589838b441893",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Set up, audit, and debug analytics tracking implementation \u2014 GA4, Google Tag Manager, event taxonomy, conversion tracking, and data quality. Use when building a tracking plan from scratch, auditing existing analytics for gaps or errors, debugging missing events, or setting up GTM. Trigger keywords: GA4 setup, Google Tag Manager, GTM, event tracking, analytics implementation, conversion tracking, tracking plan, event taxonomy, custom dimensions, UTM tracking, analytics audit, missing events, tracking broken. NOT for analyzing marketing campaign data \u2014 use campaign-analytics for that. NOT for \u2026",
       "tools": [
         {
-          "script": "marketing-skill/skills/analytics-tracking/scripts/tracking_plan_generator.py",
+          "script": "skills/marketing-skill/skills/analytics-tracking/scripts/tracking_plan_generator.py",
+          "sha256": "c81149bbbe15a8b0278d6358f9b1a43c70252a5b9fc3674bb82589838b441893",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/analytics-tracking/scripts/tracking_plan_generator.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/analytics-tracking/scripts/tracking_plan_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -171,107 +323,209 @@
         "close_out": false
       },
       "references": [
-        "debugging-playbook.md",
-        "event-taxonomy-guide.md",
-        "gtm-patterns.md"
+        "skills/marketing-skill/skills/analytics-tracking/references/debugging-playbook.md",
+        "skills/marketing-skill/skills/analytics-tracking/references/event-taxonomy-guide.md",
+        "skills/marketing-skill/skills/analytics-tracking/references/gtm-patterns.md"
       ]
     },
     {
       "name": "app-store-optimization",
-      "path": "marketing-skill/skills/app-store-optimization",
+      "path": "skills/marketing-skill/skills/app-store-optimization",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "app-store-optimization",
+        "skill_path": "skills/marketing-skill/skills/app-store-optimization",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/HOW_TO_USE.md",
+            "sha256": "88163da94aff5fd03196f635f7e1640e14cf7be8e76fa3086473cbc41e03f18e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/README.md",
+            "sha256": "4c3289588110cbb07049b15e05b22a3e3c251e62305be94e3952195c36d701d2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/SKILL.md",
+            "sha256": "05e10346aa393379a2b790e6c56568f2d24e8c56d271e728ff242c726e50f41a",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/assets/aso-audit-template.md",
+            "sha256": "3a96bbc323bf420b59219c0d0e223393850a923c94c4a52df0acf992739ee010",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/expected_output.json",
+            "sha256": "59db04fda533c3f2e0e0aa6387afd5bdd09b8278234af22ef4b40c85dcf92c47",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/references/aso-best-practices.md",
+            "sha256": "e86e9710a8dcdd5034c19113eb41a232104531c71f1339e7135dfe0c1aa33c82",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/references/keyword-research-guide.md",
+            "sha256": "631a6206414ab908f3e09c218a83a6deaec5dfec3b869336d8420da9b072f833",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/references/platform-requirements.md",
+            "sha256": "686604daedaf48e0f6bc70a9ad4b327069c54ee524c1104c56e45f6a1d45fe34",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/sample_input.json",
+            "sha256": "e4abb74979b21e8707e0026b77d76bfa882416710a49d35b9985b7ca692de585",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/scripts/ab_test_planner.py",
+            "sha256": "bc65f41e0fe84170b02e83b4648d3d2dbb460e9588acb1e1bea4d7d9e63d1a95",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/scripts/aso_scorer.py",
+            "sha256": "df2854642b889a55877f2420563a22a753dc157723a3c7fe40d3dfcfc16b7892",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/scripts/competitor_analyzer.py",
+            "sha256": "df64cf5b9c863afabebca1461230039287c6075806895e21541f8471c10f47c8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/scripts/keyword_analyzer.py",
+            "sha256": "7d66b1043a859eecfe919649c82f693ac841a18361cffffc5a8faf92e2c432f4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/scripts/launch_checklist.py",
+            "sha256": "4d820f097856c612b7f41bd02319f5003384af237318ad0139e0f62c723587a1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/scripts/localization_helper.py",
+            "sha256": "1c6c26fc2c8c87867d02777bcd90753ed461319573df7961ccaf38bb2c29726b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/scripts/metadata_optimizer.py",
+            "sha256": "e689b3521cad59b510b89e5e6d9536519286e521079f805fe016d7546d68702f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/app-store-optimization/scripts/review_analyzer.py",
+            "sha256": "395f675845886fd88b28c94c445b7450e60522c1acf0e0cd26a7465cfef8560f",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "App Store Optimization (ASO) toolkit for researching keywords, analyzing competitor rankings, generating metadata suggestions, and improving app visibility on Apple App Store and Google Play Store. Use when the user asks about ASO, app store rankings, app metadata, app titles and descriptions, app store listings, app visibility, or mobile app marketing on iOS or Android. Supports keyword research and scoring, competitor keyword analysis, metadata optimization, A/B test planning, launch checklists, and tracking ranking changes.",
       "tools": [
         {
-          "script": "marketing-skill/skills/app-store-optimization/scripts/ab_test_planner.py",
+          "script": "skills/marketing-skill/skills/app-store-optimization/scripts/ab_test_planner.py",
+          "sha256": "bc65f41e0fe84170b02e83b4648d3d2dbb460e9588acb1e1bea4d7d9e63d1a95",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/app-store-optimization/scripts/ab_test_planner.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/app-store-optimization/scripts/ab_test_planner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/app-store-optimization/scripts/aso_scorer.py",
+          "script": "skills/marketing-skill/skills/app-store-optimization/scripts/aso_scorer.py",
+          "sha256": "df2854642b889a55877f2420563a22a753dc157723a3c7fe40d3dfcfc16b7892",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/app-store-optimization/scripts/aso_scorer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/app-store-optimization/scripts/aso_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/app-store-optimization/scripts/competitor_analyzer.py",
+          "script": "skills/marketing-skill/skills/app-store-optimization/scripts/competitor_analyzer.py",
+          "sha256": "df64cf5b9c863afabebca1461230039287c6075806895e21541f8471c10f47c8",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/app-store-optimization/scripts/competitor_analyzer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/app-store-optimization/scripts/competitor_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/app-store-optimization/scripts/keyword_analyzer.py",
+          "script": "skills/marketing-skill/skills/app-store-optimization/scripts/keyword_analyzer.py",
+          "sha256": "7d66b1043a859eecfe919649c82f693ac841a18361cffffc5a8faf92e2c432f4",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/app-store-optimization/scripts/keyword_analyzer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/app-store-optimization/scripts/keyword_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/app-store-optimization/scripts/launch_checklist.py",
+          "script": "skills/marketing-skill/skills/app-store-optimization/scripts/launch_checklist.py",
+          "sha256": "4d820f097856c612b7f41bd02319f5003384af237318ad0139e0f62c723587a1",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/app-store-optimization/scripts/launch_checklist.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/app-store-optimization/scripts/launch_checklist.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/app-store-optimization/scripts/localization_helper.py",
+          "script": "skills/marketing-skill/skills/app-store-optimization/scripts/localization_helper.py",
+          "sha256": "1c6c26fc2c8c87867d02777bcd90753ed461319573df7961ccaf38bb2c29726b",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/app-store-optimization/scripts/localization_helper.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/app-store-optimization/scripts/localization_helper.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/app-store-optimization/scripts/metadata_optimizer.py",
+          "script": "skills/marketing-skill/skills/app-store-optimization/scripts/metadata_optimizer.py",
+          "sha256": "e689b3521cad59b510b89e5e6d9536519286e521079f805fe016d7546d68702f",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/app-store-optimization/scripts/metadata_optimizer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/app-store-optimization/scripts/metadata_optimizer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/app-store-optimization/scripts/review_analyzer.py",
+          "script": "skills/marketing-skill/skills/app-store-optimization/scripts/review_analyzer.py",
+          "sha256": "395f675845886fd88b28c94c445b7450e60522c1acf0e0cd26a7465cfef8560f",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/app-store-optimization/scripts/review_analyzer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/app-store-optimization/scripts/review_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -286,14 +540,33 @@
         "close_out": false
       },
       "references": [
-        "aso-best-practices.md",
-        "keyword-research-guide.md",
-        "platform-requirements.md"
+        "skills/marketing-skill/skills/app-store-optimization/references/aso-best-practices.md",
+        "skills/marketing-skill/skills/app-store-optimization/references/keyword-research-guide.md",
+        "skills/marketing-skill/skills/app-store-optimization/references/platform-requirements.md"
       ]
     },
     {
       "name": "brand-guidelines",
-      "path": "marketing-skill/skills/brand-guidelines",
+      "path": "skills/marketing-skill/skills/brand-guidelines",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "brand-guidelines",
+        "skill_path": "skills/marketing-skill/skills/brand-guidelines",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/brand-guidelines/SKILL.md",
+            "sha256": "2c4bce4eaf394a76d6e0f81394c2b13078153408f56cf4b7fe46d3bbb88eacd2",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/brand-guidelines/references/brand-identity-and-framework.md",
+            "sha256": "3dc4a37391ab5403d614dd413dbc49e66e9bd63f8569d5d7a63e68371b8a6d13",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to apply, document, or enforce brand guidelines for any product or company. Also use when the user mentions 'brand guidelines,' 'brand colors,' 'typography,' 'logo usage,' 'brand voice,' 'visual identity,' 'tone of voice,' 'brand standards,' 'style guide,' 'brand consistency,' or 'company design standards.' Covers color systems, typography, logo rules, imagery guidelines, and tone matrix for any brand \u2014 including Anthropic's official identity.",
       "tools": [],
       "agentic_signals": {
@@ -304,45 +577,117 @@
         "close_out": false
       },
       "references": [
-        "brand-identity-and-framework.md"
+        "skills/marketing-skill/skills/brand-guidelines/references/brand-identity-and-framework.md"
       ]
     },
     {
       "name": "campaign-analytics",
-      "path": "marketing-skill/skills/campaign-analytics",
+      "path": "skills/marketing-skill/skills/campaign-analytics",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "campaign-analytics",
+        "skill_path": "skills/marketing-skill/skills/campaign-analytics",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/campaign-analytics/SKILL.md",
+            "sha256": "c2a7431cbe7e92b08802597f6c02bbd0f173aebe508a1fc7b067f082764c67c1",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/campaign-analytics/assets/ab_test_template.md",
+            "sha256": "3df619680783ba97bc6aec7f109291fe2f190d0b9eb0125b0e13b269ca220d43",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/campaign-analytics/assets/campaign_report_template.md",
+            "sha256": "448ef109e333b351b0fbc2b2a087352d6abc89d125620585e6518b6aa91e631c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/campaign-analytics/assets/channel_comparison_template.md",
+            "sha256": "5c6b30fccafa570192907ad7ff83f1d4b16b83519ab06ceccadbfa195fae69ba",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/campaign-analytics/assets/expected_output.json",
+            "sha256": "5214cc084d57938e4b92ba592305355597e9f2298c76520ace8d46d4a325c4d7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/campaign-analytics/assets/sample_campaign_data.json",
+            "sha256": "6e8604e35126d012d34272e9de8094a1f69e9f21b9ab2c1054ee0c52ab061156",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/campaign-analytics/references/attribution-models-guide.md",
+            "sha256": "7909ca8534cf68bab00c1f2e2035fa3b6b0dbfd6fb94da2db88948b8616058e5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/campaign-analytics/references/campaign-metrics-benchmarks.md",
+            "sha256": "5f83037ed8d13db1febfa5490ad3f21698043057ad859a70c323912091e30cd7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/campaign-analytics/references/funnel-optimization-framework.md",
+            "sha256": "9a95040212cf0df227ec40079da50db34b909b7f4ca7ad5c3711a6d0f517d612",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/campaign-analytics/scripts/attribution_analyzer.py",
+            "sha256": "cc01b84dcd0d2d0659dbb4603ea8499a129d43c38ea5bcf727d12399af74f3e5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/campaign-analytics/scripts/campaign_roi_calculator.py",
+            "sha256": "503809b68fc7754cc903e633dbcc8da87d147e8b61160f1b399c445cb94f5782",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/campaign-analytics/scripts/funnel_analyzer.py",
+            "sha256": "c9d31b4142512aa31e5965ebe7d6222893e78b19f653fbcc3f404e4122fe0463",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Analyzes campaign performance with multi-touch attribution, funnel conversion analysis, and ROI calculation for marketing optimization. Use when analyzing marketing campaigns, ad performance, attribution models, conversion rates, or calculating marketing ROI, ROAS, CPA, and campaign metrics across channels.",
       "tools": [
         {
-          "script": "marketing-skill/skills/campaign-analytics/scripts/attribution_analyzer.py",
+          "script": "skills/marketing-skill/skills/campaign-analytics/scripts/attribution_analyzer.py",
+          "sha256": "cc01b84dcd0d2d0659dbb4603ea8499a129d43c38ea5bcf727d12399af74f3e5",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/campaign-analytics/scripts/attribution_analyzer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/campaign-analytics/scripts/attribution_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/campaign-analytics/scripts/campaign_roi_calculator.py",
+          "script": "skills/marketing-skill/skills/campaign-analytics/scripts/campaign_roi_calculator.py",
+          "sha256": "503809b68fc7754cc903e633dbcc8da87d147e8b61160f1b399c445cb94f5782",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/campaign-analytics/scripts/campaign_roi_calculator.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/campaign-analytics/scripts/campaign_roi_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/campaign-analytics/scripts/funnel_analyzer.py",
+          "script": "skills/marketing-skill/skills/campaign-analytics/scripts/funnel_analyzer.py",
+          "sha256": "c9d31b4142512aa31e5965ebe7d6222893e78b19f653fbcc3f404e4122fe0463",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/campaign-analytics/scripts/funnel_analyzer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/campaign-analytics/scripts/funnel_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -357,23 +702,53 @@
         "close_out": false
       },
       "references": [
-        "attribution-models-guide.md",
-        "campaign-metrics-benchmarks.md",
-        "funnel-optimization-framework.md"
+        "skills/marketing-skill/skills/campaign-analytics/references/attribution-models-guide.md",
+        "skills/marketing-skill/skills/campaign-analytics/references/campaign-metrics-benchmarks.md",
+        "skills/marketing-skill/skills/campaign-analytics/references/funnel-optimization-framework.md"
       ]
     },
     {
       "name": "churn-prevention",
-      "path": "marketing-skill/skills/churn-prevention",
+      "path": "skills/marketing-skill/skills/churn-prevention",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "churn-prevention",
+        "skill_path": "skills/marketing-skill/skills/churn-prevention",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/churn-prevention/SKILL.md",
+            "sha256": "92c0132bdc156c0cd856d278e0c06fca162f0e474473c5f6c699bab50047b611",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/churn-prevention/references/cancel-flow-playbook.md",
+            "sha256": "72190b72bca56d2205eb77616c81d2e35d6e73152367142ef76021d22e675d74",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/churn-prevention/references/dunning-guide.md",
+            "sha256": "580cc7ea4a9fd4f557b67406220f76ed26e88151a9ad464d6aef3320bef1a2d6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/churn-prevention/scripts/churn_impact_calculator.py",
+            "sha256": "d1ec4b16e63a626f3e3949f7cce3aeba48315deea000e9267ca29946dd60236d",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Reduce voluntary and involuntary churn through cancel flow design, save offers, exit surveys, and dunning sequences. Use when designing or optimizing a cancel flow, building save offers, setting up dunning emails, or reducing failed-payment churn. Trigger keywords: cancel flow, churn reduction, save offers, dunning, exit survey, payment recovery, win-back, involuntary churn, failed payments, cancel page. NOT for customer health scoring or expansion revenue \u2014 use customer-success-manager for that.",
       "tools": [
         {
-          "script": "marketing-skill/skills/churn-prevention/scripts/churn_impact_calculator.py",
+          "script": "skills/marketing-skill/skills/churn-prevention/scripts/churn_impact_calculator.py",
+          "sha256": "d1ec4b16e63a626f3e3949f7cce3aeba48315deea000e9267ca29946dd60236d",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/churn-prevention/scripts/churn_impact_calculator.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/churn-prevention/scripts/churn_impact_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -388,22 +763,57 @@
         "close_out": true
       },
       "references": [
-        "cancel-flow-playbook.md",
-        "dunning-guide.md"
+        "skills/marketing-skill/skills/churn-prevention/references/cancel-flow-playbook.md",
+        "skills/marketing-skill/skills/churn-prevention/references/dunning-guide.md"
       ]
     },
     {
       "name": "cold-email",
-      "path": "marketing-skill/skills/cold-email",
+      "path": "skills/marketing-skill/skills/cold-email",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "cold-email",
+        "skill_path": "skills/marketing-skill/skills/cold-email",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/cold-email/SKILL.md",
+            "sha256": "edb7c11d193300c871365f489fd9688906c076a40df0735c593d53985a8f9ba6",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/cold-email/references/deliverability-guide.md",
+            "sha256": "a29f8e59e2f4e7e08206d8ac6bdbd382cf71762e66d24a913a9257d72cda8463",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/cold-email/references/follow-up-playbook.md",
+            "sha256": "7a74ce354759dab651c708a484bb248307193901692b403cd192e2b378ea74c3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/cold-email/references/frameworks.md",
+            "sha256": "fa11242bc12795c71be22fb773d11bfef5c62fa394bfa10c012b647eaccffc66",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/cold-email/scripts/email_sequence_analyzer.py",
+            "sha256": "71768d0956145576a33c85414954523d7906818668cdc866a0fa0449a2f21623",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to write, improve, or build a sequence of B2B cold outreach emails to prospects who haven't asked to hear from them. Use when the user mentions 'cold email,' 'cold outreach,' 'prospecting emails,' 'SDR emails,' 'sales emails,' 'first touch email,' 'follow-up sequence,' or 'email prospecting.' Also use when they share an email draft that sounds too sales-y and needs to be humanized. Distinct from email-sequence (lifecycle/nurture to opted-in subscribers) \u2014 this is unsolicited outreach to new prospects. NOT for lifecycle emails, newsletters, or drip campaigns (use \u2026",
       "tools": [
         {
-          "script": "marketing-skill/skills/cold-email/scripts/email_sequence_analyzer.py",
+          "script": "skills/marketing-skill/skills/cold-email/scripts/email_sequence_analyzer.py",
+          "sha256": "71768d0956145576a33c85414954523d7906818668cdc866a0fa0449a2f21623",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/cold-email/scripts/email_sequence_analyzer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/cold-email/scripts/email_sequence_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -418,23 +828,53 @@
         "close_out": true
       },
       "references": [
-        "deliverability-guide.md",
-        "follow-up-playbook.md",
-        "frameworks.md"
+        "skills/marketing-skill/skills/cold-email/references/deliverability-guide.md",
+        "skills/marketing-skill/skills/cold-email/references/follow-up-playbook.md",
+        "skills/marketing-skill/skills/cold-email/references/frameworks.md"
       ]
     },
     {
       "name": "competitor-alternatives",
-      "path": "marketing-skill/skills/competitor-alternatives",
+      "path": "skills/marketing-skill/skills/competitor-alternatives",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "competitor-alternatives",
+        "skill_path": "skills/marketing-skill/skills/competitor-alternatives",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/competitor-alternatives/SKILL.md",
+            "sha256": "4fb425b9e5e61298447c78ec944ceac74287849efb95c7aa046ada53f3d0e365",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/competitor-alternatives/references/content-architecture.md",
+            "sha256": "dbf0122971e4aa3406e96f1042ee729131dec415dee4ac37edd2f63c56df0c92",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/competitor-alternatives/references/templates.md",
+            "sha256": "e658031a3df2f83168ee9f57e18f9bbd58254511f12af1602ec1c23e09ad3c0c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/competitor-alternatives/scripts/comparison_matrix_builder.py",
+            "sha256": "d682fdf5681e9dc2a602acd89a259555037e1c0b73392ca49467d37119a6154c",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to create competitor comparison or alternative pages for SEO and sales enablement. Also use when the user mentions 'alternative page,' 'vs page,' 'competitor comparison,' 'comparison page,' '[Product] vs [Product],' '[Product] alternative,' 'competitive landing pages,' 'switch from competitor,' or 'comparison content.' Covers four formats: singular alternative, plural alternatives, you vs competitor, and competitor vs competitor. Emphasizes deep research, modular content architecture, and varied section types beyond feature tables.",
       "tools": [
         {
-          "script": "marketing-skill/skills/competitor-alternatives/scripts/comparison_matrix_builder.py",
+          "script": "skills/marketing-skill/skills/competitor-alternatives/scripts/comparison_matrix_builder.py",
+          "sha256": "d682fdf5681e9dc2a602acd89a259555037e1c0b73392ca49467d37119a6154c",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/competitor-alternatives/scripts/comparison_matrix_builder.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/competitor-alternatives/scripts/comparison_matrix_builder.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -449,13 +889,62 @@
         "close_out": false
       },
       "references": [
-        "content-architecture.md",
-        "templates.md"
+        "skills/marketing-skill/skills/competitor-alternatives/references/content-architecture.md",
+        "skills/marketing-skill/skills/competitor-alternatives/references/templates.md"
       ]
     },
     {
       "name": "content-creator",
-      "path": "marketing-skill/skills/content-creator",
+      "path": "skills/marketing-skill/skills/content-creator",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "content-creator",
+        "skill_path": "skills/marketing-skill/skills/content-creator",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/content-creator/SKILL.md",
+            "sha256": "0f548f6236783d8cf0dcc3d4f793ea6072e67bfd4eba36f773137fcd810e4a00",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-creator/assets/content_calendar_template.md",
+            "sha256": "338d24a0dd5b41e9e5de98d8feda602000211abf09ce41c2b6f2493ceeb2951d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-creator/examples/brand_voice_analysis_example.md",
+            "sha256": "9c87726c7be78f36cf8507f3c5bfd248a75c6c6e572e6b1634eff878688cee86",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-creator/examples/seo_optimization_example.md",
+            "sha256": "8597e5d3fe37c85073ab491ed6b8d6e7d58ccb91cb01130b9370ac5564346af5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-creator/references/analytics_guide.md",
+            "sha256": "08d4f5c42b865c484d1efd8a74d6c782136b7b23e82737f10bbc2955eff8b2d2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-creator/references/brand_guidelines.md",
+            "sha256": "6d6e9dc47ae44f80fa18976f2a37b3667de4dae13fdeefaaa4ad219f302fd8d0",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-creator/references/content_frameworks.md",
+            "sha256": "a6696080a7550cba45dd4841312f28f8d62a5f8ba42e893540ea86b2b2052538",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-creator/references/social_media_optimization.md",
+            "sha256": "b6c14dc67901d28bea22513b283f715e54f0eccd8b7171f5ec07a2e813ea0901",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Deprecated redirect skill that routes legacy 'content creator' requests to the correct specialist. Use when a user invokes 'content creator', asks to write a blog post, article, guide, or brand voice analysis (routes to content-production), or asks to plan content, build a topic cluster, or create a content calendar (routes to content-strategy). Does not handle requests directly \u2014 identifies user intent and redirects to content-production for writing/SEO/brand-voice tasks or content-strategy for planning tasks.",
       "tools": [],
       "agentic_signals": {
@@ -466,24 +955,54 @@
         "close_out": false
       },
       "references": [
-        "analytics_guide.md",
-        "brand_guidelines.md",
-        "content_frameworks.md",
-        "social_media_optimization.md"
+        "skills/marketing-skill/skills/content-creator/references/analytics_guide.md",
+        "skills/marketing-skill/skills/content-creator/references/brand_guidelines.md",
+        "skills/marketing-skill/skills/content-creator/references/content_frameworks.md",
+        "skills/marketing-skill/skills/content-creator/references/social_media_optimization.md"
       ]
     },
     {
       "name": "content-humanizer",
-      "path": "marketing-skill/skills/content-humanizer",
+      "path": "skills/marketing-skill/skills/content-humanizer",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "content-humanizer",
+        "skill_path": "skills/marketing-skill/skills/content-humanizer",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/content-humanizer/SKILL.md",
+            "sha256": "394c104c21992e984d1d14e0de40f0b244a59407e7d16232d6ea8c55ee892cdb",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-humanizer/references/ai-tells-checklist.md",
+            "sha256": "2acefc0276c8a27f9ad29dc98376786048189f0ce269e7b380cbd594c29aa35e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-humanizer/references/voice-techniques.md",
+            "sha256": "dbd1ef6ede95f67fb551a7cd3b6092c87ab977c3f0e37df0b32e2ab42160318d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-humanizer/scripts/humanizer_scorer.py",
+            "sha256": "0a25759afcb9d951af616b7c8c2ba69d82008caa3e85613831d1944166a1c294",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Makes AI-generated content sound genuinely human \u2014 not just cleaned up, but alive. Use when content feels robotic, uses too many AI clich\u00e9s, lacks personality, or reads like it was written by committee. Triggers: 'this sounds like AI', 'make it more human', 'add personality', 'it feels generic', 'sounds robotic', 'fix AI writing', 'inject our voice'. NOT for initial content creation (use content-production). NOT for SEO optimization (use content-production Mode 3).",
       "tools": [
         {
-          "script": "marketing-skill/skills/content-humanizer/scripts/humanizer_scorer.py",
+          "script": "skills/marketing-skill/skills/content-humanizer/scripts/humanizer_scorer.py",
+          "sha256": "0a25759afcb9d951af616b7c8c2ba69d82008caa3e85613831d1944166a1c294",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/content-humanizer/scripts/humanizer_scorer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/content-humanizer/scripts/humanizer_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -498,58 +1017,121 @@
         "close_out": false
       },
       "references": [
-        "ai-tells-checklist.md",
-        "voice-techniques.md"
+        "skills/marketing-skill/skills/content-humanizer/references/ai-tells-checklist.md",
+        "skills/marketing-skill/skills/content-humanizer/references/voice-techniques.md"
       ]
     },
     {
       "name": "content-production",
-      "path": "marketing-skill/skills/content-production",
+      "path": "skills/marketing-skill/skills/content-production",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "content-production",
+        "skill_path": "skills/marketing-skill/skills/content-production",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/content-production/SKILL.md",
+            "sha256": "8e893a54ee044459e6dc8f3c901aa6617cfa6f66d940f60881b9957fd7c1aed3",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-production/references/ai-citation-readiness.md",
+            "sha256": "6fa6b6e18aab4331bd4bb2351504f689c74edefcc1327c191ae2d6cc5af96829",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-production/references/content-brief-guide.md",
+            "sha256": "06dadeb490dbf1df46884cad543e39ed30191ebaafe5c7844324e50c05452a74",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-production/references/content-templates.md",
+            "sha256": "f0b049f34289ab71e488da3821b2c91c98b7e071283d186eaab4d89988a5e99d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-production/references/optimization-checklist.md",
+            "sha256": "dd129826e56cef101903a76e77e34c25b5ded61ff85051cf22de3e77a48ba39e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-production/scripts/brand_voice_analyzer.py",
+            "sha256": "31547f877755f120731d0eeb97dac1c06cdec315b0b1c860df13522c5d66196a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-production/scripts/content_quality_gates.py",
+            "sha256": "12c1d5299f2b6eaaffa6dd6359cd09a4a9c1a12d3ef2fece8a8de999d9fad3a2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-production/scripts/content_scorer.py",
+            "sha256": "b111df93859ae15d74f5b3345de4650e78e6b72c18e5dceb32ed0c409dedcbdc",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-production/scripts/seo_optimizer.py",
+            "sha256": "f89760f6d90072b8e7dcdefcb2897f964bb5c8c076cd307a99b125665f56d368",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-production/templates/content-brief-template.md",
+            "sha256": "2ca82bc462e7e6caa7bf799a7e7d3ed305124371b39ba4a6252decc983248120",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Full content production pipeline \u2014 takes a topic from blank page to published-ready piece. Use when you need to execute content: write a blog post, article, or guide end-to-end. Triggers: 'write a post about', 'draft an article', 'create content for', 'help me write', 'I need a blog post'. NOT for content strategy or calendar planning (use content-strategy). NOT for repurposing existing content (use content-repurposing). NOT for social captions only.",
       "tools": [
         {
-          "script": "marketing-skill/skills/content-production/scripts/brand_voice_analyzer.py",
+          "script": "skills/marketing-skill/skills/content-production/scripts/brand_voice_analyzer.py",
+          "sha256": "31547f877755f120731d0eeb97dac1c06cdec315b0b1c860df13522c5d66196a",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/content-production/scripts/brand_voice_analyzer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/content-production/scripts/brand_voice_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/content-production/scripts/content_quality_gates.py",
+          "script": "skills/marketing-skill/skills/content-production/scripts/content_quality_gates.py",
+          "sha256": "12c1d5299f2b6eaaffa6dd6359cd09a4a9c1a12d3ef2fece8a8de999d9fad3a2",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/content-production/scripts/content_quality_gates.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/content-production/scripts/content_quality_gates.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/content-production/scripts/content_scorer.py",
+          "script": "skills/marketing-skill/skills/content-production/scripts/content_scorer.py",
+          "sha256": "b111df93859ae15d74f5b3345de4650e78e6b72c18e5dceb32ed0c409dedcbdc",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/content-production/scripts/content_scorer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/content-production/scripts/content_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/content-production/scripts/seo_optimizer.py",
+          "script": "skills/marketing-skill/skills/content-production/scripts/seo_optimizer.py",
+          "sha256": "f89760f6d90072b8e7dcdefcb2897f964bb5c8c076cd307a99b125665f56d368",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/content-production/scripts/seo_optimizer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/content-production/scripts/seo_optimizer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -564,24 +1146,49 @@
         "close_out": false
       },
       "references": [
-        "ai-citation-readiness.md",
-        "content-brief-guide.md",
-        "content-templates.md",
-        "optimization-checklist.md"
+        "skills/marketing-skill/skills/content-production/references/ai-citation-readiness.md",
+        "skills/marketing-skill/skills/content-production/references/content-brief-guide.md",
+        "skills/marketing-skill/skills/content-production/references/content-templates.md",
+        "skills/marketing-skill/skills/content-production/references/optimization-checklist.md"
       ]
     },
     {
       "name": "content-strategy",
-      "path": "marketing-skill/skills/content-strategy",
-      "description": "When the user wants to plan a content strategy, decide what content to create, or figure out what topics to cover. Also use when the user mentions \\\"content strategy,\\\" \\\"what should I write about,\\\" \\\"content ideas,\\\" \\\"blog strategy,\\\" \\\"topic clusters,\\\" or \\\"content planning.\\\" For writing individual pieces, see copywriting. For SEO-specific audits, see seo-audit.",
+      "path": "skills/marketing-skill/skills/content-strategy",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "content-strategy",
+        "skill_path": "skills/marketing-skill/skills/content-strategy",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/content-strategy/SKILL.md",
+            "sha256": "eddbe5788b8bf6806dabe308c0f8babdd7d0e79a04e848d112c016cccd05bc83",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-strategy/references/content-strategy-reference.md",
+            "sha256": "20d4622525d816944430db88181830e5ea97110fe18e1c3d3e339b91052e28ee",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/content-strategy/scripts/topic_cluster_mapper.py",
+            "sha256": "2ccde4ec61ffa5ae9936c787d649ea35c42a7c2c3576ed32971da1b0fe05494c",
+            "role": "owned_resource"
+          }
+        ]
+      },
+      "description": "When the user wants to plan a content strategy, decide what content to create, or figure out what topics to cover. Also use when the user mentions \"content strategy,\" \"what should I write about,\" \"content ideas,\" \"blog strategy,\" \"topic clusters,\" or \"content planning.\" For writing individual pieces, see copywriting. For SEO-specific audits, see seo-audit.",
       "tools": [
         {
-          "script": "marketing-skill/skills/content-strategy/scripts/topic_cluster_mapper.py",
+          "script": "skills/marketing-skill/skills/content-strategy/scripts/topic_cluster_mapper.py",
+          "sha256": "2ccde4ec61ffa5ae9936c787d649ea35c42a7c2c3576ed32971da1b0fe05494c",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/content-strategy/scripts/topic_cluster_mapper.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/content-strategy/scripts/topic_cluster_mapper.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -596,33 +1203,69 @@
         "close_out": false
       },
       "references": [
-        "content-strategy-reference.md"
+        "skills/marketing-skill/skills/content-strategy/references/content-strategy-reference.md"
       ]
     },
     {
       "name": "copy-editing",
-      "path": "marketing-skill/skills/copy-editing",
+      "path": "skills/marketing-skill/skills/copy-editing",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "copy-editing",
+        "skill_path": "skills/marketing-skill/skills/copy-editing",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/copy-editing/SKILL.md",
+            "sha256": "ecdbe7a6ff18422470eb277f5e9a307e76601c2fb54d4b6bf7ba7cb76caabeb1",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/copy-editing/references/ai-detection-patterns.md",
+            "sha256": "125af481709a59e571184b667d8a2ed108517601c66ce5657060440d0adc78bd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/copy-editing/references/plain-english-alternatives.md",
+            "sha256": "491c34b011de82617613a558ce609ff7ba8fd92554ac90b4c5b4db2ab0aef62e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/copy-editing/scripts/ai_content_detector.py",
+            "sha256": "2c8a4cfdf527089f2d6b7548575a8e879ef7bf906ccee3596db8aca31fda626b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/copy-editing/scripts/readability_scorer.py",
+            "sha256": "4a43bc05dabe7e9acd28fdf0c151a158b3d57a2a633eb09675a3c4a67d16b0ce",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to edit, review, or improve existing marketing copy. Also use when the user mentions 'edit this copy,' 'review my copy,' 'copy feedback,' 'proofread,' 'polish this,' 'make this better,' or 'copy sweep.' This skill provides a systematic approach to editing marketing copy through multiple focused passes.",
       "tools": [
         {
-          "script": "marketing-skill/skills/copy-editing/scripts/ai_content_detector.py",
+          "script": "skills/marketing-skill/skills/copy-editing/scripts/ai_content_detector.py",
+          "sha256": "2c8a4cfdf527089f2d6b7548575a8e879ef7bf906ccee3596db8aca31fda626b",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/copy-editing/scripts/ai_content_detector.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/copy-editing/scripts/ai_content_detector.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/copy-editing/scripts/readability_scorer.py",
+          "script": "skills/marketing-skill/skills/copy-editing/scripts/readability_scorer.py",
+          "sha256": "4a43bc05dabe7e9acd28fdf0c151a158b3d57a2a633eb09675a3c4a67d16b0ce",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/copy-editing/scripts/readability_scorer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/copy-editing/scripts/readability_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -637,22 +1280,52 @@
         "close_out": false
       },
       "references": [
-        "ai-detection-patterns.md",
-        "plain-english-alternatives.md"
+        "skills/marketing-skill/skills/copy-editing/references/ai-detection-patterns.md",
+        "skills/marketing-skill/skills/copy-editing/references/plain-english-alternatives.md"
       ]
     },
     {
       "name": "copywriting",
-      "path": "marketing-skill/skills/copywriting",
-      "description": "When the user wants to write, rewrite, or improve marketing copy for any page \u2014 including homepage, landing pages, pricing pages, feature pages, about pages, or product pages. Also use when the user says \\\"write copy for,\\\" \\\"improve this copy,\\\" \\\"rewrite this page,\\\" \\\"marketing copy,\\\" \\\"headline help,\\\" or \\\"CTA copy.\\\" For email copy, see email-sequence. For popup copy, see popup-cro.",
+      "path": "skills/marketing-skill/skills/copywriting",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "copywriting",
+        "skill_path": "skills/marketing-skill/skills/copywriting",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/copywriting/SKILL.md",
+            "sha256": "f6415e5e3f1a2e0e62b112bb29566e8050c087f5aa6b674e5712805f2633c9b8",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/copywriting/references/copy-frameworks.md",
+            "sha256": "a96c5290cd5ec24b82b9ac1dfaebbcb7111cb9e6495d5b6d1b1a5daa6332f739",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/copywriting/references/natural-transitions.md",
+            "sha256": "83bd937ed92ca9b4ca461a8c30c81402b3dc866340f7f957f58ae73cae4cd541",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/copywriting/scripts/headline_scorer.py",
+            "sha256": "8e1f3532b0bb72ac2c8bb8b179f4ec2424e8dcd6942683d709f9a8dd5ea26199",
+            "role": "owned_resource"
+          }
+        ]
+      },
+      "description": "When the user wants to write, rewrite, or improve marketing copy for any page \u2014 including homepage, landing pages, pricing pages, feature pages, about pages, or product pages. Also use when the user says \"write copy for,\" \"improve this copy,\" \"rewrite this page,\" \"marketing copy,\" \"headline help,\" or \"CTA copy.\" For email copy, see email-sequence. For popup copy, see popup-cro.",
       "tools": [
         {
-          "script": "marketing-skill/skills/copywriting/scripts/headline_scorer.py",
+          "script": "skills/marketing-skill/skills/copywriting/scripts/headline_scorer.py",
+          "sha256": "8e1f3532b0bb72ac2c8bb8b179f4ec2424e8dcd6942683d709f9a8dd5ea26199",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/copywriting/scripts/headline_scorer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/copywriting/scripts/headline_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -667,22 +1340,47 @@
         "close_out": false
       },
       "references": [
-        "copy-frameworks.md",
-        "natural-transitions.md"
+        "skills/marketing-skill/skills/copywriting/references/copy-frameworks.md",
+        "skills/marketing-skill/skills/copywriting/references/natural-transitions.md"
       ]
     },
     {
       "name": "email-sequence",
-      "path": "marketing-skill/skills/email-sequence",
+      "path": "skills/marketing-skill/skills/email-sequence",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "email-sequence",
+        "skill_path": "skills/marketing-skill/skills/email-sequence",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/email-sequence/SKILL.md",
+            "sha256": "bd291de8f67291efcf61e24abb904f8d8db0455ee08bb2b51e08b5e1ca779f4c",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/email-sequence/references/email-sequence-playbook.md",
+            "sha256": "c5a37a172609f1f5ca399d4a8ee1c1a1e48e61f059bca3ff9b7448c3a6ec4036",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/email-sequence/scripts/sequence_analyzer.py",
+            "sha256": "4c915d4d2ff389974453d6e7fa7e83eebf62c2aa2bcaf39f002efd1de860c849",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to create or optimize an email sequence, drip campaign, automated email flow, or lifecycle email program. Also use when the user mentions \"email sequence,\" \"drip campaign,\" \"nurture sequence,\" \"onboarding emails,\" \"welcome sequence,\" \"re-engagement emails,\" \"email automation,\" or \"lifecycle emails.\" For in-app onboarding, see onboarding-cro.",
       "tools": [
         {
-          "script": "marketing-skill/skills/email-sequence/scripts/sequence_analyzer.py",
+          "script": "skills/marketing-skill/skills/email-sequence/scripts/sequence_analyzer.py",
+          "sha256": "4c915d4d2ff389974453d6e7fa7e83eebf62c2aa2bcaf39f002efd1de860c849",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/email-sequence/scripts/sequence_analyzer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/email-sequence/scripts/sequence_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -697,21 +1395,46 @@
         "close_out": false
       },
       "references": [
-        "email-sequence-playbook.md"
+        "skills/marketing-skill/skills/email-sequence/references/email-sequence-playbook.md"
       ]
     },
     {
       "name": "form-cro",
-      "path": "marketing-skill/skills/form-cro",
+      "path": "skills/marketing-skill/skills/form-cro",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "form-cro",
+        "skill_path": "skills/marketing-skill/skills/form-cro",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/form-cro/SKILL.md",
+            "sha256": "613b78af57e61291c106c34115b6f0da1618a644c1918d158bc66320a90c62d4",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/form-cro/references/form-cro-playbook.md",
+            "sha256": "9119af964afcff010da74ef30f15f54fa59b43aad0c1ff20672260b88577720e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/form-cro/scripts/form_field_analyzer.py",
+            "sha256": "73e0e2f04c7aa5d3c7f79bd1204bb29539c2e126b5b04ecf43f4c5e8c13aecca",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to optimize any form that is NOT signup/registration \u2014 including lead capture forms, contact forms, demo request forms, application forms, survey forms, or checkout forms. Also use when the user mentions \"form optimization,\" \"lead form conversions,\" \"form friction,\" \"form fields,\" \"form completion rate,\" or \"contact form.\" For signup/registration forms, see signup-flow-cro. For popups containing forms, see popup-cro.",
       "tools": [
         {
-          "script": "marketing-skill/skills/form-cro/scripts/form_field_analyzer.py",
+          "script": "skills/marketing-skill/skills/form-cro/scripts/form_field_analyzer.py",
+          "sha256": "73e0e2f04c7aa5d3c7f79bd1204bb29539c2e126b5b04ecf43f4c5e8c13aecca",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/form-cro/scripts/form_field_analyzer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/form-cro/scripts/form_field_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -726,21 +1449,51 @@
         "close_out": true
       },
       "references": [
-        "form-cro-playbook.md"
+        "skills/marketing-skill/skills/form-cro/references/form-cro-playbook.md"
       ]
     },
     {
       "name": "free-tool-strategy",
-      "path": "marketing-skill/skills/free-tool-strategy",
+      "path": "skills/marketing-skill/skills/free-tool-strategy",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "free-tool-strategy",
+        "skill_path": "skills/marketing-skill/skills/free-tool-strategy",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/free-tool-strategy/SKILL.md",
+            "sha256": "1deb39b71ff522db9c678f90f06e62e1d7d4bf5030f2f1b75bc664aa81f8256d",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/free-tool-strategy/references/launch-playbook.md",
+            "sha256": "9a2215a5b53a749274aca3432b5bd3f445fb7a5e9ab9ddc261c25849c1da7ab1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/free-tool-strategy/references/tool-types-guide.md",
+            "sha256": "81c7fbb6b90c71467ac8f3ecec6c336993daeec8141b6c1ce0900a4ad4158d37",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/free-tool-strategy/scripts/tool_roi_estimator.py",
+            "sha256": "99a1b0f3db85950722da398ffab1623d466e93426dd7f8acd183d1a0889ebda5",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to build a free tool for marketing \u2014 lead generation, SEO value, or brand awareness. Use when they mention 'engineering as marketing,' 'free tool,' 'calculator,' 'generator,' 'checker,' 'grader,' 'marketing tool,' 'lead gen tool,' 'build something for traffic,' 'interactive tool,' or 'free resource.' Covers idea evaluation, tool design, and launch strategy. For pure SEO content strategy (no tool), use seo-audit or content-strategy instead.",
       "tools": [
         {
-          "script": "marketing-skill/skills/free-tool-strategy/scripts/tool_roi_estimator.py",
+          "script": "skills/marketing-skill/skills/free-tool-strategy/scripts/tool_roi_estimator.py",
+          "sha256": "99a1b0f3db85950722da398ffab1623d466e93426dd7f8acd183d1a0889ebda5",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/free-tool-strategy/scripts/tool_roi_estimator.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/free-tool-strategy/scripts/tool_roi_estimator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -755,22 +1508,47 @@
         "close_out": true
       },
       "references": [
-        "launch-playbook.md",
-        "tool-types-guide.md"
+        "skills/marketing-skill/skills/free-tool-strategy/references/launch-playbook.md",
+        "skills/marketing-skill/skills/free-tool-strategy/references/tool-types-guide.md"
       ]
     },
     {
       "name": "launch-strategy",
-      "path": "marketing-skill/skills/launch-strategy",
+      "path": "skills/marketing-skill/skills/launch-strategy",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "launch-strategy",
+        "skill_path": "skills/marketing-skill/skills/launch-strategy",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/launch-strategy/SKILL.md",
+            "sha256": "8c28d7ad81b510088e42030e8f282f75773efe6a48a684532022083f5cc8338b",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/launch-strategy/references/launch-frameworks-and-checklists.md",
+            "sha256": "2dafb564099f68aa1e17fcdaed823e311e62e3a598a47c7439a817c8cb9c8e67",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/launch-strategy/scripts/launch_readiness_scorer.py",
+            "sha256": "da82426ac02f8c72f079e1b22c7cb368893db5d1206f82d07f72a56e9bd0cae3",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to plan a product launch, feature announcement, or release strategy. Also use when the user mentions 'launch,' 'Product Hunt,' 'feature release,' 'announcement,' 'go-to-market,' 'beta launch,' 'early access,' 'waitlist,' 'product update,' 'GTM plan,' 'launch checklist,' or 'launch momentum.' This skill covers phased launches, channel strategy, and ongoing launch momentum.",
       "tools": [
         {
-          "script": "marketing-skill/skills/launch-strategy/scripts/launch_readiness_scorer.py",
+          "script": "skills/marketing-skill/skills/launch-strategy/scripts/launch_readiness_scorer.py",
+          "sha256": "da82426ac02f8c72f079e1b22c7cb368893db5d1206f82d07f72a56e9bd0cae3",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/launch-strategy/scripts/launch_readiness_scorer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/launch-strategy/scripts/launch_readiness_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -785,45 +1563,92 @@
         "close_out": false
       },
       "references": [
-        "launch-frameworks-and-checklists.md"
+        "skills/marketing-skill/skills/launch-strategy/references/launch-frameworks-and-checklists.md"
       ]
     },
     {
       "name": "local-seo-manager",
-      "path": "marketing-skill/skills/local-seo-manager",
+      "path": "skills/marketing-skill/skills/local-seo-manager",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "local-seo-manager",
+        "skill_path": "skills/marketing-skill/skills/local-seo-manager",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/local-seo-manager/SKILL.md",
+            "sha256": "6d93fc13f7e0bd4907722c5950aa0e7803e186d941405cec9bdccc553e027ecc",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/local-seo-manager/references/local-schema-types.md",
+            "sha256": "2a71ad3929ef27532ca86dc7f79adf33348e42632aaeeb8952bc4d7f2eb7f378",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/local-seo-manager/references/local-seo-checklist.md",
+            "sha256": "20970b1758856b8876acf120c11d7096f45c365426437006b249e1e33c32981e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/local-seo-manager/references/review-response-templates.md",
+            "sha256": "2881365051d4fb817ad2986e254f236d7c9256832556552ad83295335d470496",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/local-seo-manager/scripts/nap_checker.py",
+            "sha256": "34419852ce87ba6b4badf8531527b515a625b195b64e366169eb7a584b62c64a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/local-seo-manager/scripts/schema_generator.py",
+            "sha256": "f946833921e84939f4ffe25c32396836cdc011d299cdd3c4bd0d7552772d1c51",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/local-seo-manager/scripts/service_area_generator.py",
+            "sha256": "66322ef7a9d7994614a0ff8a8ca9fa2c438a191f79fa2ca2e7981654e6c3a349",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Manage local SEO for service-area businesses \u2014 appliance repair, HVAC, plumbing, cleaning, and any business that serves customers at their location. Use when the user wants to: audit Google Business Profile, generate neighborhood service area pages, check NAP consistency across directories, create LocalBusiness schema, or write review responses. Triggers: 'local SEO', 'Google Business Profile', 'GBP', 'service area page', 'NAP consistency', 'local citations', 'LocalBusiness schema', 'review responses', 'Google Maps ranking'. NOT for national SEO (use seo-audit). NOT for general schema (use \u2026",
       "tools": [
         {
-          "script": "marketing-skill/skills/local-seo-manager/scripts/nap_checker.py",
+          "script": "skills/marketing-skill/skills/local-seo-manager/scripts/nap_checker.py",
+          "sha256": "34419852ce87ba6b4badf8531527b515a625b195b64e366169eb7a584b62c64a",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/local-seo-manager/scripts/nap_checker.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/local-seo-manager/scripts/nap_checker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/local-seo-manager/scripts/schema_generator.py",
+          "script": "skills/marketing-skill/skills/local-seo-manager/scripts/schema_generator.py",
+          "sha256": "f946833921e84939f4ffe25c32396836cdc011d299cdd3c4bd0d7552772d1c51",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/local-seo-manager/scripts/schema_generator.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/local-seo-manager/scripts/schema_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/local-seo-manager/scripts/service_area_generator.py",
+          "script": "skills/marketing-skill/skills/local-seo-manager/scripts/service_area_generator.py",
+          "sha256": "66322ef7a9d7994614a0ff8a8ca9fa2c438a191f79fa2ca2e7981654e6c3a349",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/local-seo-manager/scripts/service_area_generator.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/local-seo-manager/scripts/service_area_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -838,23 +1663,48 @@
         "close_out": false
       },
       "references": [
-        "local-schema-types.md",
-        "local-seo-checklist.md",
-        "review-response-templates.md"
+        "skills/marketing-skill/skills/local-seo-manager/references/local-schema-types.md",
+        "skills/marketing-skill/skills/local-seo-manager/references/local-seo-checklist.md",
+        "skills/marketing-skill/skills/local-seo-manager/references/review-response-templates.md"
       ]
     },
     {
       "name": "marketing-context",
-      "path": "marketing-skill/skills/marketing-context",
+      "path": "skills/marketing-skill/skills/marketing-context",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "marketing-context",
+        "skill_path": "skills/marketing-skill/skills/marketing-context",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/marketing-context/SKILL.md",
+            "sha256": "c023b0105f1d6177effe6f6af01b40eadb4619667bedf4a04e9954af2608c93f",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/marketing-context/scripts/context_validator.py",
+            "sha256": "7870b2031dab6eece5d661c8437ef4d186af98f3214942763694ad8d0cbbbc43",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/marketing-context/templates/marketing-context-template.md",
+            "sha256": "d976e8b8a2f259897ca7f58592128c643f10dda44133de0711385c95bb151a89",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Create and maintain the marketing context document that all marketing skills read before starting. Use when the user mentions 'marketing context,' 'brand voice,' 'set up context,' 'target audience,' 'ICP,' 'style guide,' 'who is my customer,' 'positioning,' or wants to avoid repeating foundational information across marketing tasks. Run this at the start of any new project before using other marketing skills.",
       "tools": [
         {
-          "script": "marketing-skill/skills/marketing-context/scripts/context_validator.py",
+          "script": "skills/marketing-skill/skills/marketing-context/scripts/context_validator.py",
+          "sha256": "7870b2031dab6eece5d661c8437ef4d186af98f3214942763694ad8d0cbbbc43",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/marketing-context/scripts/context_validator.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/marketing-context/scripts/context_validator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -872,16 +1722,56 @@
     },
     {
       "name": "marketing-demand-acquisition",
-      "path": "marketing-skill/skills/marketing-demand-acquisition",
+      "path": "skills/marketing-skill/skills/marketing-demand-acquisition",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "marketing-demand-acquisition",
+        "skill_path": "skills/marketing-skill/skills/marketing-demand-acquisition",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/marketing-demand-acquisition/SKILL.md",
+            "sha256": "dae4f8b4275322d86d5bcdb3ce37d36a275d4b8507be93af7cf33b583f1c1d48",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/marketing-demand-acquisition/references/attribution-guide.md",
+            "sha256": "0d5f0555742e7dfe3d1e3b11c575a5dab377ff32a0701aff87427964339bfea3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/marketing-demand-acquisition/references/campaign-templates.md",
+            "sha256": "f02d04c4ee3d51774b3e581c543f8de81214eb92d059e389b9ad13e3d768bba2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/marketing-demand-acquisition/references/hubspot-workflows.md",
+            "sha256": "9aeee64edf7eada107fdf4136bad4d87ee18151b574cb19bb50c88258e4aca9d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/marketing-demand-acquisition/references/international-playbooks.md",
+            "sha256": "dc929706768e816ad62e3f071c059580b79e3015c70c0a26eff9ae291df1d7c9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/marketing-demand-acquisition/scripts/calculate_cac.py",
+            "sha256": "9b5c2adb2283e4fae1094d06e9d150cd7d19151e5e3f926b95f0dd35418b4d98",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Creates demand generation campaigns, optimizes paid ad spend across LinkedIn, Google, and Meta, develops SEO strategies, and structures partnership programs. Use when planning demand gen strategy, growth marketing, advertising campaigns, PPC optimization, lead generation, pipeline generation, or marketing budgets. Covers multi-channel acquisition (Google Ads, LinkedIn Ads, Meta Ads), CAC analysis, MQL/SQL workflows, attribution modeling, technical SEO, and co-marketing partnerships. Default calibration profile is a Series A+ B2B SaaS scaling internationally (EU/US/Canada, hybrid \u2026",
       "tools": [
         {
-          "script": "marketing-skill/skills/marketing-demand-acquisition/scripts/calculate_cac.py",
+          "script": "skills/marketing-skill/skills/marketing-demand-acquisition/scripts/calculate_cac.py",
+          "sha256": "9b5c2adb2283e4fae1094d06e9d150cd7d19151e5e3f926b95f0dd35418b4d98",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/marketing-demand-acquisition/scripts/calculate_cac.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/marketing-demand-acquisition/scripts/calculate_cac.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -896,15 +1786,34 @@
         "close_out": true
       },
       "references": [
-        "attribution-guide.md",
-        "campaign-templates.md",
-        "hubspot-workflows.md",
-        "international-playbooks.md"
+        "skills/marketing-skill/skills/marketing-demand-acquisition/references/attribution-guide.md",
+        "skills/marketing-skill/skills/marketing-demand-acquisition/references/campaign-templates.md",
+        "skills/marketing-skill/skills/marketing-demand-acquisition/references/hubspot-workflows.md",
+        "skills/marketing-skill/skills/marketing-demand-acquisition/references/international-playbooks.md"
       ]
     },
     {
       "name": "marketing-ideas",
-      "path": "marketing-skill/skills/marketing-ideas",
+      "path": "skills/marketing-skill/skills/marketing-ideas",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "marketing-ideas",
+        "skill_path": "skills/marketing-skill/skills/marketing-ideas",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/marketing-ideas/SKILL.md",
+            "sha256": "1bdb8c3e96c115633d8b0269b48c5805870ad8e37f579f072eba782d813df26c",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/marketing-ideas/references/ideas-by-category.md",
+            "sha256": "97a02c0bce46d337d6a7e50c483785858efe408e4f8be37d7d78846da525f345",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user needs marketing ideas, inspiration, or strategies for their SaaS or software product. Also use when the user asks for 'marketing ideas,' 'growth ideas,' 'how to market,' 'marketing strategies,' 'marketing tactics,' 'ways to promote,' or 'ideas to grow.' This skill provides 139 proven marketing approaches organized by category.",
       "tools": [],
       "agentic_signals": {
@@ -915,21 +1824,41 @@
         "close_out": false
       },
       "references": [
-        "ideas-by-category.md"
+        "skills/marketing-skill/skills/marketing-ideas/references/ideas-by-category.md"
       ]
     },
     {
       "name": "marketing-ops",
-      "path": "marketing-skill/skills/marketing-ops",
-      "description": "Central router for the marketing skill ecosystem. Use when unsure which marketing skill to use, when orchestrating a multi-skill campaign, or when coordinating across content, SEO, CRO, channels, and analytics. Also use when the user mentions 'marketing help,' 'campaign plan,' 'what should I do next,' 'marketing priorities,' or 'coordinate marketing.",
+      "path": "skills/marketing-skill/skills/marketing-ops",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "marketing-ops",
+        "skill_path": "skills/marketing-skill/skills/marketing-ops",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/marketing-ops/SKILL.md",
+            "sha256": "5161ad6ef1fccb690362d3519f3f3a9f6f1a11c1b01f831af12723eb3d565dee",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/marketing-ops/scripts/campaign_tracker.py",
+            "sha256": "e5990e077789d712c8604a9935bd78a8089e3b2efb04fd211bdfe947a5f98f69",
+            "role": "owned_resource"
+          }
+        ]
+      },
+      "description": "Central router for the marketing skill ecosystem. Use when unsure which marketing skill to use, when orchestrating a multi-skill campaign, or when coordinating across content, SEO, CRO, channels, and analytics. Also use when the user mentions 'marketing help,' 'campaign plan,' 'what should I do next,' 'marketing priorities,' or 'coordinate marketing.'",
       "tools": [
         {
-          "script": "marketing-skill/skills/marketing-ops/scripts/campaign_tracker.py",
+          "script": "skills/marketing-skill/skills/marketing-ops/scripts/campaign_tracker.py",
+          "sha256": "e5990e077789d712c8604a9935bd78a8089e3b2efb04fd211bdfe947a5f98f69",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/marketing-ops/scripts/campaign_tracker.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/marketing-ops/scripts/campaign_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -947,7 +1876,26 @@
     },
     {
       "name": "marketing-psychology",
-      "path": "marketing-skill/skills/marketing-psychology",
+      "path": "skills/marketing-skill/skills/marketing-psychology",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "marketing-psychology",
+        "skill_path": "skills/marketing-skill/skills/marketing-psychology",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/marketing-psychology/SKILL.md",
+            "sha256": "32716116e6756d57592f3e7c02e25673075bcbedb64f86f4bc2268a655881ac7",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/marketing-psychology/references/mental-models-catalog.md",
+            "sha256": "454c659324ae8298109dff0d8a3a4a0a3a791797924ec7002b88a319a0196e69",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to apply psychological principles, mental models, or behavioral science to marketing. Also use when the user mentions 'psychology,' 'mental models,' 'cognitive bias,' 'persuasion,' 'behavioral science,' 'why people buy,' 'decision-making,' or 'consumer behavior.' This skill provides 70+ mental models organized for marketing application.",
       "tools": [],
       "agentic_signals": {
@@ -958,12 +1906,26 @@
         "close_out": false
       },
       "references": [
-        "mental-models-catalog.md"
+        "skills/marketing-skill/skills/marketing-psychology/references/mental-models-catalog.md"
       ]
     },
     {
       "name": "marketing-skills",
-      "path": "marketing-skill/skills/marketing-skills",
+      "path": "skills/marketing-skill/skills/marketing-skills",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "marketing-skills",
+        "skill_path": "skills/marketing-skill/skills/marketing-skills",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/marketing-skills/SKILL.md",
+            "sha256": "b4bbb03864bc0c098b37a676afaaf40420aafca470f3b95597544b078dd9218a",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Directory and router for the marketing skills library. Use when you need to find the right marketing skill for a task, see what marketing capabilities exist, or get oriented in this plugin. 44 specialist skills across 8 pods (content, SEO + AEO, CRO, channels, growth, intelligence, sales enablement, ops), 59 stdlib Python tools. Routes to one skill \u2014 it does not execute marketing work itself.",
       "tools": [],
       "agentic_signals": {
@@ -977,7 +1939,41 @@
     },
     {
       "name": "marketing-strategy-pmm",
-      "path": "marketing-skill/skills/marketing-strategy-pmm",
+      "path": "skills/marketing-skill/skills/marketing-strategy-pmm",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "marketing-strategy-pmm",
+        "skill_path": "skills/marketing-skill/skills/marketing-strategy-pmm",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/marketing-strategy-pmm/SKILL.md",
+            "sha256": "da0d88832df6a10b675596e1def74732613b083eafbf6b6f350f671bab440f5d",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/marketing-strategy-pmm/references/international-gtm.md",
+            "sha256": "1933d2f131048c446828ea6ea1bb9668d27572c108fed59c353cb831901d7d5c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/marketing-strategy-pmm/references/launch-checklists.md",
+            "sha256": "56eb263385be1769378a08150e9be1a003b2a825f3d19edfb84d963aa7bb2bfb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/marketing-strategy-pmm/references/messaging-templates.md",
+            "sha256": "019e1470bf02f706e17195148975cdf28dfadcfd38de46f26a2c038e39a33c87",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/marketing-strategy-pmm/references/positioning-frameworks.md",
+            "sha256": "fe488a7a37d156e2ba1f68964406f608ddb1f182978cb8a10da68eb3a8dc20e6",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Product marketing skill for positioning, GTM strategy, competitive intelligence, and product launches. Use when the user asks about product positioning, go-to-market planning, competitive analysis, target audience definition, ICP definition, market research, launch plans, or sales enablement. Covers April Dunford positioning, ICP definition, competitive battlecards, launch playbooks, and international market entry. Produces deliverables including positioning statements, battlecard documents, launch plans, and go-to-market strategies.",
       "tools": [],
       "agentic_signals": {
@@ -988,24 +1984,44 @@
         "close_out": true
       },
       "references": [
-        "international-gtm.md",
-        "launch-checklists.md",
-        "messaging-templates.md",
-        "positioning-frameworks.md"
+        "skills/marketing-skill/skills/marketing-strategy-pmm/references/international-gtm.md",
+        "skills/marketing-skill/skills/marketing-strategy-pmm/references/launch-checklists.md",
+        "skills/marketing-skill/skills/marketing-strategy-pmm/references/messaging-templates.md",
+        "skills/marketing-skill/skills/marketing-strategy-pmm/references/positioning-frameworks.md"
       ]
     },
     {
       "name": "onboarding-cro",
-      "path": "marketing-skill/skills/onboarding-cro",
+      "path": "skills/marketing-skill/skills/onboarding-cro",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "onboarding-cro",
+        "skill_path": "skills/marketing-skill/skills/onboarding-cro",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/onboarding-cro/SKILL.md",
+            "sha256": "9fecfb3fbe9770408063d419c8a3336940ea5f86df9130495ab461f28745280b",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/onboarding-cro/scripts/activation_funnel_analyzer.py",
+            "sha256": "eec829762b14c1111dbe5ab20d166582250a328698a7ba841d188bfc5b284ae0",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to optimize post-signup onboarding, user activation, first-run experience, or time-to-value. Also use when the user mentions \"onboarding flow,\" \"activation rate,\" \"user activation,\" \"first-run experience,\" \"empty states,\" \"onboarding checklist,\" \"aha moment,\" or \"new user experience.\" For signup/registration optimization, see signup-flow-cro. For ongoing email sequences, see email-sequence.",
       "tools": [
         {
-          "script": "marketing-skill/skills/onboarding-cro/scripts/activation_funnel_analyzer.py",
+          "script": "skills/marketing-skill/skills/onboarding-cro/scripts/activation_funnel_analyzer.py",
+          "sha256": "eec829762b14c1111dbe5ab20d166582250a328698a7ba841d188bfc5b284ae0",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/onboarding-cro/scripts/activation_funnel_analyzer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/onboarding-cro/scripts/activation_funnel_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1023,16 +2039,36 @@
     },
     {
       "name": "page-cro",
-      "path": "marketing-skill/skills/page-cro",
+      "path": "skills/marketing-skill/skills/page-cro",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "page-cro",
+        "skill_path": "skills/marketing-skill/skills/page-cro",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/page-cro/SKILL.md",
+            "sha256": "5017f078d779365a6f6b7326804270857475a24535f278eb1b1dc436ef5a343a",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/page-cro/scripts/conversion_audit.py",
+            "sha256": "c4caebc591d0602fb254de5e0a2639edf29da9149403549a83dd9db66de85493",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to optimize, improve, or increase conversions on any marketing page \u2014 including homepage, landing pages, pricing pages, feature pages, or blog posts. Also use when the user says \"CRO,\" \"conversion rate optimization,\" \"this page isn't converting,\" \"improve conversions,\" or \"why isn't this page working.\" For signup/registration flows, see signup-flow-cro. For post-signup activation, see onboarding-cro. For forms outside of signup, see form-cro. For popups/modals, see popup-cro.",
       "tools": [
         {
-          "script": "marketing-skill/skills/page-cro/scripts/conversion_audit.py",
+          "script": "skills/marketing-skill/skills/page-cro/scripts/conversion_audit.py",
+          "sha256": "c4caebc591d0602fb254de5e0a2639edf29da9149403549a83dd9db66de85493",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/page-cro/scripts/conversion_audit.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/page-cro/scripts/conversion_audit.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1050,28 +2086,79 @@
     },
     {
       "name": "paid-ads",
-      "path": "marketing-skill/skills/paid-ads",
+      "path": "skills/marketing-skill/skills/paid-ads",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "paid-ads",
+        "skill_path": "skills/marketing-skill/skills/paid-ads",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/paid-ads/SKILL.md",
+            "sha256": "87351be1779ec4f02c72543afc620ce1543865cfceaaf857d7488302eb5f0d45",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/paid-ads/references/ad-copy-templates.md",
+            "sha256": "cd83de02d8770e5bbb58769bac452f9ff7f82dd9eb13f8a922175bb9b21bc778",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/paid-ads/references/audience-targeting.md",
+            "sha256": "9a9bd7994f9b1e63b1e3955465a52828639f1533e6544d4bbfae3fc97850e17f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/paid-ads/references/copy-frameworks.md",
+            "sha256": "12c1a5530f7cfe7ffd7c3babf786a423dd8e26ac6dae00e03ff10bf5b9320da4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/paid-ads/references/platform-setup-checklists.md",
+            "sha256": "f6b3bb7e79106840991cfa18c2dac15b6868e21e4460f8187f9a70869c47dd8a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/paid-ads/references/scoring-system.md",
+            "sha256": "ff5cee9c815b51ec1addee0b7c28be6861ddfc30ee94f29a8d0f5f4a531aede3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/paid-ads/scripts/ad_health_scorer.py",
+            "sha256": "489c7c91e0fac6e6974e0d02af7c3ec824cdcf09c75fe83605a394b104eebc15",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/paid-ads/scripts/roas_calculator.py",
+            "sha256": "47f0d82912a741c1d96a97efc20172c497179f3026264fc8b7643832c0a55a03",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants help with paid advertising campaigns on Google Ads, Meta (Facebook/Instagram), LinkedIn, Twitter/X, or other ad platforms. Also use when the user mentions 'PPC,' 'paid media,' 'ad copy,' 'ad creative,' 'ROAS,' 'CPA,' 'ad campaign,' 'retargeting,' or 'audience targeting.' This skill covers campaign strategy, ad creation, audience targeting, and optimization.",
       "tools": [
         {
-          "script": "marketing-skill/skills/paid-ads/scripts/ad_health_scorer.py",
+          "script": "skills/marketing-skill/skills/paid-ads/scripts/ad_health_scorer.py",
+          "sha256": "489c7c91e0fac6e6974e0d02af7c3ec824cdcf09c75fe83605a394b104eebc15",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/paid-ads/scripts/ad_health_scorer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/paid-ads/scripts/ad_health_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/paid-ads/scripts/roas_calculator.py",
+          "script": "skills/marketing-skill/skills/paid-ads/scripts/roas_calculator.py",
+          "sha256": "47f0d82912a741c1d96a97efc20172c497179f3026264fc8b7643832c0a55a03",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/paid-ads/scripts/roas_calculator.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/paid-ads/scripts/roas_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1086,16 +2173,30 @@
         "close_out": false
       },
       "references": [
-        "ad-copy-templates.md",
-        "audience-targeting.md",
-        "copy-frameworks.md",
-        "platform-setup-checklists.md",
-        "scoring-system.md"
+        "skills/marketing-skill/skills/paid-ads/references/ad-copy-templates.md",
+        "skills/marketing-skill/skills/paid-ads/references/audience-targeting.md",
+        "skills/marketing-skill/skills/paid-ads/references/copy-frameworks.md",
+        "skills/marketing-skill/skills/paid-ads/references/platform-setup-checklists.md",
+        "skills/marketing-skill/skills/paid-ads/references/scoring-system.md"
       ]
     },
     {
       "name": "paywall-upgrade-cro",
-      "path": "marketing-skill/skills/paywall-upgrade-cro",
+      "path": "skills/marketing-skill/skills/paywall-upgrade-cro",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "paywall-upgrade-cro",
+        "skill_path": "skills/marketing-skill/skills/paywall-upgrade-cro",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/paywall-upgrade-cro/SKILL.md",
+            "sha256": "4f6f3916b9fcdee631fe898f3970e91a6a27e387868919e7feb33c8a0edae002",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "When the user wants to create or optimize in-app paywalls, upgrade screens, upsell modals, or feature gates. Also use when the user mentions \"paywall,\" \"upgrade screen,\" \"upgrade modal,\" \"upsell,\" \"feature gate,\" \"convert free to paid,\" \"freemium conversion,\" \"trial expiration screen,\" \"limit reached screen,\" \"plan upgrade prompt,\" or \"in-app pricing.\" Distinct from public pricing pages (see page-cro) \u2014 this skill focuses on in-product upgrade moments where the user has already experienced value.",
       "tools": [],
       "agentic_signals": {
@@ -1109,7 +2210,26 @@
     },
     {
       "name": "popup-cro",
-      "path": "marketing-skill/skills/popup-cro",
+      "path": "skills/marketing-skill/skills/popup-cro",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "popup-cro",
+        "skill_path": "skills/marketing-skill/skills/popup-cro",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/popup-cro/SKILL.md",
+            "sha256": "c8af49f0c29b87c80b9e2d2f266f410d989a21ecee29b584e59e5e89a0d2f65f",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/popup-cro/references/popup-cro-playbook.md",
+            "sha256": "d26d95562b032aced6774472f473c80ccccec7bc02a5a39bacc807cdd4d2220f",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to create or optimize popups, modals, overlays, slide-ins, or banners for conversion purposes. Also use when the user mentions \"exit intent,\" \"popup conversions,\" \"modal optimization,\" \"lead capture popup,\" \"email popup,\" \"announcement banner,\" or \"overlay.\" For forms outside of popups, see form-cro. For general page conversion optimization, see page-cro.",
       "tools": [],
       "agentic_signals": {
@@ -1120,21 +2240,51 @@
         "close_out": false
       },
       "references": [
-        "popup-cro-playbook.md"
+        "skills/marketing-skill/skills/popup-cro/references/popup-cro-playbook.md"
       ]
     },
     {
       "name": "pricing-strategy",
-      "path": "marketing-skill/skills/pricing-strategy",
+      "path": "skills/marketing-skill/skills/pricing-strategy",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "pricing-strategy",
+        "skill_path": "skills/marketing-skill/skills/pricing-strategy",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/pricing-strategy/SKILL.md",
+            "sha256": "7b92d0f653fb30784c1317cd60fb58a7a15220debd1ea6884ee5893098acc15a",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/pricing-strategy/references/pricing-models.md",
+            "sha256": "9f6c3a31c8e39d0dc63e564817bbf4fd6c36d6e464650e235edc934d0c9cd1ef",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/pricing-strategy/references/pricing-page-playbook.md",
+            "sha256": "d66505cad00d9aaec6c42fd5bfbca7d2f58ddd60f6c394110eee31beaac3564d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/pricing-strategy/scripts/pricing_modeler.py",
+            "sha256": "4ff76c1f28c8282440885c4cb860c4486415f99fef6c224552d5a20f727b96dc",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Design, optimize, and communicate SaaS pricing \u2014 tier structure, value metrics, pricing pages, and price increase strategy. Use when building a pricing model from scratch, redesigning existing pricing, planning a price increase, or improving a pricing page. Trigger keywords: pricing tiers, pricing page, price increase, packaging, value metric, per seat pricing, usage-based pricing, freemium, good-better-best, pricing strategy, monetization, pricing page conversion, Van Westendorp. NOT for broader product strategy \u2014 use product-strategist for that. NOT for customer success or renewals \u2014 use \u2026",
       "tools": [
         {
-          "script": "marketing-skill/skills/pricing-strategy/scripts/pricing_modeler.py",
+          "script": "skills/marketing-skill/skills/pricing-strategy/scripts/pricing_modeler.py",
+          "sha256": "4ff76c1f28c8282440885c4cb860c4486415f99fef6c224552d5a20f727b96dc",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/pricing-strategy/scripts/pricing_modeler.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/pricing-strategy/scripts/pricing_modeler.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1149,22 +2299,42 @@
         "close_out": false
       },
       "references": [
-        "pricing-models.md",
-        "pricing-page-playbook.md"
+        "skills/marketing-skill/skills/pricing-strategy/references/pricing-models.md",
+        "skills/marketing-skill/skills/pricing-strategy/references/pricing-page-playbook.md"
       ]
     },
     {
       "name": "programmatic-seo",
-      "path": "marketing-skill/skills/programmatic-seo",
+      "path": "skills/marketing-skill/skills/programmatic-seo",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "programmatic-seo",
+        "skill_path": "skills/marketing-skill/skills/programmatic-seo",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/programmatic-seo/SKILL.md",
+            "sha256": "0851f7c8ab34a21d52a27ee1c7993ea0b37e670b7a51293939c6ad82b6102e22",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/programmatic-seo/scripts/url_pattern_generator.py",
+            "sha256": "c5e435255bc3d400d5cebf97abac7dfddfc9acc6488b8132ce07ab279e0b1148",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to create SEO-driven pages at scale using templates and data. Also use when the user mentions \"programmatic SEO,\" \"template pages,\" \"pages at scale,\" \"directory pages,\" \"location pages,\" \"[keyword] + [city] pages,\" \"comparison pages,\" \"integration pages,\" or \"building many pages for SEO.\" For auditing existing SEO issues, see seo-audit.",
       "tools": [
         {
-          "script": "marketing-skill/skills/programmatic-seo/scripts/url_pattern_generator.py",
+          "script": "skills/marketing-skill/skills/programmatic-seo/scripts/url_pattern_generator.py",
+          "sha256": "c5e435255bc3d400d5cebf97abac7dfddfc9acc6488b8132ce07ab279e0b1148",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/programmatic-seo/scripts/url_pattern_generator.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/programmatic-seo/scripts/url_pattern_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1182,28 +2352,74 @@
     },
     {
       "name": "prompt-engineer-toolkit",
-      "path": "marketing-skill/skills/prompt-engineer-toolkit",
+      "path": "skills/marketing-skill/skills/prompt-engineer-toolkit",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "prompt-engineer-toolkit",
+        "skill_path": "skills/marketing-skill/skills/prompt-engineer-toolkit",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/prompt-engineer-toolkit/README.md",
+            "sha256": "9c3a78ebb25a4903b3400e864d0fb537c943742dd22af774a3fe1c4dea79f33f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/prompt-engineer-toolkit/SKILL.md",
+            "sha256": "619516d20520a7a84b54aaad8f35d35d42317a1b633e173bb2595f575b2ac4df",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/prompt-engineer-toolkit/references/evaluation-rubric.md",
+            "sha256": "ec91966377773387394c946d41ebc3d28ed11b1922034b709c64a9bfd978146c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/prompt-engineer-toolkit/references/prompt-templates.md",
+            "sha256": "c07ff57e626f6b4f507a2a33626494f8a158cf5af5e8bd7b13f63745101ef583",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/prompt-engineer-toolkit/references/technique-guide.md",
+            "sha256": "a5daca06d39c439eb4eabbf7d24c280a6db8cdbe3fdef938b693ffb05da756ea",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/prompt-engineer-toolkit/scripts/prompt_tester.py",
+            "sha256": "250effa4dd83e85d3f1952d9ae5c204de49215831fd72cb91783aa8d549eb359",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/prompt-engineer-toolkit/scripts/prompt_versioner.py",
+            "sha256": "407a025b70785a5c8d40ed9b745a26127a6e487f1bd24dc8c80e6cc1d1d17465",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "Turns marketing prompts into tested, versioned production assets: A/B prompt evaluation against structured test cases, immutable prompt version history with diffs, ready-to-use marketing prompt templates (ad copy, email campaigns, social posts, landing pages, SEO meta), and an LLM-governance playbook for marketing teams (claim discipline, disclosure rules, human-review gates). Use when a marketing team relies on AI-generated content and needs prompt quality to be measurable and safe \u2014 or when the user mentions 'prompt engineering,' 'improve my prompts,' 'prompt templates,' 'prompt \u2026",
       "tools": [
         {
-          "script": "marketing-skill/skills/prompt-engineer-toolkit/scripts/prompt_tester.py",
+          "script": "skills/marketing-skill/skills/prompt-engineer-toolkit/scripts/prompt_tester.py",
+          "sha256": "250effa4dd83e85d3f1952d9ae5c204de49215831fd72cb91783aa8d549eb359",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/prompt-engineer-toolkit/scripts/prompt_tester.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/prompt-engineer-toolkit/scripts/prompt_tester.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/prompt-engineer-toolkit/scripts/prompt_versioner.py",
+          "script": "skills/marketing-skill/skills/prompt-engineer-toolkit/scripts/prompt_versioner.py",
+          "sha256": "407a025b70785a5c8d40ed9b745a26127a6e487f1bd24dc8c80e6cc1d1d17465",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/prompt-engineer-toolkit/scripts/prompt_versioner.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/prompt-engineer-toolkit/scripts/prompt_versioner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1218,23 +2434,53 @@
         "close_out": false
       },
       "references": [
-        "evaluation-rubric.md",
-        "prompt-templates.md",
-        "technique-guide.md"
+        "skills/marketing-skill/skills/prompt-engineer-toolkit/references/evaluation-rubric.md",
+        "skills/marketing-skill/skills/prompt-engineer-toolkit/references/prompt-templates.md",
+        "skills/marketing-skill/skills/prompt-engineer-toolkit/references/technique-guide.md"
       ]
     },
     {
       "name": "referral-program",
-      "path": "marketing-skill/skills/referral-program",
+      "path": "skills/marketing-skill/skills/referral-program",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "referral-program",
+        "skill_path": "skills/marketing-skill/skills/referral-program",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/referral-program/SKILL.md",
+            "sha256": "24e4624f1374f6fbe86b678f27d0ec0c06002a826f143cfc57796572621fd905",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/referral-program/references/measurement-framework.md",
+            "sha256": "f3a6b8b64c3d00cf0e1af71cd3655c56f36f331cc4057c4ae58c332b584770a8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/referral-program/references/program-mechanics.md",
+            "sha256": "c2bdbe6d40b72ecd8f6a562617f89135b80c67839e6bb009ac2d0ed55c03c38a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/referral-program/scripts/referral_roi_calculator.py",
+            "sha256": "f7b2cfb11f3cf9ebd8afb41c1eb95423d018a7cec78924f01bddc82ce530a6c2",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to design, launch, or optimize a referral or affiliate program. Use when they mention 'referral program,' 'affiliate program,' 'word of mouth,' 'refer a friend,' 'incentive program,' 'customer referrals,' 'brand ambassador,' 'partner program,' 'referral link,' or 'growth through referrals.' Covers program mechanics, incentive design, and optimization \u2014 not just the idea of referrals but the actual system.",
       "tools": [
         {
-          "script": "marketing-skill/skills/referral-program/scripts/referral_roi_calculator.py",
+          "script": "skills/marketing-skill/skills/referral-program/scripts/referral_roi_calculator.py",
+          "sha256": "f7b2cfb11f3cf9ebd8afb41c1eb95423d018a7cec78924f01bddc82ce530a6c2",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/referral-program/scripts/referral_roi_calculator.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/referral-program/scripts/referral_roi_calculator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1249,22 +2495,52 @@
         "close_out": false
       },
       "references": [
-        "measurement-framework.md",
-        "program-mechanics.md"
+        "skills/marketing-skill/skills/referral-program/references/measurement-framework.md",
+        "skills/marketing-skill/skills/referral-program/references/program-mechanics.md"
       ]
     },
     {
       "name": "schema-markup",
-      "path": "marketing-skill/skills/schema-markup",
+      "path": "skills/marketing-skill/skills/schema-markup",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "schema-markup",
+        "skill_path": "skills/marketing-skill/skills/schema-markup",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/schema-markup/SKILL.md",
+            "sha256": "949186b826c714ae173d8d2e9dd73c705dbd4ee5fe33645e9583a5b451e1dfcc",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/schema-markup/references/implementation-patterns.md",
+            "sha256": "2b547b731800d9462034cf0a1ce89ee013d90e5d433aa7e05674f55f7ae61326",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/schema-markup/references/schema-types-guide.md",
+            "sha256": "72edf22e63b03ba65cfc21ad23d5922f6c6cab79aff3d8d6267bee706087358c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/schema-markup/scripts/schema_validator.py",
+            "sha256": "3208581ba89078f927a0cab880d9094ae38c94726201e4ed6ada4b4c9a90009c",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to implement, audit, or validate structured data (schema markup) on their website. Use when the user mentions 'structured data,' 'schema.org,' 'JSON-LD,' 'rich results,' 'rich snippets,' 'schema markup,' 'FAQ schema,' 'Product schema,' 'HowTo schema,' or 'structured data errors in Search Console.' Also use when someone asks why their content isn't showing rich results or wants to improve AI search visibility. NOT for general SEO audits (use seo-audit) or technical SEO crawl issues (use site-architecture).",
       "tools": [
         {
-          "script": "marketing-skill/skills/schema-markup/scripts/schema_validator.py",
+          "script": "skills/marketing-skill/skills/schema-markup/scripts/schema_validator.py",
+          "sha256": "3208581ba89078f927a0cab880d9094ae38c94726201e4ed6ada4b4c9a90009c",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/schema-markup/scripts/schema_validator.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/schema-markup/scripts/schema_validator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1279,34 +2555,80 @@
         "close_out": false
       },
       "references": [
-        "implementation-patterns.md",
-        "schema-types-guide.md"
+        "skills/marketing-skill/skills/schema-markup/references/implementation-patterns.md",
+        "skills/marketing-skill/skills/schema-markup/references/schema-types-guide.md"
       ]
     },
     {
       "name": "seo-audit",
-      "path": "marketing-skill/skills/seo-audit",
+      "path": "skills/marketing-skill/skills/seo-audit",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "seo-audit",
+        "skill_path": "skills/marketing-skill/skills/seo-audit",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/seo-audit/SKILL.md",
+            "sha256": "e91739cc21461f4b92979fc79bd11d606e1e10f5a50911b1ef02b2ce46dd25a6",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/seo-audit/references/cwv-thresholds.md",
+            "sha256": "fda95d390852fcdae21bd5f84ff3c002c1a27fd19c9426a74ed4bc35b6c6e817",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/seo-audit/references/eeat-framework.md",
+            "sha256": "dc422c57783e3bc21bbcfe183327db875bbe8214886b0123ff7e12c883c4abe9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/seo-audit/references/schema-types.md",
+            "sha256": "083923f3d28b54be7f66905da888864f4e1620252bf0c693046a64b5d9ce0f1e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/seo-audit/references/seo-audit-reference.md",
+            "sha256": "e45e26da9373f7a0c119294fe85aa8e8e78164fb58412fcbff165064892e38fc",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/seo-audit/scripts/seo_checker.py",
+            "sha256": "849857659a79849e70849a0b58dd15ff26339bd3da9252055027003d08c0fa8d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/seo-audit/scripts/seo_health_scorer.py",
+            "sha256": "ec8f0667bd80b62b796f080c412dd34aff314550d69fa91ee9856af79f7a7933",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to audit, review, or diagnose SEO issues on their site. Also use when the user mentions \"SEO audit,\" \"technical SEO,\" \"why am I not ranking,\" \"SEO issues,\" \"on-page SEO,\" \"meta tags review,\" or \"SEO health check.\" For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema-markup.",
       "tools": [
         {
-          "script": "marketing-skill/skills/seo-audit/scripts/seo_checker.py",
+          "script": "skills/marketing-skill/skills/seo-audit/scripts/seo_checker.py",
+          "sha256": "849857659a79849e70849a0b58dd15ff26339bd3da9252055027003d08c0fa8d",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/seo-audit/scripts/seo_checker.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/seo-audit/scripts/seo_checker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/seo-audit/scripts/seo_health_scorer.py",
+          "script": "skills/marketing-skill/skills/seo-audit/scripts/seo_health_scorer.py",
+          "sha256": "ec8f0667bd80b62b796f080c412dd34aff314550d69fa91ee9856af79f7a7933",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/seo-audit/scripts/seo_health_scorer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/seo-audit/scripts/seo_health_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1321,24 +2643,49 @@
         "close_out": false
       },
       "references": [
-        "cwv-thresholds.md",
-        "eeat-framework.md",
-        "schema-types.md",
-        "seo-audit-reference.md"
+        "skills/marketing-skill/skills/seo-audit/references/cwv-thresholds.md",
+        "skills/marketing-skill/skills/seo-audit/references/eeat-framework.md",
+        "skills/marketing-skill/skills/seo-audit/references/schema-types.md",
+        "skills/marketing-skill/skills/seo-audit/references/seo-audit-reference.md"
       ]
     },
     {
       "name": "signup-flow-cro",
-      "path": "marketing-skill/skills/signup-flow-cro",
+      "path": "skills/marketing-skill/skills/signup-flow-cro",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "signup-flow-cro",
+        "skill_path": "skills/marketing-skill/skills/signup-flow-cro",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/signup-flow-cro/SKILL.md",
+            "sha256": "d9927eb3fc91c33bcab0b3c615536066c51fde4de87966d06559ca2426fca615",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/signup-flow-cro/references/signup-cro-playbook.md",
+            "sha256": "2478df05e89fb67a5fa356db0761d0857bc692d3f356669719ee5fb97ba35fd3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/signup-flow-cro/scripts/funnel_drop_analyzer.py",
+            "sha256": "5e0d87f506b497c5bd7ea97f4cbf764a66fafa3d0297ee4db299dc94dead0fa3",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to optimize signup, registration, account creation, or trial activation flows. Also use when the user mentions \"signup conversions,\" \"registration friction,\" \"signup form optimization,\" \"free trial signup,\" \"reduce signup dropoff,\" or \"account creation flow.\" For post-signup onboarding, see onboarding-cro. For lead capture forms (not account creation), see form-cro.",
       "tools": [
         {
-          "script": "marketing-skill/skills/signup-flow-cro/scripts/funnel_drop_analyzer.py",
+          "script": "skills/marketing-skill/skills/signup-flow-cro/scripts/funnel_drop_analyzer.py",
+          "sha256": "5e0d87f506b497c5bd7ea97f4cbf764a66fafa3d0297ee4db299dc94dead0fa3",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/signup-flow-cro/scripts/funnel_drop_analyzer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/signup-flow-cro/scripts/funnel_drop_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1353,21 +2700,51 @@
         "close_out": true
       },
       "references": [
-        "signup-cro-playbook.md"
+        "skills/marketing-skill/skills/signup-flow-cro/references/signup-cro-playbook.md"
       ]
     },
     {
       "name": "site-architecture",
-      "path": "marketing-skill/skills/site-architecture",
+      "path": "skills/marketing-skill/skills/site-architecture",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "site-architecture",
+        "skill_path": "skills/marketing-skill/skills/site-architecture",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/site-architecture/SKILL.md",
+            "sha256": "cc087247b41768403428424a0aee891bbebc548e189e5e4032014f24ebb8e119",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/site-architecture/references/internal-linking-playbook.md",
+            "sha256": "dc2c20e6b42ee9daaaa8532cdd0ef57353832cac604d1dc030bd8991aabbc89e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/site-architecture/references/url-design-guide.md",
+            "sha256": "86a7e76064bdaa42d8468a29f1bd752b7035e1fead15fd322650f690a37eafdd",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/site-architecture/scripts/sitemap_analyzer.py",
+            "sha256": "38faaee8186339fca074fb2f7cd61aabb485c15077c5617c24f2582951093f70",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to audit, redesign, or plan their website's structure, URL hierarchy, navigation design, or internal linking strategy. Use when the user mentions 'site architecture,' 'URL structure,' 'internal links,' 'site navigation,' 'breadcrumbs,' 'topic clusters,' 'hub pages,' 'orphan pages,' 'silo structure,' 'information architecture,' or 'website reorganization.' Also use when someone has SEO problems and the root cause is structural (not content or schema). NOT for content strategy decisions about what to write (use content-strategy) or for schema markup (use schema-markup).",
       "tools": [
         {
-          "script": "marketing-skill/skills/site-architecture/scripts/sitemap_analyzer.py",
+          "script": "skills/marketing-skill/skills/site-architecture/scripts/sitemap_analyzer.py",
+          "sha256": "38faaee8186339fca074fb2f7cd61aabb485c15077c5617c24f2582951093f70",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/site-architecture/scripts/sitemap_analyzer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/site-architecture/scripts/sitemap_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1382,13 +2759,42 @@
         "close_out": false
       },
       "references": [
-        "internal-linking-playbook.md",
-        "url-design-guide.md"
+        "skills/marketing-skill/skills/site-architecture/references/internal-linking-playbook.md",
+        "skills/marketing-skill/skills/site-architecture/references/url-design-guide.md"
       ]
     },
     {
       "name": "social-content",
-      "path": "marketing-skill/skills/social-content",
+      "path": "skills/marketing-skill/skills/social-content",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "social-content",
+        "skill_path": "skills/marketing-skill/skills/social-content",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/social-content/SKILL.md",
+            "sha256": "02008f95432fd0c9088bccd71a3358b3ead1f06ac6115f3fe3fe5f562fc2da37",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/social-content/references/platforms.md",
+            "sha256": "b2c765478102c90e3516de625286de8f9d5eddfe5705f5d6affdd11456c43efe",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/social-content/references/post-templates.md",
+            "sha256": "673e0c47e0e247d2102a25c939af69f782280b691f2e733cb75e33805d17a8a5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/social-content/references/reverse-engineering.md",
+            "sha256": "59c0ce29fbe346510a53c17def3881f729de253bb4f49f7ea9f24319a8958482",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants help creating, scheduling, or optimizing social media content for LinkedIn, Twitter/X, Instagram, TikTok, Facebook, or other platforms. Also use when the user mentions 'LinkedIn post,' 'Twitter thread,' 'social media,' 'content calendar,' 'social scheduling,' 'engagement,' or 'viral content.' This skill covers content creation, repurposing, and platform-specific strategies.",
       "tools": [],
       "agentic_signals": {
@@ -1399,35 +2805,81 @@
         "close_out": false
       },
       "references": [
-        "platforms.md",
-        "post-templates.md",
-        "reverse-engineering.md"
+        "skills/marketing-skill/skills/social-content/references/platforms.md",
+        "skills/marketing-skill/skills/social-content/references/post-templates.md",
+        "skills/marketing-skill/skills/social-content/references/reverse-engineering.md"
       ]
     },
     {
       "name": "social-media-analyzer",
-      "path": "marketing-skill/skills/social-media-analyzer",
-      "description": "Social media campaign analysis and performance tracking. Calculates engagement rates, ROI, and benchmarks across platforms. Use when analyzing social media performance, calculating engagement rate, measuring campaign ROI, comparing platform metrics, or benchmarking against industry standards. Also use when the user mentions \"social media audit,\" \"engagement rate,\" or \"which platform performs best.",
+      "path": "skills/marketing-skill/skills/social-media-analyzer",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "social-media-analyzer",
+        "skill_path": "skills/marketing-skill/skills/social-media-analyzer",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/social-media-analyzer/HOW_TO_USE.md",
+            "sha256": "183fb0224c6d4332b6e8aa41dfc3687eaa416461c937ea3e2ed9258fcfe0faa4",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/social-media-analyzer/SKILL.md",
+            "sha256": "68cc6de8b9fa26b7543f37a197d6b8c7035b91caf1aa203911640621a9b7b86e",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/social-media-analyzer/assets/expected_output.json",
+            "sha256": "ce13ad2784d7a60f1172e1059f9b598f78b43246601c0f0f4d7c560e2b2726ee",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/social-media-analyzer/assets/sample_input.json",
+            "sha256": "e4210a55977c498092fdb93046ab4667cc479001dffac8b6e94a0ef701a8be5f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/social-media-analyzer/references/platform-benchmarks.md",
+            "sha256": "59643afbc1a0b21b09bfc9acdf84a193ce5e120bf914001b8683a425d3dd6e34",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/social-media-analyzer/scripts/analyze_performance.py",
+            "sha256": "cf1addc5fc1e6f02cc2637b8a958b18de88767d68aa51fdccc17ad85788ca0ac",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/social-media-analyzer/scripts/calculate_metrics.py",
+            "sha256": "1f57c3fe56ca0c881321036a7bbf315cb5ba83143b52dfd5d9225eb41960dd6c",
+            "role": "owned_resource"
+          }
+        ]
+      },
+      "description": "Social media campaign analysis and performance tracking. Calculates engagement rates, ROI, and benchmarks across platforms. Use when analyzing social media performance, calculating engagement rate, measuring campaign ROI, comparing platform metrics, or benchmarking against industry standards. Also use when the user mentions \"social media audit,\" \"engagement rate,\" or \"which platform performs best.\"",
       "tools": [
         {
-          "script": "marketing-skill/skills/social-media-analyzer/scripts/analyze_performance.py",
+          "script": "skills/marketing-skill/skills/social-media-analyzer/scripts/analyze_performance.py",
+          "sha256": "cf1addc5fc1e6f02cc2637b8a958b18de88767d68aa51fdccc17ad85788ca0ac",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/social-media-analyzer/scripts/analyze_performance.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/social-media-analyzer/scripts/analyze_performance.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/social-media-analyzer/scripts/calculate_metrics.py",
+          "script": "skills/marketing-skill/skills/social-media-analyzer/scripts/calculate_metrics.py",
+          "sha256": "1f57c3fe56ca0c881321036a7bbf315cb5ba83143b52dfd5d9225eb41960dd6c",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/social-media-analyzer/scripts/calculate_metrics.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/social-media-analyzer/scripts/calculate_metrics.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1442,21 +2894,41 @@
         "close_out": false
       },
       "references": [
-        "platform-benchmarks.md"
+        "skills/marketing-skill/skills/social-media-analyzer/references/platform-benchmarks.md"
       ]
     },
     {
       "name": "social-media-manager",
-      "path": "marketing-skill/skills/social-media-manager",
+      "path": "skills/marketing-skill/skills/social-media-manager",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "social-media-manager",
+        "skill_path": "skills/marketing-skill/skills/social-media-manager",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/social-media-manager/SKILL.md",
+            "sha256": "a72fbb003a99607ad370ec791fbd42c832348c6e766f6ffc1d45b465e6adab08",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/social-media-manager/scripts/social_calendar_generator.py",
+            "sha256": "ce61f8fc4ddf8bf59deb73116c5008bc7c7316a5baf4a772fd23527b9e4944b2",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to develop social media strategy, plan content calendars, manage community engagement, or grow their social presence across platforms. Also use when the user mentions 'social media strategy,' 'social calendar,' 'community management,' 'social media plan,' 'grow followers,' 'engagement rate,' 'social media audit,' or 'which platforms should I use.' For writing individual social posts, see social-content. For analyzing social performance data, see social-media-analyzer.",
       "tools": [
         {
-          "script": "marketing-skill/skills/social-media-manager/scripts/social_calendar_generator.py",
+          "script": "skills/marketing-skill/skills/social-media-manager/scripts/social_calendar_generator.py",
+          "sha256": "ce61f8fc4ddf8bf59deb73116c5008bc7c7316a5baf4a772fd23527b9e4944b2",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/social-media-manager/scripts/social_calendar_generator.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/social-media-manager/scripts/social_calendar_generator.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1474,21 +2946,66 @@
     },
     {
       "name": "webinar-marketing",
-      "path": "marketing-skill/skills/webinar-marketing",
+      "path": "skills/marketing-skill/skills/webinar-marketing",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "webinar-marketing",
+        "skill_path": "skills/marketing-skill/skills/webinar-marketing",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/webinar-marketing/SKILL.md",
+            "sha256": "b0f422e8578708221dc7cd8ee3504701a80c8458182cff72444258ae5cbc2ac1",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/webinar-marketing/evals/evals.json",
+            "sha256": "eec0eeba9a47ee225335defa5f308c95e43226a7f7438ca9df99826d5ecf49fe",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/webinar-marketing/references/benchmarks.md",
+            "sha256": "6220aa84dc6632198be4b8df8cf0a7da86b84c80682335429b676892ff4d4e78",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/webinar-marketing/references/promotion-playbook.md",
+            "sha256": "4d385fdaa544bd4ead270b15e6d349c8a06f6547e04e7c2b872748ed8102c478",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/webinar-marketing/references/webinar-formats.md",
+            "sha256": "0469c5d0926f7db1b205044fbd19983587f193afb6b580c2430e7ae926bca1bf",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/webinar-marketing/scripts/webinar_funnel_scorer.py",
+            "sha256": "2866884c07219e9f8c7ecb2527c455f59a15b3f3b0e78cbdf3a151647734d7b1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/webinar-marketing/templates/webinar-plan-template.md",
+            "sha256": "679a3755529a6871f80875f997c11e7d4671e2715db2a047b67641b86dce9699",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "When the user wants to plan, promote, run, or improve a webinar or virtual event to generate and convert demand. Use when the user mentions 'webinar,' 'virtual event,' 'online event,' 'live demo,' 'virtual summit,' 'workshop,' 'masterclass,' 'fireside chat,' 'roundtable,' 'registration funnel,' 'show-up rate,' 'attendance rate,' 'webinar promotion,' 'webinar follow-up,' or 'on-demand webinar.' Also use when they have a webinar that isn't converting \u2014 low registrations, low show-up, or attendees who don't buy \u2014 and want to diagnose and fix it. Covers the full funnel: registration, promotion \u2026",
       "tools": [
         {
-          "script": "marketing-skill/skills/webinar-marketing/scripts/webinar_funnel_scorer.py",
+          "script": "skills/marketing-skill/skills/webinar-marketing/scripts/webinar_funnel_scorer.py",
+          "sha256": "2866884c07219e9f8c7ecb2527c455f59a15b3f3b0e78cbdf3a151647734d7b1",
           "wired": true,
           "supports_sample": true,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/webinar-marketing/scripts/webinar_funnel_scorer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/webinar-marketing/scripts/webinar_funnel_scorer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             },
             {
-              "cmd": "python3 marketing-skill/skills/webinar-marketing/scripts/webinar_funnel_scorer.py --sample",
+              "cmd": "python3 skills/marketing-skill/skills/webinar-marketing/scripts/webinar_funnel_scorer.py --sample",
               "expect_exit": 0,
               "kind": "sample"
             }
@@ -1503,71 +3020,125 @@
         "close_out": true
       },
       "references": [
-        "benchmarks.md",
-        "promotion-playbook.md",
-        "webinar-formats.md"
+        "skills/marketing-skill/skills/webinar-marketing/references/benchmarks.md",
+        "skills/marketing-skill/skills/webinar-marketing/references/promotion-playbook.md",
+        "skills/marketing-skill/skills/webinar-marketing/references/webinar-formats.md"
       ]
     },
     {
       "name": "x-twitter-growth",
-      "path": "marketing-skill/skills/x-twitter-growth",
+      "path": "skills/marketing-skill/skills/x-twitter-growth",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "x-twitter-growth",
+        "skill_path": "skills/marketing-skill/skills/x-twitter-growth",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/x-twitter-growth/.gitignore",
+            "sha256": "e909479e67ebd985d354b0535d2653c43a34e21fbf737d91c052b01332e2192e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/x-twitter-growth/SKILL.md",
+            "sha256": "f25b551a88fee2c5654e315e7113182d6fd956260ae170b2503a459e3d9d23db",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/marketing-skill/skills/x-twitter-growth/references/algorithm-signals.md",
+            "sha256": "5e60425e85a2d39d2aa31c080dea5bf5c686acdd6b8b76a222dbdd577c4a221d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/x-twitter-growth/scripts/competitor_analyzer.py",
+            "sha256": "5af517d049e6f6fa111a3f1f85bb21faf4610b86741471b00d46b31a3caecc30",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/x-twitter-growth/scripts/content_planner.py",
+            "sha256": "2ec2892244ee5a0883899dc042e77d4f87e444a1a00392515b28faf3efbc2a92",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/x-twitter-growth/scripts/growth_tracker.py",
+            "sha256": "bf1838bf021472f2dae057a46df1e13c23a2da68910729251add24b09952ec8b",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/x-twitter-growth/scripts/profile_auditor.py",
+            "sha256": "7fb783e542c389f215d412c4dad0855b2df1440c93aa5fbf7b905be9288d1d41",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/marketing-skill/skills/x-twitter-growth/scripts/tweet_composer.py",
+            "sha256": "603b934a69130a7f5cc0dc77ae859b9419a685bfc6d5ed15eb8ea99aa6ddac58",
+            "role": "owned_resource"
+          }
+        ]
+      },
       "description": "X/Twitter growth engine for building audience, crafting viral content, and analyzing engagement. Use when the user wants to grow on X/Twitter, write tweets or threads, analyze their X profile, research competitors on X, plan a posting strategy, or optimize engagement. Complements social-content (generic multi-platform) with X-specific depth: algorithm mechanics, thread engineering, reply strategy, profile optimization, and competitive intelligence via web search.",
       "tools": [
         {
-          "script": "marketing-skill/skills/x-twitter-growth/scripts/competitor_analyzer.py",
+          "script": "skills/marketing-skill/skills/x-twitter-growth/scripts/competitor_analyzer.py",
+          "sha256": "5af517d049e6f6fa111a3f1f85bb21faf4610b86741471b00d46b31a3caecc30",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/x-twitter-growth/scripts/competitor_analyzer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/x-twitter-growth/scripts/competitor_analyzer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/x-twitter-growth/scripts/content_planner.py",
+          "script": "skills/marketing-skill/skills/x-twitter-growth/scripts/content_planner.py",
+          "sha256": "2ec2892244ee5a0883899dc042e77d4f87e444a1a00392515b28faf3efbc2a92",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/x-twitter-growth/scripts/content_planner.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/x-twitter-growth/scripts/content_planner.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/x-twitter-growth/scripts/growth_tracker.py",
+          "script": "skills/marketing-skill/skills/x-twitter-growth/scripts/growth_tracker.py",
+          "sha256": "bf1838bf021472f2dae057a46df1e13c23a2da68910729251add24b09952ec8b",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/x-twitter-growth/scripts/growth_tracker.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/x-twitter-growth/scripts/growth_tracker.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/x-twitter-growth/scripts/profile_auditor.py",
+          "script": "skills/marketing-skill/skills/x-twitter-growth/scripts/profile_auditor.py",
+          "sha256": "7fb783e542c389f215d412c4dad0855b2df1440c93aa5fbf7b905be9288d1d41",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/x-twitter-growth/scripts/profile_auditor.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/x-twitter-growth/scripts/profile_auditor.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
           ]
         },
         {
-          "script": "marketing-skill/skills/x-twitter-growth/scripts/tweet_composer.py",
+          "script": "skills/marketing-skill/skills/x-twitter-growth/scripts/tweet_composer.py",
+          "sha256": "603b934a69130a7f5cc0dc77ae859b9419a685bfc6d5ed15eb8ea99aa6ddac58",
           "wired": true,
           "supports_sample": false,
           "verification": [
             {
-              "cmd": "python3 marketing-skill/skills/x-twitter-growth/scripts/tweet_composer.py --help",
+              "cmd": "python3 skills/marketing-skill/skills/x-twitter-growth/scripts/tweet_composer.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
@@ -1582,12 +3153,26 @@
         "close_out": false
       },
       "references": [
-        "algorithm-signals.md"
+        "skills/marketing-skill/skills/x-twitter-growth/references/algorithm-signals.md"
       ]
     },
     {
       "name": "youtube-full",
-      "path": "marketing-skill/skills/youtube-full",
+      "path": "skills/marketing-skill/skills/youtube-full",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "youtube-full",
+        "skill_path": "skills/marketing-skill/skills/youtube-full",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/skills/youtube-full/SKILL.md",
+            "sha256": "0035de6d16bb11384365276fd88ee84be5fa0bb590aae5f7c0542084ad07933f",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Use when the user needs YouTube transcripts, video search, channel browsing, playlist extraction, or content monitoring. Trigger phrases: 'get the transcript for', 'search YouTube for', 'what are the latest videos on', 'list this playlist', 'monitor this channel', or any request involving a YouTube URL, video ID, or @handle. Do NOT use for downloading video or audio files, YouTube engagement data (likes, comments), or private/age-restricted videos.",
       "tools": [],
       "agentic_signals": {
@@ -1601,7 +3186,21 @@
     },
     {
       "name": "video-content-strategist",
-      "path": "marketing-skill/video-content-strategist/skills/video-content-strategist",
+      "path": "skills/marketing-skill/video-content-strategist/skills/video-content-strategist",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "video-content-strategist",
+        "skill_path": "skills/marketing-skill/video-content-strategist/skills/video-content-strategist",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/marketing-skill/video-content-strategist/skills/video-content-strategist/SKILL.md",
+            "sha256": "0788d327bc4deec2fa6adf78813b78d8fb54f91e595fb42b9b928f44e5ca301b",
+            "role": "skill_body"
+          }
+        ]
+      },
       "description": "Use when planning video content strategy, writing video scripts, optimizing YouTube channels, building short-form video pipelines (Reels, TikTok, Shorts), or repurposing long-form content into video. Triggers: 'start a YouTube channel', 'video content strategy', 'write a video script', 'repurpose into video', 'YouTube SEO', 'short-form video'. NOT for written blog content (use content-production). NOT for social captions without video (use social-media-manager).",
       "tools": [],
       "agentic_signals": {

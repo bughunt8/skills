@@ -6,6 +6,26 @@
       "file": "skills/pstack/why/references/synthesizer-prompt.md",
       "link": "url",
       "reason": "Upstream template placeholder: a Markdown link whose target is the literal word url, inside an example line an agent is meant to fill in. Vendored verbatim from backnotprop/pstack, so it is exempted here rather than edited."
+    },
+    {
+      "file": "skills/engineering/wayfinder/SKILL.md",
+      "link": "link",
+      "reason": "Literal closed-ticket link placeholder inside the upstream map-body template, not a bundled dependency. Preserved verbatim at v1.3.1."
+    },
+    {
+      "file": "skills/engineering/domain-modeling/GLOSSARY-FORMAT.md",
+      "link": "./src/ordering/GLOSSARY.md",
+      "reason": "Example consumer-project glossary in the upstream multi-context template. This library does not create fictional ordering domain documents."
+    },
+    {
+      "file": "skills/engineering/domain-modeling/GLOSSARY-FORMAT.md",
+      "link": "./src/billing/GLOSSARY.md",
+      "reason": "Example consumer-project glossary in the upstream multi-context template. This library does not create fictional billing domain documents."
+    },
+    {
+      "file": "skills/engineering/domain-modeling/GLOSSARY-FORMAT.md",
+      "link": "./src/fulfillment/GLOSSARY.md",
+      "reason": "Example consumer-project glossary in the upstream multi-context template. This library does not create fictional fulfillment domain documents."
     }
   ]
 }
