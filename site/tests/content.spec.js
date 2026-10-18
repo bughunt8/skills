@@ -177,6 +177,33 @@ test.describe("prerendered content", () => {
         .map((c) => c.querySelector("h3")?.textContent)
     );
     expect(missing, "cards with no licence").toEqual([]);
+
+    // "and more" is not attribution. Every project in the two inventories must
+    // have its own entry, and every entry must carry a link a reader can follow.
+    const manifest = JSON.parse(
+      readFileSync(new URL("../../skills/vendor.manifest.json", import.meta.url), "utf8")
+    );
+    const inventory = JSON.parse(
+      readFileSync(new URL("../../docs/third-party-inventory.json", import.meta.url), "utf8")
+    );
+    const repos = new Set();
+    for (const source of [...manifest.sources, ...inventory.legacy]) {
+      if (source.repo) repos.add(source.repo.replace(/\/$/, ""));
+    }
+    const entries = page.locator(".attrib li");
+    expect(await entries.count()).toBeGreaterThanOrEqual(repos.size);
+    for (const repo of repos) {
+      await expect(
+        page.locator(`.attrib a[href="${repo}"]`),
+        `missing attribution for ${repo}`
+      ).toHaveCount(1);
+    }
+    const unlinked = await entries.evaluateAll((items) =>
+      items.filter((i) => !i.querySelector('a[href^="https://"]')).map((i) => i.textContent.trim())
+    );
+    expect(unlinked, "attribution entries with no link").toEqual([]);
+    const attribText = (await page.locator(".attrib").textContent()) ?? "";
+    expect(attribText).not.toMatch(/\betc\.?\b|\band more\b/i);
   });
 
   test("no placeholder or lorem text survived", () => {

@@ -322,6 +322,12 @@ summary { padding: var(--space-3) var(--space-4); cursor: pointer; }
 .close__lede { max-width: 80ch; color: var(--muted); margin-block: var(--space-3); }
 .credits { display: grid; gap: var(--space-3); margin-block: var(--space-4); }
 .credits > div { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.attrib { list-style: none; padding: 0; margin-block: var(--space-4); display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-2) var(--space-4); }
+.attrib li { border-top: 1px solid var(--border); padding-top: var(--space-2); }
+.attrib a { font-weight: 600; }
+.attrib__meta { display: block; color: var(--muted); font-size: 0.92em; }
 .close__credit { color: var(--muted); }
 .no-js { padding: var(--space-4); }
 html:not(.js) .workspace { height: auto; min-height: 0; }

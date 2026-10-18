@@ -23,27 +23,44 @@ single place a source is declared.
 **Most of what is indexed under this name is itself imported from elsewhere.**
 Of the skills attributed to `bughunt8/skills` on this page, all but one are
 vendored from other projects — the host repository is largely an aggregator, and
-only `start-github-repo` is original to it. Those upstreams are recorded in the
-host repository's own notices, in two tiers:
+only `start-github-repo` is original to it.
 
-- **Under automated refresh** (`skills/vendor.manifest.json`, commit-pinned and
-  refreshed on a schedule): `pstack` by Lauren Tan
-  ([@backnotprop](https://github.com/backnotprop), "poteto"),
-  `job-hunt-skills`, `i-have-adhd`,
-  [mattpocock/skills](https://github.com/mattpocock/skills) by Matt Pocock,
-  [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills), and
-  [humanlayer/skills](https://github.com/humanlayer/skills).
-- **Hand-copied before that manifest existed** (`docs/third-party-inventory.json`,
-  attributed but not auto-refreshed): further projects including `stitch-skills`
-  by Google Labs, `impeccable` by Paul Bakaus, `taste-skill` by Leonxlnx,
-  `ui-ux-pro-max-skill`, `togaf-advisor`, `github-repository-setup`, and
-  `awesome-design-md` by VoltAgent.
+Every upstream project is listed below. The page's list is generated from
+`skills/vendor.manifest.json` and `docs/third-party-inventory.json` on every
+build, so an import that is not in this table fails CI. Where an upstream has no
+public repository URL, the link points at the licence file vendored with it.
 
-Seventeen distinct upstream repositories are recorded by URL, plus a handful more
-recorded by author name only. The per-skill attribution and licence files travel
-inside the vendored trees and are linked from each skill's own directory in the
-host repository; the authoritative record is
-[its `THIRD_PARTY_NOTICES.md`](https://github.com/bughunt8/skills/blob/main/THIRD_PARTY_NOTICES.md).
+| Upstream project | Author | Licence | Import |
+| --- | --- | --- | --- |
+| [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) | Addy Osmani | MIT | refreshed |
+| [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd) | Ayoub Ghriss (@ayghri) | MIT | refreshed |
+| [backnotprop/pstack](https://github.com/backnotprop/pstack) | Lauren Tan (@backnotprop, "poteto") | MIT | refreshed |
+| [bhubanmm/togaf-advisor](https://github.com/bhubanmm/togaf-advisor) | Bhuban | MIT | hand-copied |
+| [borahanmirzaii/alirezarezvani-claude-skills](https://github.com/borahanmirzaii/alirezarezvani-claude-skills) | Alireza Rezvani and contributors | MIT | hand-copied |
+| [collab-proof](https://github.com/bughunt8/skills/blob/main/skills/engineering/collab-proof/LICENSE) | dong7812 | MIT | hand-copied |
+| [deeparchi-ai/togaf-skill](https://github.com/deeparchi-ai/togaf-skill) | DeepArchi | MIT | hand-copied |
+| [DogInfantry/claude-skill-management-consultant-B1](https://github.com/DogInfantry/claude-skill-management-consultant-B1) | DogInfantry | Apache-2.0 | hand-copied |
+| [domelic/github-repository-setup](https://github.com/domelic/github-repository-setup) | Damir Omelic | MIT | hand-copied |
+| [explainer-graphic](https://github.com/bughunt8/skills/blob/main/skills/productivity/explainer-graphic/LICENSE) | Silicon Valley Academy | MIT | hand-copied |
+| [Forward-Future/loop-library](https://github.com/Forward-Future/loop-library) | Forward Future | MIT | hand-copied |
+| [google-labs-code/stitch-skills](https://github.com/google-labs-code/stitch-skills) | Google Labs and contributors | Apache-2.0 | hand-copied |
+| [humanlayer/skills](https://github.com/humanlayer/skills) | HumanLayer and contributors; `show-me` credited to Dex Horthy | MIT | refreshed |
+| [jamesrochabrun/skills](https://github.com/jamesrochabrun/skills) | James Rochabrun | MIT | hand-copied |
+| [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | Leonxlnx | MIT | hand-copied |
+| [mattpocock/skills](https://github.com/mattpocock/skills) | Matt Pocock (@mattpocock) | MIT | refreshed |
+| [microsoft/SkillOpt](https://github.com/microsoft/SkillOpt) | Microsoft Corporation | MIT | hand-copied |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | Next Level Builder | MIT | hand-copied |
+| [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | Paul Bakaus | Apache-2.0 | hand-copied |
+| [playwright-pro](https://github.com/bughunt8/skills/blob/main/skills/engineering-team/playwright-pro/LICENSE) | Reza Rezvani | MIT | hand-copied |
+| [Remotivated/job-hunt-skills](https://github.com/Remotivated/job-hunt-skills) | Remotivated | MIT | refreshed |
+| [self-improving-agent](https://github.com/bughunt8/skills/blob/main/skills/engineering-team/self-improving-agent/LICENSE) | Reza Rezvani | MIT | hand-copied |
+| [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md) | VoltAgent | MIT | hand-copied |
+
+"Refreshed" imports are commit-pinned in `skills/vendor.manifest.json` and updated
+on a schedule; "hand-copied" imports predate that manifest and are recorded in
+`docs/third-party-inventory.json`. The per-skill attribution and licence files
+travel inside the vendored trees, and the authoritative record is
+[the host repository's `THIRD_PARTY_NOTICES.md`](https://github.com/bughunt8/skills/blob/main/THIRD_PARTY_NOTICES.md).
 
 ### haowjy/creative-writing-skills
 

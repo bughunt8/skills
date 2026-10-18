@@ -57,6 +57,10 @@ MARKERS = {
         "<!-- BEGIN GENERATED: credits (build.py) -- do not edit by hand -->",
         "<!-- END GENERATED: credits -->",
     ),
+    "attribution": (
+        "<!-- BEGIN GENERATED: attribution (build.py) -- do not edit by hand -->",
+        "<!-- END GENERATED: attribution -->",
+    ),
 }
 
 # Human labels for directory names. A category with no entry falls back to its
@@ -827,6 +831,61 @@ def render_workspace(community_meta, order, counts, sols, graph_svg, graph_label
     </details>"""
 
 
+def render_attribution() -> str:
+    """Every upstream project this repository redistributes, as linked HTML.
+
+    Built from the two inventories rather than typed into the page: a hand-written
+    list is how "and more" happens, and the two files are already the record that
+    CI's third-party audit enforces.
+    """
+    merged = {}
+
+    def add(repo, name, author, licence, tier, notice):
+        key = (repo or "").rstrip("/").lower() or f"id:{name or author}"
+        entry = merged.setdefault(
+            key,
+            {"repo": (repo or "").rstrip("/"), "name": name or "",
+             "authors": set(), "licences": set(), "tiers": set(), "notices": set()},
+        )
+        if not entry["name"] and name:
+            entry["name"] = name
+        if author:
+            entry["authors"].add(author)
+        if licence:
+            entry["licences"].add(licence)
+        entry["tiers"].add(tier)
+        if notice:
+            entry["notices"].add(notice)
+
+    manifest = REPO_ROOT / "skills" / "vendor.manifest.json"
+    if manifest.exists():
+        for source in json.loads(manifest.read_text(encoding="utf-8")).get("sources", []):
+            add(source.get("repo"), source.get("id"), source.get("author"),
+                source.get("license"), "refreshed", None)
+    inventory = REPO_ROOT / "docs" / "third-party-inventory.json"
+    if inventory.exists():
+        for source in json.loads(inventory.read_text(encoding="utf-8")).get("legacy", []):
+            add(source.get("repo"), source.get("name") or source.get("id"), source.get("author"),
+                source.get("license"), "hand-copied",
+                source.get("notice") or source.get("license_file"))
+
+    rows = []
+    for entry in merged.values():
+        label = entry["repo"].split("github.com/", 1)[-1] if entry["repo"] else entry["name"]
+        href = entry["repo"]
+        if not href and entry["notices"]:
+            href = "https://github.com/bughunt8/skills/blob/main/" + sorted(entry["notices"])[0]
+        title = f'<a href="{esc(href)}" rel="noopener">{esc(label)}</a>' if href else esc(label)
+        rows.append(
+            (label.lower(), '        <li>' + title
+             + f'<span class="attrib__meta">{esc("; ".join(sorted(entry["authors"])) or "author not recorded")}'
+             + f' · {esc(" / ".join(sorted(entry["licences"])) or "licence not recorded")}'
+             + f' · {esc("refreshed" if "refreshed" in entry["tiers"] else "hand-copied")}</span></li>')
+        )
+    rows.sort(key=lambda row: row[0])
+    return '<ul class="attrib">\n' + "\n".join(row[1] for row in rows) + "\n        </ul>"
+
+
 def render(rows: list) -> "tuple[dict, str]":
     counts = collections.Counter(r["dom"] for r in rows)
     # Sorted by size then by name: two categories with the same count must not swap
@@ -1048,7 +1107,8 @@ def render(rows: list) -> "tuple[dict, str]":
         + ";\n"
     )
     return (
-        {"main": "\n".join(out), "credits": "\n".join(cred)},
+        {"main": "\n".join(out), "credits": "\n".join(cred),
+         "attribution": render_attribution()},
         data,
         len(sols),
         n_stated,

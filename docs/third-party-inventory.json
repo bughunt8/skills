@@ -236,7 +236,7 @@
     {
       "id": "skillopt-sleep",
       "name": "skillopt-sleep",
-      "repo": "",
+      "repo": "https://github.com/microsoft/SkillOpt",
       "author": "Microsoft Corporation",
       "license": "MIT",
       "notice": "skills/engineering/skillopt-sleep/LICENSE",
@@ -248,7 +248,7 @@
     {
       "id": "loop-library",
       "name": "loop-library",
-      "repo": "",
+      "repo": "https://github.com/Forward-Future/loop-library",
       "author": "Forward Future",
       "license": "MIT",
       "notice": "skills/loop-library/LICENSE",
