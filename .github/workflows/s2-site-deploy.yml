@@ -184,6 +184,39 @@ jobs:
           echo "publishing:"
           find _site -type f | sort | sed 's/^/  /'
 
+      # BUILD-INFO.txt records the commit, but nobody opens a text file to find out
+      # which build they are looking at. Stamp the commit into the footer of the
+      # published copy, never the source tree, so the committed page still matches
+      # build.py --check and the same sources produce the same reviewed artifact.
+      - name: Stamp the deployed commit into the footer
+        working-directory: site
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          short="${COMMIT_SHA:0:7}"
+          python3 - "$short" "$COMMIT_SHA" <<'PY'
+          import re
+          import sys
+
+          short, full = sys.argv[1], sys.argv[2]
+          path = "_site/index.html"
+          page = open(path, encoding="utf-8").read()
+          pattern = re.compile(r'<span id="status-version"[^>]*>[^<]*</span>')
+          found = pattern.findall(page)
+          if len(found) != 1:
+              raise SystemExit(f"expected exactly one status-version span, found {len(found)}")
+          page = pattern.sub(
+              f'<span id="status-version" title="Deployed commit {full}">{short}</span>',
+              page,
+          )
+          open(path, "w", encoding="utf-8").write(page)
+          print(f"footer stamped with {short}")
+          PY
+          grep -q ">${short}<" _site/index.html || {
+            echo "::error::footer stamp missing from the published page"
+            exit 1
+          }
+
       # Absolute asset paths work locally and 404 under a subpath, so catch them
       # before they are the live site.
       - name: Reject absolute asset paths

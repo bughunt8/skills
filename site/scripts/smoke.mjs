@@ -132,6 +132,14 @@ try {
     } else {
       fail("BUILD-INFO.txt was not served, cannot confirm which commit is live");
     }
+
+    const shortSha = expectedSha.slice(0, 7);
+    const stamped = (html.match(/<span id="status-version"[^>]*>([^<]*)<\/span>/) || [])[1];
+    if (stamped && stamped.trim() === shortSha) {
+      ok(`footer shows commit ${shortSha}`);
+    } else {
+      fail(`footer shows "${(stamped || "nothing").trim()}", expected ${shortSha}`);
+    }
   }
 } catch (e) {
   fail(e.message);

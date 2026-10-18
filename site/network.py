@@ -324,7 +324,13 @@ def label_community(members: list, rows_by_key: dict, graph: dict) -> str:
             if len(t) >= MIN_TOKEN and t not in STOP:
                 counts[t] += 1
     if not counts:
-        return "unnamed"
+        # Every token in these names is a STOP word or too short, which is the right
+        # filter for inferring edges but the wrong one for naming a community: a
+        # one-member cluster is named by its member, and "advisor"/"wizard" are that
+        # member's actual name. Falling through to the strongest member keeps the
+        # dropdown consistent with the panel, which already shows the real name.
+        hub = max(members, key=lambda k: (graph["degree"][k], k))
+        return rows_by_key[hub]["n"]
     # Sorted by count and then by the token itself. Counter.most_common breaks ties in
     # insertion order, and the insertion order here comes from iterating a set of
     # strings, whose order depends on PYTHONHASHSEED. Community 6 was named

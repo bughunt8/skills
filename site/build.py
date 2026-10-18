@@ -797,7 +797,7 @@ def render_workspace(community_meta, order, counts, sols, graph_svg, graph_label
       </main>
       <footer id="statusbar" class="statusbar" aria-label="Graph status">
         <div class="status-fields" role="status" aria-live="polite" aria-atomic="true">
-          <span id="status-context"></span><span id="status-counts"></span>
+          <span id="status-version" title="Deployed commit">local</span><span id="status-context"></span><span id="status-counts"></span>
           <span id="status-selected"></span><span id="status-zoom"></span>
           <span id="status-evidence"></span>
         </div><a href="#workspace-help" data-open="workspace-help">Help</a>
