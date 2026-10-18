@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Runner-local proof of the real smoke command. No public requests or uploads.
-// Only the in-memory BUILD-INFO response changes. Site files stay untouched.
+// Only in-memory responses change: BUILD-INFO.txt and the footer commit stamp.
+// Site files stay untouched, and the hashes below prove it.
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -30,6 +31,11 @@ const types = {
   ".txt": "text/plain; charset=utf-8", ".json": "application/json"
 };
 let buildInfo = marker(expectedSha);
+const sourceIndex = readFileSync(resolve(root, "index.html"), "utf8");
+const stampedIndex = sourceIndex.replace(
+  /<span id="status-version"[^>]*>[^<]*<\/span>/,
+  `<span id="status-version" title="Deployed commit ${expectedSha}">${expectedSha.slice(0, 7)}</span>`
+);
 let requests = [];
 let activeChild;
 const cases = [];
@@ -45,6 +51,16 @@ const server = createServer((req, res) => {
       res.writeHead(buildInfo === null ? 404 : 200, {
         "content-type": types[".txt"], "cache-control": "no-store"
       }).end(buildInfo ?? "Not found");
+      return;
+    }
+    // The deploy stamps the footer in the published copy; this fixture is the
+    // published copy, so serve the stamped page rather than the source file.
+    if (pathname === "/" || pathname === "/index.html") {
+      res.writeHead(200, {
+        "content-type": types[".html"], "cache-control": "no-store",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "strict-origin-when-cross-origin"
+      }).end(stampedIndex);
       return;
     }
     const file = resolve(root, "." + (pathname === "/" ? "/index.html" : pathname));
