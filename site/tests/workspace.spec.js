@@ -151,7 +151,12 @@ test.describe("workspace acceptance", () => {
     expect(selected.context.results.slice().sort()).toEqual(expected);
     expect(selected.context.query).toBe("NDA");
     expect(selected.camera).not.toEqual(before.camera);
-    expect(selected.camera.scale, "node neighborhood must expand from broad NDA results").toBeGreaterThan(before.camera.scale);
+    // Selecting a result replaces the broad search scene with exactly that node's
+    // neighbourhood. Zoom direction is not the contract: when a broad query's results
+    // sit closer together than one neighbourhood, the fitted camera tightens instead.
+    const keyIndex = data.nodes.indexOf(key);
+    const degree = data.edges.filter(([a, b]) => a === keyIndex || b === keyIndex).length;
+    expect(selected.rendered, "selection frames the node's neighbourhood").toBe(1 + degree);
     const selectedCrossed = await sweepUnrelatedNodes(page, key);
     const frame = await page.locator("#gsvg").boundingBox();
     await page.mouse.move(frame.x + frame.width * 0.5, frame.y + frame.height * 0.5, { steps: 12 });

@@ -107,6 +107,7 @@ export async function readState(page) {
         results: [...document.querySelectorAll("#gresults button[data-key]")].map((e) => e.dataset.key)
       },
       matching: Number(d.matchingCount), visible: Number(d.visibleCount),
+      rendered: Number(d.renderedCount),
       camera: { x: Number(vp.x), y: Number(vp.y), scale: Number(vp.scale) }
     };
   });
