@@ -1612,6 +1612,14 @@
       root.dataset.ready = "true";
     }
   }
+  const requestedCommunity = new URLSearchParams(location.search).get("community");
+  if (requestedCommunity !== null && communities.has(requestedCommunity)) {
+    state.filters.community = requestedCommunity;
+    state.community = requestedCommunity;
+    state.selected = "";
+    state.mode = baseMode();
+    state.listKind = state.mode;
+  }
   resize();
   new ResizeObserver(resize).observe($("graph-canvas"));
   if (document.fonts) document.fonts.ready.then(drawLabels);

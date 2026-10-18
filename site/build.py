@@ -1073,6 +1073,7 @@ def render(rows: list) -> "tuple[dict, str]":
                 # 1,868 edges written as pairs of identity keys came to 96 KB, and as
                 # pairs of integers they come to 21 KB.
                 "nodes": [k for k in node_index_order],
+                "commOf": [comm[k] for k in node_index_order],
                 "edges": [
                     [node_index[a], node_index[b], w, 0 if kind == "extracted" else 1]
                     for (a, b, w, kind, _why) in edge_rows

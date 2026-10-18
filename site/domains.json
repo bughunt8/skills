@@ -3,7 +3,7 @@
     "The top layer of the graph: what kind of work a skill is for.",
     "",
     "The 25 groups below it are the repository's own directory names, which is why",
-    "they read like `pstack`, `shuohao` and `ra-qm-team` — they are source layout,",
+    "they read like `pstack`, `shuohao` and `ra-qm-team` \u2014 they are source layout,",
     "not a taxonomy, and there are too many of them to be an opening view. This file",
     "is the one place where an editorial judgement is made about the library, so it",
     "is data rather than code: every category must appear exactly once, and the build",
@@ -33,37 +33,69 @@
       "id": "lead",
       "label": "Lead and advise",
       "blurb": "Executive judgement, programmes and operations.",
-      "categories": ["c-level-advisor", "project-management", "business-operations"]
+      "categories": [
+        "c-level-advisor",
+        "project-management",
+        "business-operations"
+      ]
     },
     {
       "id": "grow",
       "label": "Grow and sell",
       "blurb": "Demand, positioning and revenue.",
-      "categories": ["marketing-skill", "commercial", "business-growth", "marketing"]
+      "categories": [
+        "marketing-skill",
+        "commercial",
+        "business-growth",
+        "marketing"
+      ]
     },
     {
       "id": "make",
       "label": "Design and write",
       "blurb": "Interfaces, prose and screen craft.",
-      "categories": ["design", "creative-writing", "shuohao"]
+      "categories": [
+        "design",
+        "creative-writing",
+        "shuohao"
+      ]
     },
     {
       "id": "decide",
-      "label": "Research and decide",
-      "blurb": "Evidence, product direction and numbers.",
-      "categories": ["product-team", "research", "research-ops", "finance"]
+      "label": "Decide and prioritise",
+      "blurb": "Product direction and numbers.",
+      "categories": [
+        "product-team",
+        "finance"
+      ]
+    },
+    {
+      "id": "research",
+      "label": "Research and investigate",
+      "blurb": "Evidence, literature and structured inquiry.",
+      "categories": [
+        "research",
+        "research-ops"
+      ]
     },
     {
       "id": "work",
       "label": "Work and career",
       "blurb": "Personal throughput and getting hired.",
-      "categories": ["productivity", "job-hunt", "i-have-adhd"]
+      "categories": [
+        "productivity",
+        "job-hunt",
+        "i-have-adhd"
+      ]
     },
     {
       "id": "govern",
       "label": "Govern and comply",
       "blurb": "Assurance, regulation and risk.",
-      "categories": ["ra-qm-team", "compliance-os"]
+      "categories": [
+        "ra-qm-team",
+        "compliance-os"
+      ]
     }
   ],
   "categories": {
