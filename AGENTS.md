@@ -5,7 +5,7 @@ anything here.
 
 ## What this repository is
 
-A library of 479 skill files across 23 directories, 478 of which are linted; the difference is
+A library of 527 skill files across 24 directories, 526 of which are linted; the difference is
 one deliberate test fixture. The skill index in `README.md` is the authoritative count.
 `scripts/generate_index.py` regenerates it and CI checks it, so refresh these numbers there
 when the tree changes. The skill files are instructions to another agent. The

@@ -49,6 +49,7 @@ refreshed at least every two weeks. Provenance presence is enforced on every pul
 | [Matt Pocock writing-for-agents](https://github.com/mattpocock/skills) | Matt Pocock (@mattpocock) | MIT | `skills/productivity/writing-for-agents/` | [`24fe0ef7737e`](https://github.com/mattpocock/skills/commit/24fe0ef7737efae15c87225755e9f6f5965e4888) | [ATTRIBUTION.md](./skills/productivity/writing-for-agents/ATTRIBUTION.md) |
 | [Matt Pocock invocation policy reference](https://github.com/mattpocock/skills) | Matt Pocock (@mattpocock) | MIT | `docs/reference-sources/mattpocock-invocation/` | [`24fe0ef7737e`](https://github.com/mattpocock/skills/commit/24fe0ef7737efae15c87225755e9f6f5965e4888) | [ATTRIBUTION.md](./docs/reference-sources/mattpocock-invocation/ATTRIBUTION.md) |
 | [HumanLayer show-me credit license](https://github.com/humanlayer/skills) | HumanLayer and contributors; show-me credited to Dex Horthy | MIT | `docs/reference-sources/humanlayer-pr-credit/` | [`ca7c8088db69`](https://github.com/humanlayer/skills/commit/ca7c8088db69e315a8b2deea43820270457f8f3c) | [ATTRIBUTION.md](./docs/reference-sources/humanlayer-pr-credit/ATTRIBUTION.md) |
+| [financeskills](https://github.com/GAJETOso/financeskills) | Ayotunde Oso (@GAJETOso), KOMVIA | MIT | `skills/financeskills/` | [`b0c6239e339c`](https://github.com/GAJETOso/financeskills/commit/b0c6239e339c1865c54bd2bb4cd4c1974120f1b8) | [ATTRIBUTION.md](./skills/financeskills/ATTRIBUTION.md) |
 
 ### Secondary licences inside those imports
 
@@ -77,12 +78,12 @@ attribution file appears in the tree without a matching entry.
 | explainer-graphic | Silicon Valley Academy | MIT | `skills/productivity/explainer-graphic` | [LICENSE](./skills/productivity/explainer-graphic/LICENSE) |
 | [github-repository-setup](https://github.com/domelic/github-repository-setup) | Damir Omelic | MIT | `skills/engineering/github-repository-setup` | [ATTRIBUTION.md](./skills/engineering/github-repository-setup/ATTRIBUTION.md) |
 | [impeccable](https://github.com/pbakaus/impeccable) | Paul Bakaus | Apache-2.0 | `skills/engineering/impeccable` | [ATTRIBUTION.md](./skills/engineering/impeccable/ATTRIBUTION.md) |
-| loop-library | Forward Future | MIT | `skills/loop-library` | [LICENSE](./skills/loop-library/LICENSE) |
+| [loop-library](https://github.com/Forward-Future/loop-library) | Forward Future | MIT | `skills/loop-library` | [LICENSE](./skills/loop-library/LICENSE) |
 | [mattpocock/skills](https://github.com/mattpocock/skills) | Matt Pocock (@mattpocock) | MIT | `skills/engineering/caveman`, `skills/engineering/write-a-skill`, `docs/migrations/matt-v1.3.1/legacy` | [MATTPOCOCK_SKILLS_ATTRIBUTION.md](./skills/engineering/MATTPOCOCK_SKILLS_ATTRIBUTION.md) |
 | playwright-pro | Reza Rezvani | MIT | `skills/engineering-team/playwright-pro` | [LICENSE](./skills/engineering-team/playwright-pro/LICENSE) |
 | [prd-generator](https://github.com/jamesrochabrun/skills) | James Rochabrun | MIT | `skills/productivity/agile-prd-creator` | [ATTRIBUTION.md](./skills/productivity/agile-prd-creator/ATTRIBUTION.md) |
 | self-improving-agent | Reza Rezvani | MIT | `skills/engineering-team/self-improving-agent` | [LICENSE](./skills/engineering-team/self-improving-agent/LICENSE) |
-| skillopt-sleep | Microsoft Corporation | MIT | `skills/engineering/skillopt-sleep` | [LICENSE](./skills/engineering/skillopt-sleep/LICENSE) |
+| [skillopt-sleep](https://github.com/microsoft/SkillOpt) | Microsoft Corporation | MIT | `skills/engineering/skillopt-sleep` | [LICENSE](./skills/engineering/skillopt-sleep/LICENSE) |
 | [stitch-skills](https://github.com/google-labs-code/stitch-skills) | Google Labs and contributors | Apache-2.0 | `skills/design/stitch-code-to-design`, `skills/design/stitch-design-md`, `skills/design/stitch-enhance-prompt` and 11 more | [ATTRIBUTION.md](./skills/design/stitch-design-md/ATTRIBUTION.md) |
 | [taste-skill and derivatives](https://github.com/Leonxlnx/taste-skill) | Leonxlnx | MIT | `skills/design/brandkit`, `skills/design/brutalist-skill`, `skills/design/gpt-tasteskill` and 10 more | [ATTRIBUTION.md](./skills/design/taste-skill/ATTRIBUTION.md) |
 | [togaf-advisor](https://github.com/bhubanmm/togaf-advisor) | Bhuban | MIT | `skills/engineering/togaf-advisor` | [ATTRIBUTION.md](./skills/engineering/togaf-advisor/ATTRIBUTION.md) |

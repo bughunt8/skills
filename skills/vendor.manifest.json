@@ -1115,6 +1115,40 @@
         "Expected-commit guard deliberately rejects a moved main until the pin is reviewed. This notice does not independently establish the ancestry of Matt's copied text."
       ],
       "pinned_at": "2026-10-05"
+    },
+    {
+      "id": "financeskills",
+      "name": "financeskills",
+      "repo": "https://github.com/GAJETOso/financeskills",
+      "homepage": "https://github.com/GAJETOso/financeskills",
+      "author": "Ayotunde Oso (@GAJETOso), KOMVIA",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "main",
+      "pinned_commit": "b0c6239e339c1865c54bd2bb4cd4c1974120f1b8",
+      "expected_commit": "b0c6239e339c1865c54bd2bb4cd4c1974120f1b8",
+      "dest": "skills/financeskills",
+      "paths": [
+        {
+          "from": "skills",
+          "to": "",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        }
+      ],
+      "mandatory": [],
+      "limitations": [
+        "Only the upstream skills/ tree is imported. No Markdown link from a skill leaves skills/, so commands/, tools/, standards/, foundations/, workflows/, compliance/ and projects/ are not vendored. The 52 slash commands under commands/ are wrappers that call a skill by path and are not vendored; the MCP server and helper tooling under tools/ are plugin runtime, not skill content.",
+        "Four prose references point at unvendored trees: standards/foundational/practice-standard-earned-value-management, standards/auditing-assurance, projects/context.md and projects/completed-projects/2019/holdings-of-cryptocurrencies/. An agent following them literally finds nothing here.",
+        "projects/context.md is a user workspace file, the same way job-hunt reads my-documents/. It is not vendored content.",
+        "The upstream validator (validate_skills.py, validate-skills.sh) is not vendored. scripts/lint_skills.py is the only validator this repository runs.",
+        "The upstream LICENSE names KOMVIA as the copyright holder while the README credits Ayotunde Oso (@GAJETOso). Both are recorded rather than choosing one."
+      ],
+      "pinned_at": "2026-10-24"
     }
   ]
 }

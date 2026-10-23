@@ -162,3 +162,6 @@ __pycache__/
 *$py.class
 .venv/
 venv/
+
+# Codegraph index (local analysis cache)
+.codegraph/
