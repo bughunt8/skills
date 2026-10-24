@@ -1452,6 +1452,37 @@
         "Many reference files are duplicated across skills upstream. They are copied as-is rather than deduplicated, because the vendor model copies whole skill directories."
       ],
       "pinned_at": "2026-10-24"
+    },
+    {
+      "id": "jev-skill",
+      "name": "jev-skill",
+      "repo": "https://github.com/wuyoscar/jev-skill",
+      "homepage": "https://github.com/wuyoscar/jev-skill",
+      "author": "wuyoscar",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "main",
+      "pinned_commit": "86b19a2c9856cc908ad29b5cf02ff1c4e7323c09",
+      "dest": "skills/jev-skill",
+      "paths": [
+        {
+          "from": "skills",
+          "to": "",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        }
+      ],
+      "mandatory": [],
+      "limitations": [
+        "docs/, evals/, tests/ and .claude/ are not vendored. Skills reference them in prose, including docs/api, docs/experiments, docs/cookbook, evals/CALIBRATION.md, evals/THIRD_PARTY.md and tests/session.test.ts, so those paths do not resolve here.",
+        "skills/jev/scripts/jev.py is vendored as content. The pyproject.toml and the jev-decide console entry point are not, so the CLI is not installed as a command.",
+        "skills/jev-eval/agents/openai.yaml is shipped content, not an agent registration this repository honours."
+      ],
+      "pinned_at": "2026-10-24"
     }
   ]
 }

@@ -91,6 +91,7 @@ LABELS = {
     "financeskills": "Finance practice",
     "gtm-skills": "GTM playbooks",
     "loop-library": "Agent loops",
+    "jev-skill": "Jev agent workflows",
     "start-github-repo": "Repo scaffolding",
     "marketing": "Landing pages",
 }
