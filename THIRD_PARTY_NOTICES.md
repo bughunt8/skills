@@ -50,6 +50,7 @@ refreshed at least every two weeks. Provenance presence is enforced on every pul
 | [Matt Pocock invocation policy reference](https://github.com/mattpocock/skills) | Matt Pocock (@mattpocock) | MIT | `docs/reference-sources/mattpocock-invocation/` | [`24fe0ef7737e`](https://github.com/mattpocock/skills/commit/24fe0ef7737efae15c87225755e9f6f5965e4888) | [ATTRIBUTION.md](./docs/reference-sources/mattpocock-invocation/ATTRIBUTION.md) |
 | [HumanLayer show-me credit license](https://github.com/humanlayer/skills) | HumanLayer and contributors; show-me credited to Dex Horthy | MIT | `docs/reference-sources/humanlayer-pr-credit/` | [`ca7c8088db69`](https://github.com/humanlayer/skills/commit/ca7c8088db69e315a8b2deea43820270457f8f3c) | [ATTRIBUTION.md](./docs/reference-sources/humanlayer-pr-credit/ATTRIBUTION.md) |
 | [financeskills](https://github.com/GAJETOso/financeskills) | Ayotunde Oso (@GAJETOso), KOMVIA | MIT | `skills/financeskills/` | [`b0c6239e339c`](https://github.com/GAJETOso/financeskills/commit/b0c6239e339c1865c54bd2bb4cd4c1974120f1b8) | [ATTRIBUTION.md](./skills/financeskills/ATTRIBUTION.md) |
+| [gtm-skills](https://github.com/LeadMagic/gtm-skills) | LeadMagic LLC | MIT | `skills/gtm-skills/` | [`2b7ec0f9e704`](https://github.com/LeadMagic/gtm-skills/commit/2b7ec0f9e7044f46e4c77b536f486303fd863e28) | [ATTRIBUTION.md](./skills/gtm-skills/ATTRIBUTION.md) |
 
 ### Secondary licences inside those imports
 

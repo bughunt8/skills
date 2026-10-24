@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+import sys
+from pathlib import Path
+
+terms = ["maturity", "bowtie", "cadence", "revops"]
+path = Path(sys.argv[1]) if len(sys.argv) > 1 else None
+if not path or not path.exists():
+    print("Usage: check-output.py path/to/deliverable.md")
+    raise SystemExit(2)
+t = path.read_text().lower()
+# Reject unresolved fields from the shipped output template.
+if any(marker in t.lower() for marker in ('[field]', '[value]', '[company]', '[one paragraph:', '[fill per')):
+    print('FAIL — unresolved output-template placeholders remain')
+    raise SystemExit(1)
+missing = [x for x in terms if x not in t]
+if missing:
+    print("Missing:", ", ".join(missing))
+    raise SystemExit(1)
+print("OK")

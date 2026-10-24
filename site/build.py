@@ -88,6 +88,8 @@ LABELS = {
     "research-ops": "Research ops",
     "shuohao": "Short-drama production",
     "finance": "Finance",
+    "financeskills": "Finance practice",
+    "gtm-skills": "GTM playbooks",
     "loop-library": "Agent loops",
     "start-github-repo": "Repo scaffolding",
     "marketing": "Landing pages",
