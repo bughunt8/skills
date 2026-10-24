@@ -17,7 +17,26 @@ async function openIntro(page) {
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/intro.html");
   await expect(page.locator("body")).toHaveAttribute("data-ready", "true", { timeout: 15000 });
+  // data-ready is set before the 700 ms opening camera move. Reading data-scale
+  // immediately after it samples a frame in flight, which inverts the wheel
+  // assertion and makes the first hover land on a moving dot. Wait for the scale to
+  // hold across two polls instead of sleeping for a guessed duration.
+  await page.waitForFunction(() => {
+    const scale = window.__intro.network.getScale().toFixed(4);
+    const previous = window.__scaleSeen;
+    window.__scaleSeen = scale;
+    return previous === scale && document.body.dataset.scale !== undefined;
+  }, null, { polling: 250 });
   return errors;
+}
+
+async function waitForCameraSettled(page) {
+  await page.waitForFunction(() => {
+    const scale = window.__intro.network.getScale().toFixed(4);
+    const previous = window.__cameraSettled;
+    window.__cameraSettled = scale;
+    return previous === scale;
+  }, null, { polling: 100 });
 }
 
 async function freeNodePoint(page) {
@@ -29,8 +48,13 @@ async function freeNodePoint(page) {
       .filter(Boolean)
       .map((element) => element.getBoundingClientRect());
     const positions = network.getPositions();
+    // Hidden dots are still in getPositions(). The intro hides sparse
+    // communities below the focus scale, and a pointer over a hidden dot
+    // resolves to nothing, so pick a dot the page will actually answer for.
+    const eligible = new Set(window.__intro.eligible());
     for (const key of Object.keys(positions)) {
       const id = Number(key);
+      if (!eligible.has(id)) continue;
       const point = network.canvasToDOM(positions[key]);
       const x = point.x + canvas.left;
       const y = point.y + canvas.top;
@@ -58,7 +82,12 @@ test.describe("cinematic navigation", () => {
       const before = Number(await page.locator("body").getAttribute("data-scale"));
       await page.mouse.move(700, 400);
       await page.mouse.wheel(0, -900);
-      await page.waitForTimeout(600);
+      await page.waitForFunction(() => {
+        const scale = window.__intro.network.getScale().toFixed(4);
+        const previous = window.__wheelSeen;
+        window.__wheelSeen = scale;
+        return previous === scale;
+      }, null, { polling: 250 });
       expect(Number(await page.locator("body").getAttribute("data-scale"))).toBeGreaterThan(before);
       expect(await page.evaluate(() => window.scrollY)).toBe(0);
     }
@@ -220,7 +249,7 @@ test.describe("cinematic navigation", () => {
       window.__intro.network.moveTo({ scale, animation: { duration: 250 } });
     }, focusScale * 1.6);
     await expect(page.locator("body")).toHaveAttribute("data-scale", /^[0-9.]+$/);
-    await page.waitForTimeout(600);
+    await waitForCameraSettled(page);
 
     expect(Number(await page.locator("body").getAttribute("data-scale"))).toBeGreaterThanOrEqual(
       focusScale
@@ -230,7 +259,7 @@ test.describe("cinematic navigation", () => {
     await page.evaluate(() => {
       window.__intro.network.moveTo({ scale: 0.05, animation: { duration: 250 } });
     });
-    await page.waitForTimeout(600);
+    await waitForCameraSettled(page);
     await expect(page.locator("body")).toHaveAttribute("data-hidden", "0");
   });
 });

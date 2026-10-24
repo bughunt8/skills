@@ -4,7 +4,8 @@ import {
   openMotionWorkspace, openMotionPage, expectMotionIdle, resetProbe, readProbe,
   motionEpisodes, sampleMotionFrame, motionSnapshot, comparableSnapshot,
   semanticTop, viewTop, sampleViewTruth, sampleSelectedLabel,
-  resultKeys, resultFor, tapOrClick, ensureVisible, sampleCamera, cameraDisplacement
+  resultKeys, resultFor, tapOrClick, ensureVisible, sampleCamera, cameraDisplacement,
+  armCameraBurst, readCameraBurst
 } from "../scripts/motion-test-helpers.mjs";
 
 // Acceptance for `site/MOTION.md`. One rule is under test everywhere here:
@@ -187,11 +188,13 @@ test.describe("graph motion acceptance", () => {
   // One camera beat, watched frame by frame. No idle wait before or during the
   // sampling: the point is to observe the flight. `expect` messages carry the
   // MOTION_CAMERA_TRAVEL tag so the planted-defect proof can match them.
-  async function proveCameraTravel(page, label, trigger) {
-    await resetProbe(page);
-    await trigger();
+  // Sampling starts before the trigger so the first in-flight frames are not
+  // missed while the click is dispatched. The loop only stops after it has seen
+  // motion go running and then settle twice, so a pre-trigger idle sample cannot
+  // end it early.
+  async function collectCamera(page, deadlineMs = 6000) {
     const samples = [];
-    const deadline = Date.now() + 5000;
+    const deadline = Date.now() + deadlineMs;
     let sawRunning = false, settled = 0;
     while (Date.now() < deadline) {
       const sample = await sampleCamera(page);
@@ -200,8 +203,16 @@ test.describe("graph motion acceptance", () => {
       if (sample.motion !== "running" && sawRunning) settled++;
       if (settled >= 2) break;
     }
+    return samples;
+  }
+
+  async function proveCameraTravel(page, label, trigger) {
+    await resetProbe(page);
+    await armCameraBurst(page);
+    await trigger();
+    const samples = await readCameraBurst(page);
     const during = samples.filter((s) => s.motion === "running");
-    expect(sawRunning, `non-vacuity: the ${label} beat must animate`).toBe(true);
+    expect(during.length > 0, `non-vacuity: the ${label} beat must animate`).toBe(true);
     expect(during.length,
       `non-vacuity: the sampler must catch several in-flight camera frames for ${label}`)
       .toBeGreaterThanOrEqual(3);
@@ -221,6 +232,19 @@ test.describe("graph motion acceptance", () => {
       `MOTION_CAMERA_TRAVEL: the settled camera must equal the committed target exactly (${label})`)
       .toBe(`translate(${end.target.x} ${end.target.y}) scale(${end.target.scale})`);
     return { label, samples: samples.length, inFlight: during.length, steps, travel, end };
+  }
+
+  async function collectLabels(page, deadlineMs = 6000) {
+    const samples = [];
+    const deadline = Date.now() + deadlineMs;
+    let sawRunning = false, after = 0;
+    while (Date.now() < deadline) {
+      const sample = await sampleSelectedLabel(page);
+      samples.push(sample);
+      if (sample.motion === "running") sawRunning = true;
+      if (sawRunning && sample.motion !== "running" && ++after >= 2) break;
+    }
+    return samples;
   }
 
   test("MOTION_CAMERA_TRAVEL the camera actually travels on context, zoom and fit", async ({ page }, testInfo) => {
@@ -252,16 +276,9 @@ test.describe("graph motion acceptance", () => {
     for (const beat of [{ name: "zoom-out", selector: "#gzoom-out" },
                         { name: "zoom-out-again", selector: "#gzoom-out" },
                         { name: "fit", selector: "#gfit" }]) {
+      const sampling = collectLabels(page);
       await tapOrClick(await ensureVisible(page, beat.selector), testInfo);
-      const samples = [];
-      const deadline = Date.now() + 5000;
-      let sawRunning = false, after = 0;
-      while (Date.now() < deadline) {
-        const sample = await sampleSelectedLabel(page);
-        samples.push(sample);
-        if (sample.motion === "running") sawRunning = true;
-        if (sawRunning && sample.motion !== "running" && ++after >= 2) break;
-      }
+      const samples = await sampling;
       const during = samples.filter((s) => s.motion === "running");
       expect(during.length,
         `non-vacuity: the ${beat.name} beat must animate and be sampled in flight`)

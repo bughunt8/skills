@@ -353,6 +353,53 @@ export async function sampleCamera(page) {
   });
 }
 
+// Frame-rate sampling that lives in the page. A sampler driven by CDP round
+// trips loses frames on a heavy graph: the loop is only as fast as the protocol,
+// not the compositor. This arms a MutationObserver, records every frame from the
+// moment #top reports motion, and stops after the camera settles. Nothing here
+// changes what is asserted; it only observes more of the flight.
+export async function armCameraBurst(page) {
+  await page.evaluate(() => {
+    const top = document.getElementById("top"), vp = document.getElementById("vp");
+    const read = () => {
+      const ctm = vp.getScreenCTM();
+      return {
+        t: performance.now(),
+        motion: top.dataset.motion ?? null,
+        beat: top.dataset.motionBeat ?? null,
+        transform: vp.getAttribute("transform"),
+        matrix: ctm ? { a: ctm.a, b: ctm.b, c: ctm.c, d: ctm.d, e: ctm.e, f: ctm.f } : null,
+        target: { x: Number(vp.dataset.x), y: Number(vp.dataset.y), scale: Number(vp.dataset.scale) }
+      };
+    };
+    const state = { samples: [], done: false, started: false };
+    window.__cameraBurst = state;
+    const deadline = performance.now() + 8000;
+    let idle = 0;
+    function tick() {
+      state.samples.push(read());
+      if (top.dataset.motion === "running") idle = 0;
+      else if (state.started) idle++;
+      if (idle >= 2 || performance.now() > deadline) { state.done = true; return; }
+      requestAnimationFrame(tick);
+    }
+    const observer = new MutationObserver(() => {
+      if (top.dataset.motion === "running" && !state.started) {
+        state.started = true;
+        observer.disconnect();
+        requestAnimationFrame(tick);
+      }
+    });
+    observer.observe(top, { attributes: true, attributeFilter: ["data-motion"] });
+  });
+}
+
+export async function readCameraBurst(page) {
+  await page.waitForFunction(() => window.__cameraBurst && window.__cameraBurst.done, null,
+    { timeout: 10000 });
+  return page.evaluate(() => window.__cameraBurst.samples);
+}
+
 // Screen displacement of the scene origin between two camera samples, plus the
 // scale change. A camera that never interpolates produces zeroes here.
 export function cameraDisplacement(a, b) {
