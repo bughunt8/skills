@@ -1483,6 +1483,32 @@
         "skills/jev-eval/agents/openai.yaml is shipped content, not an agent registration this repository honours."
       ],
       "pinned_at": "2026-10-24"
+    },
+    {
+      "id": "rederive",
+      "name": "rederive",
+      "repo": "https://github.com/EricJujianZou/rederive",
+      "homepage": "https://github.com/EricJujianZou/rederive",
+      "author": "Eric Zou",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "master",
+      "pinned_commit": "329f9c915944272f4f63954220f5d00a5c342270",
+      "dest": "skills/rederive",
+      "paths": [
+        {
+          "from": "skills/rederive",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [],
+      "limitations": [
+        "docs/, assets/ and .claude-plugin/ are not vendored. Static relative-link checks found no links under skills/ to them.",
+        "scripts/history.sh shells out to git and scripts/structure.py to python3. Both are standard tooling, not bundled dependencies.",
+        "The skill writes .rederive/map.md and .rederive/log.md into the target repository. That is workspace state in the user's repo, not vendored content."
+      ],
+      "pinned_at": "2026-10-25"
     }
   ]
 }
