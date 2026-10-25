@@ -163,6 +163,12 @@ remain open acceptance work, not verified delivery claims.
 
 ## Publication boundary
 
-The candidate branch is based on `origin/staging`. A local branch and package
-do not change GitHub or the live catalogue. Do not merge, promote or deploy
-without separate authorization.
+The reviewed implementation commit is
+`ccf2e9e568c9ff1f2e1fc8f1518f913739127585`. After explicit user approval, the
+feature branch was pushed and [draft PR #66](https://github.com/bughunt8/skills/pull/66)
+was opened against `staging`. The remaining qualification work is tracked in
+[issue #65](https://github.com/bughunt8/skills/issues/65), which stays open until
+its acceptance evidence is verified.
+
+Publication of this draft does not authorize merge, promotion to `main` or
+deployment. The separate standalone package remains the reviewed v1.0.0 source.
