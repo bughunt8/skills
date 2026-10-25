@@ -1,0 +1,754 @@
+{
+  "schema_version": "1.0",
+  "source": {
+    "repository": "OpenHeart MIT Observer source fixture",
+    "revision": "0bf962fc06e975e9ea7610242b8997b1391fec05",
+    "scope": [
+      "com/patterns/behavioral/observer"
+    ],
+    "languages": [
+      "Java"
+    ],
+    "exclusions": []
+  },
+  "files": [
+    {
+      "path": "com/patterns/behavioral/observer/NewsAgency.java",
+      "sha256": "24e0704bd8116706aa388a0725db1f4705af54057cf37554ccdcbdbcd69e3fe1",
+      "line_count": 31,
+      "encoding": "utf-8",
+      "role": "source"
+    },
+    {
+      "path": "com/patterns/behavioral/observer/NewsChannel.java",
+      "sha256": "6862345269bf67855f304ae67e15bdfd5c449f59c4a8648ab18eb0ae4211d832",
+      "line_count": 11,
+      "encoding": "utf-8",
+      "role": "source"
+    },
+    {
+      "path": "com/patterns/behavioral/observer/Observer.java",
+      "sha256": "603d1f3dc0d4c3382a07e542a15ffc6ae7e0499bad1994e0c0bb5724a7fbdafe",
+      "line_count": 5,
+      "encoding": "utf-8",
+      "role": "source"
+    },
+    {
+      "path": "com/patterns/behavioral/observer/Subject.java",
+      "sha256": "24ae10ec63572a6f2925e1ea9dbffda22daba1fb7f2b6c5d3b4aadbcf278ab3c",
+      "line_count": 7,
+      "encoding": "utf-8",
+      "role": "source"
+    }
+  ],
+  "stages": {
+    "ingestion": {
+      "status": "not_computed",
+      "reason": "Not computed in this declaration-only Java regression.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "syntax": {
+      "status": "not_computed",
+      "reason": "Not computed in this declaration-only Java regression.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "symbols": {
+      "status": "partial",
+      "reason": "JDK types and full name-resolution tables are omitted.",
+      "method": "Manually reconstructed fixture, not parser/solver output",
+      "nodes": [
+        {
+          "id": "java:com.patterns.behavioral.observer.NewsAgency",
+          "label": "com.patterns.behavioral.observer.NewsAgency",
+          "kind": "class",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "com/patterns/behavioral/observer/NewsAgency.java",
+              "line_start": 6,
+              "line_end": 31,
+              "excerpt": "public class NewsAgency implements Subject {"
+            }
+          ],
+          "fields": [
+            {
+              "visibility": "-",
+              "name": "news",
+              "type_name": "String",
+              "signature": "String news",
+              "is_static": false,
+              "is_final": false
+            },
+            {
+              "visibility": "-",
+              "name": "observers",
+              "type_name": "List<Observer>",
+              "signature": "List<Observer> observers",
+              "is_static": false,
+              "is_final": false
+            }
+          ],
+          "methods": [
+            {
+              "visibility": "+",
+              "name": "setNews",
+              "type_name": "void",
+              "signature": "void setNews(String news)",
+              "is_static": false,
+              "is_final": false
+            },
+            {
+              "visibility": "+",
+              "name": "attach",
+              "type_name": "void",
+              "signature": "void attach(Observer observer)",
+              "is_static": false,
+              "is_final": false
+            },
+            {
+              "visibility": "+",
+              "name": "detach",
+              "type_name": "void",
+              "signature": "void detach(Observer observer)",
+              "is_static": false,
+              "is_final": false
+            },
+            {
+              "visibility": "+",
+              "name": "notifyObservers",
+              "type_name": "void",
+              "signature": "void notifyObservers()",
+              "is_static": false,
+              "is_final": false
+            }
+          ],
+          "attributes": {
+            "qualified_name": "com.patterns.behavioral.observer.NewsAgency",
+            "symbol_kind": "class"
+          }
+        },
+        {
+          "id": "java:com.patterns.behavioral.observer.NewsChannel",
+          "label": "com.patterns.behavioral.observer.NewsChannel",
+          "kind": "class",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "com/patterns/behavioral/observer/NewsChannel.java",
+              "line_start": 3,
+              "line_end": 11,
+              "excerpt": "public class NewsChannel implements Observer {"
+            }
+          ],
+          "fields": [
+            {
+              "visibility": "-",
+              "name": "news",
+              "type_name": "String",
+              "signature": "String news",
+              "is_static": false,
+              "is_final": false
+            }
+          ],
+          "methods": [
+            {
+              "visibility": "+",
+              "name": "update",
+              "type_name": "void",
+              "signature": "void update(String news)",
+              "is_static": false,
+              "is_final": false
+            }
+          ],
+          "attributes": {
+            "qualified_name": "com.patterns.behavioral.observer.NewsChannel",
+            "symbol_kind": "class"
+          }
+        },
+        {
+          "id": "java:com.patterns.behavioral.observer.Observer",
+          "label": "com.patterns.behavioral.observer.Observer",
+          "kind": "interface",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "com/patterns/behavioral/observer/Observer.java",
+              "line_start": 3,
+              "line_end": 5,
+              "excerpt": "public interface Observer {"
+            }
+          ],
+          "fields": [],
+          "methods": [
+            {
+              "visibility": "+",
+              "name": "update",
+              "type_name": "void",
+              "signature": "void update(String news)",
+              "is_static": false,
+              "is_final": false
+            }
+          ],
+          "attributes": {
+            "qualified_name": "com.patterns.behavioral.observer.Observer",
+            "symbol_kind": "interface"
+          }
+        },
+        {
+          "id": "java:com.patterns.behavioral.observer.Subject",
+          "label": "com.patterns.behavioral.observer.Subject",
+          "kind": "interface",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "com/patterns/behavioral/observer/Subject.java",
+              "line_start": 3,
+              "line_end": 7,
+              "excerpt": "public interface Subject {"
+            }
+          ],
+          "fields": [],
+          "methods": [
+            {
+              "visibility": "+",
+              "name": "attach",
+              "type_name": "void",
+              "signature": "void attach(Observer observer)",
+              "is_static": false,
+              "is_final": false
+            },
+            {
+              "visibility": "+",
+              "name": "detach",
+              "type_name": "void",
+              "signature": "void detach(Observer observer)",
+              "is_static": false,
+              "is_final": false
+            },
+            {
+              "visibility": "+",
+              "name": "notifyObservers",
+              "type_name": "void",
+              "signature": "void notifyObservers()",
+              "is_static": false,
+              "is_final": false
+            }
+          ],
+          "attributes": {
+            "qualified_name": "com.patterns.behavioral.observer.Subject",
+            "symbol_kind": "interface"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "java:implements:NewsAgency:Subject",
+          "source": "java:com.patterns.behavioral.observer.NewsAgency",
+          "target": "java:com.patterns.behavioral.observer.Subject",
+          "kind": "implements",
+          "label": "implements",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "com/patterns/behavioral/observer/NewsAgency.java",
+              "line_start": 6,
+              "line_end": 31,
+              "excerpt": "public class NewsAgency implements Subject {"
+            }
+          ],
+          "attributes": {
+            "derivation": "The declaration explicitly states implements Subject."
+          }
+        },
+        {
+          "id": "java:implements:NewsChannel:Observer",
+          "source": "java:com.patterns.behavioral.observer.NewsChannel",
+          "target": "java:com.patterns.behavioral.observer.Observer",
+          "kind": "implements",
+          "label": "implements",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "com/patterns/behavioral/observer/NewsChannel.java",
+              "line_start": 3,
+              "line_end": 11,
+              "excerpt": "public class NewsChannel implements Observer {"
+            }
+          ],
+          "attributes": {
+            "derivation": "The declaration explicitly states implements Observer."
+          }
+        },
+        {
+          "id": "java:type-use:NewsAgency:Observer",
+          "source": "java:com.patterns.behavioral.observer.NewsAgency",
+          "target": "java:com.patterns.behavioral.observer.Observer",
+          "kind": "type_use",
+          "label": "observer element type",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "com/patterns/behavioral/observer/NewsAgency.java",
+              "line_start": 8,
+              "line_end": 8,
+              "excerpt": "private List<Observer> observers = new ArrayList<>();"
+            }
+          ],
+          "attributes": {
+            "derivation": "The declared generic element type refers to the same-package Observer interface."
+          }
+        }
+      ]
+    },
+    "control_flow": {
+      "status": "not_computed",
+      "reason": "Not computed in this declaration-only Java regression.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "data_flow": {
+      "status": "not_computed",
+      "reason": "Not computed in this declaration-only Java regression.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "calls": {
+      "status": "not_computed",
+      "reason": "Not computed in this declaration-only Java regression.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "traceability": {
+      "status": "not_computed",
+      "reason": "Not computed in this declaration-only Java regression.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "paths": {
+      "status": "not_computed",
+      "reason": "Not computed in this declaration-only Java regression.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "uml": {
+      "status": "not_computed",
+      "reason": "Not computed in this declaration-only Java regression.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "unified": {
+      "status": "not_computed",
+      "reason": "Not computed in this declaration-only Java regression.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    }
+  },
+  "diagrams": {
+    "class": {
+      "status": "partial",
+      "reason": "Scoped declarations only; JDK types and full UML ownership semantics omitted.",
+      "method": "Manually reconstructed fixture, not parser/solver output",
+      "nodes": [
+        {
+          "id": "java:com.patterns.behavioral.observer.NewsAgency",
+          "label": "com.patterns.behavioral.observer.NewsAgency",
+          "kind": "class",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "com/patterns/behavioral/observer/NewsAgency.java",
+              "line_start": 6,
+              "line_end": 31,
+              "excerpt": "public class NewsAgency implements Subject {"
+            }
+          ],
+          "fields": [
+            {
+              "visibility": "-",
+              "name": "news",
+              "type_name": "String",
+              "signature": "String news",
+              "is_static": false,
+              "is_final": false
+            },
+            {
+              "visibility": "-",
+              "name": "observers",
+              "type_name": "List<Observer>",
+              "signature": "List<Observer> observers",
+              "is_static": false,
+              "is_final": false
+            }
+          ],
+          "methods": [
+            {
+              "visibility": "+",
+              "name": "setNews",
+              "type_name": "void",
+              "signature": "void setNews(String news)",
+              "is_static": false,
+              "is_final": false
+            },
+            {
+              "visibility": "+",
+              "name": "attach",
+              "type_name": "void",
+              "signature": "void attach(Observer observer)",
+              "is_static": false,
+              "is_final": false
+            },
+            {
+              "visibility": "+",
+              "name": "detach",
+              "type_name": "void",
+              "signature": "void detach(Observer observer)",
+              "is_static": false,
+              "is_final": false
+            },
+            {
+              "visibility": "+",
+              "name": "notifyObservers",
+              "type_name": "void",
+              "signature": "void notifyObservers()",
+              "is_static": false,
+              "is_final": false
+            }
+          ],
+          "attributes": {
+            "qualified_name": "com.patterns.behavioral.observer.NewsAgency",
+            "symbol_kind": "class"
+          }
+        },
+        {
+          "id": "java:com.patterns.behavioral.observer.NewsChannel",
+          "label": "com.patterns.behavioral.observer.NewsChannel",
+          "kind": "class",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "com/patterns/behavioral/observer/NewsChannel.java",
+              "line_start": 3,
+              "line_end": 11,
+              "excerpt": "public class NewsChannel implements Observer {"
+            }
+          ],
+          "fields": [
+            {
+              "visibility": "-",
+              "name": "news",
+              "type_name": "String",
+              "signature": "String news",
+              "is_static": false,
+              "is_final": false
+            }
+          ],
+          "methods": [
+            {
+              "visibility": "+",
+              "name": "update",
+              "type_name": "void",
+              "signature": "void update(String news)",
+              "is_static": false,
+              "is_final": false
+            }
+          ],
+          "attributes": {
+            "qualified_name": "com.patterns.behavioral.observer.NewsChannel",
+            "symbol_kind": "class"
+          }
+        },
+        {
+          "id": "java:com.patterns.behavioral.observer.Observer",
+          "label": "com.patterns.behavioral.observer.Observer",
+          "kind": "interface",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "com/patterns/behavioral/observer/Observer.java",
+              "line_start": 3,
+              "line_end": 5,
+              "excerpt": "public interface Observer {"
+            }
+          ],
+          "fields": [],
+          "methods": [
+            {
+              "visibility": "+",
+              "name": "update",
+              "type_name": "void",
+              "signature": "void update(String news)",
+              "is_static": false,
+              "is_final": false
+            }
+          ],
+          "attributes": {
+            "qualified_name": "com.patterns.behavioral.observer.Observer",
+            "symbol_kind": "interface"
+          }
+        },
+        {
+          "id": "java:com.patterns.behavioral.observer.Subject",
+          "label": "com.patterns.behavioral.observer.Subject",
+          "kind": "interface",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "com/patterns/behavioral/observer/Subject.java",
+              "line_start": 3,
+              "line_end": 7,
+              "excerpt": "public interface Subject {"
+            }
+          ],
+          "fields": [],
+          "methods": [
+            {
+              "visibility": "+",
+              "name": "attach",
+              "type_name": "void",
+              "signature": "void attach(Observer observer)",
+              "is_static": false,
+              "is_final": false
+            },
+            {
+              "visibility": "+",
+              "name": "detach",
+              "type_name": "void",
+              "signature": "void detach(Observer observer)",
+              "is_static": false,
+              "is_final": false
+            },
+            {
+              "visibility": "+",
+              "name": "notifyObservers",
+              "type_name": "void",
+              "signature": "void notifyObservers()",
+              "is_static": false,
+              "is_final": false
+            }
+          ],
+          "attributes": {
+            "qualified_name": "com.patterns.behavioral.observer.Subject",
+            "symbol_kind": "interface"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "java:implements:NewsAgency:Subject",
+          "source": "java:com.patterns.behavioral.observer.NewsAgency",
+          "target": "java:com.patterns.behavioral.observer.Subject",
+          "kind": "implements",
+          "label": "implements",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "com/patterns/behavioral/observer/NewsAgency.java",
+              "line_start": 6,
+              "line_end": 31,
+              "excerpt": "public class NewsAgency implements Subject {"
+            }
+          ],
+          "attributes": {
+            "derivation": "The declaration explicitly states implements Subject."
+          }
+        },
+        {
+          "id": "java:implements:NewsChannel:Observer",
+          "source": "java:com.patterns.behavioral.observer.NewsChannel",
+          "target": "java:com.patterns.behavioral.observer.Observer",
+          "kind": "implements",
+          "label": "implements",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "com/patterns/behavioral/observer/NewsChannel.java",
+              "line_start": 3,
+              "line_end": 11,
+              "excerpt": "public class NewsChannel implements Observer {"
+            }
+          ],
+          "attributes": {
+            "derivation": "The declaration explicitly states implements Observer."
+          }
+        },
+        {
+          "id": "java:type-use:NewsAgency:Observer",
+          "source": "java:com.patterns.behavioral.observer.NewsAgency",
+          "target": "java:com.patterns.behavioral.observer.Observer",
+          "kind": "type_use",
+          "label": "observer element type",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "com/patterns/behavioral/observer/NewsAgency.java",
+              "line_start": 8,
+              "line_end": 8,
+              "excerpt": "private List<Observer> observers = new ArrayList<>();"
+            }
+          ],
+          "attributes": {
+            "derivation": "The declared generic element type refers to the same-package Observer interface."
+          }
+        }
+      ]
+    },
+    "package": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "component": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "composite": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "object": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "deployment": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "profile": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "sequence": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "statemachine": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "activity": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "usecase": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "communication": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "interaction": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "timing": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "cfg": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "dfg": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "cdg": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "callgraph": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "robdd": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "ast": {
+      "status": "not_requested",
+      "reason": "Outside this run's requested scope.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    }
+  },
+  "limitations": [
+    "Model independently authored from four MIT-licensed Java inputs at the pinned upstream revision.",
+    "No upstream executable or output JSON used as the truth oracle.",
+    "Only declarations, signatures, two realizations and one type dependency are qualified.",
+    "No token, CFG, SSA, call, ROBDD, runtime, deployment or whole-language benchmark is claimed."
+  ]
+}

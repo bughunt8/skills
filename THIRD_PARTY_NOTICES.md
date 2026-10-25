@@ -12,10 +12,12 @@ Two tiers, because they carry different guarantees.
 
 Declared in [`skills/vendor.manifest.json`](./skills/vendor.manifest.json), imported by
 [`scripts/sync_vendor.py`](./scripts/sync_vendor.py), pinned to a full commit, and
-refreshed at least every two weeks. Provenance presence is enforced on every pull request.
+checked at least every two weeks. Branch-tracking sources can refresh automatically; immutable
+commit references require a reviewed manual pin update. Provenance presence is enforced on every pull request.
 
 | Upstream project | Author | Licence | Vendored to | Pinned commit | Attribution |
 | --- | --- | --- | --- | --- | --- |
+| [OpenHeart](https://github.com/AhmadHassan-BTed/OpenHeart) | Ahmad Hassan (B-Ted); copyright notice: OpenHeart Contributors | MIT | `skills/engineering/openheart-analysis/references/upstream/` | [`0bf962fc06e9`](https://github.com/AhmadHassan-BTed/OpenHeart/commit/0bf962fc06e975e9ea7610242b8997b1391fec05) | [ATTRIBUTION.md](./skills/engineering/openheart-analysis/references/upstream/ATTRIBUTION.md) |
 | [pstack](https://github.com/backnotprop/pstack) | Lauren Tan (@backnotprop, "poteto") | MIT | `skills/pstack/` | [`18e0e908a135`](https://github.com/backnotprop/pstack/commit/18e0e908a13553b0e58d065ab26dbc9a972ec8ba) | [ATTRIBUTION.md](./skills/pstack/ATTRIBUTION.md) |
 | [job-hunt-skills](https://github.com/Remotivated/job-hunt-skills) | Remotivated | MIT, plus OFL-1.1 | `skills/job-hunt/` | [`5fb238febf14`](https://github.com/Remotivated/job-hunt-skills/commit/5fb238febf14a0b41fb5a8fe7384594ad1f59335) | [ATTRIBUTION.md](./skills/job-hunt/ATTRIBUTION.md) |
 | [i-have-adhd](https://github.com/ayghri/i-have-adhd) | Ayoub Ghriss (@ayghri) | MIT | `skills/i-have-adhd/` | [`4092de07ce3e`](https://github.com/ayghri/i-have-adhd/commit/4092de07ce3ed88389d77c0d623b7af89b40ac0e) | [ATTRIBUTION.md](./skills/i-have-adhd/ATTRIBUTION.md) |

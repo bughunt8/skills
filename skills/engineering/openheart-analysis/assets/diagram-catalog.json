@@ -1,0 +1,151 @@
+{
+  "schema_version": "1.0",
+  "upstream_commit": "0bf962fc06e975e9ea7610242b8997b1391fec05",
+  "act_alias": {
+    "id": "ACT",
+    "canonical": "activity",
+    "provisional": true
+  },
+  "diagrams": [
+    {
+      "id": "class",
+      "title": "Class",
+      "upstream": true,
+      "mermaid": "classDiagram",
+      "native_notation": true
+    },
+    {
+      "id": "package",
+      "title": "Package",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "component",
+      "title": "Component",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "composite",
+      "title": "Composite structure",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "object",
+      "title": "Object",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "deployment",
+      "title": "Deployment",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "profile",
+      "title": "Profile",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "sequence",
+      "title": "Sequence",
+      "upstream": true,
+      "mermaid": "sequenceDiagram",
+      "native_notation": true
+    },
+    {
+      "id": "statemachine",
+      "title": "State machine",
+      "upstream": true,
+      "mermaid": "stateDiagram-v2",
+      "native_notation": true
+    },
+    {
+      "id": "activity",
+      "title": "Activity",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "usecase",
+      "title": "Use case",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "communication",
+      "title": "Communication",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "interaction",
+      "title": "Interaction overview",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "timing",
+      "title": "Timing",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "cfg",
+      "title": "Control flow",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "dfg",
+      "title": "Data flow",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "cdg",
+      "title": "Control dependence",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "callgraph",
+      "title": "Call graph",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "robdd",
+      "title": "ROBDD path summary",
+      "upstream": true,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    },
+    {
+      "id": "ast",
+      "title": "Abstract syntax tree",
+      "upstream": false,
+      "mermaid": "flowchart TD",
+      "native_notation": false
+    }
+  ]
+}

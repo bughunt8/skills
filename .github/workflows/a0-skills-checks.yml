@@ -60,6 +60,9 @@ jobs:
       - name: Test GitHub setup skill contracts and templates
         run: python3 skills/engineering/github-repository-setup/scripts/test_bundle.py
 
+      - name: Test standalone OpenHeart analysis skill
+        run: python3 -m unittest discover -s skills/engineering/openheart-analysis/tests -p 'test_*.py' -v
+
       # The README used to carry hand-counted totals; three of them were wrong.
       # The counts are generated now, and this step proves nobody bypassed it.
       - name: Check the generated skill index is current

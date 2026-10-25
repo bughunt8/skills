@@ -3,6 +3,67 @@
   "$comment": "Single source of truth for every directory in this repository that is vendored from an upstream project. scripts/sync_vendor.py reads this file to perform both the initial import and every scheduled refresh, so an import and an update take exactly the same code path. Do not hand-edit vendored directories: change the manifest, then re-run the script. A source maps a list of upstream subtrees into its own vendored root, preserving the relative distance between them so links inside the vendored content keep resolving. kind=skill-collection tracks each child directory individually; kind=support copies a linked-into subtree whole.",
   "sources": [
     {
+      "id": "openheart-reference",
+      "name": "OpenHeart",
+      "repo": "https://github.com/AhmadHassan-BTed/OpenHeart",
+      "homepage": "https://github.com/AhmadHassan-BTed/OpenHeart",
+      "author": "Ahmad Hassan (B-Ted); copyright notice: OpenHeart Contributors",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "0bf962fc06e975e9ea7610242b8997b1391fec05",
+      "expected_commit": "0bf962fc06e975e9ea7610242b8997b1391fec05",
+      "dest": "skills/engineering/openheart-analysis/references/upstream",
+      "paths": [
+        {
+          "from": "",
+          "to": "source",
+          "kind": "support",
+          "file_include": [
+            "src/main.rs",
+            "src/core/types/*.rs",
+            "src/scpg/diagram/common.rs",
+            "src/scpg/diagram/factory.rs",
+            "src/scpg/diagram/export/*.rs",
+            "src/uma/types.rs",
+            "src/uma/behavioral/timing_diagram.rs",
+            "src/uma/structural/object_diagram.rs",
+            "src/tra/types.rs",
+            "src/psa/types.rs",
+            "src/ingestion/adapter/registry.rs",
+            "src/ast/adapter/registry.rs",
+            "src/symbol/adapter/mod.rs",
+            "docs/uml_derivation.md",
+            "examples/test_patterns_codebase/com/patterns/behavioral/observer/*.java",
+            "scripts/generate_diagrams.py",
+            "scripts/test_ruthless_popular_datasets.py",
+            "ruthless_verify.py",
+            "ruthless_config.json",
+            "web/diagrams/manifest.json",
+            "web/diagrams/class.json",
+            "web/diagrams/class.mmd",
+            "web/diagrams/class.puml",
+            "web/diagrams/activity.json",
+            "web/diagrams/activity.mmd",
+            "web/diagrams/activity.puml",
+            "web/diagrams/sequence.json",
+            "web/diagrams/sequence.mmd",
+            "web/diagrams/sequence.puml"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        }
+      ],
+      "limitations": [
+        "This is a deliberately selected, non-routable source reference, not the complete OpenHeart application and not an upstream skill.",
+        "Do not execute bundled Rust or Python source snapshots. The authored skill runs only its own scripts and does not require the upstream server or compiler.",
+        "A pinned reference does not qualify language coverage, numerical claims, benchmark results or synthetic upstream projections.",
+        "This is an immutable commit reference with no automatic refresh cadence. Updates are manual and require an explicit ref, expected_commit and pinned_commit change plus source-fidelity and adversarial review."
+      ],
+      "notes": "The local openheart-analysis SKILL.md, workflow, templates, schema, exporter and tests are separately authored outside this read-only destination. The importer preserves original source, selected example output shapes, author credit and the exact MIT notice. Review and update this immutable pin manually; it does not follow the upstream branch.",
+      "pinned_commit": "0bf962fc06e975e9ea7610242b8997b1391fec05",
+      "pinned_at": "2026-10-25"
+    },
+    {
       "id": "pstack",
       "name": "pstack",
       "repo": "https://github.com/backnotprop/pstack",

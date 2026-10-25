@@ -1,0 +1,3202 @@
+@startuml
+skinparam backgroundColor transparent
+skinparam monochrome false
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName "Space Grotesk", "Segoe UI", sans-serif
+skinparam defaultFontColor #e5e5e5
+skinparam defaultFontSize 12
+skinparam ArrowColor #38bdf8
+skinparam ArrowThickness 1.5
+skinparam packageStyle rectangle
+skinparam PackageBorderColor #facc15
+skinparam PackageBackgroundColor #0f141c
+skinparam PackageFontColor #facc15
+skinparam ClassBorderColor #38bdf8
+skinparam ClassBackgroundColor #14171f
+skinparam ClassHeaderBackgroundColor #1e2433
+skinparam ClassFontColor #ffffff
+skinparam ObjectBorderColor #38bdf8
+skinparam ObjectBackgroundColor #14171f
+skinparam ObjectFontColor #ffffff
+skinparam ComponentBorderColor #38bdf8
+skinparam ComponentBackgroundColor #14171f
+skinparam ComponentFontColor #ffffff
+skinparam NodeBorderColor #38bdf8
+skinparam NodeBackgroundColor #14171f
+skinparam NodeFontColor #ffffff
+skinparam StateBorderColor #38bdf8
+skinparam StateBackgroundColor #14171f
+skinparam StateFontColor #ffffff
+skinparam ActivityBorderColor #38bdf8
+skinparam ActivityBackgroundColor #14171f
+skinparam ActivityFontColor #ffffff
+skinparam SequenceLifeLineBorderColor #38bdf8
+skinparam SequenceLifeLineBackgroundColor #14171f
+skinparam SequenceGroupBorderColor #facc15
+skinparam SequenceGroupBackgroundColor #0f141c
+skinparam SequenceGroupFontColor #facc15
+skinparam ParticipantBorderColor #38bdf8
+skinparam ParticipantBackgroundColor #14171f
+skinparam ParticipantFontColor #ffffff
+skinparam ActorBorderColor #facc15
+skinparam ActorBackgroundColor #14171f
+skinparam ActorFontColor #ffffff
+skinparam UsecaseBorderColor #38bdf8
+skinparam UsecaseBackgroundColor #14171f
+skinparam UsecaseFontColor #ffffff
+
+actor "ExternalActor" as act_ExternalActor
+participant "backend" as part_backend
+
+part_Actor -> part_backend : App()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+actor "ExternalActor" as act_ExternalActor
+participant "backend" as part_backend
+
+part_Actor -> part_backend : component_name()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+participant "backend" as part_backend
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_backend : RootNavigator()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+actor "ExternalActor" as act_ExternalActor
+participant "backend" as part_backend
+
+part_Actor -> part_backend : component_name()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+actor "ExternalActor" as act_ExternalActor
+participant "backend" as part_backend
+
+part_Actor -> part_backend : rootReducer()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+participant "backend" as part_backend
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_backend : state()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+participant "backend" as part_backend
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_backend : set()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+participant "backend" as part_backend
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_backend : AppContextProvider()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+actor "ExternalActor" as act_ExternalActor
+participant "backend" as part_backend
+
+part_Actor -> part_backend : useAppContext()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+participant "backend" as part_backend
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_backend : isEmail()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+participant "backend" as part_backend
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_backend : isPhoneNumber()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+actor "ExternalActor" as act_ExternalActor
+participant "backend" as part_backend
+
+part_Actor -> part_backend : isEmpty()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+actor "ExternalActor" as act_ExternalActor
+participant "backend" as part_backend
+
+part_Actor -> part_backend : formatDate()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+actor "ExternalActor" as act_ExternalActor
+participant "backend" as part_backend
+
+part_Actor -> part_backend : formatCurrency()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+participant "backend" as part_backend
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_backend : truncateString()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+actor "ExternalActor" as act_ExternalActor
+participant "backend" as part_backend
+
+part_Actor -> part_backend : al()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+participant "SRS" as part_SRS
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_SRS : al()
+activate part_SRS
+part_SRS --> part_Actor : return
+deactivate part_SRS
+actor "ExternalActor" as act_ExternalActor
+participant "backend" as part_backend
+
+part_Actor -> part_backend : falls()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+actor "ExternalActor" as act_ExternalActor
+participant "Sitemap" as part_Sitemap
+
+part_Actor -> part_Sitemap : al()
+activate part_Sitemap
+part_Sitemap --> part_Actor : return
+deactivate part_Sitemap
+actor "ExternalActor" as act_ExternalActor
+participant "Sitemap" as part_Sitemap
+
+part_Actor -> part_Sitemap : al()
+activate part_Sitemap
+part_Sitemap --> part_Actor : return
+deactivate part_Sitemap
+actor "ExternalActor" as act_ExternalActor
+participant "BrowserRouter" as part_BrowserRouter
+
+part_Actor -> part_BrowserRouter : path()
+activate part_BrowserRouter
+part_BrowserRouter --> part_Actor : return
+deactivate part_BrowserRouter
+actor "ExternalActor" as act_ExternalActor
+participant "path" as part_path
+
+part_Actor -> part_path : App()
+activate part_path
+part_path --> part_Actor : return
+deactivate part_path
+actor "ExternalActor" as act_ExternalActor
+participant "ButtonProps" as part_ButtonProps
+
+part_Actor -> part_ButtonProps : onClick()
+activate part_ButtonProps
+part_ButtonProps --> part_Actor : return
+deactivate part_ButtonProps
+participant "ButtonProps" as part_ButtonProps
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_ButtonProps : disabled()
+activate part_ButtonProps
+part_ButtonProps --> part_Actor : return
+deactivate part_ButtonProps
+participant "disabled" as part_disabled
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_disabled : Button()
+activate part_disabled
+part_disabled --> part_Actor : return
+deactivate part_disabled
+participant "SectionProps" as part_SectionProps
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_SectionProps : span()
+activate part_SectionProps
+part_SectionProps --> part_Actor : return
+deactivate part_SectionProps
+participant "span" as part_span
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_span : Section()
+activate part_span
+part_span --> part_Actor : return
+deactivate part_span
+participant "StatusBadgeProps" as part_StatusBadgeProps
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_StatusBadgeProps : children()
+activate part_StatusBadgeProps
+part_StatusBadgeProps --> part_Actor : return
+deactivate part_StatusBadgeProps
+actor "ExternalActor" as act_ExternalActor
+participant "children" as part_children
+
+part_Actor -> part_children : StatusBadge()
+activate part_children
+part_children --> part_Actor : return
+deactivate part_children
+participant "type" as part_type
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_type : div()
+activate part_type
+part_type --> part_Actor : return
+deactivate part_type
+actor "ExternalActor" as act_ExternalActor
+participant "div" as part_div
+
+part_Actor -> part_div : DeploymentSection()
+activate part_div
+part_div --> part_Actor : return
+deactivate part_div
+actor "ExternalActor" as act_ExternalActor
+participant "useState" as part_useState
+
+part_Actor -> part_useState : DesignTokens()
+activate part_useState
+part_useState --> part_Actor : return
+deactivate part_useState
+participant "Source_Serif_4" as part_Source_Serif_4
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_Source_Serif_4 : Source_Serif_4()
+activate part_Source_Serif_4
+part_Source_Serif_4 --> part_Actor : return
+deactivate part_Source_Serif_4
+actor "ExternalActor" as act_ExternalActor
+participant "setSelectedPreset" as part_setSelectedPreset
+
+part_Actor -> part_setSelectedPreset : DesignSection()
+activate part_setSelectedPreset
+part_setSelectedPreset --> part_Actor : return
+deactivate part_setSelectedPreset
+actor "ExternalActor" as act_ExternalActor
+participant "useState" as part_useState
+participant "custom" as part_custom
+
+part_Actor -> part_custom : custom()
+activate part_custom
+part_custom --> part_Actor : return
+deactivate part_custom
+part_custom -> part_useState : setSelectedPreset()
+activate part_useState
+part_useState --> part_custom : return
+deactivate part_useState
+part_useState -> part_useState : setSelectedPreset()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : setSelectedPreset()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : setSelectedPreset()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : setSelectedPreset()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : setSelectedPreset()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : setSelectedPreset()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : setSelectedPreset()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : setSelectedPreset()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : setSelectedPreset()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : setSelectedPreset()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : setSelectedPreset()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : setSelectedPreset()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : setSelectedPreset()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+actor "ExternalActor" as act_ExternalActor
+participant "useState" as part_useState
+
+part_Actor -> part_useState : backgroundColor()
+activate part_useState
+part_useState --> part_Actor : return
+deactivate part_useState
+participant "useState" as part_useState
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_useState : onClick()
+activate part_useState
+part_useState --> part_Actor : return
+deactivate part_useState
+actor "ExternalActor" as act_ExternalActor
+participant "useState" as part_useState
+
+part_Actor -> part_useState : onClick()
+activate part_useState
+part_useState --> part_Actor : return
+deactivate part_useState
+participant "useState" as part_useState
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_useState : onClick()
+activate part_useState
+part_useState --> part_Actor : return
+deactivate part_useState
+participant "e" as part_e
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_e : e()
+activate part_e
+part_e --> part_Actor : return
+deactivate part_e
+actor "ExternalActor" as act_ExternalActor
+participant "e" as part_e
+
+part_Actor -> part_e : e()
+activate part_e
+part_e --> part_Actor : return
+deactivate part_e
+participant "e" as part_e
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_e : e()
+activate part_e
+part_e --> part_Actor : return
+deactivate part_e
+actor "ExternalActor" as act_ExternalActor
+participant "useState" as part_useState
+
+part_Actor -> part_useState : font()
+activate part_useState
+part_useState --> part_Actor : return
+deactivate part_useState
+actor "ExternalActor" as act_ExternalActor
+participant "useState" as part_useState
+
+part_Actor -> part_useState : font()
+activate part_useState
+part_useState --> part_Actor : return
+deactivate part_useState
+actor "ExternalActor" as act_ExternalActor
+participant "useState" as part_useState
+
+part_Actor -> part_useState : className()
+activate part_useState
+part_useState --> part_Actor : return
+deactivate part_useState
+actor "ExternalActor" as act_ExternalActor
+participant "useEffect" as part_useEffect
+
+part_Actor -> part_useEffect : accent()
+activate part_useEffect
+part_useEffect --> part_Actor : return
+deactivate part_useEffect
+actor "ExternalActor" as act_ExternalActor
+participant "accent" as part_accent
+
+part_Actor -> part_accent : toGeneratorDesignTokens()
+activate part_accent
+part_accent --> part_Actor : return
+deactivate part_accent
+actor "ExternalActor" as act_ExternalActor
+participant "useEffect" as part_useEffect
+
+part_Actor -> part_useEffect : GeneratedComponentsSection()
+activate part_useEffect
+part_useEffect --> part_Actor : return
+deactivate part_useEffect
+participant "srs" as part_srs
+participant "srs" as part_srs
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_srs : components()
+activate part_srs
+part_srs --> part_Actor : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+actor "ExternalActor" as act_ExternalActor
+participant "srs" as part_srs
+participant "srs" as part_srs
+
+part_Actor -> part_srs : error()
+activate part_srs
+part_srs --> part_Actor : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+part_srs -> part_srs : srs()
+activate part_srs
+part_srs --> part_srs : return
+deactivate part_srs
+participant "useEffect" as part_useEffect
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_useEffect : chip_button()
+activate part_useEffect
+part_useEffect --> part_Actor : return
+deactivate part_useEffect
+actor "ExternalActor" as act_ExternalActor
+participant "useEffect" as part_useEffect
+
+part_Actor -> part_useEffect : screen_name()
+activate part_useEffect
+part_useEffect --> part_Actor : return
+deactivate part_useEffect
+participant "useState" as part_useState
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_useState : type()
+activate part_useState
+part_useState --> part_Actor : return
+deactivate part_useState
+actor "ExternalActor" as act_ExternalActor
+participant "activeTab" as part_activeTab
+
+part_Actor -> part_activeTab : PreviewSection()
+activate part_activeTab
+part_activeTab --> part_Actor : return
+deactivate part_activeTab
+participant "null" as part_null
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_null : c()
+activate part_null
+part_null --> part_Actor : return
+deactivate part_null
+participant "activeTab" as part_activeTab
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_activeTab : component()
+activate part_activeTab
+part_activeTab --> part_Actor : return
+deactivate part_activeTab
+participant "type" as part_type
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_type : primary()
+activate part_type
+part_type --> part_Actor : return
+deactivate part_type
+participant "primary" as part_primary
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_primary : buildColors()
+activate part_primary
+part_primary --> part_Actor : return
+deactivate part_primary
+participant "type" as part_type
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_type : View()
+activate part_type
+part_type --> part_Actor : return
+deactivate part_type
+actor "ExternalActor" as act_ExternalActor
+participant "View" as part_View
+
+part_Actor -> part_View : getType()
+activate part_View
+part_View --> part_Actor : return
+deactivate part_View
+participant "type" as part_type
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_type : getLabel()
+activate part_type
+part_type --> part_Actor : return
+deactivate part_type
+participant "length" as part_length
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_length : renderChildren()
+activate part_length
+part_length --> part_Actor : return
+deactivate part_length
+participant "length" as part_length
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_length : fontFamily()
+activate part_length
+part_length --> part_Actor : return
+deactivate part_length
+participant "type" as part_type
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_type : RenderNode()
+activate part_type
+part_type --> part_Actor : return
+deactivate part_type
+actor "ExternalActor" as act_ExternalActor
+participant "type" as part_type
+
+part_Actor -> part_type : fontFamily()
+activate part_type
+part_type --> part_Actor : return
+deactivate part_type
+participant "designTokens" as part_designTokens
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_designTokens : ScreenRenderer()
+activate part_designTokens
+part_designTokens --> part_Actor : return
+deactivate part_designTokens
+actor "ExternalActor" as act_ExternalActor
+participant "useEffect" as part_useEffect
+
+part_Actor -> part_useEffect : any()
+activate part_useEffect
+part_useEffect --> part_Actor : return
+deactivate part_useEffect
+actor "ExternalActor" as act_ExternalActor
+participant "progress" as part_progress
+
+part_Actor -> part_progress : PromptComposer()
+activate part_progress
+part_progress --> part_Actor : return
+deactivate part_progress
+participant "setCurrentStage" as part_setCurrentStage
+participant "useEffect" as part_useEffect
+participant "progress" as part_progress
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_setCurrentStage : setCurrentStage()
+activate part_setCurrentStage
+part_setCurrentStage --> part_Actor : return
+deactivate part_setCurrentStage
+part_setCurrentStage -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_setCurrentStage : return
+deactivate part_useEffect
+part_setCurrentStage -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_setCurrentStage : return
+deactivate part_useEffect
+part_setCurrentStage -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_setCurrentStage : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_progress : setPrompt()
+activate part_progress
+part_progress --> part_useEffect : return
+deactivate part_progress
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_progress -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_progress : return
+deactivate part_useEffect
+participant "result" as part_result
+participant "useEffect" as part_useEffect
+participant "progress" as part_progress
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_result : result()
+activate part_result
+part_result --> part_Actor : return
+deactivate part_result
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_result -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_result : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_progress : setPrompt()
+activate part_progress
+part_progress --> part_useEffect : return
+deactivate part_progress
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_progress -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_progress : return
+deactivate part_useEffect
+participant "stage" as part_stage
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_stage : stage()
+activate part_stage
+part_stage --> part_Actor : return
+deactivate part_stage
+participant "progress" as part_progress
+participant "useEffect" as part_useEffect
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_progress : e()
+activate part_progress
+part_progress --> part_Actor : return
+deactivate part_progress
+part_progress -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_progress : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_progress : setPrompt()
+activate part_progress
+part_progress --> part_useEffect : return
+deactivate part_progress
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_progress -> part_useEffect : progress()
+activate part_useEffect
+part_useEffect --> part_progress : return
+deactivate part_useEffect
+actor "ExternalActor" as act_ExternalActor
+participant "progress" as part_progress
+
+part_Actor -> part_progress : stage()
+activate part_progress
+part_progress --> part_Actor : return
+deactivate part_progress
+actor "ExternalActor" as act_ExternalActor
+participant "progress" as part_progress
+
+part_Actor -> part_progress : active()
+activate part_progress
+part_progress --> part_Actor : return
+deactivate part_progress
+actor "ExternalActor" as act_ExternalActor
+participant "backend" as part_backend
+
+part_Actor -> part_backend : getItems()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+participant "backend" as part_backend
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_backend : getItems()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+actor "ExternalActor" as act_ExternalActor
+participant "backend" as part_backend
+
+part_Actor -> part_backend : displayItem()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+participant "backend" as part_backend
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_backend : humanize()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+participant "backend" as part_backend
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_backend : SRSSection()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+participant "HeadingLevel" as part_HeadingLevel
+participant "HeadingLevel" as part_HeadingLevel
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_HeadingLevel : padStart()
+activate part_HeadingLevel
+part_HeadingLevel --> part_Actor : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+participant "HeadingLevel" as part_HeadingLevel
+participant "HeadingLevel" as part_HeadingLevel
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_HeadingLevel : padStart()
+activate part_HeadingLevel
+part_HeadingLevel --> part_Actor : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+actor "ExternalActor" as act_ExternalActor
+participant "HeadingLevel" as part_HeadingLevel
+participant "HeadingLevel" as part_HeadingLevel
+
+part_Actor -> part_HeadingLevel : index()
+activate part_HeadingLevel
+part_HeadingLevel --> part_Actor : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+participant "HeadingLevel" as part_HeadingLevel
+participant "HeadingLevel" as part_HeadingLevel
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_HeadingLevel : push()
+activate part_HeadingLevel
+part_HeadingLevel --> part_Actor : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+participant "push" as part_push
+participant "HeadingLevel" as part_HeadingLevel
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_push : children()
+activate part_push
+part_push --> part_Actor : return
+deactivate part_push
+part_push -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_push : return
+deactivate part_HeadingLevel
+part_push -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_push : return
+deactivate part_HeadingLevel
+part_push -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_push : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+actor "ExternalActor" as act_ExternalActor
+participant "HeadingLevel" as part_HeadingLevel
+participant "HeadingLevel" as part_HeadingLevel
+
+part_Actor -> part_HeadingLevel : displayItem()
+activate part_HeadingLevel
+part_HeadingLevel --> part_Actor : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+part_HeadingLevel -> part_HeadingLevel : HeadingLevel()
+activate part_HeadingLevel
+part_HeadingLevel --> part_HeadingLevel : return
+deactivate part_HeadingLevel
+participant "String" as part_String
+participant "backend" as part_backend
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_String : humanize()
+activate part_String
+part_String --> part_Actor : return
+deactivate part_String
+part_String -> part_backend : String()
+activate part_backend
+part_backend --> part_String : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : String()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+participant "backend" as part_backend
+actor "ExternalActor" as act_ExternalActor
+participant "name" as part_name
+
+part_Actor -> part_name : attribute_name()
+activate part_name
+part_name --> part_Actor : return
+deactivate part_name
+part_name -> part_backend : name()
+activate part_backend
+part_backend --> part_name : return
+deactivate part_backend
+part_backend -> part_backend : name()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+part_backend -> part_backend : name()
+activate part_backend
+part_backend --> part_backend : return
+deactivate part_backend
+participant "stage" as part_stage
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_stage : WorkflowStepper()
+activate part_stage
+part_stage --> part_Actor : return
+deactivate part_stage
+participant "stage" as part_stage
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_stage : stage()
+activate part_stage
+part_stage --> part_Actor : return
+deactivate part_stage
+participant "stage" as part_stage
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_stage : isActive()
+activate part_stage
+part_stage --> part_Actor : return
+deactivate part_stage
+actor "ExternalActor" as act_ExternalActor
+participant "design" as part_design
+
+part_Actor -> part_design : useJinieWorkflow()
+activate part_design
+part_design --> part_Actor : return
+deactivate part_design
+participant "useState" as part_useState
+actor "ExternalActor" as act_ExternalActor
+participant "srs" as part_srs
+
+part_Actor -> part_srs : srs()
+activate part_srs
+part_srs --> part_Actor : return
+deactivate part_srs
+part_srs -> part_useState : design()
+activate part_useState
+part_useState --> part_srs : return
+deactivate part_useState
+part_srs -> part_useState : design()
+activate part_useState
+part_useState --> part_srs : return
+deactivate part_useState
+part_srs -> part_useState : design()
+activate part_useState
+part_useState --> part_srs : return
+deactivate part_useState
+part_useState -> part_useState : design()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+actor "ExternalActor" as act_ExternalActor
+participant "design" as part_design
+participant "useState" as part_useState
+
+part_Actor -> part_design : design()
+activate part_design
+part_design --> part_Actor : return
+deactivate part_design
+part_design -> part_useState : design()
+activate part_useState
+part_useState --> part_design : return
+deactivate part_useState
+part_design -> part_useState : design()
+activate part_useState
+part_useState --> part_design : return
+deactivate part_useState
+part_useState -> part_useState : design()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+participant "preview" as part_preview
+participant "useState" as part_useState
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_preview : preview()
+activate part_preview
+part_preview --> part_Actor : return
+deactivate part_preview
+part_preview -> part_useState : design()
+activate part_useState
+part_useState --> part_preview : return
+deactivate part_useState
+part_preview -> part_useState : design()
+activate part_useState
+part_useState --> part_preview : return
+deactivate part_useState
+part_useState -> part_useState : design()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+participant "useState" as part_useState
+actor "ExternalActor" as act_ExternalActor
+participant "deployment" as part_deployment
+
+part_Actor -> part_deployment : deployment()
+activate part_deployment
+part_deployment --> part_Actor : return
+deactivate part_deployment
+part_deployment -> part_useState : design()
+activate part_useState
+part_useState --> part_deployment : return
+deactivate part_useState
+part_deployment -> part_useState : design()
+activate part_useState
+part_useState --> part_deployment : return
+deactivate part_useState
+part_useState -> part_useState : design()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+participant "div" as part_div
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_div : DeployPage()
+activate part_div
+part_div --> part_Actor : return
+deactivate part_div
+participant "useState" as part_useState
+participant "success" as part_success
+actor "ExternalActor" as act_ExternalActor
+participant "success" as part_success
+
+part_Actor -> part_success : success()
+activate part_success
+part_success --> part_Actor : return
+deactivate part_success
+part_success -> part_useState : div()
+activate part_useState
+part_useState --> part_success : return
+deactivate part_useState
+part_success -> part_success : success()
+activate part_success
+part_success --> part_success : return
+deactivate part_success
+part_success -> part_useState : div()
+activate part_useState
+part_useState --> part_success : return
+deactivate part_useState
+part_useState -> part_useState : div()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+participant "trim" as part_trim
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_trim : HomePage()
+activate part_trim
+part_trim --> part_Actor : return
+deactivate part_trim
+participant "setItem" as part_setItem
+participant "useState" as part_useState
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_setItem : setItem()
+activate part_setItem
+part_setItem --> part_Actor : return
+deactivate part_setItem
+part_setItem -> part_useState : trim()
+activate part_useState
+part_useState --> part_setItem : return
+deactivate part_useState
+part_setItem -> part_useState : trim()
+activate part_useState
+part_useState --> part_setItem : return
+deactivate part_useState
+part_setItem -> part_useState : trim()
+activate part_useState
+part_useState --> part_setItem : return
+deactivate part_useState
+part_setItem -> part_useState : trim()
+activate part_useState
+part_useState --> part_setItem : return
+deactivate part_useState
+part_setItem -> part_useState : trim()
+activate part_useState
+part_useState --> part_setItem : return
+deactivate part_useState
+part_setItem -> part_useState : trim()
+activate part_useState
+part_useState --> part_setItem : return
+deactivate part_useState
+part_setItem -> part_useState : trim()
+activate part_useState
+part_useState --> part_setItem : return
+deactivate part_useState
+part_setItem -> part_useState : trim()
+activate part_useState
+part_useState --> part_setItem : return
+deactivate part_useState
+part_setItem -> part_useState : trim()
+activate part_useState
+part_useState --> part_setItem : return
+deactivate part_useState
+part_setItem -> part_useState : trim()
+activate part_useState
+part_useState --> part_setItem : return
+deactivate part_useState
+part_setItem -> part_useState : trim()
+activate part_useState
+part_useState --> part_setItem : return
+deactivate part_useState
+part_setItem -> part_useState : trim()
+activate part_useState
+part_useState --> part_setItem : return
+deactivate part_useState
+part_useState -> part_useState : trim()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : trim()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : trim()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : trim()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : trim()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+participant "trim" as part_trim
+participant "useState" as part_useState
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_trim : e()
+activate part_trim
+part_trim --> part_Actor : return
+deactivate part_trim
+part_trim -> part_useState : trim()
+activate part_useState
+part_useState --> part_trim : return
+deactivate part_useState
+part_useState -> part_useState : trim()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : trim()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : trim()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : trim()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+part_useState -> part_useState : trim()
+activate part_useState
+part_useState --> part_useState : return
+deactivate part_useState
+actor "ExternalActor" as act_ExternalActor
+participant "null" as part_null
+
+part_Actor -> part_null : WorkspacePage()
+activate part_null
+part_null --> part_Actor : return
+deactivate part_null
+participant "useEffect" as part_useEffect
+participant "null" as part_null
+participant "design" as part_design
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_design : design()
+activate part_design
+part_design --> part_Actor : return
+deactivate part_design
+part_design -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_design : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_null : setSrs()
+activate part_null
+part_null --> part_useEffect : return
+deactivate part_null
+part_useEffect -> part_null : jinie_stage()
+activate part_null
+part_null --> part_useEffect : return
+deactivate part_null
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+participant "useEffect" as part_useEffect
+participant "components" as part_components
+actor "ExternalActor" as act_ExternalActor
+participant "null" as part_null
+
+part_Actor -> part_components : components()
+activate part_components
+part_components --> part_Actor : return
+deactivate part_components
+part_components -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_components : return
+deactivate part_useEffect
+part_components -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_components : return
+deactivate part_useEffect
+part_components -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_components : return
+deactivate part_useEffect
+part_components -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_components : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_null : setSrs()
+activate part_null
+part_null --> part_useEffect : return
+deactivate part_null
+part_useEffect -> part_null : jinie_stage()
+activate part_null
+part_null --> part_useEffect : return
+deactivate part_null
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+participant "null" as part_null
+participant "preview" as part_preview
+participant "useEffect" as part_useEffect
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_preview : preview()
+activate part_preview
+part_preview --> part_Actor : return
+deactivate part_preview
+part_preview -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_preview : return
+deactivate part_useEffect
+part_preview -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_preview : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_null : setSrs()
+activate part_null
+part_null --> part_useEffect : return
+deactivate part_null
+part_useEffect -> part_null : jinie_stage()
+activate part_null
+part_null --> part_useEffect : return
+deactivate part_null
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+participant "null" as part_null
+actor "ExternalActor" as act_ExternalActor
+participant "navigate" as part_navigate
+participant "useEffect" as part_useEffect
+
+part_Actor -> part_navigate : navigate()
+activate part_navigate
+part_navigate --> part_Actor : return
+deactivate part_navigate
+part_navigate -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_navigate : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_useEffect : return
+deactivate part_useEffect
+part_useEffect -> part_null : setSrs()
+activate part_null
+part_null --> part_useEffect : return
+deactivate part_null
+part_useEffect -> part_null : jinie_stage()
+activate part_null
+part_null --> part_useEffect : return
+deactivate part_null
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+part_null -> part_useEffect : null()
+activate part_useEffect
+part_useEffect --> part_null : return
+deactivate part_useEffect
+actor "ExternalActor" as act_ExternalActor
+participant "prompt" as part_prompt
+
+part_Actor -> part_prompt : generateSRS()
+activate part_prompt
+part_prompt --> part_Actor : return
+deactivate part_prompt
+participant "backend" as part_backend
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_backend : generateComponents()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+participant "backend" as part_backend
+actor "ExternalActor" as act_ExternalActor
+
+part_Actor -> part_backend : generateSRSWithProgress()
+activate part_backend
+part_backend --> part_Actor : return
+deactivate part_backend
+
+@enduml

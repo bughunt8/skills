@@ -5,7 +5,7 @@ anything here.
 
 ## What this repository is
 
-A library of 527 skill files across 24 directories, 526 of which are linted; the difference is
+A library of 528 skill files across 24 directories, 527 of which are linted; the difference is
 one deliberate test fixture. The skill index in `README.md` is the authoritative count.
 `scripts/generate_index.py` regenerates it and CI checks it, so refresh these numbers there
 when the tree changes. The skill files are instructions to another agent. The
@@ -120,6 +120,19 @@ python3 -m unittest discover -s skills/engineering/spec-driven-development/tests
 Passing structural checks does not prove that code implements a specification.
 Read the actual diff, run the named tests, verify negative security paths, and
 resolve independent review findings before marking a task complete.
+
+## OpenHeart-derived analysis
+
+[openheart-analysis](skills/engineering/openheart-analysis/SKILL.md) is an
+independent source-analysis skill, not the OpenHeart application. Its workflow,
+templates, dataset/schema and exporters are local. The selected upstream source
+under `references/upstream` is script-managed evidence and must not be executed
+or hand-edited. Read [the integration report](docs/openheart-integration.md)
+before updating the source pin or changing equivalence claims. Run its tests:
+
+```bash
+python3 -m unittest discover -s skills/engineering/openheart-analysis/tests -v
+```
 
 ## Adding a solution
 

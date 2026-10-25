@@ -1,0 +1,916 @@
+{
+  "schema_version": "1.0",
+  "source": {
+    "repository": "Originally authored checkout fixture",
+    "revision": "fixture-v1",
+    "scope": [
+      "checkout.py"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "exclusions": []
+  },
+  "files": [
+    {
+      "path": "checkout.py",
+      "sha256": "4a2caa2291594a3d833f7ff83920c669bb06e04a5dfad2afc24049b1cbabaeec",
+      "line_count": 10,
+      "encoding": "utf-8",
+      "role": "source"
+    }
+  ],
+  "stages": {
+    "ingestion": {
+      "status": "not_computed",
+      "reason": "File inventory is present; a lexical token corpus was not computed.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "syntax": {
+      "status": "partial",
+      "reason": "Selected syntax only; no parser run.",
+      "method": "Manually reconstructed fixture, not parser/solver output",
+      "nodes": [
+        {
+          "id": "ast:submit",
+          "label": "submit",
+          "kind": "ast",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "def submit(self, payment, amount):"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {
+            "node_type": "FunctionDef"
+          }
+        },
+        {
+          "id": "ast:if",
+          "label": "if amount <= 0",
+          "kind": "ast",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "if amount <= 0:"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {
+            "node_type": "If"
+          }
+        },
+        {
+          "id": "ast:call",
+          "label": "payment.charge",
+          "kind": "ast",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 10,
+              "line_end": 10,
+              "excerpt": "return payment.charge(amount)"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {
+            "node_type": "Call"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "ast:contains:if",
+          "source": "ast:submit",
+          "target": "ast:if",
+          "kind": "contains",
+          "label": "",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "if amount <= 0:"
+            }
+          ],
+          "attributes": {
+            "derivation": "Manually reconstructed from the cited scoped source statement."
+          }
+        },
+        {
+          "id": "ast:contains:call",
+          "source": "ast:submit",
+          "target": "ast:call",
+          "kind": "contains",
+          "label": "",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 10,
+              "line_end": 10,
+              "excerpt": "return payment.charge(amount)"
+            }
+          ],
+          "attributes": {
+            "derivation": "Manually reconstructed from the cited scoped source statement."
+          }
+        }
+      ]
+    },
+    "symbols": {
+      "status": "partial",
+      "reason": "Only class declarations are catalogued.",
+      "method": "Manually reconstructed fixture, not parser/solver output",
+      "nodes": [
+        {
+          "id": "class:Payment",
+          "label": "Payment",
+          "kind": "class",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 1,
+              "line_end": 3,
+              "excerpt": "class Payment:"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        },
+        {
+          "id": "class:Checkout",
+          "label": "Checkout",
+          "kind": "class",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 6,
+              "line_end": 10,
+              "excerpt": "class Checkout:"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        }
+      ],
+      "edges": []
+    },
+    "control_flow": {
+      "status": "partial",
+      "reason": "Entry/exit and exceptional paths omitted.",
+      "method": "Manually reconstructed fixture, not parser/solver output",
+      "nodes": [
+        {
+          "id": "block:guard",
+          "label": "amount <= 0",
+          "kind": "block",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "if amount <= 0:"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        },
+        {
+          "id": "block:false",
+          "label": "return False",
+          "kind": "block",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 9,
+              "line_end": 9,
+              "excerpt": "return False"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        },
+        {
+          "id": "block:charge",
+          "label": "return payment.charge(amount)",
+          "kind": "block",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 10,
+              "line_end": 10,
+              "excerpt": "return payment.charge(amount)"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        }
+      ],
+      "edges": [
+        {
+          "id": "cfg:true",
+          "source": "block:guard",
+          "target": "block:false",
+          "kind": "true",
+          "label": "true",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "if amount <= 0:"
+            }
+          ],
+          "attributes": {
+            "derivation": "The if body returns False when amount is nonpositive."
+          }
+        },
+        {
+          "id": "cfg:false",
+          "source": "block:guard",
+          "target": "block:charge",
+          "kind": "false",
+          "label": "false",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "if amount <= 0:"
+            }
+          ],
+          "attributes": {
+            "derivation": "The fallthrough returns the call result."
+          }
+        }
+      ]
+    },
+    "data_flow": {
+      "status": "not_computed",
+      "reason": "Analysis has not started.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "calls": {
+      "status": "partial",
+      "reason": "Dynamic receiver cannot be resolved from this source.",
+      "method": "Manually reconstructed fixture, not parser/solver output",
+      "nodes": [
+        {
+          "id": "call:caller",
+          "label": "Checkout.submit",
+          "kind": "symbol",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "def submit("
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        },
+        {
+          "id": "call:unresolved",
+          "label": "payment.charge, unresolved receiver",
+          "kind": "callsite",
+          "basis": "inferred",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 10,
+              "line_end": 10,
+              "excerpt": "return payment.charge(amount)"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {
+            "resolution": "unresolved"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "call:site",
+          "source": "call:caller",
+          "target": "call:unresolved",
+          "kind": "candidate_call",
+          "label": "unresolved receiver",
+          "basis": "inferred",
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 10,
+              "line_end": 10,
+              "excerpt": "return payment.charge(amount)"
+            }
+          ],
+          "attributes": {
+            "derivation": "Receiver type is not constrained; Payment is not a confirmed callee."
+          }
+        }
+      ]
+    },
+    "traceability": {
+      "status": "not_computed",
+      "reason": "Per-record evidence is present; binary TRA links are not computed. Export builds the normalized source index.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "paths": {
+      "status": "not_computed",
+      "reason": "Analysis has not started.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "uml": {
+      "status": "not_computed",
+      "reason": "Class projection uses declaration records; a separate UMA record graph is not computed.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "unified": {
+      "status": "not_computed",
+      "reason": "The normalized model is the container; binary SCPG unification is not computed.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    }
+  },
+  "diagrams": {
+    "class": {
+      "status": "partial",
+      "reason": "Members and relationships omitted in this fixture.",
+      "method": "Manually reconstructed fixture, not parser/solver output",
+      "nodes": [
+        {
+          "id": "class:Payment",
+          "label": "Payment",
+          "kind": "class",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 1,
+              "line_end": 3,
+              "excerpt": "class Payment:"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        },
+        {
+          "id": "class:Checkout",
+          "label": "Checkout",
+          "kind": "class",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 6,
+              "line_end": 10,
+              "excerpt": "class Checkout:"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        }
+      ],
+      "edges": []
+    },
+    "package": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "component": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "composite": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "object": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "deployment": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "profile": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "sequence": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "statemachine": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "activity": {
+      "status": "partial",
+      "reason": "Selected branch view; exceptions omitted.",
+      "method": "Manually reconstructed fixture, not parser/solver output",
+      "nodes": [
+        {
+          "id": "block:guard",
+          "label": "amount <= 0",
+          "kind": "block",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "if amount <= 0:"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        },
+        {
+          "id": "block:false",
+          "label": "return False",
+          "kind": "block",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 9,
+              "line_end": 9,
+              "excerpt": "return False"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        },
+        {
+          "id": "block:charge",
+          "label": "return payment.charge(amount)",
+          "kind": "block",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 10,
+              "line_end": 10,
+              "excerpt": "return payment.charge(amount)"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        }
+      ],
+      "edges": [
+        {
+          "id": "cfg:true",
+          "source": "block:guard",
+          "target": "block:false",
+          "kind": "true",
+          "label": "true",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "if amount <= 0:"
+            }
+          ],
+          "attributes": {
+            "derivation": "The if body returns False when amount is nonpositive."
+          }
+        },
+        {
+          "id": "cfg:false",
+          "source": "block:guard",
+          "target": "block:charge",
+          "kind": "false",
+          "label": "false",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "if amount <= 0:"
+            }
+          ],
+          "attributes": {
+            "derivation": "The fallthrough returns the call result."
+          }
+        }
+      ]
+    },
+    "usecase": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "communication": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "interaction": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "timing": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "cfg": {
+      "status": "partial",
+      "reason": "Selected branch view; exceptions omitted.",
+      "method": "Manually reconstructed fixture, not parser/solver output",
+      "nodes": [
+        {
+          "id": "block:guard",
+          "label": "amount <= 0",
+          "kind": "block",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "if amount <= 0:"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        },
+        {
+          "id": "block:false",
+          "label": "return False",
+          "kind": "block",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 9,
+              "line_end": 9,
+              "excerpt": "return False"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        },
+        {
+          "id": "block:charge",
+          "label": "return payment.charge(amount)",
+          "kind": "block",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 10,
+              "line_end": 10,
+              "excerpt": "return payment.charge(amount)"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        }
+      ],
+      "edges": [
+        {
+          "id": "cfg:true",
+          "source": "block:guard",
+          "target": "block:false",
+          "kind": "true",
+          "label": "true",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "if amount <= 0:"
+            }
+          ],
+          "attributes": {
+            "derivation": "The if body returns False when amount is nonpositive."
+          }
+        },
+        {
+          "id": "cfg:false",
+          "source": "block:guard",
+          "target": "block:charge",
+          "kind": "false",
+          "label": "false",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "if amount <= 0:"
+            }
+          ],
+          "attributes": {
+            "derivation": "The fallthrough returns the call result."
+          }
+        }
+      ]
+    },
+    "dfg": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "cdg": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "callgraph": {
+      "status": "partial",
+      "reason": "Dynamic receiver unresolved.",
+      "method": "Manually reconstructed fixture, not parser/solver output",
+      "nodes": [
+        {
+          "id": "call:caller",
+          "label": "Checkout.submit",
+          "kind": "symbol",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "def submit("
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {}
+        },
+        {
+          "id": "call:unresolved",
+          "label": "payment.charge, unresolved receiver",
+          "kind": "callsite",
+          "basis": "inferred",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 10,
+              "line_end": 10,
+              "excerpt": "return payment.charge(amount)"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {
+            "resolution": "unresolved"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "call:site",
+          "source": "call:caller",
+          "target": "call:unresolved",
+          "kind": "candidate_call",
+          "label": "unresolved receiver",
+          "basis": "inferred",
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 10,
+              "line_end": 10,
+              "excerpt": "return payment.charge(amount)"
+            }
+          ],
+          "attributes": {
+            "derivation": "Receiver type is not constrained; Payment is not a confirmed callee."
+          }
+        }
+      ]
+    },
+    "robdd": {
+      "status": "insufficient_evidence",
+      "reason": "This fixture supplies no supported projection for this category.",
+      "method": "not run",
+      "nodes": [],
+      "edges": []
+    },
+    "ast": {
+      "status": "partial",
+      "reason": "Selected syntax only; no parser run.",
+      "method": "Manually reconstructed fixture, not parser/solver output",
+      "nodes": [
+        {
+          "id": "ast:submit",
+          "label": "submit",
+          "kind": "ast",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "def submit(self, payment, amount):"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {
+            "node_type": "FunctionDef"
+          }
+        },
+        {
+          "id": "ast:if",
+          "label": "if amount <= 0",
+          "kind": "ast",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "if amount <= 0:"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {
+            "node_type": "If"
+          }
+        },
+        {
+          "id": "ast:call",
+          "label": "payment.charge",
+          "kind": "ast",
+          "basis": "source",
+          "parent": null,
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 10,
+              "line_end": 10,
+              "excerpt": "return payment.charge(amount)"
+            }
+          ],
+          "fields": [],
+          "methods": [],
+          "attributes": {
+            "node_type": "Call"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "ast:contains:if",
+          "source": "ast:submit",
+          "target": "ast:if",
+          "kind": "contains",
+          "label": "",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 7,
+              "line_end": 10,
+              "excerpt": "if amount <= 0:"
+            }
+          ],
+          "attributes": {
+            "derivation": "Manually reconstructed from the cited scoped source statement."
+          }
+        },
+        {
+          "id": "ast:contains:call",
+          "source": "ast:submit",
+          "target": "ast:call",
+          "kind": "contains",
+          "label": "",
+          "basis": "derived",
+          "evidence": [
+            {
+              "file": "checkout.py",
+              "line_start": 10,
+              "line_end": 10,
+              "excerpt": "return payment.charge(amount)"
+            }
+          ],
+          "attributes": {
+            "derivation": "Manually reconstructed from the cited scoped source statement."
+          }
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "Partial manually authored regression fixture, not automatic extraction.",
+    "No token corpus, SSA, postdominators, path solver, timing or deployment analysis.",
+    "No inferred edge from payment.charge to Payment.charge."
+  ]
+}
