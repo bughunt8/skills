@@ -1,0 +1,1097 @@
+{
+  "images": {
+    "plantuml": {
+      "tag_observed": "plantuml/plantuml:1.2025.2",
+      "reference": "plantuml/plantuml@sha256:62c11f4cec2c430a435df8b2892f9b1a7654393c8ef2086faaca32cc16151370"
+    },
+    "uml": {
+      "tag_observed": "mrorgues/umbrello:latest",
+      "reference": "mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95"
+    }
+  },
+  "cases": {
+    "checkout": {
+      "validation": {
+        "schema": "pass",
+        "cross_references": "pass",
+        "source_consistency": "pass",
+        "semantic_accuracy": "not_validated",
+        "renderer_syntax": "not_run",
+        "revision_consistency": "not_validated"
+      },
+      "plantuml_exports": {
+        "ACT.puml": "@startuml\n' partial: Selected branch view exceptions omitted.\nrectangle \"return payment.charge(amount)\" as n0\nrectangle \"return False\" as n1\nrectangle \"amount = 0\" as n2\nn2 -> n0 : false\nn2 -> n1 : true\n@enduml\n",
+        "activity.puml": "@startuml\n' partial: Selected branch view exceptions omitted.\nrectangle \"return payment.charge(amount)\" as n0\nrectangle \"return False\" as n1\nrectangle \"amount = 0\" as n2\nn2 -> n0 : false\nn2 -> n1 : true\n@enduml\n",
+        "ast.puml": "@startuml\n' partial: Selected syntax only no parser run.\nrectangle \"payment.charge\" as n0\nrectangle \"if amount = 0\" as n1\nrectangle \"submit\" as n2\nn2 -> n0 : contains\nn2 -> n1 : contains\n@enduml\n",
+        "callgraph.puml": "@startuml\n' partial: Dynamic receiver unresolved.\nrectangle \"Checkout.submit\" as n0\nrectangle \"payment.charge, unresolved receiver\" as n1\nn0 -> n1 : unresolved receiver\n@enduml\n",
+        "cdg.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "cfg.puml": "@startuml\n' partial: Selected branch view exceptions omitted.\nrectangle \"return payment.charge(amount)\" as n0\nrectangle \"return False\" as n1\nrectangle \"amount = 0\" as n2\nn2 -> n0 : false\nn2 -> n1 : true\n@enduml\n",
+        "class.puml": "@startuml\n' partial: Members and relationships omitted in this fixture.\nclass \"Checkout\" as n0 {\n}\nclass \"Payment\" as n1 {\n}\n@enduml\n",
+        "communication.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "component.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "composite.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "deployment.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "dfg.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "interaction.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "object.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "package.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "profile.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "robdd.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "sequence.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "statemachine.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "timing.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "usecase.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n"
+      }
+    },
+    "native-populated": {
+      "validation": {
+        "schema": "pass",
+        "cross_references": "pass",
+        "source_consistency": "pass",
+        "semantic_accuracy": "not_validated",
+        "renderer_syntax": "not_run",
+        "revision_consistency": "not_validated"
+      },
+      "plantuml_exports": {
+        "ACT.puml": "@startuml\n' partial: Selected branch view exceptions omitted.\nrectangle \"return payment.charge(amount)\" as n0\nrectangle \"return False\" as n1\nrectangle \"amount = 0\" as n2\nn2 -> n0 : false\nn2 -> n1 : true\n@enduml\n",
+        "activity.puml": "@startuml\n' partial: Selected branch view exceptions omitted.\nrectangle \"return payment.charge(amount)\" as n0\nrectangle \"return False\" as n1\nrectangle \"amount = 0\" as n2\nn2 -> n0 : false\nn2 -> n1 : true\n@enduml\n",
+        "ast.puml": "@startuml\n' partial: Selected syntax only no parser run.\nrectangle \"payment.charge\" as n0\nrectangle \"if amount = 0\" as n1\nrectangle \"submit\" as n2\nn2 -> n0 : contains\nn2 -> n1 : contains\n@enduml\n",
+        "callgraph.puml": "@startuml\n' partial: Dynamic receiver unresolved.\nrectangle \"Checkout.submit\" as n0\nrectangle \"payment.charge, unresolved receiver\" as n1\nn0 -> n1 : unresolved receiver\n@enduml\n",
+        "cdg.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "cfg.puml": "@startuml\n' partial: Selected branch view exceptions omitted.\nrectangle \"return payment.charge(amount)\" as n0\nrectangle \"return False\" as n1\nrectangle \"amount = 0\" as n2\nn2 -> n0 : false\nn2 -> n1 : true\n@enduml\n",
+        "class.puml": "@startuml\n' partial: Members and relationships omitted in this fixture.\nclass \"Checkout\" as n0 {\n}\nclass \"Payment\" as n1 {\n}\n@enduml\n",
+        "communication.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "component.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "composite.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "deployment.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "dfg.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "interaction.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "object.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "package.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "profile.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "robdd.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "sequence.puml": "@startuml\n' partial: Synthetic renderer fixture, not runtime evidence.\nparticipant \"Checkout\" as n0\nparticipant \"Payment\" as n1\nn0 -> n1 : 1. candidate charge\n@enduml\n",
+        "statemachine.puml": "@startuml\n' partial: Synthetic state notation over branch blocks not state extraction.\nstate \"return payment.charge(amount)\" as n0\nstate \"return False\" as n1\nstate \"amount = 0\" as n2\nn2 -> n0 : false\nn2 -> n1 : true\n@enduml\n",
+        "timing.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "usecase.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n"
+      }
+    },
+    "malicious-label": {
+      "validation": {
+        "schema": "pass",
+        "cross_references": "pass",
+        "source_consistency": "pass",
+        "semantic_accuracy": "not_validated",
+        "renderer_syntax": "not_run",
+        "revision_consistency": "not_validated"
+      },
+      "plantuml_exports": {
+        "ACT.puml": "@startuml\n' partial: Selected branch view exceptions omitted.\nrectangle \"!include /etc/passwd init: x script click\" as n0\nrectangle \"!include /etc/passwd init: x script click\" as n1\nrectangle \"!include /etc/passwd init: x script click\" as n2\nn2 -> n0 : !include /etc/passwd init: x script click\nn2 -> n1 : !include /etc/passwd init: x script click\n@enduml\n",
+        "activity.puml": "@startuml\n' partial: Selected branch view exceptions omitted.\nrectangle \"!include /etc/passwd init: x script click\" as n0\nrectangle \"!include /etc/passwd init: x script click\" as n1\nrectangle \"!include /etc/passwd init: x script click\" as n2\nn2 -> n0 : !include /etc/passwd init: x script click\nn2 -> n1 : !include /etc/passwd init: x script click\n@enduml\n",
+        "ast.puml": "@startuml\n' partial: Selected syntax only no parser run.\nrectangle \"!include /etc/passwd init: x script click\" as n0\nrectangle \"!include /etc/passwd init: x script click\" as n1\nrectangle \"!include /etc/passwd init: x script click\" as n2\nn2 -> n0 : !include /etc/passwd init: x script click\nn2 -> n1 : !include /etc/passwd init: x script click\n@enduml\n",
+        "callgraph.puml": "@startuml\n' partial: Dynamic receiver unresolved.\nrectangle \"!include /etc/passwd init: x script click\" as n0\nrectangle \"!include /etc/passwd init: x script click\" as n1\nn0 -> n1 : !include /etc/passwd init: x script click\n@enduml\n",
+        "cdg.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "cfg.puml": "@startuml\n' partial: Selected branch view exceptions omitted.\nrectangle \"!include /etc/passwd init: x script click\" as n0\nrectangle \"!include /etc/passwd init: x script click\" as n1\nrectangle \"!include /etc/passwd init: x script click\" as n2\nn2 -> n0 : !include /etc/passwd init: x script click\nn2 -> n1 : !include /etc/passwd init: x script click\n@enduml\n",
+        "class.puml": "@startuml\n' partial: Members and relationships omitted in this fixture.\nclass \"!include /etc/passwd init: x script click\" as n0 {\n}\nclass \"!include /etc/passwd init: x script click\" as n1 {\n}\n@enduml\n",
+        "communication.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "component.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "composite.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "deployment.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "dfg.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "interaction.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "object.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "package.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "profile.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "robdd.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "sequence.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "statemachine.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "timing.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "usecase.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n"
+      }
+    },
+    "untyped-member": {
+      "validation": {
+        "schema": "pass",
+        "cross_references": "pass",
+        "source_consistency": "pass",
+        "semantic_accuracy": "not_validated",
+        "renderer_syntax": "not_run",
+        "revision_consistency": "not_validated"
+      },
+      "plantuml_exports": {
+        "ACT.puml": "@startuml\n' partial: Selected branch view exceptions omitted.\nrectangle \"return payment.charge(amount)\" as n0\nrectangle \"return False\" as n1\nrectangle \"amount = 0\" as n2\nn2 -> n0 : false\nn2 -> n1 : true\n@enduml\n",
+        "activity.puml": "@startuml\n' partial: Selected branch view exceptions omitted.\nrectangle \"return payment.charge(amount)\" as n0\nrectangle \"return False\" as n1\nrectangle \"amount = 0\" as n2\nn2 -> n0 : false\nn2 -> n1 : true\n@enduml\n",
+        "ast.puml": "@startuml\n' partial: Selected syntax only no parser run.\nrectangle \"payment.charge\" as n0\nrectangle \"if amount = 0\" as n1\nrectangle \"submit\" as n2\nn2 -> n0 : contains\nn2 -> n1 : contains\n@enduml\n",
+        "callgraph.puml": "@startuml\n' partial: Dynamic receiver unresolved.\nrectangle \"Checkout.submit\" as n0\nrectangle \"payment.charge, unresolved receiver\" as n1\nn0 -> n1 : unresolved receiver\n@enduml\n",
+        "cdg.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "cfg.puml": "@startuml\n' partial: Selected branch view exceptions omitted.\nrectangle \"return payment.charge(amount)\" as n0\nrectangle \"return False\" as n1\nrectangle \"amount = 0\" as n2\nn2 -> n0 : false\nn2 -> n1 : true\n@enduml\n",
+        "class.puml": "@startuml\n' partial: Members and relationships omitted in this fixture.\nclass \"Checkout\" as n0 {\n}\nclass \"Payment\" as n1 {\n    +x\n    +x()\n}\n@enduml\n",
+        "communication.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "component.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "composite.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "deployment.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "dfg.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "interaction.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "object.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "package.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "profile.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "robdd.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "sequence.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "statemachine.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "timing.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n",
+        "usecase.puml": "@startuml\n' insufficient_evidence: This fixture supplies no supported projection for this category.\nrectangle \"insufficient_evidence: This fixture supplies no supported projection for this category.\" as status\n@enduml\n"
+      }
+    },
+    "empty-evidence": {
+      "validation": {
+        "schema": "pass",
+        "cross_references": "pass",
+        "source_consistency": "pass",
+        "semantic_accuracy": "not_validated",
+        "renderer_syntax": "not_run",
+        "revision_consistency": "not_validated"
+      },
+      "plantuml_exports": {
+        "ACT.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "activity.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "ast.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "callgraph.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "cdg.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "cfg.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "class.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "communication.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "component.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "composite.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "deployment.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "dfg.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "interaction.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "object.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "package.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "profile.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "robdd.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "sequence.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "statemachine.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "timing.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n",
+        "usecase.puml": "@startuml\n' insufficient_evidence: No supported evidence in this renderer fixture.\nrectangle \"insufficient_evidence: No supported evidence in this renderer fixture.\" as status\n@enduml\n"
+      }
+    },
+    "java-classifiers": {
+      "validation": {
+        "schema": "pass",
+        "cross_references": "pass",
+        "source_consistency": "pass",
+        "semantic_accuracy": "not_validated",
+        "renderer_syntax": "not_run",
+        "revision_consistency": "not_validated"
+      },
+      "plantuml_exports": {
+        "class.puml": "@startuml\n' partial: Scoped declarations only JDK types and full UML ownership semantics omitted.\nclass \"com.patterns.behavioral.observer.NewsAgency\" as n0 {\n    -news : String\n    -observers : List Observer\n    +setNews() : void\n    +attach() : void\n    +detach() : void\n    +notifyObservers() : void\n}\nclass \"com.patterns.behavioral.observer.NewsChannel\" as n1 {\n    -news : String\n    +update() : void\n}\nclass \"com.patterns.behavioral.observer.Observer\" as n2 {\n    +update() : void\n}\nclass \"com.patterns.behavioral.observer.Subject\" as n3 {\n    +attach() : void\n    +detach() : void\n    +notifyObservers() : void\n}\nn0 ..|> n3 : implements\nn1 ..|> n2 : implements\nn0 ..> n2 : observer element type\n@enduml\n"
+      }
+    }
+  },
+  "render": {
+    "argv": [
+      "docker",
+      "run",
+      "--rm",
+      "--network",
+      "none",
+      "--user",
+      "1000:1000",
+      "-e",
+      "PLANTUML_SECURITY_PROFILE=SECURE",
+      "-v",
+      "/tmp/opencode/openheart-t16-final/plantuml:/work",
+      "plantuml/plantuml@sha256:62c11f4cec2c430a435df8b2892f9b1a7654393c8ef2086faaca32cc16151370",
+      "-tsvg",
+      "-failfast2",
+      "-stdrpt:1",
+      "/work/checkout--ACT.puml",
+      "/work/checkout--activity.puml",
+      "/work/checkout--ast.puml",
+      "/work/checkout--callgraph.puml",
+      "/work/checkout--cdg.puml",
+      "/work/checkout--cfg.puml",
+      "/work/checkout--class.puml",
+      "/work/checkout--communication.puml",
+      "/work/checkout--component.puml",
+      "/work/checkout--composite.puml",
+      "/work/checkout--deployment.puml",
+      "/work/checkout--dfg.puml",
+      "/work/checkout--interaction.puml",
+      "/work/checkout--object.puml",
+      "/work/checkout--package.puml",
+      "/work/checkout--profile.puml",
+      "/work/checkout--robdd.puml",
+      "/work/checkout--sequence.puml",
+      "/work/checkout--statemachine.puml",
+      "/work/checkout--timing.puml",
+      "/work/checkout--usecase.puml",
+      "/work/empty-evidence--ACT.puml",
+      "/work/empty-evidence--activity.puml",
+      "/work/empty-evidence--ast.puml",
+      "/work/empty-evidence--callgraph.puml",
+      "/work/empty-evidence--cdg.puml",
+      "/work/empty-evidence--cfg.puml",
+      "/work/empty-evidence--class.puml",
+      "/work/empty-evidence--communication.puml",
+      "/work/empty-evidence--component.puml",
+      "/work/empty-evidence--composite.puml",
+      "/work/empty-evidence--deployment.puml",
+      "/work/empty-evidence--dfg.puml",
+      "/work/empty-evidence--interaction.puml",
+      "/work/empty-evidence--object.puml",
+      "/work/empty-evidence--package.puml",
+      "/work/empty-evidence--profile.puml",
+      "/work/empty-evidence--robdd.puml",
+      "/work/empty-evidence--sequence.puml",
+      "/work/empty-evidence--statemachine.puml",
+      "/work/empty-evidence--timing.puml",
+      "/work/empty-evidence--usecase.puml",
+      "/work/java-classifiers--class.puml",
+      "/work/malicious-label--ACT.puml",
+      "/work/malicious-label--activity.puml",
+      "/work/malicious-label--ast.puml",
+      "/work/malicious-label--callgraph.puml",
+      "/work/malicious-label--cdg.puml",
+      "/work/malicious-label--cfg.puml",
+      "/work/malicious-label--class.puml",
+      "/work/malicious-label--communication.puml",
+      "/work/malicious-label--component.puml",
+      "/work/malicious-label--composite.puml",
+      "/work/malicious-label--deployment.puml",
+      "/work/malicious-label--dfg.puml",
+      "/work/malicious-label--interaction.puml",
+      "/work/malicious-label--object.puml",
+      "/work/malicious-label--package.puml",
+      "/work/malicious-label--profile.puml",
+      "/work/malicious-label--robdd.puml",
+      "/work/malicious-label--sequence.puml",
+      "/work/malicious-label--statemachine.puml",
+      "/work/malicious-label--timing.puml",
+      "/work/malicious-label--usecase.puml",
+      "/work/native-populated--ACT.puml",
+      "/work/native-populated--activity.puml",
+      "/work/native-populated--ast.puml",
+      "/work/native-populated--callgraph.puml",
+      "/work/native-populated--cdg.puml",
+      "/work/native-populated--cfg.puml",
+      "/work/native-populated--class.puml",
+      "/work/native-populated--communication.puml",
+      "/work/native-populated--component.puml",
+      "/work/native-populated--composite.puml",
+      "/work/native-populated--deployment.puml",
+      "/work/native-populated--dfg.puml",
+      "/work/native-populated--interaction.puml",
+      "/work/native-populated--object.puml",
+      "/work/native-populated--package.puml",
+      "/work/native-populated--profile.puml",
+      "/work/native-populated--robdd.puml",
+      "/work/native-populated--sequence.puml",
+      "/work/native-populated--statemachine.puml",
+      "/work/native-populated--timing.puml",
+      "/work/native-populated--usecase.puml",
+      "/work/untyped-member--ACT.puml",
+      "/work/untyped-member--activity.puml",
+      "/work/untyped-member--ast.puml",
+      "/work/untyped-member--callgraph.puml",
+      "/work/untyped-member--cdg.puml",
+      "/work/untyped-member--cfg.puml",
+      "/work/untyped-member--class.puml",
+      "/work/untyped-member--communication.puml",
+      "/work/untyped-member--component.puml",
+      "/work/untyped-member--composite.puml",
+      "/work/untyped-member--deployment.puml",
+      "/work/untyped-member--dfg.puml",
+      "/work/untyped-member--interaction.puml",
+      "/work/untyped-member--object.puml",
+      "/work/untyped-member--package.puml",
+      "/work/untyped-member--profile.puml",
+      "/work/untyped-member--robdd.puml",
+      "/work/untyped-member--sequence.puml",
+      "/work/untyped-member--statemachine.puml",
+      "/work/untyped-member--timing.puml",
+      "/work/untyped-member--usecase.puml"
+    ],
+    "command": "docker run --rm --network none --user 1000:1000 -e PLANTUML_SECURITY_PROFILE=SECURE -v /tmp/opencode/openheart-t16-final/plantuml:/work plantuml/plantuml@sha256:62c11f4cec2c430a435df8b2892f9b1a7654393c8ef2086faaca32cc16151370 -tsvg -failfast2 -stdrpt:1 /work/checkout--ACT.puml /work/checkout--activity.puml /work/checkout--ast.puml /work/checkout--callgraph.puml /work/checkout--cdg.puml /work/checkout--cfg.puml /work/checkout--class.puml /work/checkout--communication.puml /work/checkout--component.puml /work/checkout--composite.puml /work/checkout--deployment.puml /work/checkout--dfg.puml /work/checkout--interaction.puml /work/checkout--object.puml /work/checkout--package.puml /work/checkout--profile.puml /work/checkout--robdd.puml /work/checkout--sequence.puml /work/checkout--statemachine.puml /work/checkout--timing.puml /work/checkout--usecase.puml /work/empty-evidence--ACT.puml /work/empty-evidence--activity.puml /work/empty-evidence--ast.puml /work/empty-evidence--callgraph.puml /work/empty-evidence--cdg.puml /work/empty-evidence--cfg.puml /work/empty-evidence--class.puml /work/empty-evidence--communication.puml /work/empty-evidence--component.puml /work/empty-evidence--composite.puml /work/empty-evidence--deployment.puml /work/empty-evidence--dfg.puml /work/empty-evidence--interaction.puml /work/empty-evidence--object.puml /work/empty-evidence--package.puml /work/empty-evidence--profile.puml /work/empty-evidence--robdd.puml /work/empty-evidence--sequence.puml /work/empty-evidence--statemachine.puml /work/empty-evidence--timing.puml /work/empty-evidence--usecase.puml /work/java-classifiers--class.puml /work/malicious-label--ACT.puml /work/malicious-label--activity.puml /work/malicious-label--ast.puml /work/malicious-label--callgraph.puml /work/malicious-label--cdg.puml /work/malicious-label--cfg.puml /work/malicious-label--class.puml /work/malicious-label--communication.puml /work/malicious-label--component.puml /work/malicious-label--composite.puml /work/malicious-label--deployment.puml /work/malicious-label--dfg.puml /work/malicious-label--interaction.puml /work/malicious-label--object.puml /work/malicious-label--package.puml /work/malicious-label--profile.puml /work/malicious-label--robdd.puml /work/malicious-label--sequence.puml /work/malicious-label--statemachine.puml /work/malicious-label--timing.puml /work/malicious-label--usecase.puml /work/native-populated--ACT.puml /work/native-populated--activity.puml /work/native-populated--ast.puml /work/native-populated--callgraph.puml /work/native-populated--cdg.puml /work/native-populated--cfg.puml /work/native-populated--class.puml /work/native-populated--communication.puml /work/native-populated--component.puml /work/native-populated--composite.puml /work/native-populated--deployment.puml /work/native-populated--dfg.puml /work/native-populated--interaction.puml /work/native-populated--object.puml /work/native-populated--package.puml /work/native-populated--profile.puml /work/native-populated--robdd.puml /work/native-populated--sequence.puml /work/native-populated--statemachine.puml /work/native-populated--timing.puml /work/native-populated--usecase.puml /work/untyped-member--ACT.puml /work/untyped-member--activity.puml /work/untyped-member--ast.puml /work/untyped-member--callgraph.puml /work/untyped-member--cdg.puml /work/untyped-member--cfg.puml /work/untyped-member--class.puml /work/untyped-member--communication.puml /work/untyped-member--component.puml /work/untyped-member--composite.puml /work/untyped-member--deployment.puml /work/untyped-member--dfg.puml /work/untyped-member--interaction.puml /work/untyped-member--object.puml /work/untyped-member--package.puml /work/untyped-member--profile.puml /work/untyped-member--robdd.puml /work/untyped-member--sequence.puml /work/untyped-member--statemachine.puml /work/untyped-member--timing.puml /work/untyped-member--usecase.puml",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "outputs": {
+      "checkout--ACT.svg": {
+        "sha256": "dd2c7449e113090bb07ffaaf77baf2e745b962253bdfc1434fe0f4ae2a2ac538",
+        "bytes": 2832
+      },
+      "checkout--activity.svg": {
+        "sha256": "dd2c7449e113090bb07ffaaf77baf2e745b962253bdfc1434fe0f4ae2a2ac538",
+        "bytes": 2832
+      },
+      "checkout--ast.svg": {
+        "sha256": "915a0af4143830f36d613e57ec14641e3498108beca242b58283b76fefd93b1a",
+        "bytes": 2798
+      },
+      "checkout--callgraph.svg": {
+        "sha256": "e5c5cb69841acdda6029c13280b1b5b52adc0c662547326c2a02383280c6f3cd",
+        "bytes": 1864
+      },
+      "checkout--cdg.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "checkout--cfg.svg": {
+        "sha256": "dd2c7449e113090bb07ffaaf77baf2e745b962253bdfc1434fe0f4ae2a2ac538",
+        "bytes": 2832
+      },
+      "checkout--class.svg": {
+        "sha256": "2f73de493697da6b06367ddcce0661f6ff09d6df74b7ab81b491178d86ed776d",
+        "bytes": 2968
+      },
+      "checkout--communication.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "checkout--component.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "checkout--composite.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "checkout--deployment.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "checkout--dfg.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "checkout--interaction.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "checkout--object.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "checkout--package.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "checkout--profile.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "checkout--robdd.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "checkout--sequence.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "checkout--statemachine.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "checkout--timing.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "checkout--usecase.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "empty-evidence--ACT.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--activity.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--ast.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--callgraph.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--cdg.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--cfg.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--class.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--communication.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--component.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--composite.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--deployment.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--dfg.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--interaction.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--object.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--package.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--profile.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--robdd.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--sequence.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--statemachine.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--timing.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "empty-evidence--usecase.svg": {
+        "sha256": "b333c7d2fc97bd8826776c7d3d3c8999e3e7ba8f62639b51b001206d5f61994e",
+        "bytes": 906
+      },
+      "java-classifiers--class.svg": {
+        "sha256": "e2b515d141276bd6ddb0cf53577193b4462f8ce0a561ea65f7c8d6ecd00702c3",
+        "bytes": 10860
+      },
+      "malicious-label--ACT.svg": {
+        "sha256": "0baa577995a05b99a7fbce9c9c430b89a4754e254d35008d8b22ad0b6a90ad3f",
+        "bytes": 3045
+      },
+      "malicious-label--activity.svg": {
+        "sha256": "0baa577995a05b99a7fbce9c9c430b89a4754e254d35008d8b22ad0b6a90ad3f",
+        "bytes": 3045
+      },
+      "malicious-label--ast.svg": {
+        "sha256": "72df19e33385c684a8e6191487939356230cbfcfd8f92a597293c10f0fec8715",
+        "bytes": 3041
+      },
+      "malicious-label--callgraph.svg": {
+        "sha256": "b8445b20be4bfacac5a9c99c44a5d7a1f863648a91364ffa3413852ca384f181",
+        "bytes": 1908
+      },
+      "malicious-label--cdg.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "malicious-label--cfg.svg": {
+        "sha256": "0baa577995a05b99a7fbce9c9c430b89a4754e254d35008d8b22ad0b6a90ad3f",
+        "bytes": 3045
+      },
+      "malicious-label--class.svg": {
+        "sha256": "166f9ed5ab025be7e712c5f7ebcf647efbc054538e2b622e2d677ebe6a661c59",
+        "bytes": 3038
+      },
+      "malicious-label--communication.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "malicious-label--component.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "malicious-label--composite.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "malicious-label--deployment.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "malicious-label--dfg.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "malicious-label--interaction.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "malicious-label--object.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "malicious-label--package.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "malicious-label--profile.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "malicious-label--robdd.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "malicious-label--sequence.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "malicious-label--statemachine.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "malicious-label--timing.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "malicious-label--usecase.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "native-populated--ACT.svg": {
+        "sha256": "dd2c7449e113090bb07ffaaf77baf2e745b962253bdfc1434fe0f4ae2a2ac538",
+        "bytes": 2832
+      },
+      "native-populated--activity.svg": {
+        "sha256": "dd2c7449e113090bb07ffaaf77baf2e745b962253bdfc1434fe0f4ae2a2ac538",
+        "bytes": 2832
+      },
+      "native-populated--ast.svg": {
+        "sha256": "915a0af4143830f36d613e57ec14641e3498108beca242b58283b76fefd93b1a",
+        "bytes": 2798
+      },
+      "native-populated--callgraph.svg": {
+        "sha256": "e5c5cb69841acdda6029c13280b1b5b52adc0c662547326c2a02383280c6f3cd",
+        "bytes": 1864
+      },
+      "native-populated--cdg.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "native-populated--cfg.svg": {
+        "sha256": "dd2c7449e113090bb07ffaaf77baf2e745b962253bdfc1434fe0f4ae2a2ac538",
+        "bytes": 2832
+      },
+      "native-populated--class.svg": {
+        "sha256": "2f73de493697da6b06367ddcce0661f6ff09d6df74b7ab81b491178d86ed776d",
+        "bytes": 2968
+      },
+      "native-populated--communication.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "native-populated--component.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "native-populated--composite.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "native-populated--deployment.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "native-populated--dfg.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "native-populated--interaction.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "native-populated--object.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "native-populated--package.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "native-populated--profile.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "native-populated--robdd.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "native-populated--sequence.svg": {
+        "sha256": "eb2eebc34b873da6bc73841c87de643342687cb625789491bf9f3931a40adcd4",
+        "bytes": 2817
+      },
+      "native-populated--statemachine.svg": {
+        "sha256": "8d427df11b7b3f126669dea1f7edb38d7e00bdff437c8cee12cd7dca356c20b1",
+        "bytes": 2801
+      },
+      "native-populated--timing.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "native-populated--usecase.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--ACT.svg": {
+        "sha256": "dd2c7449e113090bb07ffaaf77baf2e745b962253bdfc1434fe0f4ae2a2ac538",
+        "bytes": 2832
+      },
+      "untyped-member--activity.svg": {
+        "sha256": "dd2c7449e113090bb07ffaaf77baf2e745b962253bdfc1434fe0f4ae2a2ac538",
+        "bytes": 2832
+      },
+      "untyped-member--ast.svg": {
+        "sha256": "915a0af4143830f36d613e57ec14641e3498108beca242b58283b76fefd93b1a",
+        "bytes": 2798
+      },
+      "untyped-member--callgraph.svg": {
+        "sha256": "e5c5cb69841acdda6029c13280b1b5b52adc0c662547326c2a02383280c6f3cd",
+        "bytes": 1864
+      },
+      "untyped-member--cdg.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--cfg.svg": {
+        "sha256": "dd2c7449e113090bb07ffaaf77baf2e745b962253bdfc1434fe0f4ae2a2ac538",
+        "bytes": 2832
+      },
+      "untyped-member--class.svg": {
+        "sha256": "0050541f7e6dc3ce3eda97021740ad6fe59904658bb440bbacaf52b3853d57e1",
+        "bytes": 3391
+      },
+      "untyped-member--communication.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--component.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--composite.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--deployment.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--dfg.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--interaction.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--object.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--package.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--profile.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--robdd.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--sequence.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--statemachine.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--timing.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      },
+      "untyped-member--usecase.svg": {
+        "sha256": "12cb70cf97bcef6bca00c42ed5ddf9f8765f5eb4f60c068b2683494f056addbe",
+        "bytes": 941
+      }
+    },
+    "expected_count": 106,
+    "passed": true
+  },
+  "imports": {
+    "checkout": {
+      "argv": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "-e",
+        "QT_QPA_PLATFORM=offscreen",
+        "-v",
+        "/tmp/opencode/openheart-t16-final:/work",
+        "--entrypoint",
+        "timeout",
+        "mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95",
+        "-k",
+        "2s",
+        "8s",
+        "umbrello",
+        "/work/checkout/diagrams/class.xmi",
+        "--export",
+        "svg",
+        "--directory",
+        "/work/imported/checkout"
+      ],
+      "command": "docker run --rm --network none -e QT_QPA_PLATFORM=offscreen -v /tmp/opencode/openheart-t16-final:/work --entrypoint timeout mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95 -k 2s 8s umbrello /work/checkout/diagrams/class.xmi --export svg --directory /work/imported/checkout",
+      "exit_code": 124,
+      "stdout": "",
+      "stderr": "QCommandLineParser: option not defined: \"languages\"\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nShortcut for action  \"delete_selected\" \"Delete &Selected\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"move_tab_left\" \"&Move Tab Left\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"move_tab_right\" \"&Move Tab Right\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"previous_tab\" \"Select Diagram on Left\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"next_tab\" \"Select Diagram on Right\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\numbrello: view is NULL\numbrello: \"folder\"  : umlPackage not set on object\numbrello: UMLDoc::openDocument: copy from  QUrl(\"file:///work/checkout/diagrams/class.xmi\")  to  QUrl(\"file:///tmp/umbrello.KPEth7\") .\nCouldn't start kuiserver from org.kde.kuiserver.service: QDBusError(\"org.freedesktop.DBus.Error.Disconnected\", \"Not connected to D-Bus server\")\nQStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-root'\nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \ncouldn't create slave: \"Cannot talk to klauncher: Not connected to D-Bus server\"\numbrello: UMLDoc::openDocument:  \"Could not start process Cannot talk to klauncher: Not connected to D-Bus server.\"\n",
+      "diagnostic_lines": [
+        "Couldn't start kuiserver from org.kde.kuiserver.service: QDBusError(\"org.freedesktop.DBus.Error.Disconnected\", \"Not connected to D-Bus server\")",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "couldn't create slave: \"Cannot talk to klauncher: Not connected to D-Bus server\"",
+        "umbrello: UMLDoc::openDocument:  \"Could not start process Cannot talk to klauncher: Not connected to D-Bus server.\""
+      ],
+      "status": "open",
+      "consumer_reported_omissions": null,
+      "reason": "No verified classifier inventory or consumer omission report was returned.",
+      "input_xmi": "<?xml version='1.0' encoding='utf-8'?>\n<uml:Model xmlns:uml=\"http://www.eclipse.org/uml2/5.0.0/UML\" xmlns:xmi=\"http://www.omg.org/spec/XMI/20131001\" xmi:version=\"2.5\" xmi:id=\"model\" name=\"Identity-only class export\"><packagedElement xmi:type=\"uml:Class\" xmi:id=\"n0\" name=\"Checkout\" /><packagedElement xmi:type=\"uml:Class\" xmi:id=\"n1\" name=\"Payment\" /></uml:Model>\n",
+      "input_sha256": "85c61cc72db7ca4a694e8547aae0466404086b22372c88ba8480104bcdd07823",
+      "exporter_omissions": {
+        "fields": 0,
+        "methods": 0,
+        "relationships": 0
+      },
+      "expected_omissions": [
+        "fields",
+        "methods",
+        "relationships",
+        "other diagram views",
+        "layout",
+        "source evidence and analysis provenance"
+      ]
+    },
+    "native-populated": {
+      "argv": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "-e",
+        "QT_QPA_PLATFORM=offscreen",
+        "-v",
+        "/tmp/opencode/openheart-t16-final:/work",
+        "--entrypoint",
+        "timeout",
+        "mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95",
+        "-k",
+        "2s",
+        "8s",
+        "umbrello",
+        "/work/native-populated/diagrams/class.xmi",
+        "--export",
+        "svg",
+        "--directory",
+        "/work/imported/native-populated"
+      ],
+      "command": "docker run --rm --network none -e QT_QPA_PLATFORM=offscreen -v /tmp/opencode/openheart-t16-final:/work --entrypoint timeout mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95 -k 2s 8s umbrello /work/native-populated/diagrams/class.xmi --export svg --directory /work/imported/native-populated",
+      "exit_code": 124,
+      "stdout": "",
+      "stderr": "QCommandLineParser: option not defined: \"languages\"\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nShortcut for action  \"delete_selected\" \"Delete &Selected\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"move_tab_left\" \"&Move Tab Left\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"move_tab_right\" \"&Move Tab Right\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"previous_tab\" \"Select Diagram on Left\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"next_tab\" \"Select Diagram on Right\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\numbrello: view is NULL\numbrello: \"folder\"  : umlPackage not set on object\numbrello: UMLDoc::openDocument: copy from  QUrl(\"file:///work/native-populated/diagrams/class.xmi\")  to  QUrl(\"file:///tmp/umbrello.KPEth7\") .\nCouldn't start kuiserver from org.kde.kuiserver.service: QDBusError(\"org.freedesktop.DBus.Error.Disconnected\", \"Not connected to D-Bus server\")\nQStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-root'\nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \ncouldn't create slave: \"Cannot talk to klauncher: Not connected to D-Bus server\"\numbrello: UMLDoc::openDocument:  \"Could not start process Cannot talk to klauncher: Not connected to D-Bus server.\"\n",
+      "diagnostic_lines": [
+        "Couldn't start kuiserver from org.kde.kuiserver.service: QDBusError(\"org.freedesktop.DBus.Error.Disconnected\", \"Not connected to D-Bus server\")",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "couldn't create slave: \"Cannot talk to klauncher: Not connected to D-Bus server\"",
+        "umbrello: UMLDoc::openDocument:  \"Could not start process Cannot talk to klauncher: Not connected to D-Bus server.\""
+      ],
+      "status": "open",
+      "consumer_reported_omissions": null,
+      "reason": "No verified classifier inventory or consumer omission report was returned.",
+      "input_xmi": "<?xml version='1.0' encoding='utf-8'?>\n<uml:Model xmlns:uml=\"http://www.eclipse.org/uml2/5.0.0/UML\" xmlns:xmi=\"http://www.omg.org/spec/XMI/20131001\" xmi:version=\"2.5\" xmi:id=\"model\" name=\"Identity-only class export\"><packagedElement xmi:type=\"uml:Class\" xmi:id=\"n0\" name=\"Checkout\" /><packagedElement xmi:type=\"uml:Class\" xmi:id=\"n1\" name=\"Payment\" /></uml:Model>\n",
+      "input_sha256": "85c61cc72db7ca4a694e8547aae0466404086b22372c88ba8480104bcdd07823",
+      "exporter_omissions": {
+        "fields": 0,
+        "methods": 0,
+        "relationships": 0
+      },
+      "expected_omissions": [
+        "fields",
+        "methods",
+        "relationships",
+        "other diagram views",
+        "layout",
+        "source evidence and analysis provenance"
+      ]
+    },
+    "malicious-label": {
+      "argv": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "-e",
+        "QT_QPA_PLATFORM=offscreen",
+        "-v",
+        "/tmp/opencode/openheart-t16-final:/work",
+        "--entrypoint",
+        "timeout",
+        "mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95",
+        "-k",
+        "2s",
+        "8s",
+        "umbrello",
+        "/work/malicious-label/diagrams/class.xmi",
+        "--export",
+        "svg",
+        "--directory",
+        "/work/imported/malicious-label"
+      ],
+      "command": "docker run --rm --network none -e QT_QPA_PLATFORM=offscreen -v /tmp/opencode/openheart-t16-final:/work --entrypoint timeout mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95 -k 2s 8s umbrello /work/malicious-label/diagrams/class.xmi --export svg --directory /work/imported/malicious-label",
+      "exit_code": 124,
+      "stdout": "",
+      "stderr": "QCommandLineParser: option not defined: \"languages\"\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nShortcut for action  \"delete_selected\" \"Delete &Selected\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"move_tab_left\" \"&Move Tab Left\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"move_tab_right\" \"&Move Tab Right\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"previous_tab\" \"Select Diagram on Left\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"next_tab\" \"Select Diagram on Right\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\numbrello: view is NULL\numbrello: \"folder\"  : umlPackage not set on object\numbrello: UMLDoc::openDocument: copy from  QUrl(\"file:///work/malicious-label/diagrams/class.xmi\")  to  QUrl(\"file:///tmp/umbrello.KPEth7\") .\nCouldn't start kuiserver from org.kde.kuiserver.service: QDBusError(\"org.freedesktop.DBus.Error.Disconnected\", \"Not connected to D-Bus server\")\nQStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-root'\nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \ncouldn't create slave: \"Cannot talk to klauncher: Not connected to D-Bus server\"\numbrello: UMLDoc::openDocument:  \"Could not start process Cannot talk to klauncher: Not connected to D-Bus server.\"\n",
+      "diagnostic_lines": [
+        "Couldn't start kuiserver from org.kde.kuiserver.service: QDBusError(\"org.freedesktop.DBus.Error.Disconnected\", \"Not connected to D-Bus server\")",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "couldn't create slave: \"Cannot talk to klauncher: Not connected to D-Bus server\"",
+        "umbrello: UMLDoc::openDocument:  \"Could not start process Cannot talk to klauncher: Not connected to D-Bus server.\""
+      ],
+      "status": "open",
+      "consumer_reported_omissions": null,
+      "reason": "No verified classifier inventory or consumer omission report was returned.",
+      "input_xmi": "<?xml version='1.0' encoding='utf-8'?>\n<uml:Model xmlns:uml=\"http://www.eclipse.org/uml2/5.0.0/UML\" xmlns:xmi=\"http://www.omg.org/spec/XMI/20131001\" xmi:version=\"2.5\" xmi:id=\"model\" name=\"Identity-only class export\"><packagedElement xmi:type=\"uml:Class\" xmi:id=\"n0\" name=\"&quot;&#10;!include /etc/passwd&#10;%%{init: x}%%&lt;script&gt;click\" /><packagedElement xmi:type=\"uml:Class\" xmi:id=\"n1\" name=\"&quot;&#10;!include /etc/passwd&#10;%%{init: x}%%&lt;script&gt;click\" /></uml:Model>\n",
+      "input_sha256": "9ff9a32c003bcf3c71e9803f9f578d61fade8d1ea1053b44c442ad71a305b1d9",
+      "exporter_omissions": {
+        "fields": 0,
+        "methods": 0,
+        "relationships": 0
+      },
+      "expected_omissions": [
+        "fields",
+        "methods",
+        "relationships",
+        "other diagram views",
+        "layout",
+        "source evidence and analysis provenance"
+      ]
+    },
+    "untyped-member": {
+      "argv": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "-e",
+        "QT_QPA_PLATFORM=offscreen",
+        "-v",
+        "/tmp/opencode/openheart-t16-final:/work",
+        "--entrypoint",
+        "timeout",
+        "mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95",
+        "-k",
+        "2s",
+        "8s",
+        "umbrello",
+        "/work/untyped-member/diagrams/class.xmi",
+        "--export",
+        "svg",
+        "--directory",
+        "/work/imported/untyped-member"
+      ],
+      "command": "docker run --rm --network none -e QT_QPA_PLATFORM=offscreen -v /tmp/opencode/openheart-t16-final:/work --entrypoint timeout mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95 -k 2s 8s umbrello /work/untyped-member/diagrams/class.xmi --export svg --directory /work/imported/untyped-member",
+      "exit_code": 124,
+      "stdout": "",
+      "stderr": "QCommandLineParser: option not defined: \"languages\"\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nShortcut for action  \"delete_selected\" \"Delete &Selected\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"move_tab_left\" \"&Move Tab Left\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"move_tab_right\" \"&Move Tab Right\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"previous_tab\" \"Select Diagram on Left\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"next_tab\" \"Select Diagram on Right\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\numbrello: view is NULL\numbrello: \"folder\"  : umlPackage not set on object\numbrello: UMLDoc::openDocument: copy from  QUrl(\"file:///work/untyped-member/diagrams/class.xmi\")  to  QUrl(\"file:///tmp/umbrello.KPEth7\") .\nCouldn't start kuiserver from org.kde.kuiserver.service: QDBusError(\"org.freedesktop.DBus.Error.Disconnected\", \"Not connected to D-Bus server\")\nQStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-root'\nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \ncouldn't create slave: \"Cannot talk to klauncher: Not connected to D-Bus server\"\numbrello: UMLDoc::openDocument:  \"Could not start process Cannot talk to klauncher: Not connected to D-Bus server.\"\n",
+      "diagnostic_lines": [
+        "Couldn't start kuiserver from org.kde.kuiserver.service: QDBusError(\"org.freedesktop.DBus.Error.Disconnected\", \"Not connected to D-Bus server\")",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "couldn't create slave: \"Cannot talk to klauncher: Not connected to D-Bus server\"",
+        "umbrello: UMLDoc::openDocument:  \"Could not start process Cannot talk to klauncher: Not connected to D-Bus server.\""
+      ],
+      "status": "open",
+      "consumer_reported_omissions": null,
+      "reason": "No verified classifier inventory or consumer omission report was returned.",
+      "input_xmi": "<?xml version='1.0' encoding='utf-8'?>\n<uml:Model xmlns:uml=\"http://www.eclipse.org/uml2/5.0.0/UML\" xmlns:xmi=\"http://www.omg.org/spec/XMI/20131001\" xmi:version=\"2.5\" xmi:id=\"model\" name=\"Identity-only class export\"><packagedElement xmi:type=\"uml:Class\" xmi:id=\"n0\" name=\"Checkout\" /><packagedElement xmi:type=\"uml:Class\" xmi:id=\"n1\" name=\"Payment\" /></uml:Model>\n",
+      "input_sha256": "85c61cc72db7ca4a694e8547aae0466404086b22372c88ba8480104bcdd07823",
+      "exporter_omissions": {
+        "fields": 1,
+        "methods": 1,
+        "relationships": 0
+      },
+      "expected_omissions": [
+        "fields",
+        "methods",
+        "relationships",
+        "other diagram views",
+        "layout",
+        "source evidence and analysis provenance"
+      ]
+    },
+    "empty-evidence": {
+      "status": "not_emitted",
+      "reason": "No classifier identities; exporter emits no XMI."
+    },
+    "java-classifiers": {
+      "argv": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "-e",
+        "QT_QPA_PLATFORM=offscreen",
+        "-v",
+        "/tmp/opencode/openheart-t16-final:/work",
+        "--entrypoint",
+        "timeout",
+        "mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95",
+        "-k",
+        "2s",
+        "8s",
+        "umbrello",
+        "/work/java-classifiers/diagrams/class.xmi",
+        "--export",
+        "svg",
+        "--directory",
+        "/work/imported/java-classifiers"
+      ],
+      "command": "docker run --rm --network none -e QT_QPA_PLATFORM=offscreen -v /tmp/opencode/openheart-t16-final:/work --entrypoint timeout mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95 -k 2s 8s umbrello /work/java-classifiers/diagrams/class.xmi --export svg --directory /work/imported/java-classifiers",
+      "exit_code": 124,
+      "stdout": "",
+      "stderr": "QCommandLineParser: option not defined: \"languages\"\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nShortcut for action  \"delete_selected\" \"Delete &Selected\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"move_tab_left\" \"&Move Tab Left\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"move_tab_right\" \"&Move Tab Right\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"previous_tab\" \"Select Diagram on Left\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nShortcut for action  \"next_tab\" \"Select Diagram on Right\" set with QAction::setShortcut()! Use KActionCollection::setDefaultShortcut(s) instead.\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nIllegal icon group:  7\nQCursor: Cannot create bitmap cursor; invalid bitmap(s)\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\nQFontDatabase: Cannot find font directory /usr/lib/x86_64-linux-gnu/fonts.\nNote that Qt no longer ships fonts. Deploy some (from http://dejavu-fonts.org for example) or switch to fontconfig.\numbrello: view is NULL\numbrello: \"folder\"  : umlPackage not set on object\numbrello: UMLDoc::openDocument: copy from  QUrl(\"file:///work/java-classifiers/diagrams/class.xmi\")  to  QUrl(\"file:///tmp/umbrello.KPEth7\") .\nCouldn't start kuiserver from org.kde.kuiserver.service: QDBusError(\"org.freedesktop.DBus.Error.Disconnected\", \"Not connected to D-Bus server\")\nQStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-root'\nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \nklauncher not running... launching kdeinit\nkdeinit5: Aborting. $DISPLAY is not set. \ncouldn't create slave: \"Cannot talk to klauncher: Not connected to D-Bus server\"\numbrello: UMLDoc::openDocument:  \"Could not start process Cannot talk to klauncher: Not connected to D-Bus server.\"\n",
+      "diagnostic_lines": [
+        "Couldn't start kuiserver from org.kde.kuiserver.service: QDBusError(\"org.freedesktop.DBus.Error.Disconnected\", \"Not connected to D-Bus server\")",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "kdeinit5: Aborting. $DISPLAY is not set. ",
+        "couldn't create slave: \"Cannot talk to klauncher: Not connected to D-Bus server\"",
+        "umbrello: UMLDoc::openDocument:  \"Could not start process Cannot talk to klauncher: Not connected to D-Bus server.\""
+      ],
+      "status": "open",
+      "consumer_reported_omissions": null,
+      "reason": "No verified classifier inventory or consumer omission report was returned.",
+      "input_xmi": "<?xml version='1.0' encoding='utf-8'?>\n<uml:Model xmlns:uml=\"http://www.eclipse.org/uml2/5.0.0/UML\" xmlns:xmi=\"http://www.omg.org/spec/XMI/20131001\" xmi:version=\"2.5\" xmi:id=\"model\" name=\"Identity-only class export\"><packagedElement xmi:type=\"uml:Class\" xmi:id=\"n0\" name=\"com.patterns.behavioral.observer.NewsAgency\" /><packagedElement xmi:type=\"uml:Class\" xmi:id=\"n1\" name=\"com.patterns.behavioral.observer.NewsChannel\" /><packagedElement xmi:type=\"uml:Interface\" xmi:id=\"n2\" name=\"com.patterns.behavioral.observer.Observer\" /><packagedElement xmi:type=\"uml:Interface\" xmi:id=\"n3\" name=\"com.patterns.behavioral.observer.Subject\" /></uml:Model>\n",
+      "input_sha256": "348a248f1e6deb7cbf8c9f8fc593dfa80a02d804368aeee70fb1735b442aba2d",
+      "exporter_omissions": {
+        "fields": 3,
+        "methods": 9,
+        "relationships": 3
+      },
+      "expected_omissions": [
+        "fields",
+        "methods",
+        "relationships",
+        "other diagram views",
+        "layout",
+        "source evidence and analysis provenance"
+      ]
+    }
+  },
+  "versions": {
+    "plantuml": {
+      "argv": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "plantuml/plantuml@sha256:62c11f4cec2c430a435df8b2892f9b1a7654393c8ef2086faaca32cc16151370",
+        "-version"
+      ],
+      "command": "docker run --rm --network none plantuml/plantuml@sha256:62c11f4cec2c430a435df8b2892f9b1a7654393c8ef2086faaca32cc16151370 -version",
+      "exit_code": 0,
+      "stdout": "PlantUML version 1.2025.2 (Tue Jan 07 17:35:36 UTC 2025)\n(GPL source distribution)\nJava Runtime: OpenJDK Runtime Environment\nJVM: OpenJDK 64-Bit Server VM\nDefault Encoding: UTF-8\nLanguage: en\nCountry: US\n \nPLANTUML_LIMIT_SIZE: 4096\n\nDot version: Warning: Could not load \"/usr/local/lib/graphviz/libgvplugin_gd.so.6\" - It was found, so perhaps one of its dependents was not.  Try ldd. dot - graphviz version 12.2.1 (20241206.2353)\nInstallation seems OK. File generation OK\n",
+      "stderr": ""
+    },
+    "uml": {
+      "argv": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "-e",
+        "QT_QPA_PLATFORM=offscreen",
+        "mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95",
+        "--version"
+      ],
+      "command": "docker run --rm --network none -e QT_QPA_PLATFORM=offscreen mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95 --version",
+      "exit_code": 0,
+      "stdout": "umbrello 2.20.3\n",
+      "stderr": ""
+    }
+  },
+  "negative_case": {
+    "argv": [
+      "docker",
+      "run",
+      "--rm",
+      "--network",
+      "none",
+      "--user",
+      "1000:1000",
+      "-e",
+      "PLANTUML_SECURITY_PROFILE=SECURE",
+      "-v",
+      "/tmp/opencode/openheart-t16-final:/work",
+      "plantuml/plantuml@sha256:62c11f4cec2c430a435df8b2892f9b1a7654393c8ef2086faaca32cc16151370",
+      "-tsvg",
+      "-failfast2",
+      "-stdrpt:1",
+      "/work/malformed-label.puml"
+    ],
+    "command": "docker run --rm --network none --user 1000:1000 -e PLANTUML_SECURITY_PROFILE=SECURE -v /tmp/opencode/openheart-t16-final:/work plantuml/plantuml@sha256:62c11f4cec2c430a435df8b2892f9b1a7654393c8ef2086faaca32cc16151370 -tsvg -failfast2 -stdrpt:1 /work/malformed-label.puml",
+    "exit_code": 200,
+    "stdout": "",
+    "stderr": "Some diagram description contains errors\n",
+    "passed": true
+  },
+  "open_gates": [
+    "Native-host model invocation receipt was not produced. No model session was invoked.",
+    "Semantic accuracy report over independently selected, commit-pinned Java input remains open.",
+    "UML consumer classifier import and consumer-reported omissions remain open for every emitted XMI case.",
+    "Mermaid CI receipts belong to todo 15 and are not claimed by this run."
+  ],
+  "issue_65_comment": "Todo 16 qualification receipts\n\nPlantUML image: `plantuml/plantuml@sha256:62c11f4cec2c430a435df8b2892f9b1a7654393c8ef2086faaca32cc16151370`. UML consumer image: `mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95`.\n\nRendered 106/106 PlantUML exports across checkout, populated native class/sequence/state, approximate graphs, malicious-label, untyped-member, empty-evidence and existing Java classifier cases. Renderer exit: 0. Deliberately malformed label exit: 200; negative gate passed: True.\n\nReproduce with `python3 skills/engineering/openheart-analysis/scripts/qualify_consumers.py --out /tmp/openheart-qualification-new`. Exit 2 explicitly reports the remaining consumer gap. The committed datasets/qualification-receipts.json records each exact command, stdout, stderr, exported PlantUML/XMI text, SVG hashes and per-case import gaps.\n\nUmbrello imports were attempted for checkout, native-populated, malicious-label, untyped-member and java-classifiers. The container could not produce a verified import or omission report in its headless KDE/D-Bus environment. Its bounded commands and errors are in the receipts. Empty-evidence emits no XMI. Local inspection confirms the exporter omits fields, methods, relationships, other views, layout and source provenance; these are exporter observations, not consumer-reported omissions.\n\nIssue 65 remains open. The native-host model invocation receipt, the semantic accuracy report over independently selected Java input, and all unverified UML consumer imports remain open. No paid provider, API key or model session was used. Mermaid CI and mobile catalogue performance are separate gates. Draft PR 66 readiness and acceptance criteria are unchanged.",
+  "status": "consumer_gap"
+}
