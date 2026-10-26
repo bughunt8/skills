@@ -13,6 +13,7 @@
   const search = $("gsearch"), results = $("gresults");
   const ns = "http://www.w3.org/2000/svg";
   const nodes = new Map(), cards = new Map(), solutions = new Map();
+  let visibleNodes = new Set();
   const communities = new Map(data.comms.map((c) => [String(c.id), c]));
   const labels = new Map();
   const edgeElements = [...svg.querySelectorAll(".g-edge")];
@@ -27,6 +28,7 @@
   svg.querySelectorAll(".g-nlabel").forEach((el) => labels.set(el.dataset.key, el));
   svg.querySelectorAll(".g-node").forEach((el) => {
     const key = el.dataset.key, card = cards.get(key);
+    el.dataset.visible = "false";
     const description = card.querySelector("p").textContent;
     nodes.set(key, {
       key, el, card, name: el.dataset.name, description,
@@ -196,26 +198,31 @@
       included.has(edge.a) && included.has(edge.b) && allowedEdge(edge) &&
       (state.mode !== "path" || pathPairs.has([edge.a, edge.b].sort().join("|"))));
     const edgeIds = new Set(activeEdges.map((edge) => edge.index));
-    edgeElements.forEach((el) => { el.style.display = edgeIds.has(Number(el.dataset.i)) ? "" : "none"; });
+    edgeElements.forEach((el) => {
+      const display = edgeIds.has(Number(el.dataset.i)) ? "" : "none";
+      if (el.style.display !== display) el.style.display = display;
+    });
     activeEdges.forEach((edge) => {
       const a = scene.get(edge.a), b = scene.get(edge.b);
       const mx = (a.x + b.x) / 2 + (b.y - a.y) * .075;
       const my = (a.y + b.y) / 2 - (b.x - a.x) * .075;
-      edgeElements[edge.index].setAttribute("d", `M${a.x},${a.y} Q${mx},${my} ${b.x},${b.y}`);
+      const el = edgeElements[edge.index], path = `M${a.x},${a.y} Q${mx},${my} ${b.x},${b.y}`;
+      if (el.getAttribute("d") !== path) el.setAttribute("d", path);
     });
     nodes.forEach((node, key) => {
       const show = included.has(key);
-      node.el.style.display = show ? "" : "none";
-      node.el.dataset.inContext = String(show);
-      node.el.classList.toggle("is-selected", key === state.selected);
+      const display = show ? "" : "none", inContext = String(show), selected = key === state.selected;
+      if (node.el.style.display !== display) node.el.style.display = display;
+      if (node.el.dataset.inContext !== inContext) node.el.dataset.inContext = inContext;
+      if (node.el.classList.contains("is-selected") !== selected) node.el.classList.toggle("is-selected", selected);
       if (!show) return;
       const point = scene.get(key);
       [node.dot, node.hit].forEach((el) => {
-        el.setAttribute("cx", point.x);
-        el.setAttribute("cy", point.y);
+        if (el.getAttribute("cx") !== String(point.x)) el.setAttribute("cx", point.x);
+        if (el.getAttribute("cy") !== String(point.y)) el.setAttribute("cy", point.y);
       });
-      node.el.dataset.renderX = point.x;
-      node.el.dataset.renderY = point.y;
+      if (node.el.dataset.renderX !== String(point.x)) node.el.dataset.renderX = point.x;
+      if (node.el.dataset.renderY !== String(point.y)) node.el.dataset.renderY = point.y;
     });
     $("graph-empty").hidden = sceneKeys.length > 0;
     refreshLeadRoving();
@@ -424,22 +431,31 @@
 
   const cameraTransform = (v) => `translate(${v.x} ${v.y}) scale(${v.k})`;
 
-  function applyViewport(layoutPass = 0) {
+  function applyViewport() {
     const {x, y, k} = state.viewport;
     vp.setAttribute("transform", cameraTransform(state.viewport));
     Object.assign(vp.dataset, {x: String(x), y: String(y), scale: String(k)});
-    let visible = 0;
-    nodes.forEach((node, key) => {
+    const nextVisible = new Set();
+    sceneKeys.forEach((key) => {
+      const node = nodes.get(key);
       const point = scene.get(key);
-      const onScreen = !!point && point.x * k + x >= 0 && point.x * k + x <= size.w &&
+      const onScreen = point.x * k + x >= 0 && point.x * k + x <= size.w &&
         point.y * k + y >= 0 && point.y * k + y <= size.h;
-      node.el.dataset.visible = String(onScreen);
-      if (!point) return;
-      if (onScreen) visible++;
+      if (onScreen) {
+        nextVisible.add(key);
+        if (!visibleNodes.has(key)) node.el.dataset.visible = "true";
+      }
       // Nodes are readable marks, while the companion list guarantees 44px targets.
-      node.dot.setAttribute("r", Math.max(5, Math.min(15, node.radius * k)) / k);
-      node.hit.setAttribute("r", 22 / k);
+      const dotRadius = String(Math.max(5, Math.min(15, node.radius * k)) / k);
+      const hitRadius = String(22 / k);
+      if (node.dot.getAttribute("r") !== dotRadius) node.dot.setAttribute("r", dotRadius);
+      if (node.hit.getAttribute("r") !== hitRadius) node.hit.setAttribute("r", hitRadius);
     });
+    visibleNodes.forEach((key) => {
+      if (!nextVisible.has(key)) nodes.get(key).el.dataset.visible = "false";
+    });
+    visibleNodes = nextVisible;
+    const visible = visibleNodes.size;
     drawLabels();
     placeHalo();
     root.dataset.visibleCount = String(visible);
@@ -457,17 +473,6 @@
     text("status-evidence", `${stated} stated · ${activeEdges.length - stated} inferred`);
     $("gzoom-in").disabled = k >= 30;
     $("gzoom-out").disabled = k <= .08;
-    // A long title or status can wrap during this explicit render. Settle the
-    // canvas now, not one observer frame later, so counts/callouts are truthful
-    // immediately after a click. Keep the same world point at the center.
-    const rect = $("graph-canvas").getBoundingClientRect();
-    if (layoutPass < 3 && rect.width && rect.height &&
-        (Math.abs(rect.width - size.w) > .01 || Math.abs(rect.height - size.h) > .01)) {
-      state.viewport.x += (rect.width - size.w) / 2;
-      state.viewport.y += (rect.height - size.h) / 2;
-      size = {w: rect.width, h: rect.height};
-      applyViewport(layoutPass + 1);
-    }
   }
 
   // -------------------------------------------------------------- motion layer

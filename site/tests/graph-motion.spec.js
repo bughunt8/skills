@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { assertNoRuntimeErrors, saveEvidence } from "../scripts/workspace-test-helpers.mjs";
+import { assertNoRuntimeErrors, saveEvidence, ensureFiltersOpen } from "../scripts/workspace-test-helpers.mjs";
+import { EXPECTED_TOTAL } from "./library-size.mjs";
 import {
   openMotionWorkspace, openMotionPage, expectMotionIdle, resetProbe, readProbe,
   motionEpisodes, sampleMotionFrame, motionSnapshot, comparableSnapshot,
@@ -609,9 +610,6 @@ test.describe("graph motion acceptance", () => {
     const [key] = await firstResults(page, 1);
     await resetProbe(page);
     await tapOrClick(resultFor(page, key), testInfo);
-    // One cheap read while the beat is in flight: real motion primitives must be
-    // running on real graph geometry. An attribute flip with nothing animating,
-    // or frames that paint nothing, cannot satisfy this.
     const inFlight = await page.evaluate(() => ({
       motion: document.getElementById("top").dataset.motion ?? null,
       running: document.getAnimations()
@@ -634,8 +632,8 @@ test.describe("graph motion acceptance", () => {
     const episodes = motionEpisodes(probe.motionLog);
     expect(episodes.length,
       "non-vacuity: the measured window must contain a real animation").toBeGreaterThan(0);
-    expect(inFlight.motion,
-      "non-vacuity: the beat must still have been in flight when it was sampled").toBe("running");
+    expect(probe.motionLog.some((entry) => entry.attr === "data-motion" && entry.value === "running"),
+      "non-vacuity: the measured beat must have entered the running state").toBe(true);
     expect(probe.rafSince > 0 || inFlight.running.length > 0,
       "non-vacuity: real animations (frames or running CSS transitions) must be in flight").toBe(true);
     // Attribute each long task: one that contains the synchronous commit is the
@@ -648,6 +646,92 @@ test.describe("graph motion acceptance", () => {
       "MOTION_LONG_TASK: no long task over 120ms during a community to node transition").toEqual([]);
     await saveEvidence(page, testInfo, "motion-long-task", { key, longTasks: probe.longTasks,
       frames: probe.rafSince, episodes, inFlight, commitAt, overviewVisible: overview.top.visibleCount });
+  });
+
+  test("MOTION_LONG_TASK community commit stays within 120ms and skips unchanged node writes", async ({ page }, testInfo) => {
+    await ensureFiltersOpen(page);
+    const community = await page.locator("#gcommunity option").evaluateAll((options) =>
+      options.find((option) => option.value)?.value);
+    expect(community, "a real community must be available").toBeTruthy();
+    await page.locator("#gcommunity").selectOption(community);
+    await expectMotionIdle(page);
+    await expect(page.locator("#top")).toHaveAttribute("data-mode", "community");
+    await expect(page.locator(".g-node")).toHaveCount(EXPECTED_TOTAL);
+    const [key] = await firstResults(page, 1);
+    await resetProbe(page);
+    await page.evaluate(() => {
+      window.__unchangedNodeWrites = [];
+      new MutationObserver((records) => {
+        // Recover each write's new value from the following record's old value.
+        // Reading only the final attribute would misclassify a true/false pair.
+        const nextValues = new Map();
+        for (const record of records.toReversed()) {
+          const el = record.target, attr = record.attributeName;
+          if (!el.matches(".g-node, .g-dot, .g-hit")) continue;
+          if (!nextValues.has(el)) nextValues.set(el, new Map());
+          const values = nextValues.get(el);
+          const value = values.has(attr) ? values.get(attr) : el.getAttribute(attr);
+          if (value === record.oldValue) window.__unchangedNodeWrites.push({
+            key: el.closest(".g-node").dataset.key, attr, value
+          });
+          values.set(attr, record.oldValue);
+        }
+      }).observe(document.getElementById("vp"), { subtree: true, attributes: true,
+        attributeOldValue: true, attributeFilter: ["data-visible", "r"] });
+    });
+    await tapOrClick(resultFor(page, key), testInfo);
+    await expectMotionIdle(page);
+    await expect(page.locator("#top")).toHaveAttribute("data-selected-key", key);
+    const probe = await readProbe(page);
+    const unchanged = await page.evaluate(() => window.__unchangedNodeWrites);
+    expect(probe.longTaskSupported, "the commit budget requires a working long-task observer").toBe(true);
+    expect(motionEpisodes(probe.motionLog).length, "the measured community transition must animate")
+      .toBeGreaterThan(0);
+    await saveEvidence(page, testInfo, "motion-long-task-community", { key, longTasks: probe.longTasks, unchanged });
+    expect(probe.longTasks.filter((task) => task.duration > 120),
+      "MOTION_LONG_TASK: the community commit and transition must stay within 120ms").toEqual([]);
+    expect(unchanged, "MOTION_LONG_TASK: viewport updates must not rewrite unchanged visibility or radii")
+      .toEqual([]);
+  });
+
+  test("MOTION_NODE_VISIBILITY every node keeps truthful data-visible after transitions", async ({ page }, testInfo) => {
+    const [key] = await firstResults(page, 1);
+    const samples = [];
+    for (const action of [
+      () => tapOrClick(resultFor(page, key), testInfo),
+      () => tapOrClick(page.locator("#goverview"), testInfo),
+      () => tapOrClick(resultFor(page, key), testInfo),
+      async () => tapOrClick(await ensureVisible(page, "#gzoom-in"), testInfo),
+      async () => tapOrClick(await ensureVisible(page, "#gfit"), testInfo),
+      () => tapOrClick(page.locator("#gback"), testInfo)
+    ]) {
+      await action();
+      await expectMotionIdle(page);
+      const sample = await page.evaluate(() => {
+        const frame = document.getElementById("gsvg").getBoundingClientRect();
+        const nodes = [...document.querySelectorAll(".g-node")].map((el) => {
+          const dot = el.querySelector(".g-dot"), matrix = dot.getScreenCTM();
+          const point = new DOMPoint(Number(dot.getAttribute("cx")), Number(dot.getAttribute("cy")))
+            .matrixTransform(matrix);
+          const expected = getComputedStyle(el).display !== "none" &&
+            point.x >= frame.left && point.x <= frame.right &&
+            point.y >= frame.top && point.y <= frame.bottom;
+          return { key: el.dataset.key, expected, actual: el.dataset.visible };
+        });
+        return { total: nodes.length, visible: nodes.filter((node) => node.expected).length,
+          reported: Number(document.getElementById("top").dataset.visibleCount),
+          mismatches: nodes.filter((node) => node.actual !== String(node.expected)) };
+      });
+      expect(sample.total, "visibility must be checked for the entire library").toBe(EXPECTED_TOTAL);
+      expect(sample.visible, "the transition must leave actual nodes on screen").toBeGreaterThan(0);
+      expect(sample.mismatches, "MOTION_NODE_VISIBILITY: every data-visible value must match geometry")
+        .toEqual([]);
+      expect(sample.reported).toBe(sample.visible);
+      samples.push(sample);
+    }
+    expect(samples.some((sample) => sample.visible < sample.total),
+      "the checks must include nodes that became hidden").toBe(true);
+    await saveEvidence(page, testInfo, "motion-node-visibility", { key, samples });
   });
 
   test("MOTION_AMBIENT_SINGLETON exactly one ambient element while a skill is selected", async ({ page }, testInfo) => {
