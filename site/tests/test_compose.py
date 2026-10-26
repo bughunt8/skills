@@ -20,7 +20,9 @@ import io
 import re
 import sys
 import time
+from importlib.machinery import ModuleSpec
 from pathlib import Path
+from typing import cast
 
 SITE = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(SITE))
@@ -38,8 +40,21 @@ def check(label, cond, detail=""):
         FAILURES.append(label)
 
 
+def test_fan_radius_sum_uses_fsum():
+    """Frame sizing must use compensated summation for stable generated geometry."""
+    path = SITE / "compose.py"
+    source = path.read_text(encoding="utf-8")
+    check(
+        "compose frame sizing uses math.fsum",
+        "need = math.fsum(" in source and "need = sum(" not in source,
+        "the fan-radius aggregate reverted to builtin sum",
+    )
+
+
 def load_build():
     spec = importlib.util.spec_from_file_location("bp", SITE / "build.py")
+    spec = cast(ModuleSpec, spec)
+    assert spec.loader is not None
     bp = importlib.util.module_from_spec(spec)
     with contextlib.redirect_stdout(io.StringIO()):
         spec.loader.exec_module(bp)
@@ -340,6 +355,7 @@ def main():
     test_curated(rows, sols, stats)
     test_curated_rejects_bad_input(rows)
     print("tiers and stability")
+    test_fan_radius_sum_uses_fsum()
     test_tiers(sols)
     test_determinism(rows, sols)
     print("growth")
