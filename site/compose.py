@@ -540,7 +540,7 @@ def layout(sols: list, rows: list, width: float = 1400.0, height: float = 560.0)
     # and the previous behaviour was to place the extras on top of each other
     # without saying so. Area scales with the total room the clusters need, so the
     # packing stays about as dense at any size.
-    need = sum((_fan_radius_for(len(s["members"])) + 11.0) ** 2 for s in sols)
+    need = math.fsum((_fan_radius_for(len(s["members"])) + 11.0) ** 2 for s in sols)
     baseline = 51 * (35.0 ** 2)
     if need > baseline:
         grow = math.sqrt(need / baseline)

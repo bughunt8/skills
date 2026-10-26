@@ -48,6 +48,7 @@ import itertools
 import json
 import math
 import re
+from typing import Optional
 from pathlib import Path
 
 # Tokens that carry no information about what a skill is for. Every skill in a library
@@ -196,7 +197,7 @@ def build_graph(rows: list, sols: list) -> dict:
         )
         if len(found) < 2 and not narrow and not family:
             continue
-        weight = sum(_token_weight(n) for _t, n in found)
+        weight = math.fsum(_token_weight(n) for _t, n in found)
         words = ", ".join(f'"{t}"' for t, _n in found[:3])
         reason = f"named {prefix_of[a]}-*" if family and len(found) < 2 else (
             f"names share {words}"
@@ -204,7 +205,7 @@ def build_graph(rows: list, sols: list) -> dict:
         link(a, b, weight, "inferred", reason)
 
     degree = collections.Counter()
-    strength = collections.Counter()
+    strength = collections.defaultdict(float)
     for (a, b), w in weights.items():
         degree[a] += 1
         degree[b] += 1
@@ -227,11 +228,11 @@ def build_graph(rows: list, sols: list) -> dict:
 
 def _one_level(adj: dict, nodes: list, resolution: float) -> dict:
     comm = {n: n for n in nodes}
-    m2 = sum(sum(d.values()) for d in adj.values())
+    m2 = math.fsum(math.fsum(d.values()) for d in adj.values())
     if m2 <= 0:
         return comm
-    k = {n: sum(adj[n].values()) for n in nodes}
-    tot = collections.Counter()
+    k = {n: math.fsum(adj[n].values()) for n in nodes}
+    tot = collections.defaultdict(float)
     for n in nodes:
         tot[comm[n]] += k[n]
 
@@ -240,7 +241,7 @@ def _one_level(adj: dict, nodes: list, resolution: float) -> dict:
         for n in nodes:
             c0 = comm[n]
             tot[c0] -= k[n]
-            links = collections.Counter()
+            links = collections.defaultdict(float)
             for nb, w in sorted(adj[n].items()):
                 if nb != n:
                     links[comm[nb]] += w
@@ -373,7 +374,7 @@ def shortest_path(graph: dict, a: str, b: str) -> list:
     for (x, y) in graph["weights"]:
         adj[x].append(y)
         adj[y].append(x)
-    seen = {a: None}
+    seen: dict[str, Optional[str]] = {a: None}
     queue = collections.deque([a])
     while queue:
         cur = queue.popleft()
@@ -750,7 +751,7 @@ def load_domains(site_dir: Path) -> dict:
     }
 
 
-def agreement(comm: dict, rows: list, spec: dict, degree: dict = None) -> dict:
+def agreement(comm: dict, rows: list, spec: dict, degree: Optional[dict] = None) -> dict:
     """Majority-label purity of the detected communities against the declared domains.
 
     Not "agreement", which is what this was called and what it is not. A detected community
@@ -815,7 +816,7 @@ def agreement(comm: dict, rows: list, spec: dict, degree: dict = None) -> dict:
             )
 
     def entropy(counter):
-        return -sum(
+        return -math.fsum(
             (v / n) * math.log(v / n) for v in counter.values() if v
         )
 
@@ -886,7 +887,7 @@ def label_box(
     `font` matters: the community names are drawn larger than the skill names, and computing
     both at the smaller size reserved the community boxes a fifth too narrow.
     """
-    w = font * sum(CHAR_W.get(c, CHAR_W_FALLBACK) for c in name)
+    w = font * math.fsum(CHAR_W.get(c, CHAR_W_FALLBACK) for c in name)
     if anchor == "start":
         x0 = x
     elif anchor == "end":
@@ -965,7 +966,7 @@ def place_labels(
     radius: dict,
     want: int,
     frame: tuple = (0.0, 0.0, FRAME[0], FRAME[1]),
-    reserved: list = None,
+    reserved: Optional[list] = None,
 ) -> dict:
     """Choose which names to draw unasked, and where, so that none of them collide.
 

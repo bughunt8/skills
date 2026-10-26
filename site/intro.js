@@ -104,7 +104,7 @@
     nodes: { shape: "dot" },
     edges: { selectionWidth: 0, hoverWidth: 1 }
   });
-  window.__intro = { network: network, nodes: nodes };
+  window.__intro = { network: network, nodes: nodes, eligible: eligibleIds };
 
   var reduceMotion = window.matchMedia
     ? window.matchMedia("(prefers-reduced-motion: reduce)").matches

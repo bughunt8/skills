@@ -1,10 +1,12 @@
 import { test, expect } from "@playwright/test";
-import { assertNoRuntimeErrors, saveEvidence } from "../scripts/workspace-test-helpers.mjs";
+import { assertNoRuntimeErrors, saveEvidence, ensureFiltersOpen } from "../scripts/workspace-test-helpers.mjs";
+import { EXPECTED_TOTAL } from "./library-size.mjs";
 import {
   openMotionWorkspace, openMotionPage, expectMotionIdle, resetProbe, readProbe,
   motionEpisodes, sampleMotionFrame, motionSnapshot, comparableSnapshot,
   semanticTop, viewTop, sampleViewTruth, sampleSelectedLabel,
-  resultKeys, resultFor, tapOrClick, ensureVisible, sampleCamera, cameraDisplacement
+  resultKeys, resultFor, tapOrClick, ensureVisible, sampleCamera, cameraDisplacement,
+  armCameraBurst, readCameraBurst
 } from "../scripts/motion-test-helpers.mjs";
 
 // Acceptance for `site/MOTION.md`. One rule is under test everywhere here:
@@ -187,11 +189,13 @@ test.describe("graph motion acceptance", () => {
   // One camera beat, watched frame by frame. No idle wait before or during the
   // sampling: the point is to observe the flight. `expect` messages carry the
   // MOTION_CAMERA_TRAVEL tag so the planted-defect proof can match them.
-  async function proveCameraTravel(page, label, trigger) {
-    await resetProbe(page);
-    await trigger();
+  // Sampling starts before the trigger so the first in-flight frames are not
+  // missed while the click is dispatched. The loop only stops after it has seen
+  // motion go running and then settle twice, so a pre-trigger idle sample cannot
+  // end it early.
+  async function collectCamera(page, deadlineMs = 6000) {
     const samples = [];
-    const deadline = Date.now() + 5000;
+    const deadline = Date.now() + deadlineMs;
     let sawRunning = false, settled = 0;
     while (Date.now() < deadline) {
       const sample = await sampleCamera(page);
@@ -200,8 +204,16 @@ test.describe("graph motion acceptance", () => {
       if (sample.motion !== "running" && sawRunning) settled++;
       if (settled >= 2) break;
     }
+    return samples;
+  }
+
+  async function proveCameraTravel(page, label, trigger) {
+    await resetProbe(page);
+    await armCameraBurst(page);
+    await trigger();
+    const samples = await readCameraBurst(page);
     const during = samples.filter((s) => s.motion === "running");
-    expect(sawRunning, `non-vacuity: the ${label} beat must animate`).toBe(true);
+    expect(during.length > 0, `non-vacuity: the ${label} beat must animate`).toBe(true);
     expect(during.length,
       `non-vacuity: the sampler must catch several in-flight camera frames for ${label}`)
       .toBeGreaterThanOrEqual(3);
@@ -221,6 +233,19 @@ test.describe("graph motion acceptance", () => {
       `MOTION_CAMERA_TRAVEL: the settled camera must equal the committed target exactly (${label})`)
       .toBe(`translate(${end.target.x} ${end.target.y}) scale(${end.target.scale})`);
     return { label, samples: samples.length, inFlight: during.length, steps, travel, end };
+  }
+
+  async function collectLabels(page, deadlineMs = 6000) {
+    const samples = [];
+    const deadline = Date.now() + deadlineMs;
+    let sawRunning = false, after = 0;
+    while (Date.now() < deadline) {
+      const sample = await sampleSelectedLabel(page);
+      samples.push(sample);
+      if (sample.motion === "running") sawRunning = true;
+      if (sawRunning && sample.motion !== "running" && ++after >= 2) break;
+    }
+    return samples;
   }
 
   test("MOTION_CAMERA_TRAVEL the camera actually travels on context, zoom and fit", async ({ page }, testInfo) => {
@@ -252,16 +277,9 @@ test.describe("graph motion acceptance", () => {
     for (const beat of [{ name: "zoom-out", selector: "#gzoom-out" },
                         { name: "zoom-out-again", selector: "#gzoom-out" },
                         { name: "fit", selector: "#gfit" }]) {
+      const sampling = collectLabels(page);
       await tapOrClick(await ensureVisible(page, beat.selector), testInfo);
-      const samples = [];
-      const deadline = Date.now() + 5000;
-      let sawRunning = false, after = 0;
-      while (Date.now() < deadline) {
-        const sample = await sampleSelectedLabel(page);
-        samples.push(sample);
-        if (sample.motion === "running") sawRunning = true;
-        if (sawRunning && sample.motion !== "running" && ++after >= 2) break;
-      }
+      const samples = await sampling;
       const during = samples.filter((s) => s.motion === "running");
       expect(during.length,
         `non-vacuity: the ${beat.name} beat must animate and be sampled in flight`)
@@ -379,30 +397,62 @@ test.describe("graph motion acceptance", () => {
 
   test("MOTION_POINTER_IMMUNITY a pointer sweep during a transition cannot move selection", async ({ page }, testInfo) => {
     test.setTimeout(60_000);
-    const keys = await firstResults(page, 2);
+    const candidates = await resultKeys(page);
+    const keys = await page.evaluate((candidates) => candidates.filter((key) => {
+      const node = document.querySelector(`.g-node[data-key="${CSS.escape(key)}"]`);
+      return node.dataset.name.length <= 12 && Number(node.dataset.deg) > 0;
+    }).slice(0, 2), candidates);
+    expect(keys.length, "the sweep needs two connected members with short, unwrapped titles").toBe(2);
     await tapOrClick(resultFor(page, keys[0]), testInfo);
     await expectMotionIdle(page);
     await resetProbe(page);
+    await page.evaluate((selected) => {
+      const sweep = { nodes: [...document.querySelectorAll(".g-node")], crossings: [] };
+      window.__pointerSweep = sweep;
+      document.getElementById("gsvg").addEventListener("pointermove", (event) => {
+        const node = event.target.closest(".g-node");
+        if (node && node.dataset.key !== selected && node.dataset.visible === "true") {
+          sweep.crossings.push({ key: node.dataset.key, t: performance.now() });
+        }
+      });
+    }, keys[1]);
     await tapOrClick(resultFor(page, keys[1]), testInfo);
-    const before = await sampleMotionFrame(page);
+    const { before, reachable } = await page.evaluate((selected) => {
+      const sweep = window.__pointerSweep, top = document.getElementById("top");
+      const graph = document.getElementById("gsvg").getBoundingClientRect();
+      sweep.readState = () => ({ selected: top.dataset.selectedKey, query: top.dataset.query,
+        mode: top.dataset.mode, title: document.getElementById("workspace-title").textContent.trim() });
+      const reachable = [];
+      for (const node of sweep.nodes) {
+        if (node.dataset.key === selected || node.dataset.visible !== "true") continue;
+        const style = getComputedStyle(node);
+        if (style.display === "none" || style.visibility === "hidden") continue;
+        const box = node.getBoundingClientRect();
+        const x = box.x + box.width / 2, y = box.y + box.height / 2;
+        if (box.width && box.height && x > graph.left && x < graph.right &&
+          y > graph.top && y < graph.bottom) reachable.push({ key: node.dataset.key, x, y });
+        if (reachable.length === 8) break;
+      }
+      sweep.start = performance.now();
+      sweep.beforeLog = window.__motionProbe.motionLog.slice();
+      return { before: sweep.readState(), reachable };
+    }, keys[1]);
     expect(before.selected).toBe(keys[1]);
-    const graph = await page.locator("#gsvg").boundingBox();
-    const targets = await page.locator(".g-node").evaluateAll((nodes, selected) => nodes.flatMap((n) => {
-      const box = n.getBoundingClientRect(), style = getComputedStyle(n);
-      if (n.dataset.key === selected || n.dataset.visible !== "true" || !box.width || !box.height ||
-        style.display === "none" || style.visibility === "hidden") return [];
-      return [{ key: n.dataset.key, x: box.x + box.width / 2, y: box.y + box.height / 2 }];
-    }), keys[1]);
-    const reachable = targets.filter((p) => p.x > graph.x && p.x < graph.x + graph.width &&
-      p.y > graph.y && p.y < graph.y + graph.height).slice(0, 8);
     expect(reachable.length,
       "non-vacuity: the sweep must cross actual other painted dots").toBeGreaterThan(0);
     const sweepSamples = [];
     for (const point of reachable) {
       await page.mouse.move(point.x, point.y, { steps: 5 });
-      sweepSamples.push(await sampleMotionFrame(page));
+      sweepSamples.push(await page.evaluate(() => window.__pointerSweep.readState()));
     }
-    expect(sweepSamples.some((s) => s.motion === "running"),
+    const sweep = await page.evaluate(() => ({ start: window.__pointerSweep.start, end: performance.now(),
+      beforeLog: window.__pointerSweep.beforeLog, afterLog: window.__motionProbe.motionLog.slice(),
+      crossings: window.__pointerSweep.crossings }));
+    const episodes = motionEpisodes(sweep.afterLog);
+    await testInfo.attach("pointer-sweep-timing", { body: JSON.stringify({ sweep, episodes, reachable }),
+      contentType: "application/json" });
+    expect(sweep.crossings.some((crossing) => crossing.t >= sweep.start && crossing.t <= sweep.end &&
+      episodes.some((episode) => episode.start <= crossing.t && (episode.end ?? sweep.end) >= crossing.t)),
       "non-vacuity: the pointer must have crossed dots while a tween was in flight").toBe(true);
     await expectMotionIdle(page);
     const after = await sampleMotionFrame(page);
@@ -417,7 +467,7 @@ test.describe("graph motion acceptance", () => {
         "MOTION_POINTER_IMMUNITY: pointer travel during a transition must not change the mode").toBe(before.mode);
     }
     await saveEvidence(page, testInfo, "motion-pointer-immunity",
-      { before, after, crossed: reachable.map((p) => p.key), sweepSamples });
+      { before, after, crossed: reachable.map((p) => p.key), sweepSamples, sweep, episodes });
   });
 
   test("MOTION_INTERRUPTIBLE rapid interrupting interactions land on the instant result", async ({ page }, testInfo) => {
@@ -592,9 +642,6 @@ test.describe("graph motion acceptance", () => {
     const [key] = await firstResults(page, 1);
     await resetProbe(page);
     await tapOrClick(resultFor(page, key), testInfo);
-    // One cheap read while the beat is in flight: real motion primitives must be
-    // running on real graph geometry. An attribute flip with nothing animating,
-    // or frames that paint nothing, cannot satisfy this.
     const inFlight = await page.evaluate(() => ({
       motion: document.getElementById("top").dataset.motion ?? null,
       running: document.getAnimations()
@@ -617,8 +664,8 @@ test.describe("graph motion acceptance", () => {
     const episodes = motionEpisodes(probe.motionLog);
     expect(episodes.length,
       "non-vacuity: the measured window must contain a real animation").toBeGreaterThan(0);
-    expect(inFlight.motion,
-      "non-vacuity: the beat must still have been in flight when it was sampled").toBe("running");
+    expect(probe.motionLog.some((entry) => entry.attr === "data-motion" && entry.value === "running"),
+      "non-vacuity: the measured beat must have entered the running state").toBe(true);
     expect(probe.rafSince > 0 || inFlight.running.length > 0,
       "non-vacuity: real animations (frames or running CSS transitions) must be in flight").toBe(true);
     // Attribute each long task: one that contains the synchronous commit is the
@@ -631,6 +678,92 @@ test.describe("graph motion acceptance", () => {
       "MOTION_LONG_TASK: no long task over 120ms during a community to node transition").toEqual([]);
     await saveEvidence(page, testInfo, "motion-long-task", { key, longTasks: probe.longTasks,
       frames: probe.rafSince, episodes, inFlight, commitAt, overviewVisible: overview.top.visibleCount });
+  });
+
+  test("MOTION_LONG_TASK community commit stays within 120ms and skips unchanged node writes", async ({ page }, testInfo) => {
+    await ensureFiltersOpen(page);
+    const community = await page.locator("#gcommunity option").evaluateAll((options) =>
+      options.find((option) => option.value)?.value);
+    expect(community, "a real community must be available").toBeTruthy();
+    await page.locator("#gcommunity").selectOption(community);
+    await expectMotionIdle(page);
+    await expect(page.locator("#top")).toHaveAttribute("data-mode", "community");
+    await expect(page.locator(".g-node")).toHaveCount(EXPECTED_TOTAL);
+    const [key] = await firstResults(page, 1);
+    await resetProbe(page);
+    await page.evaluate(() => {
+      window.__unchangedNodeWrites = [];
+      new MutationObserver((records) => {
+        // Recover each write's new value from the following record's old value.
+        // Reading only the final attribute would misclassify a true/false pair.
+        const nextValues = new Map();
+        for (const record of records.toReversed()) {
+          const el = record.target, attr = record.attributeName;
+          if (!el.matches(".g-node, .g-dot, .g-hit")) continue;
+          if (!nextValues.has(el)) nextValues.set(el, new Map());
+          const values = nextValues.get(el);
+          const value = values.has(attr) ? values.get(attr) : el.getAttribute(attr);
+          if (value === record.oldValue) window.__unchangedNodeWrites.push({
+            key: el.closest(".g-node").dataset.key, attr, value
+          });
+          values.set(attr, record.oldValue);
+        }
+      }).observe(document.getElementById("vp"), { subtree: true, attributes: true,
+        attributeOldValue: true, attributeFilter: ["data-visible", "r"] });
+    });
+    await tapOrClick(resultFor(page, key), testInfo);
+    await expectMotionIdle(page);
+    await expect(page.locator("#top")).toHaveAttribute("data-selected-key", key);
+    const probe = await readProbe(page);
+    const unchanged = await page.evaluate(() => window.__unchangedNodeWrites);
+    expect(probe.longTaskSupported, "the commit budget requires a working long-task observer").toBe(true);
+    expect(motionEpisodes(probe.motionLog).length, "the measured community transition must animate")
+      .toBeGreaterThan(0);
+    await saveEvidence(page, testInfo, "motion-long-task-community", { key, longTasks: probe.longTasks, unchanged });
+    expect(probe.longTasks.filter((task) => task.duration > 120),
+      "MOTION_LONG_TASK: the community commit and transition must stay within 120ms").toEqual([]);
+    expect(unchanged, "MOTION_LONG_TASK: viewport updates must not rewrite unchanged visibility or radii")
+      .toEqual([]);
+  });
+
+  test("MOTION_NODE_VISIBILITY every node keeps truthful data-visible after transitions", async ({ page }, testInfo) => {
+    const [key] = await firstResults(page, 1);
+    const samples = [];
+    for (const action of [
+      () => tapOrClick(resultFor(page, key), testInfo),
+      () => tapOrClick(page.locator("#goverview"), testInfo),
+      () => tapOrClick(resultFor(page, key), testInfo),
+      async () => tapOrClick(await ensureVisible(page, "#gzoom-in"), testInfo),
+      async () => tapOrClick(await ensureVisible(page, "#gfit"), testInfo),
+      () => tapOrClick(page.locator("#gback"), testInfo)
+    ]) {
+      await action();
+      await expectMotionIdle(page);
+      const sample = await page.evaluate(() => {
+        const frame = document.getElementById("gsvg").getBoundingClientRect();
+        const nodes = [...document.querySelectorAll(".g-node")].map((el) => {
+          const dot = el.querySelector(".g-dot"), matrix = dot.getScreenCTM();
+          const point = new DOMPoint(Number(dot.getAttribute("cx")), Number(dot.getAttribute("cy")))
+            .matrixTransform(matrix);
+          const expected = getComputedStyle(el).display !== "none" &&
+            point.x >= frame.left && point.x <= frame.right &&
+            point.y >= frame.top && point.y <= frame.bottom;
+          return { key: el.dataset.key, expected, actual: el.dataset.visible };
+        });
+        return { total: nodes.length, visible: nodes.filter((node) => node.expected).length,
+          reported: Number(document.getElementById("top").dataset.visibleCount),
+          mismatches: nodes.filter((node) => node.actual !== String(node.expected)) };
+      });
+      expect(sample.total, "visibility must be checked for the entire library").toBe(EXPECTED_TOTAL);
+      expect(sample.visible, "the transition must leave actual nodes on screen").toBeGreaterThan(0);
+      expect(sample.mismatches, "MOTION_NODE_VISIBILITY: every data-visible value must match geometry")
+        .toEqual([]);
+      expect(sample.reported).toBe(sample.visible);
+      samples.push(sample);
+    }
+    expect(samples.some((sample) => sample.visible < sample.total),
+      "the checks must include nodes that became hidden").toBe(true);
+    await saveEvidence(page, testInfo, "motion-node-visibility", { key, samples });
   });
 
   test("MOTION_AMBIENT_SINGLETON exactly one ambient element while a skill is selected", async ({ page }, testInfo) => {

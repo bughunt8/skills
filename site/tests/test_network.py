@@ -35,6 +35,8 @@ import os
 import re
 import subprocess
 import sys
+from importlib.machinery import ModuleSpec
+from typing import cast
 from pathlib import Path
 
 SITE = Path(__file__).resolve().parent.parent
@@ -54,9 +56,32 @@ def check(label: str, ok: bool, detail: str = "") -> None:
         FAILURES.append(label)
 
 
+def test_generated_float_sums_use_fsum():
+    """Generated float aggregates must not depend on builtin summation order."""
+    checks = {
+        SITE / "network.py": (
+            "math.fsum(_token_weight(n) for _t, n in found)",
+            "math.fsum(math.fsum(d.values()) for d in adj.values())",
+            "math.fsum(adj[n].values())",
+            "-math.fsum(\n            (v / n) * math.log(v / n) for v in counter.values() if v\n        )",
+            "math.fsum(CHAR_W.get(c, CHAR_W_FALLBACK) for c in name)",
+        ),
+    }
+    for path, expected in checks.items():
+        source = path.read_text(encoding="utf-8")
+        for expression in expected:
+            check(
+                f"{path.name} keeps {expression.split('(')[0]} for a float aggregate",
+                expression in source,
+                f"missing {expression}",
+            )
+
+
 def load():
     """Build the graph from the real library, the same way the page does."""
     spec = importlib.util.spec_from_file_location("bp", SITE / "build.py")
+    spec = cast(ModuleSpec, spec)
+    assert spec.loader is not None
     bp = importlib.util.module_from_spec(spec)
     with contextlib.redirect_stdout(io.StringIO()):
         spec.loader.exec_module(bp)
@@ -337,7 +362,7 @@ def main() -> int:
     )
     check(
         "the names drawn are the most connected skills",
-        placed and all(degree.get(k, 0) >= 1 for k in placed),
+        bool(placed) and all(degree.get(k, 0) >= 1 for k in placed),
     )
 
     # --------------------------------------------------------------- the paths
@@ -415,6 +440,8 @@ def main() -> int:
 
     # --------------------------------------------------------- reproducibility
     print("\nreproducibility")
+
+    test_generated_float_sums_use_fsum()
 
     again = network.layout(
         graph,
