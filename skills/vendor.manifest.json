@@ -1126,7 +1126,6 @@
       "license_path": "LICENSE",
       "ref": "main",
       "pinned_commit": "b0c6239e339c1865c54bd2bb4cd4c1974120f1b8",
-      "expected_commit": "b0c6239e339c1865c54bd2bb4cd4c1974120f1b8",
       "dest": "skills/financeskills",
       "paths": [
         {
@@ -1149,6 +1148,367 @@
         "The upstream LICENSE names KOMVIA as the copyright holder while the README credits Ayotunde Oso (@GAJETOso). Both are recorded rather than choosing one."
       ],
       "pinned_at": "2026-10-24"
+    },
+    {
+      "id": "gtm-skills",
+      "name": "gtm-skills",
+      "repo": "https://github.com/LeadMagic/gtm-skills",
+      "homepage": "https://github.com/LeadMagic/gtm-skills",
+      "author": "LeadMagic LLC",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "main",
+      "pinned_commit": "2b7ec0f9e7044f46e4c77b536f486303fd863e28",
+      "dest": "skills/gtm-skills",
+      "paths": [
+        {
+          "from": "skills/abm",
+          "to": "abm",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/analytics",
+          "to": "analytics",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [
+            "campaign-analytics"
+          ],
+          "exclude_reasons": {
+            "campaign-analytics": "Frontmatter name collides with the local skills/marketing-skill/skills/campaign-analytics. The local skill is canonical for this repository."
+          }
+        },
+        {
+          "from": "skills/automation",
+          "to": "automation",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/content-seo",
+          "to": "content-seo",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/creative",
+          "to": "creative",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [
+            "copywriting"
+          ],
+          "exclude_reasons": {
+            "copywriting": "Frontmatter name collides with the local skills/marketing-skill/skills/copywriting. The local skill is canonical for this repository."
+          }
+        },
+        {
+          "from": "skills/customer-success",
+          "to": "customer-success",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/demand-gen",
+          "to": "demand-gen",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/design",
+          "to": "design",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/events",
+          "to": "events",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/foundation",
+          "to": "foundation",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [
+            "competitive-intel",
+            "pricing-strategy"
+          ],
+          "exclude_reasons": {
+            "competitive-intel": "Frontmatter name collides with the local skills/c-level-advisor/skills/competitive-intel. The local skill is canonical for this repository.",
+            "pricing-strategy": "Frontmatter name collides with the local skills/marketing-skill/skills/pricing-strategy. The local skill is canonical for this repository."
+          }
+        },
+        {
+          "from": "skills/founder-led",
+          "to": "founder-led",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [
+            "soc2-compliance"
+          ],
+          "exclude_reasons": {
+            "soc2-compliance": "Frontmatter name collides with the local skills/ra-qm-team/skills/soc2-compliance. The local skill is canonical for this repository."
+          }
+        },
+        {
+          "from": "skills/growth",
+          "to": "growth",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [
+            "churn-prevention"
+          ],
+          "exclude_reasons": {
+            "churn-prevention": "Frontmatter name collides with the local skills/marketing-skill/skills/churn-prevention. The local skill is canonical for this repository."
+          }
+        },
+        {
+          "from": "skills/gtm-ops",
+          "to": "gtm-ops",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/inbound",
+          "to": "inbound",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/leadmagic",
+          "to": "leadmagic",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/lifecycle",
+          "to": "lifecycle",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/management-leadership",
+          "to": "management-leadership",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/outbound",
+          "to": "outbound",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [
+            "inbox-setup"
+          ],
+          "exclude_reasons": {
+            "inbox-setup": "Frontmatter name collides with the local skills/productivity/email/skills/inbox-setup. The local skill is canonical for this repository."
+          }
+        },
+        {
+          "from": "skills/partnerships",
+          "to": "partnerships",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/product-led-growth",
+          "to": "product-led-growth",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/product-marketing",
+          "to": "product-marketing",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/prospecting",
+          "to": "prospecting",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/sales-plays",
+          "to": "sales-plays",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        },
+        {
+          "from": "skills/sales-revops",
+          "to": "sales-revops",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [
+            "deal-desk"
+          ],
+          "exclude_reasons": {
+            "deal-desk": "Frontmatter name collides with the local skills/commercial/skills/deal-desk. The local skill is canonical for this repository."
+          }
+        },
+        {
+          "from": "skills/tools",
+          "to": "tools",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        }
+      ],
+      "mandatory": [],
+      "limitations": [
+        "automation/skills-lock/SKILL.md invokes the upstream root scripts (generate-skills-lock.py, validate-skills.js) and foundation/using-gtm-skills/SKILL.md invokes install.sh from the repository root. Neither the scripts nor install.sh is vendored, so those commands cannot run in this layout.",
+        "23 Markdown files reference other skills by repository path, such as skills/foundation/using-gtm-skills/SKILL.md. After vendoring the same skill sits at skills/gtm-skills/foundation/using-gtm-skills/SKILL.md, so those paths do not resolve. They appear in reading lists, not as executable steps, and the skills they name are present.",
+        "using-gtm-skills documents skills.lock and taxonomy.csv at the upstream repository root. Neither is vendored, and its integrity-check instructions cannot run here.",
+        "The upstream repository tooling (scripts/, .claude-plugin/, install.sh, assets/, docs/) is not vendored. scripts/lint_skills.py remains the only validator this repository runs.",
+        "Eight skills are excluded because their frontmatter names already exist here; the local skill wins. See exclude_reasons.",
+        "Many reference files are duplicated across skills upstream. They are copied as-is rather than deduplicated, because the vendor model copies whole skill directories."
+      ],
+      "pinned_at": "2026-10-24"
+    },
+    {
+      "id": "jev-skill",
+      "name": "jev-skill",
+      "repo": "https://github.com/wuyoscar/jev-skill",
+      "homepage": "https://github.com/wuyoscar/jev-skill",
+      "author": "wuyoscar",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "main",
+      "pinned_commit": "86b19a2c9856cc908ad29b5cf02ff1c4e7323c09",
+      "dest": "skills/jev-skill",
+      "paths": [
+        {
+          "from": "skills",
+          "to": "",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        }
+      ],
+      "mandatory": [],
+      "limitations": [
+        "docs/, evals/, tests/ and .claude/ are not vendored. Skills reference them in prose, including docs/api, docs/experiments, docs/cookbook, evals/CALIBRATION.md, evals/THIRD_PARTY.md and tests/session.test.ts, so those paths do not resolve here.",
+        "skills/jev/scripts/jev.py is vendored as content. The pyproject.toml and the jev-decide console entry point are not, so the CLI is not installed as a command.",
+        "skills/jev-eval/agents/openai.yaml is shipped content, not an agent registration this repository honours."
+      ],
+      "pinned_at": "2026-10-24"
+    },
+    {
+      "id": "rederive",
+      "name": "rederive",
+      "repo": "https://github.com/EricJujianZou/rederive",
+      "homepage": "https://github.com/EricJujianZou/rederive",
+      "author": "Eric Zou",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "master",
+      "pinned_commit": "329f9c915944272f4f63954220f5d00a5c342270",
+      "dest": "skills/rederive",
+      "paths": [
+        {
+          "from": "skills/rederive",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [],
+      "limitations": [
+        "docs/, assets/ and .claude-plugin/ are not vendored. Static relative-link checks found no links under skills/ to them.",
+        "scripts/history.sh shells out to git and scripts/structure.py to python3. Both are standard tooling, not bundled dependencies.",
+        "The skill writes .rederive/map.md and .rederive/log.md into the target repository. That is workspace state in the user's repo, not vendored content."
+      ],
+      "pinned_at": "2026-10-25"
     }
   ]
 }

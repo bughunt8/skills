@@ -17,7 +17,7 @@
 //
 // `build.py --check` proves data.js matches the skills tree. These constants prove
 // the rendered page matches data.js and that neither shrank behind our backs.
-export const EXPECTED_TOTAL = 545;
-export const EXPECTED_CATEGORIES = 26;
-export const EXPECTED_COMMUNITIES = 79;
-export const EXPECTED_SOLUTIONS = 55;
+export const EXPECTED_TOTAL = 755;
+export const EXPECTED_CATEGORIES = 29;
+export const EXPECTED_COMMUNITIES = 89;
+export const EXPECTED_SOLUTIONS = 61;

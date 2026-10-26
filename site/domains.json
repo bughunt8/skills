@@ -2,7 +2,7 @@
   "_comment": [
     "The top layer of the graph: what kind of work a skill is for.",
     "",
-    "The 25 groups below it are the repository's own directory names, which is why",
+    "The groups below it are the repository's own directory names, which is why",
     "they read like `pstack`, `shuohao` and `ra-qm-team` \u2014 they are source layout,",
     "not a taxonomy, and there are too many of them to be an opening view. This file",
     "is the one place where an editorial judgement is made about the library, so it",
@@ -26,7 +26,9 @@
         "pstack",
         "markdown-html",
         "start-github-repo",
-        "loop-library"
+        "loop-library",
+        "jev-skill",
+        "rederive"
       ]
     },
     {
@@ -47,7 +49,8 @@
         "marketing-skill",
         "commercial",
         "business-growth",
-        "marketing"
+        "marketing",
+        "gtm-skills"
       ]
     },
     {

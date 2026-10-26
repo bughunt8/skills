@@ -546,7 +546,7 @@ def _pack_discs(radii: list, edges: list, width: float, height: float) -> list:
                     # 31 communities from 19, and at 14 units apart only 88% of skills sat
                     # nearer their own community's centre than any other's - which makes
                     # colouring by community say less than it claims.
-                    want = radii[a] + radii[b] + 24.0
+                    want = radii[a] + radii[b] + 36.0
                     if d < want:
                         if d < 1e-9:
                             dx, dy, d = 1.0 + (a % 3), 0.5 + (b % 3), 1.0
@@ -617,9 +617,11 @@ def layout(graph: dict, comm: dict, rows_by_key: dict,
     edges_between = [
         (i, j, w / 6.0) for (i, j), w in sorted(between.items())
     ]
-    centres = _pack_discs(radii, edges_between, width, height)
-
-    placed: dict = {}
+    # Relax each community before packing it. The nominal sqrt(area) radius is only an
+    # allocation hint; attraction can move a member farther from the community centroid.
+    # Packing that hint and then measuring the actual extents allowed the extents to overlap.
+    local_points: dict = {}
+    pack_radii = []
     for c in order:
         mine = sorted(linked[c], key=lambda n: (-degree[n], n))
         local_index = {n: i for i, n in enumerate(mine)}
@@ -653,19 +655,20 @@ def layout(graph: dict, comm: dict, rows_by_key: dict,
         # Clamping can push two nodes back together on the rim, so separate once more
         # and accept a slightly larger disc rather than an overlap.
         _separate(pts, min_dist=MIN_GAP, passes=4)
+        local_cx = math.fsum(pt[0] for pt in pts) / len(pts)
+        local_cy = math.fsum(pt[1] for pt in pts) / len(pts)
+        pts = [[pt[0] - local_cx, pt[1] - local_cy] for pt in pts]
+        local_points[c] = (mine, local_index, pts)
+        pack_radii.append(max(math.hypot(*pt) for pt in pts))
+
+    centres = _pack_discs(pack_radii, edges_between, width, height)
+    placed: dict = {}
+    for c in order:
+        mine, local_index, pts = local_points[c]
         cx0, cy0 = centres[index[c]]
         for n in mine:
             px, py = pts[local_index[n]]
             placed[n] = [cx0 + px, cy0 + py]
-
-    # One last pass over everything. Two discs that end up touching can still put a
-    # node from each within a few units of the other, which no per-community pass can
-    # see because neither community knows about the other.
-    keys = sorted(placed)
-    pts = [placed[k] for k in keys]
-    _separate(pts, min_dist=MIN_GAP, passes=4)
-    for k, pt in zip(keys, pts):
-        placed[k] = pt
 
     # Fit what has been placed, then put the unconnected skills outside it.
     xs = [p[0] for p in placed.values()] or [0.0]
@@ -713,7 +716,7 @@ def layout(graph: dict, comm: dict, rows_by_key: dict,
             round(min(width - 4.0, max(4.0, pt[0])), 1),
             round(min(height - 4.0, max(4.0, pt[1])), 1),
         ]
-    _separate(pts, min_dist=MIN_GAP + 0.3, passes=8)
+    _separate(pts, min_dist=MIN_GAP + 0.6, passes=20)
     for k, pt in zip(keys, pts):
         out[k] = (
             round(min(width - 4.0, max(4.0, pt[0])), 1),

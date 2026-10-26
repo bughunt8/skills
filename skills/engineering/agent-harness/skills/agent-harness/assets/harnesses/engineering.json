@@ -1,7 +1,7 @@
 {
   "schema": "agent-harness/manifest.v2",
   "domain": "engineering",
-  "skill_count": 113,
+  "skill_count": 114,
   "loop_defaults": {
     "max_attempts_per_task": 3,
     "max_loop_iterations": 12,
@@ -8402,6 +8402,34 @@
         "skills/engineering/universal-scraping-architect/skills/universal-scraping-architect/references/local-extraction-patterns.md",
         "skills/engineering/universal-scraping-architect/skills/universal-scraping-architect/references/scraping-ethics-security.md"
       ]
+    },
+    {
+      "name": "vendor-import",
+      "path": "skills/engineering/vendor-import",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "vendor-import",
+        "skill_path": "skills/engineering/vendor-import",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/engineering/vendor-import/SKILL.md",
+            "sha256": "c3eacd0f04d0021a25056304af5ab600b9740607256c5abbf9174bf1f7498d95",
+            "role": "skill_body"
+          }
+        ]
+      },
+      "description": "Import an external repository of agent skills into this library through its vendor pipeline. Use when the user gives a repository URL and asks to analyse it, integrate it, bring it into this library, or update its references, templates, attribution and scripts. Covers upstream inspection, licence and commit pinning, name collisions, manifest mapping, the sync and index generators, site data, evidence collection and the Oracle review. Not for editing an already vendored tree, refreshing an existing source (run scripts/sync_vendor.py), or writing a local skill (use write-a-skill).",
+      "tools": [],
+      "agentic_signals": {
+        "goal_intake": false,
+        "refusal_gate": true,
+        "verification": true,
+        "loop_discipline": true,
+        "close_out": false
+      },
+      "references": []
     },
     {
       "name": "wayfinder",

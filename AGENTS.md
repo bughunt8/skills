@@ -5,7 +5,7 @@ anything here.
 
 ## What this repository is
 
-A library of 527 skill files across 24 directories, 526 of which are linted; the difference is
+A library of 737 skill files across 27 directories, 736 of which are linted; the difference is
 one deliberate test fixture. The skill index in `README.md` is the authoritative count.
 `scripts/generate_index.py` regenerates it and CI checks it, so refresh these numbers there
 when the tree changes. The skill files are instructions to another agent. The
@@ -97,6 +97,15 @@ and each one is a live risk of the wrong skill loading.
 
 New domain: add a line to `docs/domain-descriptions.json`, then
 `python3 scripts/generate_index.py --write`.
+
+## Vendoring an external repository
+
+When the request is to analyse someone else's skills repository and integrate it, follow
+[vendor-import](skills/engineering/vendor-import/SKILL.md). It covers upstream inspection,
+name collisions, manifest mapping for flat and nested layouts, the completeness check, the
+site updates, the evidence to collect and the Oracle review. The manifest and
+`scripts/sync_vendor.py` remain the only import path. The skill adds the procedure around
+them, not a second one.
 
 ## Spec-driven development
 
