@@ -51,6 +51,16 @@ jobs:
           fi
           echo "confirmation accepted"
 
+      - name: Require promotion credential
+        env:
+          PROMOTE_TOKEN: ${{ secrets.PROMOTE_TOKEN }}
+        run: |
+          if [ -z "$PROMOTE_TOKEN" ]; then
+            echo "::error::PROMOTE_TOKEN repository secret is required with contents: write and pull-requests: write scopes"
+            exit 1
+          fi
+          echo "promotion credential is present"
+
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
@@ -104,6 +114,8 @@ jobs:
       # main requires the head branch to be up to date, so a promotion PR whose
       # base has moved ahead can never satisfy the check on its own.
       - name: Update staging when it is behind main
+        env:
+          PROMOTE_TOKEN: ${{ secrets.PROMOTE_TOKEN }}
         run: |
           behind="$(git rev-list --count HEAD..origin/main)"
           echo "commits on main that staging lacks: $behind"
@@ -117,6 +129,7 @@ jobs:
           fi
           git merge --no-ff --no-edit origin/main \
             -m "Merge main into staging before promotion (automated by site-promote)"
+          git remote set-url origin "https://x-access-token:${PROMOTE_TOKEN}@github.com/${{ github.repository }}.git"
           git push origin HEAD:refs/heads/staging
           echo "merged main into staging and pushed"
 
@@ -151,10 +164,7 @@ jobs:
 
       - name: Open or update the promotion pull request
         env:
-          # A fine-grained PAT in PROMOTE_TOKEN is optional. It is only needed if
-          # "Allow GitHub Actions to create and approve pull requests" is off, and
-          # it also lets the PR trigger pull_request-scoped checks.
-          GH_TOKEN: ${{ secrets.PROMOTE_TOKEN || github.token }}
+          GH_TOKEN: ${{ secrets.PROMOTE_TOKEN }}
         run: |
           title="Promote staging to main: ${{ steps.diff.outputs.short }}"
           existing="$(gh pr list --base main --head staging --state open --json number --jq '.[0].number // empty')"
@@ -166,7 +176,7 @@ jobs:
             if ! gh pr create --base main --head staging --title "$title" --body-file pr-body.md > created.txt 2>&1; then
               cat created.txt
               if grep -qi "not permitted to create or approve pull requests" created.txt; then
-                echo "::error::GitHub Actions is not allowed to create pull requests in this repository. Either enable Settings → Actions → General → Allow GitHub Actions to create and approve pull requests, or add a fine-grained PAT as the PROMOTE_TOKEN secret with Contents and Pull requests write access."
+                echo "::error::PROMOTE_TOKEN repository secret is required with contents: write and pull-requests: write scopes; GitHub Actions is not allowed to create or approve pull requests without it."
               fi
               exit 1
             fi

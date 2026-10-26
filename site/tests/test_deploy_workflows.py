@@ -771,6 +771,49 @@ def check_promotion_gate(promote, producers):
     )
 
 
+def check_promotion_credential(promote):
+    job = get_job(promote, "promote", "b1-site-promote-to-main.yml")
+    push = next(
+        (step for step in job["steps"] if step.get("name") == "Update staging when it is behind main"),
+        None,
+    )
+    if push is None:
+        raise AssertionError("promotion must keep the staging synchronization step")
+    push_run = str(push.get("run") or "")
+    require(
+        "git push origin HEAD:refs/heads/staging" in push_run,
+        "promotion must keep the validated synchronization push to staging",
+    )
+    require(
+        (push.get("env") or {}).get("PROMOTE_TOKEN") == "${{ secrets.PROMOTE_TOKEN }}",
+        "the synchronization push must use the PROMOTE_TOKEN repository secret",
+    )
+    require(
+        "github.token" not in str(push),
+        "the synchronization push must not fall back to github.token",
+    )
+
+    pull_request = next(
+        (step for step in job["steps"] if step.get("name") == "Open or update the promotion pull request"),
+        None,
+    )
+    if pull_request is None:
+        raise AssertionError("promotion must keep the pull request step")
+    require(
+        "github.token" not in str(pull_request),
+        "the pull request must not fall back to github.token",
+    )
+    require(
+        (pull_request.get("env") or {}).get("GH_TOKEN") == "${{ secrets.PROMOTE_TOKEN }}",
+        "the pull request must use the PROMOTE_TOKEN repository secret",
+    )
+    workflow_text = str(promote)
+    require("PROMOTE_TOKEN repository secret is required" in workflow_text,
+            "missing PROMOTE_TOKEN must produce an operator error")
+    require("contents: write" in workflow_text and "pull-requests: write" in workflow_text,
+            "the operator error must name both required token scopes")
+
+
 class PromotionGateReachabilityTests(unittest.TestCase):
     """Flow B is only usable if its gate can be satisfied by a healthy staging."""
 
@@ -801,6 +844,40 @@ class PromotionGateReachabilityTests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, "no inspected workflow produces"):
             check_promotion_gate(self.promote, renamed)
         print("PROVED promotion gate detects an unproduced check", flush=True)
+
+    def test_promotion_uses_the_repository_credential_for_both_operations(self):
+        check_promotion_credential(self.promote)
+        print("PROVED promotion push and pull request require PROMOTE_TOKEN", flush=True)
+
+    def test_promotion_rejects_a_default_token_fallback(self):
+        broken = deepcopy(self.promote)
+        steps = broken["jobs"]["promote"]["steps"]
+        pull_request = next(step for step in steps if step.get("name") == "Open or update the promotion pull request")
+        pull_request["env"]["GH_TOKEN"] = "${{ secrets.PROMOTE_TOKEN || github.token }}"
+        with self.assertRaisesRegex(AssertionError, "must not fall back to github.token"):
+            check_promotion_credential(broken)
+        print("PROVED promotion rejects the default token fallback", flush=True)
+
+    def test_promotion_rejects_credential_on_only_one_operation(self):
+        broken = deepcopy(self.promote)
+        steps = broken["jobs"]["promote"]["steps"]
+        push = next(step for step in steps if step.get("name") == "Update staging when it is behind main")
+        del push["env"]["PROMOTE_TOKEN"]
+        with self.assertRaisesRegex(AssertionError, "synchronization push must use"):
+            check_promotion_credential(broken)
+        print("PROVED both promotion operations require the credential", flush=True)
+
+    def test_promotion_rejects_missing_sync_push(self):
+        broken = deepcopy(self.promote)
+        steps = broken["jobs"]["promote"]["steps"]
+        push = next(step for step in steps if step.get("name") == "Update staging when it is behind main")
+        push["run"] = "\n".join(
+            line for line in push["run"].splitlines()
+            if "git push origin HEAD:refs/heads/staging" not in line
+        )
+        with self.assertRaisesRegex(AssertionError, "validated synchronization push"):
+            check_promotion_credential(broken)
+        print("PROVED promotion keeps the validated synchronization push", flush=True)
 
 
 if __name__ == "__main__":
