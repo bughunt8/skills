@@ -240,16 +240,33 @@ triggering `on: push`.
 Any push to `main` deploys production, which is why `main` is protected and the
 promotion travels the same reviewed path as any other change.
 
-Opening the pull request needs one of these, because a workflow cannot open a
-pull request by default:
+Opening the pull request requires the repository-scoped fine-grained PAT
+described below. The repository setting **Settings → Actions → General → Allow
+GitHub Actions to create and approve pull requests** may still be enabled, but
+it is not a substitute for `PROMOTE_TOKEN`: the explicit credential also lets
+the pull request trigger `pull_request`-scoped checks.
 
-- **Settings → Actions → General → Allow GitHub Actions to create and approve
-  pull requests**, enabled; or
-- a fine-grained PAT in the `PROMOTE_TOKEN` secret with Contents and Pull
-  requests write access. This option also lets the pull request trigger
-  `pull_request`-scoped checks, which a `GITHUB_TOKEN`-opened one does not.
+### Promotion credential
 
-The workflow reports which of these is missing rather than failing opaquely.
+The **Site promote staging to main** workflow requires the repository secret
+`PROMOTE_TOKEN`. The owner must create a repository-scoped fine-grained token
+with exactly these write scopes:
+
+- `contents: write`
+- `pull-requests: write`
+
+The workflow uses this credential both when it pushes a synchronization merge
+from `main` into `staging` and when it opens or updates the promotion pull
+request. It does not fall back to `github.token`, because that token does not
+trigger the pull-request checks needed by the promotion path.
+
+When the secret is absent, the job fails before changing `staging` with:
+
+```text
+PROMOTE_TOKEN repository secret is required with contents: write and pull-requests: write scopes
+```
+
+Create the repository secret before rerunning the manual promotion workflow.
 
 ## What a deploy verifies
 
