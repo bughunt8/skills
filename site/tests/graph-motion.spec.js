@@ -397,30 +397,62 @@ test.describe("graph motion acceptance", () => {
 
   test("MOTION_POINTER_IMMUNITY a pointer sweep during a transition cannot move selection", async ({ page }, testInfo) => {
     test.setTimeout(60_000);
-    const keys = await firstResults(page, 2);
+    const candidates = await resultKeys(page);
+    const keys = await page.evaluate((candidates) => candidates.filter((key) => {
+      const node = document.querySelector(`.g-node[data-key="${CSS.escape(key)}"]`);
+      return node.dataset.name.length <= 12 && Number(node.dataset.deg) > 0;
+    }).slice(0, 2), candidates);
+    expect(keys.length, "the sweep needs two connected members with short, unwrapped titles").toBe(2);
     await tapOrClick(resultFor(page, keys[0]), testInfo);
     await expectMotionIdle(page);
     await resetProbe(page);
+    await page.evaluate((selected) => {
+      const sweep = { nodes: [...document.querySelectorAll(".g-node")], crossings: [] };
+      window.__pointerSweep = sweep;
+      document.getElementById("gsvg").addEventListener("pointermove", (event) => {
+        const node = event.target.closest(".g-node");
+        if (node && node.dataset.key !== selected && node.dataset.visible === "true") {
+          sweep.crossings.push({ key: node.dataset.key, t: performance.now() });
+        }
+      });
+    }, keys[1]);
     await tapOrClick(resultFor(page, keys[1]), testInfo);
-    const before = await sampleMotionFrame(page);
+    const { before, reachable } = await page.evaluate((selected) => {
+      const sweep = window.__pointerSweep, top = document.getElementById("top");
+      const graph = document.getElementById("gsvg").getBoundingClientRect();
+      sweep.readState = () => ({ selected: top.dataset.selectedKey, query: top.dataset.query,
+        mode: top.dataset.mode, title: document.getElementById("workspace-title").textContent.trim() });
+      const reachable = [];
+      for (const node of sweep.nodes) {
+        if (node.dataset.key === selected || node.dataset.visible !== "true") continue;
+        const style = getComputedStyle(node);
+        if (style.display === "none" || style.visibility === "hidden") continue;
+        const box = node.getBoundingClientRect();
+        const x = box.x + box.width / 2, y = box.y + box.height / 2;
+        if (box.width && box.height && x > graph.left && x < graph.right &&
+          y > graph.top && y < graph.bottom) reachable.push({ key: node.dataset.key, x, y });
+        if (reachable.length === 8) break;
+      }
+      sweep.start = performance.now();
+      sweep.beforeLog = window.__motionProbe.motionLog.slice();
+      return { before: sweep.readState(), reachable };
+    }, keys[1]);
     expect(before.selected).toBe(keys[1]);
-    const graph = await page.locator("#gsvg").boundingBox();
-    const targets = await page.locator(".g-node").evaluateAll((nodes, selected) => nodes.flatMap((n) => {
-      const box = n.getBoundingClientRect(), style = getComputedStyle(n);
-      if (n.dataset.key === selected || n.dataset.visible !== "true" || !box.width || !box.height ||
-        style.display === "none" || style.visibility === "hidden") return [];
-      return [{ key: n.dataset.key, x: box.x + box.width / 2, y: box.y + box.height / 2 }];
-    }), keys[1]);
-    const reachable = targets.filter((p) => p.x > graph.x && p.x < graph.x + graph.width &&
-      p.y > graph.y && p.y < graph.y + graph.height).slice(0, 8);
     expect(reachable.length,
       "non-vacuity: the sweep must cross actual other painted dots").toBeGreaterThan(0);
     const sweepSamples = [];
     for (const point of reachable) {
       await page.mouse.move(point.x, point.y, { steps: 5 });
-      sweepSamples.push(await sampleMotionFrame(page));
+      sweepSamples.push(await page.evaluate(() => window.__pointerSweep.readState()));
     }
-    expect(sweepSamples.some((s) => s.motion === "running"),
+    const sweep = await page.evaluate(() => ({ start: window.__pointerSweep.start, end: performance.now(),
+      beforeLog: window.__pointerSweep.beforeLog, afterLog: window.__motionProbe.motionLog.slice(),
+      crossings: window.__pointerSweep.crossings }));
+    const episodes = motionEpisodes(sweep.afterLog);
+    await testInfo.attach("pointer-sweep-timing", { body: JSON.stringify({ sweep, episodes, reachable }),
+      contentType: "application/json" });
+    expect(sweep.crossings.some((crossing) => crossing.t >= sweep.start && crossing.t <= sweep.end &&
+      episodes.some((episode) => episode.start <= crossing.t && (episode.end ?? sweep.end) >= crossing.t)),
       "non-vacuity: the pointer must have crossed dots while a tween was in flight").toBe(true);
     await expectMotionIdle(page);
     const after = await sampleMotionFrame(page);
@@ -435,7 +467,7 @@ test.describe("graph motion acceptance", () => {
         "MOTION_POINTER_IMMUNITY: pointer travel during a transition must not change the mode").toBe(before.mode);
     }
     await saveEvidence(page, testInfo, "motion-pointer-immunity",
-      { before, after, crossed: reachable.map((p) => p.key), sweepSamples });
+      { before, after, crossed: reachable.map((p) => p.key), sweepSamples, sweep, episodes });
   });
 
   test("MOTION_INTERRUPTIBLE rapid interrupting interactions land on the instant result", async ({ page }, testInfo) => {
