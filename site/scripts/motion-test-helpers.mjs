@@ -89,6 +89,15 @@ const DEFECTS = {
 })();
 ` + source
   },
+  "camera-jumps-to-target": {
+    url: /\/app\.js(?:\?.*)?$/,
+    patch: (source) => {
+      const interpolation = "const eased = f.ease(progress);";
+      if (source.split(interpolation).length !== 2)
+        throw new Error("Camera jump defect requires exactly one paint interpolation");
+      return source.replace(interpolation, "const eased = 1; /* Isolated camera jump defect. */");
+    }
+  },
   // (e) The label layer is blanked for the whole flight — the behaviour the
   // design review rejected. Geometry still reports 16 CSS px, so only an
   // effective-visibility check during flight can see it.
@@ -361,10 +370,10 @@ export async function sampleCamera(page) {
 export async function armCameraBurst(page) {
   await page.evaluate(() => {
     const top = document.getElementById("top"), vp = document.getElementById("vp");
-    const read = () => {
+    const read = (provenance, rafTimestamp = null) => {
       const ctm = vp.getScreenCTM();
       return {
-        t: performance.now(),
+        t: performance.now(), provenance, rafTimestamp,
         motion: top.dataset.motion ?? null,
         beat: top.dataset.motionBeat ?? null,
         transform: vp.getAttribute("transform"),
@@ -376,8 +385,8 @@ export async function armCameraBurst(page) {
     window.__cameraBurst = state;
     const deadline = performance.now() + 8000;
     let idle = 0;
-    function tick() {
-      state.samples.push(read());
+    function tick(timestamp) {
+      state.samples.push(read("raf", timestamp));
       if (top.dataset.motion === "running") idle = 0;
       else if (state.started) idle++;
       if (idle >= 2 || performance.now() > deadline) { state.done = true; return; }
@@ -387,6 +396,7 @@ export async function armCameraBurst(page) {
       if (top.dataset.motion === "running" && !state.started) {
         state.started = true;
         observer.disconnect();
+        state.samples.push(read("observer"));
         requestAnimationFrame(tick);
       }
     });
@@ -410,12 +420,12 @@ export function cameraDisplacement(a, b) {
 }
 
 // Project a camera sample onto the start-to-settled transform segment. This
-// proves an interior frame without requiring adjacent frame samples to differ.
+// reports path alignment; endpoint distances must also prove an interior frame.
 export function cameraInterpolation(start, sample, end, tolerance = 1) {
   const coordinates = (value) => value?.matrix &&
     [value.matrix.e, value.matrix.f, value.matrix.a, value.matrix.b];
   const before = coordinates(start), point = coordinates(sample), after = coordinates(end);
-  if (!before || !point || !after) return null;
+  if (![before, point, after].every((values) => values && values.every(Number.isFinite))) return null;
   const delta = after.map((value, i) => value - before[i]);
   const length = Math.hypot(...delta);
   if (!length) return null;
@@ -423,7 +433,10 @@ export function cameraInterpolation(start, sample, end, tolerance = 1) {
   const fraction = offset.reduce((sum, value, i) => sum + value * delta[i], 0) /
     (length * length);
   const perpendicular = Math.hypot(...offset.map((value, i) => value - fraction * delta[i]));
-  return { fraction, perpendicular, length, withinPath: perpendicular <= tolerance };
+  const fromStart = Math.hypot(...offset);
+  const toEnd = Math.hypot(...point.map((value, i) => value - after[i]));
+  return { fraction, perpendicular, length, fromStart, toEnd,
+    withinPath: perpendicular <= tolerance };
 }
 
 // The settled truth an instant render must reproduce: #top, the #vp transform and

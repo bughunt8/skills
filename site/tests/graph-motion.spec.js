@@ -9,6 +9,39 @@ import {
   armCameraBurst, readCameraBurst, cameraInterpolation
 } from "../scripts/motion-test-helpers.mjs";
 
+// Unrounded screen-CTM coordinates [e, f, a, b]. Epsilon is measurement
+// resolution, not a perceptibility threshold. Short context entries count too.
+const CAMERA_EPSILON = 1e-4;
+function isInteriorCamera(position) {
+  if (!position || ![position.length, position.fraction, position.perpendicular,
+    position.fromStart, position.toEnd].every(Number.isFinite)) return false;
+  const margin = Math.max(CAMERA_EPSILON, 0.05 * position.length);
+  return position.length > 20 * CAMERA_EPSILON &&
+    position.fraction > 0.05 && position.fraction < 0.95 &&
+    position.perpendicular <= 1 && position.fromStart > margin && position.toEnd > margin;
+}
+
+test("MOTION_CAMERA_TRAVEL rejects endpoint-only camera samples", () => {
+  const camera = (e, f) => ({ matrix: { a: 1, b: 0, c: 0, d: 1, e, f } });
+  const start = camera(0, 0), end = camera(10, 10);
+  for (const sample of [start, end, camera(0.1, 0.1), camera(9.9, 9.9),
+    camera(10 - Number.EPSILON * 10, 10 - Number.EPSILON * 10)]) {
+    expect(isInteriorCamera(cameraInterpolation(start, sample, end)),
+      "MOTION_CAMERA_TRAVEL: a jump or endpoint rounding must not prove interpolation").toBe(false);
+  }
+  expect(isInteriorCamera(cameraInterpolation(start, camera(5, 5), end))).toBe(true);
+  expect(isInteriorCamera(cameraInterpolation(start, start, start))).toBe(false);
+  expect(isInteriorCamera(cameraInterpolation(start, camera(0.1, 0), camera(0.2, 0)))).toBe(true);
+  expect(isInteriorCamera(cameraInterpolation(start, camera(0.0005, 0), camera(0.001, 0)))).toBe(false);
+  for (const invalid of [null, {}, { matrix: null }, camera(NaN, 0), camera(Infinity, 0),
+    { matrix: { e: 0, f: 0, a: 1, b: undefined } }]) {
+    for (const triple of [[invalid, start, end], [start, invalid, end], [start, end, invalid]]) {
+      expect(cameraInterpolation(...triple)).toBeNull();
+      expect(isInteriorCamera(cameraInterpolation(...triple))).toBe(false);
+    }
+  }
+});
+
 // Acceptance for `site/MOTION.md`. One rule is under test everywhere here:
 // state commits synchronously and only pixels interpolate. Every wait is on
 // `#top[data-motion="idle"]` or on an explicit attribute, never on a fixed sleep
@@ -213,27 +246,38 @@ test.describe("graph motion acceptance", () => {
     await armCameraBurst(page);
     await trigger();
     const samples = await readCameraBurst(page);
-    const during = samples.filter((s) => s.motion === "running");
-    expect(during.length > 0, `non-vacuity: the ${label} beat must animate`).toBe(true);
-    expect(during.length,
-      `non-vacuity: the sampler must catch several in-flight camera frames for ${label}`)
-      .toBeGreaterThanOrEqual(3);
+    const during = samples.filter((s) => s.motion === "running" && s.provenance === "raf");
     await expectMotionIdle(page);
     const end = await sampleCamera(page);
     expect(end.transform,
       `MOTION_CAMERA_TRAVEL: the settled camera must equal the committed target exactly (${label})`)
       .toBe(`translate(${end.target.x} ${end.target.y}) scale(${end.target.scale})`);
-    const positions = during.map((sample) => cameraInterpolation(start, sample, end));
-    const interpolated = positions.filter((position) => position &&
-      position.fraction > 0 && position.fraction < 1 && position.perpendicular <= 1);
+    // The observer sees paint(flight, 0), not an animated frame. The app queues
+    // its rAF first, so our first running rAF reads its first animated paint.
+    const flightStart = during[0];
+    const positions = during.map((sample) => ({ sample,
+      position: cameraInterpolation(flightStart, sample, end) }));
+    const interpolated = positions.slice(1).filter(({ sample, position }) =>
+      Number.isFinite(sample.rafTimestamp) && sample.rafTimestamp > flightStart?.rafTimestamp &&
+      isInteriorCamera(position));
+    const trace = JSON.stringify({ label, A: flightStart, B: end,
+      L: cameraInterpolation(flightStart, end, end)?.length ?? 0, samples, positions });
+    expect(during.length,
+      `MOTION_CAMERA_TRAVEL: insufficient evidence without several running rAF samples; ${trace}`)
+      .toBeGreaterThanOrEqual(3);
+    expect(Number.isFinite(flightStart?.rafTimestamp),
+      `MOTION_CAMERA_TRAVEL: first running frame needs a rAF timestamp; ${trace}`).toBe(true);
     expect(cameraInterpolation(start, end, end)?.length,
       `MOTION_CAMERA_TRAVEL: the ${label} target must differ from its starting camera`)
       .toBeGreaterThan(1);
+    expect(cameraInterpolation(flightStart, end, end)?.length ?? 0,
+      `MOTION_CAMERA_TRAVEL: flight must travel from its first running rAF camera by more than measurement resolution; ${trace}`)
+      .toBeGreaterThan(20 * CAMERA_EPSILON);
     expect(interpolated.length,
-      `MOTION_CAMERA_TRAVEL: an in-flight camera reading must lie between the starting and settled transforms (${label})`)
+      `MOTION_CAMERA_TRAVEL: insufficient evidence without a later running rAF at 0.05 < fraction < 0.95, perpendicular <= 1, both distances > max(epsilon, 0.05 * L); ${trace}`)
       .toBeGreaterThan(0);
-    return { label, samples: samples.length, inFlight: during.length,
-      interpolated, end };
+    return { label, samples, inFlight: during.length,
+      start, flightStart, positions, interpolated, end };
   }
 
   async function collectLabels(page, deadlineMs = 6000) {
