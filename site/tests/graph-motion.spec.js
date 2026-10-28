@@ -6,7 +6,7 @@ import {
   motionEpisodes, sampleMotionFrame, motionSnapshot, comparableSnapshot,
   semanticTop, viewTop, sampleViewTruth, sampleSelectedLabel,
   resultKeys, resultFor, tapOrClick, ensureVisible, sampleCamera, cameraDisplacement,
-  armCameraBurst, readCameraBurst
+  armCameraBurst, readCameraBurst, cameraInterpolation
 } from "../scripts/motion-test-helpers.mjs";
 
 // Acceptance for `site/MOTION.md`. One rule is under test everywhere here:
@@ -209,6 +209,7 @@ test.describe("graph motion acceptance", () => {
 
   async function proveCameraTravel(page, label, trigger) {
     await resetProbe(page);
+    const start = await sampleCamera(page);
     await armCameraBurst(page);
     await trigger();
     const samples = await readCameraBurst(page);
@@ -217,22 +218,22 @@ test.describe("graph motion acceptance", () => {
     expect(during.length,
       `non-vacuity: the sampler must catch several in-flight camera frames for ${label}`)
       .toBeGreaterThanOrEqual(3);
-    const steps = during.slice(1).map((sample, index) => ({
-      at: Math.round(sample.t), ...cameraDisplacement(during[index], sample) }));
-    const moved = steps.filter((step) => step.distance > 1 || Math.abs(step.dScale) > 0.002);
-    expect(moved.length,
-      `MOTION_CAMERA_TRAVEL: successive in-flight camera readings must differ by real displacement (${label})`)
-      .toBeGreaterThan(0);
-    const travel = cameraDisplacement(during[0], during[during.length - 1]);
-    expect(travel.distance > 1 || Math.abs(travel.dScale) > 0.002,
-      `MOTION_CAMERA_TRAVEL: the camera must visibly move across the ${label} flight, not jump instantly`)
-      .toBe(true);
     await expectMotionIdle(page);
     const end = await sampleCamera(page);
     expect(end.transform,
       `MOTION_CAMERA_TRAVEL: the settled camera must equal the committed target exactly (${label})`)
       .toBe(`translate(${end.target.x} ${end.target.y}) scale(${end.target.scale})`);
-    return { label, samples: samples.length, inFlight: during.length, steps, travel, end };
+    const positions = during.map((sample) => cameraInterpolation(start, sample, end));
+    const interpolated = positions.filter((position) => position &&
+      position.fraction > 0 && position.fraction < 1 && position.perpendicular <= 1);
+    expect(cameraInterpolation(start, end, end)?.length,
+      `MOTION_CAMERA_TRAVEL: the ${label} target must differ from its starting camera`)
+      .toBeGreaterThan(1);
+    expect(interpolated.length,
+      `MOTION_CAMERA_TRAVEL: an in-flight camera reading must lie between the starting and settled transforms (${label})`)
+      .toBeGreaterThan(0);
+    return { label, samples: samples.length, inFlight: during.length,
+      interpolated, end };
   }
 
   async function collectLabels(page, deadlineMs = 6000) {
