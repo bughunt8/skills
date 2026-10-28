@@ -9,7 +9,9 @@ These tests read workflow files but never rewrite them or contact a live site.
 from copy import deepcopy
 from pathlib import Path
 import re
+import shutil
 import subprocess
+import tempfile
 import unittest
 
 import yaml
@@ -203,6 +205,49 @@ def check_refresh_contract(workflow):
             f"{label}: the pull request step may only be skipped when nothing changed")
 
 
+def check_refresh_candidate_validation(workflows):
+    """Mirror S1's executable gates without checking out the old revision again."""
+    workflow = workflows[REFRESH]
+    job = get_job(workflow, "refresh", REFRESH)
+    blocking(job, "refresh job")
+    steps = job["steps"]
+    rebuild = steps.index(find_step(job, REBUILD_COMMAND, REFRESH))
+    pull = next(i for i, step in enumerate(steps)
+                if "create-pull-request" in step.get("uses", ""))
+    candidate_steps = steps[rebuild + 1:pull]
+    checkout = [step for step in steps[:rebuild]
+                if "actions/checkout@" in step.get("uses", "")]
+    require(len(checkout) == 1 and checkout[0].get("with", {}).get("fetch-depth") == 0,
+            "refresh history scan requires a full initial checkout")
+    require(not any("actions/checkout@" in step.get("uses", "")
+                    or re.search(r"git\s+(?:reset|checkout|restore|clean)\b",
+                                 step.get("run", "")) for step in candidate_steps),
+            "refresh candidate must not be replaced by a checkout or reset")
+    for name, source_job in workflows["s1-site-validate"]["jobs"].items():
+        if name == "gate":
+            continue
+        for source in source_job["steps"]:
+            action = source.get("uses", "")
+            if "run" not in source and not action.startswith("gitleaks/"):
+                continue
+            matches = [step for step in candidate_steps
+                       if (step.get("run") == source["run"] if "run" in source
+                           else step.get("uses") == action)]
+            require(matches, f"refresh candidate validation missing S1 gate: {source.get('name', source.get('run', action))}")
+            for step in matches:
+                blocking(step, "refresh candidate gate", allow_if=True)
+                require(step.get("if", CHANGED_GATE) == CHANGED_GATE,
+                        "refresh candidate gate may only skip an unchanged tree")
+                require(effective_run_setting(workflow, job, step, "working-directory", ".")
+                        == effective_run_setting(workflows["s1-site-validate"], source_job,
+                                                 source, "working-directory", "."),
+                        "refresh candidate gate must use S1 working directory")
+                require(step.get("env", {}) == source.get("env", {}),
+                        "refresh candidate gate must preserve S1 environment")
+                require(step.get("shell", "bash") == source.get("shell", "bash"),
+                        "refresh candidate gate must preserve S1 shell")
+
+
 def check_contract(workflows):
     for environment, url in (("staging", STAGING), ("production", PRODUCTION)):
         workflow = workflows[CALLERS[environment]]
@@ -285,6 +330,7 @@ def check_contract(workflows):
             "aggregate gate must run even when a required job fails")
 
     check_refresh_contract(workflows[REFRESH])
+    check_refresh_candidate_validation(workflows)
 
 
 class WorkflowContractTests(unittest.TestCase):
@@ -568,6 +614,65 @@ class WorkflowContractTests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, "before the pull request is opened"):
             check_contract(changed)
         print("PROVED refresh gates must precede the pull request", flush=True)
+
+    def test_refresh_candidate_validation_rejects_missing_and_bypassed_gates(self):
+        check_contract(self.workflows)
+        for marker in ("npm run lint:html", "node scripts/check-secrets.mjs",
+                       "npm test --", "python3 site/tests/test_deploy_workflows.py"):
+            path = self.step_path(REFRESH, "refresh", marker)
+            self.prove_mutation(f"removed candidate gate {marker}", path, DELETE,
+                                "candidate validation missing S1 gate")
+            for key, value, message in (
+                ("continue-on-error", True, "continue-on-error is forbidden"),
+                ("if", "always()", "may only skip an unchanged tree"),
+            ):
+                self.prove_mutation(f"bypassed candidate gate {marker}",
+                                    (*path, key), value, message)
+        changed = deepcopy(self.workflows)
+        steps = changed[REFRESH]["jobs"]["refresh"]["steps"]
+        steps.insert(steps.index(find_step(changed[REFRESH]["jobs"]["refresh"],
+                                          REBUILD_COMMAND, REFRESH)) + 1,
+                     {"uses": "actions/checkout@v5"})
+        with self.assertRaisesRegex(AssertionError, "candidate must not be replaced"):
+            check_contract(changed)
+
+    def test_scratch_workflow_without_candidate_validation_fails(self):
+        changed = deepcopy(self.workflows)
+        steps = changed[REFRESH]["jobs"]["refresh"]["steps"]
+        steps.remove(next(step for step in steps if step.get("run") == "npm run lint:html"))
+        with tempfile.TemporaryDirectory(prefix="refresh-contract-") as directory:
+            scratch = Path(directory) / "refresh.yml"
+            scratch.write_text(yaml.safe_dump(changed[REFRESH]))
+            changed[REFRESH] = yaml.load(scratch.read_text(), Loader=WorkflowLoader)
+            with self.assertRaisesRegex(AssertionError, "candidate validation missing S1 gate"):
+                check_contract(changed)
+        print("PROVED scratch workflow without HTML validation fails contract", flush=True)
+
+    def test_corrupted_candidate_stops_before_pull_request(self):
+        job = self.workflows[REFRESH]["jobs"]["refresh"]
+        gate = find_step(job, "node scripts/check-secrets.mjs", REFRESH)
+        with tempfile.TemporaryDirectory(prefix="refresh-candidate-") as directory:
+            site = Path(directory) / "site"
+            scripts = site / "scripts"
+            scripts.mkdir(parents=True)
+            shutil.copyfile(ROOT / "site/scripts/check-secrets.mjs",
+                            scripts / "check-secrets.mjs")
+            candidate = site / "data.js"
+            candidate.write_text("const candidate = {};\n")
+            clean = subprocess.run(["bash", "-e", "-c", gate["run"]], cwd=site,
+                                   capture_output=True, text=True, timeout=15, check=False)
+            self.assertEqual(clean.returncode, 0, clean.stderr)
+            candidate.write_text('const token = "' + "gh" + "p_" + "A" * 36 + '";\n')
+            result = subprocess.run(
+                ["bash", "-e", "-c", gate["run"] + "\ntouch pull-request-created"],
+                cwd=site, capture_output=True, text=True, timeout=15, check=False,
+            )
+            self.assertEqual(result.returncode, 1, result.stderr)
+            self.assertIn("Secret scan FAILED", result.stderr)
+            self.assertIn("data.js:1", result.stderr)
+            self.assertFalse((site / "pull-request-created").exists())
+        print("PROVED corrupt candidate data.js fails tree scan, exit 1; PR sentinel absent",
+              flush=True)
 
     def test_additional_jobs_do_not_overconstrain_the_contract(self):
         changed = deepcopy(self.workflows)
