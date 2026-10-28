@@ -406,7 +406,24 @@ export function cameraDisplacement(a, b) {
   if (!a?.matrix || !b?.matrix) return { dx: 0, dy: 0, distance: 0, dScale: 0 };
   const dx = b.matrix.e - a.matrix.e, dy = b.matrix.f - a.matrix.f;
   return { dx, dy, distance: Math.hypot(dx, dy),
-    dScale: Math.hypot(b.matrix.a, b.matrix.b) - Math.hypot(a.matrix.a, a.matrix.b) };
+     dScale: Math.hypot(b.matrix.a, b.matrix.b) - Math.hypot(a.matrix.a, a.matrix.b) };
+}
+
+// Project a camera sample onto the start-to-settled transform segment. This
+// proves an interior frame without requiring adjacent frame samples to differ.
+export function cameraInterpolation(start, sample, end, tolerance = 1) {
+  const coordinates = (value) => value?.matrix &&
+    [value.matrix.e, value.matrix.f, value.matrix.a, value.matrix.b];
+  const before = coordinates(start), point = coordinates(sample), after = coordinates(end);
+  if (!before || !point || !after) return null;
+  const delta = after.map((value, i) => value - before[i]);
+  const length = Math.hypot(...delta);
+  if (!length) return null;
+  const offset = point.map((value, i) => value - before[i]);
+  const fraction = offset.reduce((sum, value, i) => sum + value * delta[i], 0) /
+    (length * length);
+  const perpendicular = Math.hypot(...offset.map((value, i) => value - fraction * delta[i]));
+  return { fraction, perpendicular, length, withinPath: perpendicular <= tolerance };
 }
 
 // The settled truth an instant render must reproduce: #top, the #vp transform and
