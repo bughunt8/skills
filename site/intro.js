@@ -396,7 +396,10 @@
     }
     if (lastPointerType === "touch") {
       state.hovered = id;
-      showSkill(id);
+      // A click follows this pointerup. Showing the card now can put the card's
+      // own link under the finger, and that click opens the community instead of
+      // showing the card the tap asked for. Wait for the click to be dispatched.
+      setTimeout(function () { showSkill(id); }, 0);
       return;
     }
     openCommunity(commOf[id]);
