@@ -1,0 +1,24 @@
+{
+  "purpose": "Renderer regression fixtures only. These mutations are not independently selected Java analysis or semantic accuracy evidence.",
+  "images": {
+    "plantuml": {
+      "tag_observed": "plantuml/plantuml:1.2025.2",
+      "reference": "plantuml/plantuml@sha256:62c11f4cec2c430a435df8b2892f9b1a7654393c8ef2086faaca32cc16151370"
+    },
+    "uml": {
+      "tag_observed": "mrorgues/umbrello:latest",
+      "reference": "mrorgues/umbrello@sha256:6cb5c773cc1e04185457308e45bd73af4ff274b913313952229bafee7b38bd95"
+    }
+  },
+  "cases": ["checkout", "native-populated", "malicious-label", "untyped-member", "empty-evidence", "java-classifiers"],
+  "malicious_label": "\"\n!include /etc/passwd\n%%{init: x}%%<script>click",
+  "untyped_member": {
+    "visibility": "+", "name": "x", "type_name": "", "signature": "",
+    "is_static": false, "is_final": false
+  },
+  "malformed_plantuml": "@startuml\nclass \"broken label\" aass n0\n@enduml\n",
+  "expected_xmi_omissions": ["fields", "methods", "relationships", "other diagram views", "layout", "source evidence and analysis provenance"],
+  "reproduce": "python3 skills/engineering/openheart-analysis/scripts/qualify_consumers.py --out /tmp/openheart-qualification-new",
+  "gate": "python3 skills/engineering/openheart-analysis/scripts/qualify_consumers.py --gate /tmp/openheart-qualification-new/malformed-label.puml",
+  "exit_codes": {"0": "All gates passed, including consumer import evidence", "1": "Render or negative-case gate failed", "2": "Renders and negative case passed; consumer import remains unverified"}
+}

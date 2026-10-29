@@ -434,6 +434,18 @@ def write_ownership(dest_root: Path, owned: list, source_id: str) -> None:
 def fetch_upstream(source: dict, workdir: Path) -> "tuple[Path, str]":
     ref = source.get("ref") or "HEAD"
     dest = workdir / source["id"]
+    if isinstance(ref, str) and SHA_RE.fullmatch(ref):
+        # A commit object is not a branch name.  Cloning with --branch would
+        # resolve only advertised refs, so initialise an empty repository and
+        # request precisely the immutable object instead.
+        _run(["git", "init", "--quiet", str(dest)])
+        _run(["git", "remote", "add", "origin", source["repo"]], cwd=dest)
+        _run(["git", "fetch", "--quiet", "--depth", "1", "origin", ref], cwd=dest)
+        _run(["git", "checkout", "--quiet", "--detach", "FETCH_HEAD"], cwd=dest)
+        sha = _run(["git", "rev-parse", "HEAD"], cwd=dest)
+        if sha != ref:
+            _fail(f"[{source['id']}] immutable ref {ref} fetched commit {sha}")
+        return dest, sha
     _run(["git", "clone", "--quiet", "--depth", "1", "--branch", ref, source["repo"], str(dest)])
     return dest, _run(["git", "rev-parse", "HEAD"], cwd=dest)
 
@@ -445,6 +457,11 @@ def _licence_summary(source: dict) -> str:
     primary = source.get("license", "see upstream")
     extra = [entry["license"] for entry in source.get("additional_licenses") or []]
     return primary if not extra else f"{primary}, plus {', '.join(sorted(set(extra)))}"
+
+
+def is_immutable_ref(source: dict) -> bool:
+    """Whether the manifest asks Git for one full commit object, not a moving ref."""
+    return isinstance(source.get("ref"), str) and bool(SHA_RE.fullmatch(source["ref"]))
 
 
 def provenance_text(source: dict, upstream_path: str, local_dir: Path, sha: str, kind: str) -> str:
@@ -464,7 +481,12 @@ def provenance_text(source: dict, upstream_path: str, local_dir: Path, sha: str,
         f"| Licence copy | [`{lic_link}`]({lic_link}) |",
         f"| Full attribution | [`{att_link}`]({att_link}) |",
         f"| Content kind | {kind} |",
-        f"| Refresh cadence | At least every two weeks by [`{wf_link}`]({wf_link}) |",
+        (
+            "| Refresh cadence | Immutable commit; no automatic refresh. Update the manifest pin "
+            "manually after review. |"
+            if is_immutable_ref(source)
+            else f"| Refresh cadence | At least every two weeks by [`{wf_link}`]({wf_link}) |"
+        ),
     ]
     if source.get("upstream_of_upstream"):
         rows.append(f"| Upstream's own source | {source['upstream_of_upstream']} |")
@@ -513,8 +535,13 @@ def attribution_text(source: dict, sha: str, plan: list) -> str:
         f"- **Primary licence:** {source.get('license', 'see upstream')}, reproduced verbatim in "
         "[`LICENSE.upstream`](./LICENSE.upstream)",
         f"- **Tracked by:** [`{manifest_link}`]({manifest_link})",
-        f"- **Refreshed by:** [`{script_link}`]({script_link}), run at least every two weeks by "
-        f"[`{wf_link}`]({wf_link})",
+        (
+            f"- **Update cadence:** immutable commit; no automatic refresh. Update "
+            f"[`{manifest_link}`]({manifest_link}) manually after review."
+            if is_immutable_ref(source)
+            else f"- **Refreshed by:** [`{script_link}`]({script_link}), run at least every two weeks by "
+            f"[`{wf_link}`]({wf_link})"
+        ),
     ]
     if source.get("upstream_of_upstream"):
         out.append(f"- **Upstream's own source:** {source['upstream_of_upstream']}")
@@ -637,7 +664,8 @@ def notices_text(manifest: dict) -> str:
         "",
         "Declared in [`skills/vendor.manifest.json`](./skills/vendor.manifest.json), imported by",
         "[`scripts/sync_vendor.py`](./scripts/sync_vendor.py), pinned to a full commit, and",
-        "refreshed at least every two weeks. Provenance presence is enforced on every pull request.",
+        "checked at least every two weeks. Branch-tracking sources can refresh automatically; immutable",
+        "commit references require a reviewed manual pin update. Provenance presence is enforced on every pull request.",
         "",
         "| Upstream project | Author | Licence | Vendored to | Pinned commit | Attribution |",
         "| --- | --- | --- | --- | --- | --- |",
@@ -981,6 +1009,23 @@ def process_source(source: dict, checkout: Path, sha: str, apply: bool) -> dict:
     previously = read_ownership(dest_root, sid)
     added, removed, changed = [], [], []
     owned = []
+    # Metadata rendered during this sync must carry the same date subsequently
+    # recorded in the manifest, rather than requiring a second sync to settle.
+    # Keep pinned_commit untouched here so commit_moved still compares against
+    # the previous pin.
+    if apply:
+        source["pinned_at"] = _dt.date.today().isoformat()
+    # A moved upstream commit already reports drift. Its generated metadata
+    # necessarily cites the old commit until --sync writes the new pin, so
+    # validate generated files only against the manifest's current pin.
+    check_generated = not apply and source.get("pinned_commit") == sha
+
+    def generated_matches(path: Path, expected: str) -> bool:
+        """Generated files are part of the importer contract, even during --check."""
+        try:
+            return path.is_file() and path.read_text(encoding="utf-8") == expected
+        except OSError:
+            return False
 
     for spec in plan:
         upstream = resolve_under(checkout, spec["from"], "paths[].from", sid)
@@ -1004,6 +1049,13 @@ def process_source(source: dict, checkout: Path, sha: str, apply: bool) -> dict:
                 and tree_digest(local / n, {"PROVENANCE.md"})
                 != tree_digest(upstream / n, {"PROVENANCE.md"})
             ]
+            for name in selected:
+                target = local / name
+                upstream_path = posixpath.join(spec["from"], name) if spec["from"] else name
+                kind_label = "skill" if _has_skill(upstream / name) else "shared support directory"
+                expected = provenance_text(source, upstream_path, target, sha, kind_label)
+                if check_generated and not generated_matches(target / "PROVENANCE.md", expected):
+                    changed.append(f"{label}/{name}/PROVENANCE.md (generated metadata)")
             if apply:
                 for name in selected:
                     target = local / name
@@ -1028,6 +1080,15 @@ def process_source(source: dict, checkout: Path, sha: str, apply: bool) -> dict:
                 upstream, spec.get("file_include"), generated
             ):
                 changed.append(f"{label}/ ({'skill' if single_skill else 'support tree'})")
+            expected = provenance_text(
+                source,
+                spec["from"] or ".",
+                local,
+                sha,
+                "skill" if single_skill else "support files, linked to by the skills",
+            )
+            if check_generated and not generated_matches(local / "PROVENANCE.md", expected):
+                changed.append(f"{label}/PROVENANCE.md (generated metadata)")
             if apply:
                 if local.exists():
                     shutil.rmtree(local)
@@ -1056,6 +1117,8 @@ def process_source(source: dict, checkout: Path, sha: str, apply: bool) -> dict:
     all_skills = [n for spec in plan for n in spec.get("with_skill", [])]
     all_selected = [n for spec in plan for n in spec.get("selected", [])]
     missing_mandatory = [m for m in (source.get("mandatory") or []) if m not in all_selected]
+    if check_generated and not generated_matches(dest_root / "ATTRIBUTION.md", attribution_text(source, sha, plan)):
+        changed.append("ATTRIBUTION.md (generated metadata)")
 
     if apply:
         lic = source.get("license_path")

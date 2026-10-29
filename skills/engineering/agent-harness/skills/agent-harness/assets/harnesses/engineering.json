@@ -1,7 +1,7 @@
 {
   "schema": "agent-harness/manifest.v2",
   "domain": "engineering",
-  "skill_count": 114,
+  "skill_count": 115,
   "loop_defaults": {
     "max_attempts_per_task": 3,
     "max_loop_iterations": 12,
@@ -3125,6 +3125,515 @@
         "close_out": false
       },
       "references": []
+    },
+    {
+      "name": "openheart-analysis",
+      "path": "skills/engineering/openheart-analysis",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "openheart-analysis",
+        "skill_path": "skills/engineering/openheart-analysis",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/engineering/openheart-analysis/README.md",
+            "sha256": "15b91f78f8a6f4945eaede7fc4ad4704c42b32f38619ba7e6d4b31f8d46ca6d3",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/SKILL.md",
+            "sha256": "1689a39998ffaddcb936789796f74ec1ef8892b2bdd09eef9746b9ce034186ac",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/assets/diagram-catalog.json",
+            "sha256": "c8e625cd263fce2275009a63274d9d1adda647ebd9f49cbd918238904b2d5114",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/conftest.py",
+            "sha256": "d5bcc80bc47ee89bef686e73f8bdea1f6cb8beaa052c8793b3ab835ec676f8fa",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/datasets/checkout-model.json",
+            "sha256": "6d4a3ba6d91c7f04461b30c9e20a8738909be6d9765017f15f85e1a91fb54b98",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/datasets/checkout.py",
+            "sha256": "4a2caa2291594a3d833f7ff83920c669bb06e04a5dfad2afc24049b1cbabaeec",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/datasets/observer-java-model.json",
+            "sha256": "b1db266169d6df1e94da9b820694370c6642ca9e449c00b584619c2042f2fee5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/datasets/qualification-cases.json",
+            "sha256": "a9ad068d14080ced8a0a0cf13b68f7566a34e5af3008242064491ab6732e11ae",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/datasets/qualification-receipts.json",
+            "sha256": "37f918d1d51f836246ab1645efbed8adde28032e6e464ba265c65113836f0683",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/datasets/scenarios.json",
+            "sha256": "5ae337b12b74d68cbbe905720a79d0d3ad165265db4853d939d029b91f44f7ca",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/pytest.ini",
+            "sha256": "43b4516c63564ff5696d642e3b1dfce345f995668e026f45e515607e2b6be36f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/data-contract.md",
+            "sha256": "04a754588b8e911c0e5ddcc0b63569ee1aac3cf7ac467262399be8a485d4ec7a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/datasets.md",
+            "sha256": "b288aa5473f0210d93a6037b02b1225b39984e8f8f0f2a5e3553750f3c623440",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/diagram-rules.md",
+            "sha256": "a82f53b35ed679080a90e0dfa017ccd8a56a5637d9c3b72874865c40d6c330e2",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/source-map.md",
+            "sha256": "11ebb550b8b0a7a27b7c87064c9c08d8d897bb51eeafc49323ff98114d1610ac",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/.vendor-owned.json",
+            "sha256": "228018981047b82570d8a1a13a003a95b137ba5310711271ab4e9147465cab9e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/ATTRIBUTION.md",
+            "sha256": "937872b9349c487ce40878f92d2fc0a285288b667ff440fb436f366a60a265b9",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/LICENSE.upstream",
+            "sha256": "e81e48246a6a0dd4e0f696e626ec1ec2a27b995d18d032d989a4ee25ac9dad02",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/PROVENANCE.md",
+            "sha256": "1ed32313bfe06e7848f37bc63a3bebfa1f2175250037b82f913ee49214620653",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/docs/uml_derivation.md",
+            "sha256": "32cd0a561f4ec053ce3408194c93cb4e7fa273c8a9b50bb5a84b7ffe9b22351e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/examples/test_patterns_codebase/com/patterns/behavioral/observer/NewsAgency.java",
+            "sha256": "24e0704bd8116706aa388a0725db1f4705af54057cf37554ccdcbdbcd69e3fe1",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/examples/test_patterns_codebase/com/patterns/behavioral/observer/NewsChannel.java",
+            "sha256": "6862345269bf67855f304ae67e15bdfd5c449f59c4a8648ab18eb0ae4211d832",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/examples/test_patterns_codebase/com/patterns/behavioral/observer/Observer.java",
+            "sha256": "603d1f3dc0d4c3382a07e542a15ffc6ae7e0499bad1994e0c0bb5724a7fbdafe",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/examples/test_patterns_codebase/com/patterns/behavioral/observer/Subject.java",
+            "sha256": "24ae10ec63572a6f2925e1ea9dbffda22daba1fb7f2b6c5d3b4aadbcf278ab3c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/ruthless_config.json",
+            "sha256": "7aea5fb025d98b19b9d09605a2d26ec3a2fc8c98b65859f9b3ae154535268410",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/ruthless_verify.py",
+            "sha256": "85958cea28cfadb900ae5e7a5e9f9bcb573d3b7e9ac8b7e759766a3d612d7dad",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/scripts/generate_diagrams.py",
+            "sha256": "79c2e4f6576e89fa31f3f78ceeeb53b8ecffc98f8ab14c8e48bb1f82c9f7e43d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/scripts/test_ruthless_popular_datasets.py",
+            "sha256": "49e82e313b158eb40c9f0fdeea397f560322265b3727e4c760e8d6038b76f00c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/ast/adapter/registry.rs",
+            "sha256": "806fb8b9b6c57771e81c51f76327d25dbef3168ae567397ba6049ff68f9b77d0",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/artifact.rs",
+            "sha256": "2f3a6f7a9a8ede480f75dcecaa1d5d2220e015c6d8b41e49ac393bbbae185798",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/ast.rs",
+            "sha256": "ee06f28dbd78905a0679b1515e8e55de96f4285be5845ddfb458aa7499957b44",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/cfg.rs",
+            "sha256": "92f82e4c8f6588bcc3cc57703ba3192389d6c7c44499b7f27f8a0dd266d6a625",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/cg.rs",
+            "sha256": "9d8dacf45a5889e1ece249d896f7f9c359d58f488e56a1412a6f1bc0d7d120f5",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/mod.rs",
+            "sha256": "a350723f684ee89d1a0d4b83ee38303f4d2f2c42c55c5ee20e4e1472ffe7771a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/source.rs",
+            "sha256": "868c6c104fd99cf959c562e64313c2b44a2c3ceef86bba9579ed1441d1aba645",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/ssa.rs",
+            "sha256": "a0701fb4253bdb3868096f608c5043b97de1fa1aff1bd160eac0691e351c5d21",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/symbol.rs",
+            "sha256": "27eb6594d5d88909da689cf56b68fa25bfb491a966b9e62e4f56d574a345d575",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/token.rs",
+            "sha256": "ca7b7ae4b60aa93aa7c42122793396fa65fd26186d078deacbdea2444b27bddf",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/ingestion/adapter/registry.rs",
+            "sha256": "36219d51d58a0c52c6544076fdebe22564196623d2babd6e88731a983c178f4e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/main.rs",
+            "sha256": "7e523c9f47aef70a63d3e07f5b95e33db72d6b941ffa610e600a16f5ac15caad",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/psa/types.rs",
+            "sha256": "79ec08314b37f2932cb4fe4f6a2be212cb84c2fdb6fca22a9f302c613c2a221a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/common.rs",
+            "sha256": "a79b3403d35ccf3296d588cd5d423771ed01731ed34e30b5299bc303d472a487",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/export/json.rs",
+            "sha256": "c24e51efa67302e9fc167504cebc984d76a1076cb53f0b8d255df42e9f7d858f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/export/mermaid.rs",
+            "sha256": "8be836690a5763c92d9762ef38836fd1634e59cd6047b9ce313682a13652b5be",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/export/mod.rs",
+            "sha256": "5194a98631ccdd86c2116da999a4a258e9eca0050bc9a866d8a664ed5c28cc74",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/export/plantuml.rs",
+            "sha256": "7def04c55fa6ceb5d2793d1ea51621ecf5e6ae2fbb4407dcc2852bea6748cc9a",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/export/plantuml_optimizer.rs",
+            "sha256": "612c40e5c9e8ac8569be1901ea22c576dbaae653b776c417ffac4925dd2422bb",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/export/xmi.rs",
+            "sha256": "cdc9924af8a61fcb83e28ef0a9657e90925d3025862344571edb0e0cf3d1351f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/factory.rs",
+            "sha256": "5193d916c194a311376cdee34968c5f9e7811dfc1d343d3269e61ba4699247bc",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/symbol/adapter/mod.rs",
+            "sha256": "42f120a66a3fdeaa3aaeadd7d539f0868a8c27364a582b9ab78a3bd980c450a8",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/tra/types.rs",
+            "sha256": "788ef99a2db7b4b51a14439b82c17de911c31be1af09dbf7cb58280b9312908e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/uma/behavioral/timing_diagram.rs",
+            "sha256": "e9d655737dd5938e0417c6a298eaf7339a815c23f21dca2eea69c962ac84e8a0",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/uma/structural/object_diagram.rs",
+            "sha256": "d23a53954aff8f7749881014fb823c1e7f3597553e8ef180f47472f0cd93b108",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/src/uma/types.rs",
+            "sha256": "7b9f17a8e25d1e3840630abcdeacdc756332d442bfb3e30180daae4a13e11d29",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/activity.json",
+            "sha256": "25f5a559a19eeb22763d7f9d23c3d012c1cbffd346d803d25d1797e9134a004f",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/activity.mmd",
+            "sha256": "e3912e5d4bee91186ff01258b75f40eb358a58fd6cce3e61eed981bb249f93b6",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/activity.puml",
+            "sha256": "e3a19ace7d06e9c562d663b53de7c6c9a7f6b87549e7dbfc295e91c988404a8e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/class.json",
+            "sha256": "840902378cfcbd5f5d87ac114eef0777a1a1e8613c011af00518d8f1000738fa",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/class.mmd",
+            "sha256": "8a4d35a41c01c1502aefe790894908b68e39015481af12c68f5f635e2af9cf4e",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/class.puml",
+            "sha256": "481901221eea912a617155ac10c8a2765130196b26ceb4fda73d3e85dac81303",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/manifest.json",
+            "sha256": "96ed1b1acf456b81a12ae8d8f9d9fd625355905325b0fe833928779367b6c40c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/sequence.json",
+            "sha256": "6fb6876391d8a1553f715c6731a610e3ab90a37dfc53d184960e653572714bc7",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/sequence.mmd",
+            "sha256": "953a2c7ed1e7a662f4d1f747f665c715ef981c56df0c9789be4e6dd08bbe7606",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/sequence.puml",
+            "sha256": "344a7f36ed74851f8408557c82db06aa15c2ce077e5140feaf61a7e5e84a781d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/references/workflow.md",
+            "sha256": "5ccc1f0c8453ef102b7b32fad68fb607fbab67186799d789da325f056bb0e105",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/schemas/analysis.schema.json",
+            "sha256": "a25869e6b6f69921f5c72a34626f56ce63253cf693f38ffec1efc78a7cb51458",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/scripts/build_fixture.py",
+            "sha256": "5527cd371b8092a5fc9ac8a9dfbab4551092ee23662c3a54cbc98c9901cd5605",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/scripts/contract.py",
+            "sha256": "38a7298d77f1201720c2685050e47108252c8e2fb0e2b74a9912b1bb40717b73",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/scripts/openheart.py",
+            "sha256": "87e17fce2b60f50bea5cf91ff14b2bb8b372d23ccdc9cf395374949870cf3834",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/scripts/qualify_consumers.py",
+            "sha256": "2f7613088051c33f8b439ab2e7135a6451e6edd82d6539f72925b1f17e06022c",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/templates/REPORT.md.tmpl",
+            "sha256": "c396be585c1233f5e18ed2569fef222e4b49521cae7e52dc3df3b6a4cbd40a64",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/templates/VALIDATION.md.tmpl",
+            "sha256": "95c28537a7f328aa2e188d3925722fba9e05889cb34756d479473655567f8a5d",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/tests/test_openheart.py",
+            "sha256": "203bb894d3bf786a473168ba158a90432773e30d0b9b16cc063e88906d0a97e0",
+            "role": "owned_resource"
+          }
+        ]
+      },
+      "description": "Reverse-engineer source code into traceable AST, ACT/activity, UML, CFG, DFG, CDG, call-graph and path-summary datasets, Mermaid diagrams, PlantUML and analysis reports. Use for OpenHeart-style codebase analysis without its executable. Not for drawing an invented architecture or claiming compiler-grade proofs.",
+      "tools": [
+        {
+          "script": "skills/engineering/openheart-analysis/scripts/build_fixture.py",
+          "sha256": "5527cd371b8092a5fc9ac8a9dfbab4551092ee23662c3a54cbc98c9901cd5605",
+          "wired": true,
+          "supports_sample": false,
+          "verification": [
+            {
+              "cmd": "python3 skills/engineering/openheart-analysis/scripts/build_fixture.py --help",
+              "expect_exit": 0,
+              "kind": "smoke"
+            }
+          ]
+        },
+        {
+          "script": "skills/engineering/openheart-analysis/scripts/contract.py",
+          "sha256": "38a7298d77f1201720c2685050e47108252c8e2fb0e2b74a9912b1bb40717b73",
+          "wired": true,
+          "supports_sample": false,
+          "verification": [
+            {
+              "cmd": "python3 skills/engineering/openheart-analysis/scripts/contract.py --help",
+              "expect_exit": 0,
+              "kind": "smoke"
+            }
+          ]
+        },
+        {
+          "script": "skills/engineering/openheart-analysis/scripts/openheart.py",
+          "sha256": "87e17fce2b60f50bea5cf91ff14b2bb8b372d23ccdc9cf395374949870cf3834",
+          "wired": true,
+          "supports_sample": false,
+          "verification": [
+            {
+              "cmd": "python3 skills/engineering/openheart-analysis/scripts/openheart.py --help",
+              "expect_exit": 0,
+              "kind": "smoke"
+            }
+          ]
+        },
+        {
+          "script": "skills/engineering/openheart-analysis/scripts/qualify_consumers.py",
+          "sha256": "2f7613088051c33f8b439ab2e7135a6451e6edd82d6539f72925b1f17e06022c",
+          "wired": false,
+          "supports_sample": false,
+          "verification": [
+            {
+              "cmd": "python3 skills/engineering/openheart-analysis/scripts/qualify_consumers.py --help",
+              "expect_exit": 0,
+              "kind": "smoke"
+            }
+          ]
+        },
+        {
+          "script": "skills/engineering/openheart-analysis/conftest.py",
+          "sha256": "d5bcc80bc47ee89bef686e73f8bdea1f6cb8beaa052c8793b3ab835ec676f8fa",
+          "wired": false,
+          "supports_sample": false,
+          "verification": [
+            {
+              "cmd": "python3 skills/engineering/openheart-analysis/conftest.py --help",
+              "expect_exit": 0,
+              "kind": "smoke"
+            }
+          ]
+        }
+      ],
+      "agentic_signals": {
+        "goal_intake": false,
+        "refusal_gate": true,
+        "verification": true,
+        "loop_discipline": false,
+        "close_out": false
+      },
+      "references": [
+        "skills/engineering/openheart-analysis/references/data-contract.md",
+        "skills/engineering/openheart-analysis/references/datasets.md",
+        "skills/engineering/openheart-analysis/references/diagram-rules.md",
+        "skills/engineering/openheart-analysis/references/source-map.md",
+        "skills/engineering/openheart-analysis/references/upstream/.vendor-owned.json",
+        "skills/engineering/openheart-analysis/references/upstream/ATTRIBUTION.md",
+        "skills/engineering/openheart-analysis/references/upstream/LICENSE.upstream",
+        "skills/engineering/openheart-analysis/references/upstream/source/PROVENANCE.md",
+        "skills/engineering/openheart-analysis/references/upstream/source/docs/uml_derivation.md",
+        "skills/engineering/openheart-analysis/references/upstream/source/examples/test_patterns_codebase/com/patterns/behavioral/observer/NewsAgency.java",
+        "skills/engineering/openheart-analysis/references/upstream/source/examples/test_patterns_codebase/com/patterns/behavioral/observer/NewsChannel.java",
+        "skills/engineering/openheart-analysis/references/upstream/source/examples/test_patterns_codebase/com/patterns/behavioral/observer/Observer.java",
+        "skills/engineering/openheart-analysis/references/upstream/source/examples/test_patterns_codebase/com/patterns/behavioral/observer/Subject.java",
+        "skills/engineering/openheart-analysis/references/upstream/source/ruthless_config.json",
+        "skills/engineering/openheart-analysis/references/upstream/source/ruthless_verify.py",
+        "skills/engineering/openheart-analysis/references/upstream/source/scripts/generate_diagrams.py",
+        "skills/engineering/openheart-analysis/references/upstream/source/scripts/test_ruthless_popular_datasets.py",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/ast/adapter/registry.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/artifact.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/ast.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/cfg.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/cg.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/mod.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/source.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/ssa.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/symbol.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/core/types/token.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/ingestion/adapter/registry.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/main.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/psa/types.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/common.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/export/json.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/export/mermaid.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/export/mod.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/export/plantuml.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/export/plantuml_optimizer.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/export/xmi.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/scpg/diagram/factory.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/symbol/adapter/mod.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/tra/types.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/uma/behavioral/timing_diagram.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/uma/structural/object_diagram.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/src/uma/types.rs",
+        "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/activity.json",
+        "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/activity.mmd",
+        "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/activity.puml",
+        "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/class.json",
+        "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/class.mmd",
+        "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/class.puml",
+        "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/manifest.json",
+        "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/sequence.json",
+        "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/sequence.mmd",
+        "skills/engineering/openheart-analysis/references/upstream/source/web/diagrams/sequence.puml",
+        "skills/engineering/openheart-analysis/references/workflow.md"
+      ]
     },
     {
       "name": "pr",

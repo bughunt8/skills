@@ -8,6 +8,7 @@ These tests read workflow files but never rewrite them or contact a live site.
 
 from copy import deepcopy
 from pathlib import Path
+import json
 import re
 import shutil
 import subprocess
@@ -876,6 +877,57 @@ def check_promotion_gate(promote, producers):
     )
 
 
+class OpenHeartMermaidGateTests(unittest.TestCase):
+    @staticmethod
+    def check_gate(workflow, manifest, lock):
+        job = get_job(workflow, "validate", "OpenHeart Mermaid")
+        blocking(job, "OpenHeart Mermaid job")
+        step = find_step(job, "node scripts/mermaid-check/check.mjs", "OpenHeart Mermaid")
+        version = manifest.get("dependencies", {}).get("mermaid", "")
+        require(re.fullmatch(r"\d+\.\d+\.\d+", version), "Mermaid version must be exact")
+        require(step.get("name") == f"Parse every OpenHeart Mermaid export with mermaid {version}",
+                "workflow must name the exact Mermaid version from the manifest")
+        require(lock["packages"][""]["dependencies"]["mermaid"] == version
+                and lock["packages"]["node_modules/mermaid"]["version"] == version,
+                "Mermaid lockfile must match the exact manifest version")
+        check_command(workflow, job, step, {( ".",
+            "npm ci --prefix scripts/mermaid-check --ignore-scripts --no-audit --no-fund\n"
+            "node scripts/mermaid-check/check.mjs",
+        )}, "OpenHeart Mermaid command")
+
+    def test_gate_and_exact_parser_pin(self):
+        workflow = load_workflow("a0-skills-checks")
+        manifest = json.loads((ROOT / "scripts/mermaid-check/package.json").read_text())
+        lock = json.loads((ROOT / "scripts/mermaid-check/package-lock.json").read_text())
+        self.check_gate(workflow, manifest, lock)
+        steps = workflow["jobs"]["validate"]["steps"]
+        index = next(i for i, step in enumerate(steps)
+                     if "node scripts/mermaid-check/check.mjs" in step.get("run", ""))
+        for defect, change, message in (
+            ("removed gate", lambda s: s.pop(index), "must run .* exactly once"),
+            ("conditional gate", lambda s: s[index].update({"if": "false"}), "conditional skips"),
+            ("tolerated failure", lambda s: s[index].update({"continue-on-error": True}),
+             "continue-on-error"),
+            ("swallowed failure", lambda s: s[index].update(run=s[index]["run"] + " || true"),
+             "without tolerated failure"),
+            ("subset", lambda s: s[index].update(run=s[index]["run"] + " --check-dir subset"),
+             "without tolerated failure"),
+            ("floating workflow version", lambda s: s[index].update(
+                name="Parse every OpenHeart Mermaid export with mermaid latest"), "exact Mermaid version"),
+        ):
+            changed = deepcopy(workflow)
+            change(changed["jobs"]["validate"]["steps"])
+            with self.subTest(defect=defect), self.assertRaisesRegex(AssertionError, message):
+                self.check_gate(changed, manifest, lock)
+        for version in ("latest", "^11.4.1", "~11.4.1", "11", "11.4", "*"):
+            changed = deepcopy(manifest)
+            changed["dependencies"]["mermaid"] = version
+            with self.subTest(version=version), self.assertRaisesRegex(AssertionError, "must be exact"):
+                self.check_gate(workflow, changed, lock)
+        changed = deepcopy(lock)
+        changed["packages"]["node_modules/mermaid"]["version"] = "11.4.2"
+        with self.assertRaisesRegex(AssertionError, "lockfile must match"):
+            self.check_gate(workflow, manifest, changed)
 def check_promotion_credential(promote):
     job = get_job(promote, "promote", "b1-site-promote-to-main.yml")
     push = next(

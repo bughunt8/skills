@@ -1,0 +1,9 @@
+{
+  "name": "openheart-mermaid-check",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "jsdom": "26.0.0",
+    "mermaid": "11.4.1"
+  }
+}

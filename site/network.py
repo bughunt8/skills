@@ -535,6 +535,16 @@ def _pack_discs(radii: list, edges: list, width: float, height: float) -> list:
             points[i][0] += disp[i][0]
             points[i][1] += disp[i][1]
 
+        # Keep every disc inside the frame before separating them, not after.
+        # Clamping last undid the separation it was supposed to follow: a disc
+        # pushed against the frame edge was pulled back in, straight onto its
+        # neighbour, and the arrangement settled with the worst pair barely
+        # clear of each other. The separation has to be the last thing that
+        # happens, which is what the guarantee in the docstring says.
+        for i in range(n):
+            points[i][0] = min(width - radii[i] - 6, max(radii[i] + 6, points[i][0]))
+            points[i][1] = min(height - radii[i] - 6, max(radii[i] + 6, points[i][1]))
+
         # Separation, twice, because one pass can push a disc into a third one.
         for _ in range(2):
             for a in range(n):
@@ -555,9 +565,6 @@ def _pack_discs(radii: list, edges: list, width: float, height: float) -> list:
                         points[a][1] -= dy / d * push
                         points[b][0] += dx / d * push
                         points[b][1] += dy / d * push
-        for i in range(n):
-            points[i][0] = min(width - radii[i] - 6, max(radii[i] + 6, points[i][0]))
-            points[i][1] = min(height - radii[i] - 6, max(radii[i] + 6, points[i][1]))
     return points
 
 
