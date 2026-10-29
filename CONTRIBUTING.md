@@ -57,6 +57,10 @@ another LLM executes.
 This is the part that is easy to get wrong, so it is mechanised. Do not copy files in by
 hand.
 
+Follow [vendor-import](skills/engineering/vendor-import/SKILL.md) for the end-to-end
+procedure: upstream inspection, name collisions, mapping for flat and nested layouts, the
+evidence to collect and the reviews. The steps below are the contract it enforces.
+
 1. Add a source to [`skills/vendor.manifest.json`](./skills/vendor.manifest.json) with the
    upstream repository, the author, the licence, the licence file path, the destination
    directory, and an `exclude_reasons` entry for anything you leave out.

@@ -89,6 +89,15 @@ const DEFECTS = {
 })();
 ` + source
   },
+  "camera-jumps-to-target": {
+    url: /\/app\.js(?:\?.*)?$/,
+    patch: (source) => {
+      const interpolation = "const eased = f.ease(progress);";
+      if (source.split(interpolation).length !== 2)
+        throw new Error("Camera jump defect requires exactly one paint interpolation");
+      return source.replace(interpolation, "const eased = 1; /* Isolated camera jump defect. */");
+    }
+  },
   // (e) The label layer is blanked for the whole flight — the behaviour the
   // design review rejected. Geometry still reports 16 CSS px, so only an
   // effective-visibility check during flight can see it.
@@ -353,13 +362,81 @@ export async function sampleCamera(page) {
   });
 }
 
+// Frame-rate sampling that lives in the page. A sampler driven by CDP round
+// trips loses frames on a heavy graph: the loop is only as fast as the protocol,
+// not the compositor. This arms a MutationObserver, records every frame from the
+// moment #top reports motion, and stops after the camera settles. Nothing here
+// changes what is asserted; it only observes more of the flight.
+export async function armCameraBurst(page) {
+  await page.evaluate(() => {
+    const top = document.getElementById("top"), vp = document.getElementById("vp");
+    const read = (provenance, rafTimestamp = null) => {
+      const ctm = vp.getScreenCTM();
+      return {
+        t: performance.now(), provenance, rafTimestamp,
+        motion: top.dataset.motion ?? null,
+        beat: top.dataset.motionBeat ?? null,
+        transform: vp.getAttribute("transform"),
+        matrix: ctm ? { a: ctm.a, b: ctm.b, c: ctm.c, d: ctm.d, e: ctm.e, f: ctm.f } : null,
+        target: { x: Number(vp.dataset.x), y: Number(vp.dataset.y), scale: Number(vp.dataset.scale) }
+      };
+    };
+    const state = { samples: [], done: false, started: false };
+    window.__cameraBurst = state;
+    const deadline = performance.now() + 8000;
+    let idle = 0;
+    function tick(timestamp) {
+      state.samples.push(read("raf", timestamp));
+      if (top.dataset.motion === "running") idle = 0;
+      else if (state.started) idle++;
+      if (idle >= 2 || performance.now() > deadline) { state.done = true; return; }
+      requestAnimationFrame(tick);
+    }
+    const observer = new MutationObserver(() => {
+      if (top.dataset.motion === "running" && !state.started) {
+        state.started = true;
+        observer.disconnect();
+        state.samples.push(read("observer"));
+        requestAnimationFrame(tick);
+      }
+    });
+    observer.observe(top, { attributes: true, attributeFilter: ["data-motion"] });
+  });
+}
+
+export async function readCameraBurst(page) {
+  await page.waitForFunction(() => window.__cameraBurst && window.__cameraBurst.done, null,
+    { timeout: 10000 });
+  return page.evaluate(() => window.__cameraBurst.samples);
+}
+
 // Screen displacement of the scene origin between two camera samples, plus the
 // scale change. A camera that never interpolates produces zeroes here.
 export function cameraDisplacement(a, b) {
   if (!a?.matrix || !b?.matrix) return { dx: 0, dy: 0, distance: 0, dScale: 0 };
   const dx = b.matrix.e - a.matrix.e, dy = b.matrix.f - a.matrix.f;
   return { dx, dy, distance: Math.hypot(dx, dy),
-    dScale: Math.hypot(b.matrix.a, b.matrix.b) - Math.hypot(a.matrix.a, a.matrix.b) };
+     dScale: Math.hypot(b.matrix.a, b.matrix.b) - Math.hypot(a.matrix.a, a.matrix.b) };
+}
+
+// Project a camera sample onto the start-to-settled transform segment. This
+// reports path alignment; endpoint distances must also prove an interior frame.
+export function cameraInterpolation(start, sample, end, tolerance = 1) {
+  const coordinates = (value) => value?.matrix &&
+    [value.matrix.e, value.matrix.f, value.matrix.a, value.matrix.b];
+  const before = coordinates(start), point = coordinates(sample), after = coordinates(end);
+  if (![before, point, after].every((values) => values && values.every(Number.isFinite))) return null;
+  const delta = after.map((value, i) => value - before[i]);
+  const length = Math.hypot(...delta);
+  if (!length) return null;
+  const offset = point.map((value, i) => value - before[i]);
+  const fraction = offset.reduce((sum, value, i) => sum + value * delta[i], 0) /
+    (length * length);
+  const perpendicular = Math.hypot(...offset.map((value, i) => value - fraction * delta[i]));
+  const fromStart = Math.hypot(...offset);
+  const toEnd = Math.hypot(...point.map((value, i) => value - after[i]));
+  return { fraction, perpendicular, length, fromStart, toEnd,
+    withinPath: perpendicular <= tolerance };
 }
 
 // The settled truth an instant render must reproduce: #top, the #vp transform and

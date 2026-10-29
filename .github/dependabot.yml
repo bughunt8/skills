@@ -5,6 +5,12 @@ updates:
   # the new SHA with the release notes attached.
   - package-ecosystem: github-actions
     directory: /
+    # Automation pull requests target `staging`, the branch this repository works on
+    # and where the validation suite is green. `main` carries the promoted release
+    # and is only ever changed by the promotion flow, so a bump opened against it
+    # lands on a tree whose generated site artifacts lag its own sources and cannot
+    # pass the build-reproducibility gate.
+    target-branch: staging
     schedule:
       interval: weekly
       day: monday

@@ -34,7 +34,10 @@ const checks = [
     intent: "every edge and the in-flight stand-in path fade to nothing mid-transition" },
   { defect: "camera-interpolation-disabled", grep: "MOTION_CAMERA_TRAVEL",
     assertion: "MOTION_CAMERA_TRAVEL:",
-    intent: "camera interpolation is disabled while the animation clock keeps running" }
+    intent: "camera interpolation is disabled while the animation clock keeps running" },
+  { defect: "camera-jumps-to-target", grep: "MOTION_CAMERA_TRAVEL",
+    assertion: "flight must travel from its first running rAF camera by more than measurement resolution",
+    intent: "the camera jumps straight to its target while the animation clock keeps running" }
 ];
 const all = checks.map((check) => check.grep).join("|");
 let interrupted = "";

@@ -48,6 +48,7 @@ import itertools
 import json
 import math
 import re
+from typing import Optional
 from pathlib import Path
 
 # Tokens that carry no information about what a skill is for. Every skill in a library
@@ -196,7 +197,7 @@ def build_graph(rows: list, sols: list) -> dict:
         )
         if len(found) < 2 and not narrow and not family:
             continue
-        weight = sum(_token_weight(n) for _t, n in found)
+        weight = math.fsum(_token_weight(n) for _t, n in found)
         words = ", ".join(f'"{t}"' for t, _n in found[:3])
         reason = f"named {prefix_of[a]}-*" if family and len(found) < 2 else (
             f"names share {words}"
@@ -204,7 +205,7 @@ def build_graph(rows: list, sols: list) -> dict:
         link(a, b, weight, "inferred", reason)
 
     degree = collections.Counter()
-    strength = collections.Counter()
+    strength = collections.defaultdict(float)
     for (a, b), w in weights.items():
         degree[a] += 1
         degree[b] += 1
@@ -227,11 +228,11 @@ def build_graph(rows: list, sols: list) -> dict:
 
 def _one_level(adj: dict, nodes: list, resolution: float) -> dict:
     comm = {n: n for n in nodes}
-    m2 = sum(sum(d.values()) for d in adj.values())
+    m2 = math.fsum(math.fsum(d.values()) for d in adj.values())
     if m2 <= 0:
         return comm
-    k = {n: sum(adj[n].values()) for n in nodes}
-    tot = collections.Counter()
+    k = {n: math.fsum(adj[n].values()) for n in nodes}
+    tot = collections.defaultdict(float)
     for n in nodes:
         tot[comm[n]] += k[n]
 
@@ -240,7 +241,7 @@ def _one_level(adj: dict, nodes: list, resolution: float) -> dict:
         for n in nodes:
             c0 = comm[n]
             tot[c0] -= k[n]
-            links = collections.Counter()
+            links = collections.defaultdict(float)
             for nb, w in sorted(adj[n].items()):
                 if nb != n:
                     links[comm[nb]] += w
@@ -373,7 +374,7 @@ def shortest_path(graph: dict, a: str, b: str) -> list:
     for (x, y) in graph["weights"]:
         adj[x].append(y)
         adj[y].append(x)
-    seen = {a: None}
+    seen: dict[str, Optional[str]] = {a: None}
     queue = collections.deque([a])
     while queue:
         cur = queue.popleft()
@@ -545,7 +546,7 @@ def _pack_discs(radii: list, edges: list, width: float, height: float) -> list:
                     # 31 communities from 19, and at 14 units apart only 88% of skills sat
                     # nearer their own community's centre than any other's - which makes
                     # colouring by community say less than it claims.
-                    want = radii[a] + radii[b] + 24.0
+                    want = radii[a] + radii[b] + 36.0
                     if d < want:
                         if d < 1e-9:
                             dx, dy, d = 1.0 + (a % 3), 0.5 + (b % 3), 1.0
@@ -616,9 +617,11 @@ def layout(graph: dict, comm: dict, rows_by_key: dict,
     edges_between = [
         (i, j, w / 6.0) for (i, j), w in sorted(between.items())
     ]
-    centres = _pack_discs(radii, edges_between, width, height)
-
-    placed: dict = {}
+    # Relax each community before packing it. The nominal sqrt(area) radius is only an
+    # allocation hint; attraction can move a member farther from the community centroid.
+    # Packing that hint and then measuring the actual extents allowed the extents to overlap.
+    local_points: dict = {}
+    pack_radii = []
     for c in order:
         mine = sorted(linked[c], key=lambda n: (-degree[n], n))
         local_index = {n: i for i, n in enumerate(mine)}
@@ -652,19 +655,20 @@ def layout(graph: dict, comm: dict, rows_by_key: dict,
         # Clamping can push two nodes back together on the rim, so separate once more
         # and accept a slightly larger disc rather than an overlap.
         _separate(pts, min_dist=MIN_GAP, passes=4)
+        local_cx = math.fsum(pt[0] for pt in pts) / len(pts)
+        local_cy = math.fsum(pt[1] for pt in pts) / len(pts)
+        pts = [[pt[0] - local_cx, pt[1] - local_cy] for pt in pts]
+        local_points[c] = (mine, local_index, pts)
+        pack_radii.append(max(math.hypot(*pt) for pt in pts))
+
+    centres = _pack_discs(pack_radii, edges_between, width, height)
+    placed: dict = {}
+    for c in order:
+        mine, local_index, pts = local_points[c]
         cx0, cy0 = centres[index[c]]
         for n in mine:
             px, py = pts[local_index[n]]
             placed[n] = [cx0 + px, cy0 + py]
-
-    # One last pass over everything. Two discs that end up touching can still put a
-    # node from each within a few units of the other, which no per-community pass can
-    # see because neither community knows about the other.
-    keys = sorted(placed)
-    pts = [placed[k] for k in keys]
-    _separate(pts, min_dist=MIN_GAP, passes=4)
-    for k, pt in zip(keys, pts):
-        placed[k] = pt
 
     # Fit what has been placed, then put the unconnected skills outside it.
     xs = [p[0] for p in placed.values()] or [0.0]
@@ -712,7 +716,7 @@ def layout(graph: dict, comm: dict, rows_by_key: dict,
             round(min(width - 4.0, max(4.0, pt[0])), 1),
             round(min(height - 4.0, max(4.0, pt[1])), 1),
         ]
-    _separate(pts, min_dist=MIN_GAP + 0.3, passes=8)
+    _separate(pts, min_dist=MIN_GAP + 0.6, passes=20)
     for k, pt in zip(keys, pts):
         out[k] = (
             round(min(width - 4.0, max(4.0, pt[0])), 1),
@@ -750,7 +754,7 @@ def load_domains(site_dir: Path) -> dict:
     }
 
 
-def agreement(comm: dict, rows: list, spec: dict, degree: dict = None) -> dict:
+def agreement(comm: dict, rows: list, spec: dict, degree: Optional[dict] = None) -> dict:
     """Majority-label purity of the detected communities against the declared domains.
 
     Not "agreement", which is what this was called and what it is not. A detected community
@@ -815,7 +819,7 @@ def agreement(comm: dict, rows: list, spec: dict, degree: dict = None) -> dict:
             )
 
     def entropy(counter):
-        return -sum(
+        return -math.fsum(
             (v / n) * math.log(v / n) for v in counter.values() if v
         )
 
@@ -886,7 +890,7 @@ def label_box(
     `font` matters: the community names are drawn larger than the skill names, and computing
     both at the smaller size reserved the community boxes a fifth too narrow.
     """
-    w = font * sum(CHAR_W.get(c, CHAR_W_FALLBACK) for c in name)
+    w = font * math.fsum(CHAR_W.get(c, CHAR_W_FALLBACK) for c in name)
     if anchor == "start":
         x0 = x
     elif anchor == "end":
@@ -965,7 +969,7 @@ def place_labels(
     radius: dict,
     want: int,
     frame: tuple = (0.0, 0.0, FRAME[0], FRAME[1]),
-    reserved: list = None,
+    reserved: Optional[list] = None,
 ) -> dict:
     """Choose which names to draw unasked, and where, so that none of them collide.
 
