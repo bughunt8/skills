@@ -1,7 +1,7 @@
 {
   "schema": "agent-harness/manifest.v2",
   "domain": "engineering",
-  "skill_count": 114,
+  "skill_count": 115,
   "loop_defaults": {
     "max_attempts_per_task": 3,
     "max_loop_iterations": 12,
@@ -3172,6 +3172,16 @@
             "role": "owned_resource"
           },
           {
+            "path": "skills/engineering/openheart-analysis/datasets/qualification-cases.json",
+            "sha256": "a9ad068d14080ced8a0a0cf13b68f7566a34e5af3008242064491ab6732e11ae",
+            "role": "owned_resource"
+          },
+          {
+            "path": "skills/engineering/openheart-analysis/datasets/qualification-receipts.json",
+            "sha256": "37f918d1d51f836246ab1645efbed8adde28032e6e464ba265c65113836f0683",
+            "role": "owned_resource"
+          },
+          {
             "path": "skills/engineering/openheart-analysis/datasets/scenarios.json",
             "sha256": "5ae337b12b74d68cbbe905720a79d0d3ad165265db4853d939d029b91f44f7ca",
             "role": "owned_resource"
@@ -3472,6 +3482,11 @@
             "role": "owned_resource"
           },
           {
+            "path": "skills/engineering/openheart-analysis/scripts/qualify_consumers.py",
+            "sha256": "2f7613088051c33f8b439ab2e7135a6451e6edd82d6539f72925b1f17e06022c",
+            "role": "owned_resource"
+          },
+          {
             "path": "skills/engineering/openheart-analysis/templates/REPORT.md.tmpl",
             "sha256": "c396be585c1233f5e18ed2569fef222e4b49521cae7e52dc3df3b6a4cbd40a64",
             "role": "owned_resource"
@@ -3524,6 +3539,19 @@
           "verification": [
             {
               "cmd": "python3 skills/engineering/openheart-analysis/scripts/openheart.py --help",
+              "expect_exit": 0,
+              "kind": "smoke"
+            }
+          ]
+        },
+        {
+          "script": "skills/engineering/openheart-analysis/scripts/qualify_consumers.py",
+          "sha256": "2f7613088051c33f8b439ab2e7135a6451e6edd82d6539f72925b1f17e06022c",
+          "wired": false,
+          "supports_sample": false,
+          "verification": [
+            {
+              "cmd": "python3 skills/engineering/openheart-analysis/scripts/qualify_consumers.py --help",
               "expect_exit": 0,
               "kind": "smoke"
             }
