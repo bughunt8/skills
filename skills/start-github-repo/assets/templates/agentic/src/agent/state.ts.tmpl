@@ -1,0 +1,77 @@
+export type AgentStatus =
+  | "RUNNING"
+  | "PENDING_HUMAN_APPROVAL"
+  | "RESUMING_LOOP"
+  | "TASK_ABORTED"
+  | "TASK_COMPLETED";
+
+export type RoutingNode = "router" | "researcher" | "writer" | "supervisor" | "end";
+
+export interface AgentMessage {
+  role: "system" | "user" | "agent" | "tool";
+  content: string;
+}
+
+export interface PendingApproval {
+  triggerId: string;
+  toolName: string;
+  arguments: Record<string, unknown>;
+  requestedAt: string;
+  timeoutSeconds: number;
+}
+
+export interface AgentStateGraph {
+  sessionId: string;
+  status: AgentStatus;
+  messages: AgentMessage[];
+  nextTargetAgent: RoutingNode;
+  executionLoopCount: number;
+  extractedEntities: Record<string, unknown>;
+  errorsEncountered: Array<{ step: string; message: string }>;
+  pendingApproval: PendingApproval | null;
+}
+
+export const MAX_EXECUTION_LOOPS = 10;
+
+export type AgentEvent =
+  | "HITL_TRIGGERED"
+  | "HUMAN_APPROVED"
+  | "HUMAN_MODIFIED"
+  | "HUMAN_REJECTED"
+  | "HITL_TIMEOUT"
+  | "LOOP_RESUMED"
+  | "TASK_DONE"
+  | "TASK_FAILED";
+
+const transitions: Record<AgentStatus, Partial<Record<AgentEvent, AgentStatus>>> = {
+  RUNNING: {
+    HITL_TRIGGERED: "PENDING_HUMAN_APPROVAL",
+    TASK_DONE: "TASK_COMPLETED",
+    TASK_FAILED: "TASK_ABORTED",
+  },
+  PENDING_HUMAN_APPROVAL: {
+    HUMAN_APPROVED: "RESUMING_LOOP",
+    HUMAN_MODIFIED: "RESUMING_LOOP",
+    HUMAN_REJECTED: "TASK_ABORTED",
+    HITL_TIMEOUT: "TASK_ABORTED",
+  },
+  RESUMING_LOOP: {
+    LOOP_RESUMED: "RUNNING",
+    TASK_DONE: "TASK_COMPLETED",
+    TASK_FAILED: "TASK_ABORTED",
+  },
+  TASK_ABORTED: {},
+  TASK_COMPLETED: {},
+};
+
+export function transition(current: AgentStatus, event: AgentEvent): AgentStatus {
+  const next = transitions[current][event];
+  if (next === undefined) {
+    throw new Error(`Invalid transition from ${current} on ${event}`);
+  }
+  return next;
+}
+
+export function isTerminal(status: AgentStatus): boolean {
+  return status === "TASK_COMPLETED" || status === "TASK_ABORTED";
+}

@@ -1,0 +1,101 @@
+export const REDACTION_TOKEN = "[REDACTED_PII]";
+
+// Phrase matching is an evadable pre-filter, not a security boundary.
+// Tool permissions, sandboxing and HITL gates must enforce access independently.
+export const INJECTION_PATTERNS: ReadonlyArray<{ id: string; pattern: RegExp }> = [
+  { id: "system_override", pattern: /system\s*override/gi },
+  { id: "ignore_previous", pattern: /ignore\s+(all\s+)?previous\s+(instructions?|rules?)/gi },
+  { id: "identity_change", pattern: /(override|replace|change)\s+(your\s+)?(system\s+)?(prompt|instructions?)/gi },
+  { id: "dan_mode", pattern: /dan\s+mode/gi },
+];
+
+export function detectInjection(text: string): string[] {
+  return INJECTION_PATTERNS.filter(({ pattern }) => {
+    // A fresh regex prevents global lastIndex state from changing repeated results.
+    return new RegExp(pattern.source, pattern.flags).test(text);
+  }).map(({ id }) => id);
+}
+
+export function luhnValid(digits: string): boolean {
+  const normalized = digits.replace(/[ -]/g, "");
+  if (!/^\d+$/.test(normalized)) return false;
+  let sum = 0;
+  let doubleDigit = false;
+  for (let index = normalized.length - 1; index >= 0; index -= 1) {
+    let digit = normalized.charCodeAt(index) - 48;
+    if (doubleDigit) {
+      digit *= 2;
+      if (digit > 9) digit -= 9;
+    }
+    sum += digit;
+    doubleDigit = !doubleDigit;
+  }
+  return sum % 10 === 0;
+}
+
+export function maskPii(text: string): string {
+  const masked = text.replace(/\b\d{3}-\d{2}-\d{4}\b/g, REDACTION_TOKEN);
+  return masked.replace(/\d(?:[ -]*\d)*\d|\d/g, (candidate: string) => {
+    const parts = candidate.split(/(\s+)/);
+    const groups: Array<{ part: number; digits: string }> = [];
+    parts.forEach((part, partIndex) => {
+      if (part.trim().length === 0) return;
+      groups.push({ part: partIndex, digits: part.replace(/-/g, "") });
+    });
+
+    const isCard = (digits: string) => digits.length >= 13 && digits.length <= 19 && luhnValid(digits);
+    const spans: Array<[number, number]> = [];
+    const covered = (part: number) => spans.some(([from, to]) => part >= from && part <= to);
+
+    for (const group of groups) {
+      if (isCard(group.digits)) spans.push([group.part, group.part]);
+    }
+
+    // A card written in groups, such as "4111 1111 1111 1111", has no single part that
+    // qualifies. Try each run of neighbouring parts and keep the first that checks out.
+    for (let start = 0; start < groups.length; start += 1) {
+      if (covered(groups[start].part)) continue;
+      let digits = "";
+      let lastPart = groups[start].part;
+      for (let end = start; end < groups.length; end += 1) {
+        if (covered(groups[end].part)) break;
+        const extended = digits + groups[end].digits;
+        if (extended.length > 19) break;
+        digits = extended;
+        lastPart = groups[end].part;
+        if (digits.length >= 13 && luhnValid(digits)) {
+          spans.push([groups[start].part, lastPart]);
+          break;
+        }
+      }
+    }
+
+    if (spans.length === 0) return candidate;
+    const ordered = spans.slice().sort((left, right) => left[0] - right[0]);
+    let out = "";
+    let index = 0;
+    while (index < parts.length) {
+      const span = ordered.find(([from]) => from === index);
+      if (span) {
+        out += REDACTION_TOKEN;
+        index = span[1] + 1;
+        continue;
+      }
+      out += parts[index];
+      index += 1;
+    }
+    return out;
+  });
+}
+
+export function buildSecurityViolation(violations: string[]): {
+  error: { code: "SECURITY_VIOLATION"; message: string; violations: string[] };
+} {
+  return {
+    error: {
+      code: "SECURITY_VIOLATION",
+      message: `Security violations detected: ${violations.join(", ")}`,
+      violations,
+    },
+  };
+}

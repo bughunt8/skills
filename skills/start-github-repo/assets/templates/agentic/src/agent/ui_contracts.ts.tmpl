@@ -1,0 +1,52 @@
+export type ApprovalResolution = "APPROVED" | "MODIFIED" | "DENIED";
+export type MfaResolution = "APPROVED" | "DENIED" | "TIMEOUT";
+export type MfaChallengeOutcome = "approved" | "denied";
+
+// The panel must never execute the tool in the browser. The server response decides the outcome.
+export interface PendingApprovalView {
+  hitlId: string;
+  sessionId: string;
+  triggerId: string;
+  category: string;
+  description: string;
+  toolName: string;
+  proposedArguments: Record<string, unknown>;
+  requestedAt: string;
+  timeoutSeconds: number;
+}
+
+export interface AgentMfaChallenge {
+  method: string;
+  maskedTarget: string;
+  expiresAt: string;
+}
+
+export interface MfaChallengeAttempt {
+  outcome: MfaChallengeOutcome;
+  code?: string;
+}
+
+// The panel must never execute the tool in the browser. The server response decides the outcome.
+export interface TransactionApprovalModalProps {
+  approval: PendingApprovalView;
+  onApprove: () => void | Promise<void>;
+  onModify: (correctedArguments: Record<string, unknown>) => void | Promise<void>;
+  onReject: () => void | Promise<void>;
+}
+
+// The panel must never execute the tool in the browser. The server response decides the outcome.
+// The browser value is untrusted, and the server owns the final resolution.
+export interface SecurityChallengePanelProps {
+  approval: PendingApprovalView;
+  challenge: AgentMfaChallenge;
+  onChallengeAttempt: (attempt: MfaChallengeAttempt) => void | Promise<void>;
+}
+
+// The panel must never execute the tool in the browser. The server response decides the outcome.
+export interface AgentNoticeView {
+  hitlId: string;
+  sessionId: string;
+  triggerId: string;
+  description: string;
+  toolName: string;
+}
