@@ -57,13 +57,15 @@ def answers_template(manifest: dict) -> dict:
 
 
 def resolve(manifest: dict, answers: dict) -> dict:
-    """Fill defaults, validate enums, and compute derived values."""
+    """Fill defaults, validate boolean types and enums, and compute derived values."""
     schema = manifest["answers_schema"]
     resolved = {}
     problems = []
 
     for key, spec in schema.items():
         value = answers.get(key, spec.get("default"))
+        if spec.get("type") == "boolean" and not isinstance(value, bool):
+            problems.append(f"{key} must be a boolean, received {value!r} ({type(value).__name__})")
         if value in (None, "") and spec.get("required"):
             problems.append(f"missing required answer: {key} ({spec['prompt']})")
         if "enum" in spec and value not in (None, "") and value not in spec["enum"]:
@@ -116,21 +118,56 @@ def evaluate(condition: str | None, state: dict) -> bool:
       not <expr>              negation of either of the above
       <answer> == <value>     string equality
       <answer> != <value>     string inequality
+
+    Atoms combine with `and` and `or`. `not` binds tighter than `and`, and `and` binds tighter
+    than `or`, so `not a and b` reads as `(not a) and b`. A quoted value keeps its spaces, so
+    `description == "sales and support"` stays one atom.
     """
     if not condition:
         return True
 
     expr = condition.strip()
-    if expr.startswith("not "):
-        return not evaluate(expr[4:], state)
 
-    for op in ("==", "!="):
-        if op in expr:
-            left, right = (part.strip() for part in expr.split(op, 1))
-            actual = str(lookup(left, state))
-            return (actual == right) if op == "==" else (actual != right)
+    def split_words(value: str, word: str) -> list[str]:
+        """Split on a spaced word, leaving occurrences inside double quotes alone."""
+        needle = f" {word} "
+        parts: list[str] = []
+        buf: list[str] = []
+        in_quotes = False
+        index = 0
+        while index < len(value):
+            char = value[index]
+            if char == '"':
+                in_quotes = not in_quotes
+            if not in_quotes and value.startswith(needle, index):
+                parts.append("".join(buf))
+                buf = []
+                index += len(needle)
+                continue
+            buf.append(char)
+            index += 1
+        parts.append("".join(buf))
+        return parts
 
-    return bool(lookup(expr, state))
+    def parse(value: str) -> bool:
+        parts = split_words(value, "or")
+        if len(parts) > 1:
+            return any(parse(part) for part in parts)
+        parts = split_words(value, "and")
+        if len(parts) > 1:
+            return all(parse(part) for part in parts)
+        if value.startswith("not "):
+            return not parse(value[4:].strip())
+        for op in ("==", "!="):
+            if op in value:
+                left, right = (part.strip() for part in value.split(op, 1))
+                if len(right) >= 2 and right.startswith('"') and right.endswith('"'):
+                    right = right[1:-1]
+                actual = str(lookup(left, state))
+                return (actual == right) if op == "==" else (actual != right)
+        return bool(lookup(value, state))
+
+    return parse(expr)
 
 
 def lookup(name: str, state: dict):
@@ -253,6 +290,29 @@ def self_test() -> int:
     state = resolve(manifest, dict(SAMPLE))
     failures = []
 
+    for key, spec in manifest["answers_schema"].items():
+        if spec.get("type") != "boolean":
+            continue
+        for bad in ("false", 0, 1, [], {}):
+            try:
+                resolve(manifest, {**SAMPLE, key: bad})
+            except ValueError as exc:
+                if key not in str(exc) or repr(bad) not in str(exc):
+                    failures.append(f"boolean error omitted answer or received value: {exc}")
+            else:
+                failures.append(f"accepted {key}={bad!r} as a boolean")
+        for good in (True, False):
+            if resolve(manifest, {**SAMPLE, key: good})["answers"][key] is not good:
+                failures.append(f"changed boolean answer {key}={good!r}")
+
+    profile_enum = set(manifest["answers_schema"]["profile"]["enum"])
+    declared_profiles = set(manifest["profiles"])
+    if profile_enum != declared_profiles:
+        failures.append(
+            "the profile answer enum and the profiles table disagree: "
+            f"only in the enum {sorted(profile_enum - declared_profiles)}, "
+            f"only in the table {sorted(declared_profiles - profile_enum)}")
+
     if state["context"]["REPO"] != "acme/acme-edge":
         failures.append("derived REPO is wrong")
     if state["context"]["TEST_COMMAND"] != "pnpm test":
@@ -272,6 +332,64 @@ def self_test() -> int:
         failures.append("equality condition failed")
     if evaluate("not profile.cloudflare", state):
         failures.append("negation failed")
+    if evaluate("profile.cloudflare and profile.agentic", state):
+        failures.append("and condition failed: worker-service is no longer agentic")
+    if evaluate("profile.package or profile.agentic", state):
+        failures.append("or condition failed: worker-service has neither package nor agentic")
+    if evaluate("not profile.cloudflare and profile.agentic", state):
+        failures.append("not and precedence failed")
+
+    quoted = {"answers": {"description": "sales and support"}, "profile": {}}
+    if not evaluate('description == "sales and support"', quoted):
+        failures.append("a quoted value containing 'and' was split into atoms")
+    if evaluate('description == "sales and support" and profile.agentic', quoted):
+        failures.append("a quoted value containing 'and' broke the conjunction")
+
+    # R2.6: agentic stack condition combinations
+    def planned(answers, profile_name):
+        s = resolve(manifest, dict(answers))
+        s["profile"] = manifest["profiles"][profile_name]
+        return [e["dest"] for e in plan(manifest, s, None)]
+
+    agent_dests = planned(SAMPLE, "agent-service")
+    agentic_agent = [d for d in agent_dests if d.startswith(("config/", "src/agent", "src/safety/", "db/", "tests/eval", "docs/architecture/hitl"))]
+    if not agentic_agent:
+        failures.append("agent-service profile plans no agentic files")
+
+    worker_dests = planned(SAMPLE, "worker-service")
+    worker_leaked = [d for d in worker_dests if d.startswith(("config/", "src/agent", "db/", "tests/eval", "docs/architecture/hitl"))]
+    if worker_leaked:
+        failures.append(f"worker-service leaked agentic files: {worker_leaked}")
+
+    emit_on: dict = dict(SAMPLE)
+    emit_on["emit_agentic_stack"] = True
+    emit_dests = planned(emit_on, "worker-service")
+    emit_agentic = [d for d in emit_dests if d.startswith(("config/", "src/agent", "src/safety/", "tests/eval", "docs/architecture/hitl"))]
+    if not emit_agentic:
+        failures.append("worker-service with emit_agentic_stack=true plans no agentic files")
+
+    sqlite_sample = dict(SAMPLE)
+    sqlite_sample["database"] = "sqlite"
+    sqlite_dests = planned(sqlite_sample, "agent-service")
+    if "db/migrations/0001_create_agent_sessions.sql" not in sqlite_dests:
+        failures.append("agent-service with database=sqlite does not plan sqlite migration 0001")
+    if "db/migrations/0002_create_hitl_records.sql" not in sqlite_dests:
+        failures.append("agent-service with database=sqlite does not plan sqlite migration 0002")
+
+    emit_sqlite: dict = dict(SAMPLE)
+    emit_sqlite["emit_agentic_stack"] = True
+    emit_sqlite["database"] = "sqlite"
+    emit_sqlite_dests = planned(emit_sqlite, "worker-service")
+    if "db/migrations/0001_create_agent_sessions.sql" not in emit_sqlite_dests:
+        failures.append("worker-service with emit_agentic_stack=true and database=sqlite does not plan sqlite migration 0001")
+    if "db/migrations/0002_create_hitl_records.sql" not in emit_sqlite_dests:
+        failures.append("worker-service with emit_agentic_stack=true and database=sqlite does not plan sqlite migration 0002")
+
+    for combo in (dict(SAMPLE), emit_on, sqlite_sample, emit_sqlite):
+        for prof in manifest["profiles"]:
+            ds = planned(combo, prof)
+            if len(ds) != len(set(ds)):
+                failures.append(f"duplicate destination for profile={prof} combo={combo}")
 
     entries = plan(manifest, state, None)
     missing = [e["template"] for e in entries if not (TEMPLATES / e["template"]).exists()]

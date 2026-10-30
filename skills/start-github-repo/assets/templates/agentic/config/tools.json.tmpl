@@ -1,0 +1,24 @@
+{
+  "tool_definitions": [
+    {
+      "name": "fetch_user_billing",
+      "description": "Queries the relational billing system for invoice statements. Do not expose raw hash IDs to users.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "account_id": {
+            "type": "string",
+            "description": "The account identifier from the billing system, in the form returned by the billing API."
+          }
+        },
+        "required": ["account_id"]
+      }
+    }
+  ],
+  "sandbox_profile": {
+    "runtime": "docker-isolated",
+    "network_egress": "restricted",
+    "timeout_ms": 5000,
+    "max_memory_mb": 512
+  }
+}

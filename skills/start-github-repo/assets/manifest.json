@@ -3,17 +3,18 @@
   "manifest_version": 1,
 
   "profiles": {
-    "worker-service": { "label": "Cloudflare Worker service", "cloudflare": true, "package": false, "ui": true },
-    "ts-library": { "label": "TypeScript npm library", "cloudflare": false, "package": true, "ui": false },
-    "monorepo": { "label": "pnpm workspaces monorepo", "cloudflare": true, "package": true, "ui": true, "workspaces": true },
-    "docs-site": { "label": "Documentation site", "cloudflare": true, "package": false, "ui": true, "docs_site": true },
-    "internal-tool": { "label": "Internal tool or CLI", "cloudflare": false, "package": true, "ui": false }
+    "worker-service": { "label": "Cloudflare Worker service", "cloudflare": true, "package": false, "ui": true, "agentic": false },
+    "ts-library": { "label": "TypeScript npm library", "cloudflare": false, "package": true, "ui": false, "agentic": false },
+    "monorepo": { "label": "pnpm workspaces monorepo", "cloudflare": true, "package": true, "ui": true, "workspaces": true, "agentic": false },
+    "docs-site": { "label": "Documentation site", "cloudflare": true, "package": false, "ui": true, "docs_site": true, "agentic": false },
+    "internal-tool": { "label": "Internal tool or CLI", "cloudflare": false, "package": true, "ui": false, "agentic": false },
+    "agent-service": { "label": "Enterprise agent service", "cloudflare": true, "package": false, "ui": true, "agentic": true }
   },
 
   "answers_schema": {
     "project_name":       { "prompt": "Project name (kebab-case)", "required": true },
     "description":        { "prompt": "One-line description (under 120 chars)", "required": true },
-    "profile":            { "prompt": "Profile", "default": "worker-service", "enum": ["worker-service", "ts-library", "monorepo", "docs-site", "internal-tool"] },
+    "profile":            { "prompt": "Profile", "default": "worker-service", "enum": ["worker-service", "ts-library", "monorepo", "docs-site", "internal-tool", "agent-service"] },
     "license":            { "prompt": "License (SPDX id)", "default": "MIT", "enum": ["MIT", "Apache-2.0", "BSD-3-Clause", "MPL-2.0", "AGPL-3.0", "UNLICENSED"] },
     "visibility":         { "prompt": "Repository visibility", "default": "private", "enum": ["private", "public"] },
     "package_manager":    { "prompt": "Package manager", "default": "pnpm", "enum": ["pnpm", "npm", "yarn", "bun"] },
@@ -23,11 +24,13 @@
     "copyright_holder":   { "prompt": "Copyright holder", "required": true },
     "default_branch":     { "prompt": "Default branch", "default": "main" },
     "node_version":       { "prompt": "Node version", "default": "22" },
-    "emit_speckit":       { "prompt": "Emit spec-kit specs/ interop?", "default": false },
-    "emit_coc_inline":    { "prompt": "Inline the full Contributor Covenant instead of a pointer?", "default": false },
-    "emit_pr_dir":        { "prompt": "Emit multiple PR templates in a directory?", "default": false },
-    "emit_secret_scan":   { "prompt": "Add a secret-scanning step to CI?", "default": true },
-    "emit_docs_site":     { "prompt": "Scaffold a docs site?", "default": false }
+    "emit_speckit":       { "prompt": "Emit spec-kit specs/ interop?", "type": "boolean", "default": false },
+    "emit_coc_inline":    { "prompt": "Inline the full Contributor Covenant instead of a pointer?", "type": "boolean", "default": false },
+    "emit_pr_dir":        { "prompt": "Emit multiple PR templates in a directory?", "type": "boolean", "default": false },
+    "emit_secret_scan":   { "prompt": "Add a secret-scanning step to CI?", "type": "boolean", "default": true },
+    "emit_docs_site":     { "prompt": "Scaffold a docs site?", "type": "boolean", "default": false },
+    "emit_agentic_stack": { "prompt": "Also emit the agent runtime stack? The agent-service profile always includes it", "type": "boolean", "default": false },
+    "database":           { "prompt": "Database behind the agent runtime (postgres or sqlite)", "default": "postgres", "enum": ["postgres", "sqlite"] }
   },
 
   "placeholders": [
@@ -52,7 +55,8 @@
     { "id": "github",     "label": "Issue forms, PR, ownership", "order": 4 },
     { "id": "workflows",  "label": "CI and security workflows",  "order": 5 },
     { "id": "scripts",    "label": "Automation scripts",         "order": 6 },
-    { "id": "toolchain",  "label": "Test and runtime config",    "order": 7 }
+    { "id": "toolchain",  "label": "Test and runtime config",    "order": 7 },
+    { "id": "agentic-stack", "label": "Agent runtime and human-in-the-loop", "order": 8 }
   ],
 
   "files": [
@@ -117,7 +121,25 @@
     { "template": "vitest.config.ts.tmpl",     "dest": "vitest.config.ts",     "group": "toolchain" },
     { "template": "playwright.config.ts.tmpl", "dest": "playwright.config.ts", "group": "toolchain", "when": "profile.ui" },
     { "template": "wrangler.jsonc.tmpl",       "dest": "wrangler.jsonc",       "group": "toolchain", "when": "profile.cloudflare" },
-    { "template": "changeset-config.json.tmpl","dest": ".changeset/config.json","group": "toolchain", "when": "release_tooling == changesets" }
+    { "template": "changeset-config.json.tmpl","dest": ".changeset/config.json","group": "toolchain", "when": "release_tooling == changesets" },
+
+    { "template": "agentic/config/persona.json.tmpl", "dest": "config/persona.json", "group": "agentic-stack", "when": "profile.agentic or emit_agentic_stack" },
+    { "template": "agentic/config/hitl_triggers.json.tmpl", "dest": "config/hitl_triggers.json", "group": "agentic-stack", "when": "profile.agentic or emit_agentic_stack" },
+    { "template": "agentic/config/system_prompt.md.tmpl", "dest": "config/system_prompt.md", "group": "agentic-stack", "when": "profile.agentic or emit_agentic_stack" },
+    { "template": "agentic/config/vector_store.yaml.tmpl", "dest": "config/vector_store.yaml", "group": "agentic-stack", "when": "profile.agentic or emit_agentic_stack" },
+    { "template": "agentic/config/tools.json.tmpl", "dest": "config/tools.json", "group": "agentic-stack", "when": "profile.agentic or emit_agentic_stack" },
+    { "template": "agentic/db/migrations/postgres/0001_create_agent_sessions.sql.tmpl", "dest": "db/migrations/0001_create_agent_sessions.sql", "group": "agentic-stack", "when": "profile.agentic and database == postgres or emit_agentic_stack and database == postgres" },
+    { "template": "agentic/db/migrations/postgres/0002_create_hitl_records.sql.tmpl", "dest": "db/migrations/0002_create_hitl_records.sql", "group": "agentic-stack", "when": "profile.agentic and database == postgres or emit_agentic_stack and database == postgres" },
+    { "template": "agentic/db/migrations/sqlite/0001_create_agent_sessions.sql.tmpl", "dest": "db/migrations/0001_create_agent_sessions.sql", "group": "agentic-stack", "when": "profile.agentic and database == sqlite or emit_agentic_stack and database == sqlite" },
+    { "template": "agentic/db/migrations/sqlite/0002_create_hitl_records.sql.tmpl", "dest": "db/migrations/0002_create_hitl_records.sql", "group": "agentic-stack", "when": "profile.agentic and database == sqlite or emit_agentic_stack and database == sqlite" },
+    { "template": "agentic/src/agent/state.ts.tmpl", "dest": "src/agent/state.ts", "group": "agentic-stack", "when": "profile.agentic or emit_agentic_stack" },
+    { "template": "agentic/src/agent/router.ts.tmpl", "dest": "src/agent/router.ts", "group": "agentic-stack", "when": "profile.agentic or emit_agentic_stack" },
+    { "template": "agentic/src/agent/endpoints.ts.tmpl", "dest": "src/agent/endpoints.ts", "group": "agentic-stack", "when": "profile.agentic or emit_agentic_stack" },
+    { "template": "agentic/src/agent/ui_contracts.ts.tmpl", "dest": "src/agent/ui_contracts.ts", "group": "agentic-stack", "when": "profile.agentic or emit_agentic_stack" },
+    { "template": "agentic/src/agent/agentic_stack.test.ts.tmpl", "dest": "src/agent/agentic_stack.test.ts", "group": "agentic-stack", "when": "profile.agentic or emit_agentic_stack" },
+    { "template": "agentic/src/safety/filters.ts.tmpl", "dest": "src/safety/filters.ts", "group": "agentic-stack", "when": "profile.agentic or emit_agentic_stack" },
+    { "template": "agentic/tests/eval_dataset.json.tmpl", "dest": "tests/eval_dataset.json", "group": "agentic-stack", "when": "profile.agentic or emit_agentic_stack" },
+    { "template": "agentic/docs/architecture/hitl-protocol.md.tmpl", "dest": "docs/architecture/hitl-protocol.md", "group": "agentic-stack", "when": "profile.agentic or emit_agentic_stack" }
   ],
 
   "required_secrets": [

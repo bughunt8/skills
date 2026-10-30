@@ -1,0 +1,28 @@
+{
+  "agent_metadata": {
+    "identifier": "{{PROJECT_NAME}}-agent",
+    "version": "0.1.0",
+    "temperature": 0.1,
+    "max_tokens": 4096
+  },
+  "behavioral_boundaries": {
+    "allowed_domains": ["{{PROJECT_NAME}}"],
+    "forbidden_topics": [
+      "medical_advice",
+      "legal_counsel",
+      "speculative_finance",
+      "competitor_pricing"
+    ],
+    "linguistic_style": "Concise, technical, polite, active voice, objective"
+  },
+  "adversarial_mitigation": {
+    "strip_markdown_injections": true,
+    "reject_system_override_keywords": [
+      "system override",
+      "ignore previous instructions",
+      "ignore previous rules",
+      "override system prompt",
+      "dan mode"
+    ]
+  }
+}
