@@ -18,7 +18,7 @@ jobs:
     permissions:
       contents: write        # create the version PR, tags and releases
       pull-requests: write   # open and update the version PR
-      id-token: write        # OIDC — prefer this over a long-lived publish token
+      id-token: write        # OIDC, which is preferred over a long-lived publish token
       attestations: write    # SLSA provenance for published artifacts
     steps:
       - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA

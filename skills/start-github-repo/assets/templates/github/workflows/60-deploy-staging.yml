@@ -1,0 +1,32 @@
+name: Deploy Staging
+
+# The staging deployment. The concrete command depends on the target
+# repository, so it ships as a placeholder the skill fills in.
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-staging-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+      - uses: actions/setup-node@v4 # SCAFFOLD-PIN-SHA
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: "{{PACKAGE_MANAGER}} install --frozen-lockfile"
+      - name: Deploy the application to the staging environment
+        # SCAFFOLD-PLACEHOLDER: deploy-staging
+        # Replace this step with the deploy command for this repository. A
+        # deployment that needs credentials also needs them declared as secrets.
+        run: |
+          echo "No deploy command is configured for this repository yet."

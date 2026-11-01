@@ -21,7 +21,7 @@ version number in prose.
 
 | Invocation | Behaviour |
 |---|---|
-| `/start-github-repo` | Interview → plan → confirm → scaffold → validate → summarize |
+| `/start-github-repo` | Interview → assess → plan → confirm → scaffold → validate → summarize |
 | `/start-github-repo plan` | Print the resolved file list and answers. Write nothing. |
 | `/start-github-repo docs` | Emit only the document spine into an existing repo |
 | `/start-github-repo audit` | Report missing or stale template artifacts. Never writes. |
@@ -37,21 +37,26 @@ version number in prose.
     Every other profile includes it only when the operator explicitly sets `emit_agentic_stack` to
     `true`; that answer defaults to `false`. Ask `database`, either `postgres` or `sqlite`, only
     when the agentic stack is on. Default it to `postgres`. Derive everything else.
-3. **Plan.** Run `scripts/scaffold.py --dry-run` and show the tree plus every required secret by
+3. **Assess.** For every `SCAFFOLD-PLACEHOLDER` in the target repository's workflows, apply the
+   assessment rules in `references/workflow_pipeline.md` and replace the placeholder wherever the
+   target makes the command derivable. Every placeholder that stays is reported in the final
+   summary.
+4. **Plan.** Run `scripts/scaffold.py --dry-run` and show the tree plus every required secret by
    name and purpose. Get confirmation before writing.
-4. **Scaffold.** `scripts/scaffold.py` renders `assets/manifest.json`. Use `--only docs` for docs
+5. **Scaffold.** `scripts/scaffold.py` renders `assets/manifest.json`. Use `--only docs` for docs
    mode, `--force` only after an approved diff. The `agentic-stack` group, labelled
     "Agent runtime and human-in-the-loop", applies to `agent-service` and to other profiles only
     when `emit_agentic_stack` is explicitly set to `true`. It emits the fifteen destinations listed
     in the agent runtime row of `README.md`. `database` selects the migration dialect. Use
     `--only agentic-stack` to select this group without changing its conditions.
-5. **Validate.** Run `python3 scripts/validate_repo.py --root <target>` and
+6. **Validate.** Run `python3 scripts/validate_repo.py --root <target>` and
    `python3 scripts/validate_docs.py --root <target>`. When the agentic stack is on, run
    `python3 scripts/validate_repo.py --root <target> --require-agentic` for repository validation.
    Agentic checks otherwise run only when `config/hitl_triggers.json` is present. The flag makes
    a missing agentic stack an error. Both validators must exit 0.
-6. **Hand off.** Report unresolved `TODO`/`[NEEDS CLARIFICATION]` markers, required secrets, and
-   remote settings still to apply. Remote mutations are a **separate, individually confirmed step**.
+7. **Hand off.** Report unresolved `TODO`/`[NEEDS CLARIFICATION]` markers, every
+   `SCAFFOLD-PLACEHOLDER` that Assess could not fill, required secrets, and remote settings still
+   to apply. Remote mutations are a **separate, individually confirmed step**.
 
 ## Hard rules
 
@@ -80,6 +85,7 @@ Read the one that answers the question in front of you. Do not read all of them.
 | `references/cloudflare_worker_repo.md` | wrangler config, `.dev.vars`, `wrangler types`, the Vitest plugin rename, secrets |
 | `references/repo_hygiene_and_scripts.md` | `.gitignore`/`.gitattributes`/`.editorconfig`, env layering, secret scanning, hooks, `scripts/` conventions |
 | `references/traceability_scheme.md` | The five ID families, the matrix, and commit/PR/test wiring |
+| `references/workflow_pipeline.md` | How does the pipeline run, and how does the skill fill in a deployment target? |
 
 ## Scripts
 

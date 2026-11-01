@@ -1,0 +1,83 @@
+name: Promote Staging to Main
+
+# The one manual step in the pipeline. The operator types PROMOTE, because a
+# promotion into production is not a decision the pipeline may take on its own.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type PROMOTE to continue"
+        required: true
+        type: string
+      run_verification:
+        description: "Run the verification suite before promoting"
+        required: false
+        default: "true"
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: promote-production
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate the confirmation
+        if: ${{ inputs.confirm != 'PROMOTE' }}
+        run: |
+          echo "Refusing to promote. Type PROMOTE to confirm."
+          exit 1
+
+  verify:
+    needs: [guard]
+    if: ${{ inputs.run_verification == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+      - uses: actions/setup-node@v4 # SCAFFOLD-PIN-SHA
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: {{PACKAGE_MANAGER}} install --frozen-lockfile
+      - name: Lint
+        run: {{LINT_COMMAND}}
+      - name: Typecheck
+        run: {{PACKAGE_MANAGER}} exec tsc --noEmit
+      - name: Test
+        run: {{TEST_COMMAND}}
+
+  promote:
+    needs: [guard, verify]
+    if: ${{ always() && needs.guard.result == 'success' && (needs.verify.result == 'success' || needs.verify.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # push the merge commit to the default branch
+      actions: write          # start the workflows a bot push cannot start
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+        with:
+          fetch-depth: 0
+      - name: Merge staging into the default branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin staging
+          git checkout {{DEFAULT_BRANCH}}
+          git merge --no-edit origin/staging
+          git push origin {{DEFAULT_BRANCH}}
+      # A push made with GITHUB_TOKEN starts no new workflow run, apart from
+      # workflow_dispatch. The production deployment therefore has to be started
+      # by hand here, or the pipeline stops at the merge.
+      - name: Start the production deployment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh workflow view 90-deploy-production.yml >/dev/null 2>&1; then
+            gh workflow run 90-deploy-production.yml --ref {{DEFAULT_BRANCH}}
+          else
+            echo "90-deploy-production.yml is not on {{DEFAULT_BRANCH}}. Start it by hand."
+          fi

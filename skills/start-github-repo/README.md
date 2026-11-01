@@ -1,8 +1,8 @@
 # start-github-repo
 
 Renders a repository skeleton with a document spine, community files and workflows for TypeScript/Node and Cloudflare Workers projects, plus agent runtime contracts for the `agent-service` profile.
-It bundles 73 templates. A default `worker-service` scaffold plans 52 files, and
-`agent-service` plans 67 files.
+It bundles 77 templates. A default `worker-service` scaffold plans 56 files, and
+`agent-service` plans 71 files.
 
 Templates are **bundled**. There is no network fetch at scaffold time and no dependency on an
 external template catalog.
@@ -15,15 +15,40 @@ external template catalog.
 | Root | `README.md`, `AGENTS.md`, `CLAUDE.md`, `CHANGELOG.md`, `.gitignore`, `.gitattributes`, `.editorconfig`, `.nvmrc`, `.env.example`, `.dev.vars.example` |
 | Community health | `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`, `LICENSE`, `NOTICE` |
 | GitHub | three YAML issue forms + `config.yml`, PR template, `CODEOWNERS`, `dependabot.yml`, scoped `.github/AGENTS.md` |
-| Workflows | `ci`, `docs-check`, `security`, `release`, `scorecard`, `e2e`, with least-privilege permissions, concurrency and SHA-pin markers |
+| Workflows | `01-quality-gates`, `02-docs-review`, `03-e2e`, `04-security`, `05-release`, `06-scorecard`, `50-promote-to-staging`, `60-deploy-staging`, `80-promote-to-production`, `90-deploy-production`, with least-privilege permissions, concurrency, SHA-pin markers and placeholder steps for the promotion and deployment commands |
 | Scripts | `bootstrap`, `setup`, `update`, `server`, `test`, `cibuild`, `console`, `check-docs` |
 | Toolchain | `vitest.config.ts`, `playwright.config.ts`, `wrangler.jsonc`, `.changeset/config.json` |
 | Agent runtime and human-in-the-loop (`agentic-stack`) | `config/persona.json`, `config/hitl_triggers.json`, `config/system_prompt.md`, `config/vector_store.yaml`, `config/tools.json`, `db/migrations/0001_create_agent_sessions.sql`, `db/migrations/0002_create_hitl_records.sql`, `src/agent/state.ts`, `src/agent/router.ts`, `src/agent/endpoints.ts`, `src/agent/ui_contracts.ts`, `src/agent/agentic_stack.test.ts`, `src/safety/filters.ts`, `tests/eval_dataset.json`, `docs/architecture/hitl-protocol.md` |
 
+## The numbered pipeline
+
+The ten workflow templates carry a two-digit number. Sorted by name, they read in the order work
+moves from a pull request to production. Five bands group the numbers:
+
+| Band | Numbers | Files |
+|---|---|---|
+| Checks | `01`-`49` | `01-quality-gates.yml`, `02-docs-review.yml`, `03-e2e.yml`, `04-security.yml`, `05-release.yml`, `06-scorecard.yml`; `07`-`49` stays free for more checks |
+| Staging promotion | `50`-`59` | `50-promote-to-staging.yml`; `51`-`59` stays free |
+| Staging deployment | `60`-`79` | `60-deploy-staging.yml`; `61`-`79` stays free for the other work a staging environment needs |
+| Production promotion | `80`-`89` | `80-promote-to-production.yml`; `81`-`89` stays free |
+| Production deployment | `90`-`99` | `90-deploy-production.yml`; `91`-`99` stays free |
+
+Inside one workflow, `needs:` gates one job on another. Across workflows, the repository ruleset
+is the gate: a pull request must pass `01-quality-gates.yml` before it merges, and
+`80-promote-to-production.yml` is the single human gate. It runs only on `workflow_dispatch` and
+stops unless the operator types `PROMOTE`.
+
+`50-promote-to-staging.yml`, `60-deploy-staging.yml` and `90-deploy-production.yml` ship with a
+`SCAFFOLD-PLACEHOLDER` step. The validator warns once per file instead of failing, because a fresh
+scaffold cannot know the deploy command. The skill's Assess step fills each placeholder from the
+target's own deploy script or its wrangler config, then reports every one it leaves behind.
+`references/workflow_pipeline.md` holds the assessment rules and the procedure for adding a
+workflow to a reserved band.
+
 ## Usage
 
 ```
-/start-github-repo              # interview, plan, confirm, scaffold, validate
+/start-github-repo              # interview, assess, plan, confirm, scaffold, validate
 /start-github-repo plan         # dry run, writes nothing
 /start-github-repo docs         # add only the document spine to an existing repo
 /start-github-repo audit        # report missing or stale artifacts
@@ -127,7 +152,8 @@ skills/start-github-repo/
 │   ├── github_platform.md
 │   ├── release_and_versioning.md
 │   ├── repo_hygiene_and_scripts.md
-│   └── traceability_scheme.md
+│   ├── traceability_scheme.md
+│   └── workflow_pipeline.md
 └── scripts/
     ├── scaffold.py
     ├── traceability.py

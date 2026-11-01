@@ -13,7 +13,7 @@ Renders bundled repository templates without a network fetch or an external cata
 
 | Invocation | Behaviour |
 |---|---|
-| `/start-github-repo` | Interview → plan → confirm → scaffold → validate → summarize |
+| `/start-github-repo` | Interview → assess → plan → confirm → scaffold → validate → summarize |
 | `/start-github-repo plan` | Print the resolved file list, secrets and manual settings. Writes nothing. |
 | `/start-github-repo docs` | Emit only the document spine into an existing repository |
 | `/start-github-repo audit` | Report missing or stale template artifacts. Writes nothing. |
@@ -78,6 +78,37 @@ A blocking trigger parks the session in `PENDING_HUMAN_APPROVAL` until a human r
 budget before evaluating any trigger and aborts an exhausted session before human approval.
 Never pre-approve a blocking trigger.
 Replace the default `allowed_domains` in `config/persona.json` before production use.
+
+## The numbered pipeline
+
+The scaffold emits ten workflows. The two-digit prefix puts them in the order work moves from a
+pull request to production.
+
+```text
+.github/workflows/01-quality-gates.yml
+.github/workflows/02-docs-review.yml
+.github/workflows/03-e2e.yml
+.github/workflows/04-security.yml
+.github/workflows/05-release.yml
+.github/workflows/06-scorecard.yml
+.github/workflows/50-promote-to-staging.yml
+.github/workflows/60-deploy-staging.yml
+.github/workflows/80-promote-to-production.yml
+.github/workflows/90-deploy-production.yml
+```
+
+Five bands group the numbers: checks in `01`-`49`, promotion into staging in `50`-`59`, the
+staging deployment in `60`-`79`, promotion into production in `80`-`89`, and the production
+deployment in `90`-`99`. The free numbers inside a band leave room for the next file.
+`80-promote-to-production.yml` is the single human gate. It runs only on `workflow_dispatch` and
+stops unless the operator types `PROMOTE`.
+
+### Assess
+
+Before Plan, apply the assessment rules in `references/workflow_pipeline.md` to every
+`SCAFFOLD-PLACEHOLDER` in the target repository's workflows. Replace the placeholder wherever the
+target makes the command derivable. Report every placeholder that stays in the final summary.
+The validator warns once per file that still carries one, and never fails on it.
 
 ## Six forcing questions before this scaffold is considered done
 

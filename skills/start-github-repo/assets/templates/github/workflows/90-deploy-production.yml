@@ -1,0 +1,33 @@
+name: Deploy Production
+
+# The production deployment. It runs after the promotion lands on the default
+# branch. The concrete command depends on the target repository, so it ships as
+# a placeholder the skill fills in.
+on:
+  push:
+    branches: [{{DEFAULT_BRANCH}}]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+      - uses: actions/setup-node@v4 # SCAFFOLD-PIN-SHA
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: {{PACKAGE_MANAGER}} install --frozen-lockfile
+      - name: Deploy the application to the production environment
+        # SCAFFOLD-PLACEHOLDER: deploy-production
+        # Replace this step with the deploy command for this repository. A
+        # deployment that needs credentials also needs them declared as secrets.
+        run: |
+          echo "No deploy command is configured for this repository yet."

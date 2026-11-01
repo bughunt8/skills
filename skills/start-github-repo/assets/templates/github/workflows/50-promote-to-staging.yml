@@ -1,0 +1,43 @@
+name: Promote to Staging
+
+# Promotion into the staging environment. The verification job is the gate: the
+# promotion step does not run unless lint, typecheck and the test suite are green.
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: promote-staging-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+      - uses: actions/setup-node@v4 # SCAFFOLD-PIN-SHA
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: "{{PACKAGE_MANAGER}} install --frozen-lockfile"
+      - name: Lint
+        run: "{{LINT_COMMAND}}"
+      - name: Typecheck
+        run: "{{PACKAGE_MANAGER}} exec tsc --noEmit"
+      - name: Test
+        run: "{{TEST_COMMAND}}"
+
+  promote:
+    needs: [verify]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Promote the verified build into the staging environment
+        # SCAFFOLD-PLACEHOLDER: promote-to-staging
+        # Replace this step with the promotion command for this repository. A
+        # promotion that writes to the repository also needs contents: write.
+        run: |
+          echo "No staging promotion command is configured for this repository yet."

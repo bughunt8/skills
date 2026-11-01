@@ -63,6 +63,7 @@ OTHER_REQUIRED = [
 USES_RE = re.compile(r"^\s*(?:-\s*)?uses:\s*([^\s#]+)", re.M)
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 SCAFFOLD_MARKERS = ("REPLACE-WITH-CANONICAL-TEXT", "SCAFFOLD-PIN-SHA")
+PLACEHOLDER_MARKER = "SCAFFOLD-PLACEHOLDER"
 
 
 def extract_regex_literals(text: str) -> list[str]:
@@ -250,6 +251,11 @@ def check_workflows(root: pathlib.Path, rep: Report) -> None:
         for marker in SCAFFOLD_MARKERS:
             if marker in text and marker != "SCAFFOLD-PIN-SHA":
                 rep.error(f"{rel}: scaffold marker {marker} was never resolved")
+
+        placeholders = sum(1 for line in text.splitlines() if PLACEHOLDER_MARKER in line)
+        if placeholders:
+            rep.warn(f"{rel}: {placeholders} step(s) still await a real command - replace the "
+                     "SCAFFOLD-PLACEHOLDER step before this workflow deploys anything")
 
 
 def check_env(root: pathlib.Path, rep: Report) -> None:
@@ -654,7 +660,7 @@ def self_test() -> int:
         good = ("name: CI\non:\n  pull_request:\npermissions:\n  contents: read\n"
                 "concurrency:\n  group: ci\njobs:\n  a:\n    steps:\n"
                 "      - uses: actions/checkout@" + "a" * 40 + "\n")
-        (root / ".github" / "workflows" / "ci.yml").write_text(good, encoding="utf-8")
+        (root / ".github" / "workflows" / "01-quality-gates.yml").write_text(good, encoding="utf-8")
 
         def write_agentic_fixture() -> None:
             (root / "config").mkdir()
@@ -706,6 +712,24 @@ def self_test() -> int:
         rep = validate(root, "public")
         if rep.errors:
             failures.append(f"clean sample should pass, got: {rep.errors}")
+
+        # a scaffold placeholder warns and never errors
+        placeholder_path = root / ".github" / "workflows" / "deploy.yml"
+        placeholder_workflow = good + (
+            "  b:\n    steps:\n      - name: Deploy\n"
+            "        # SCAFFOLD-PLACEHOLDER: deploy\n"
+            "        run: echo pending\n")
+        placeholder_path.write_text(placeholder_workflow, encoding="utf-8")
+        placeholder_report = validate(root, "public")
+        if placeholder_report.errors:
+            failures.append(
+                f"a SCAFFOLD-PLACEHOLDER must not error, got: {placeholder_report.errors}")
+        placeholder_warnings = [w for w in placeholder_report.warnings
+                                if "SCAFFOLD-PLACEHOLDER" in w]
+        if len(placeholder_warnings) != 1 or "1 step(s)" not in placeholder_warnings[0]:
+            failures.append(
+                f"expected one placeholder warning, got: {placeholder_warnings}")
+        placeholder_path.unlink()
 
         trigger_path = root / "config" / "hitl_triggers.json"
         trigger_data = json.loads(trigger_path.read_text(encoding="utf-8"))
@@ -836,7 +860,7 @@ def self_test() -> int:
                 "name: Bug\nbody: []\n", encoding="utf-8")
             (no_hitl_root / ".gitignore").write_text(".env\n.env.*\n!.env.example\n", encoding="utf-8")
             (no_hitl_root / ".env.example").write_text("A=\n", encoding="utf-8")
-            (no_hitl_root / ".github" / "workflows" / "ci.yml").write_text(good, encoding="utf-8")
+            (no_hitl_root / ".github" / "workflows" / "01-quality-gates.yml").write_text(good, encoding="utf-8")
             (no_hitl_root / "config").mkdir()
             (no_hitl_root / "config" / "persona.json").write_text("{}\n", encoding="utf-8")
             no_hitl_rep = validate(no_hitl_root, "public")
@@ -879,13 +903,13 @@ def self_test() -> int:
             failures.append("failed to catch an unknown evaluation trigger")
 
         # unpinned action
-        (root / ".github" / "workflows" / "ci.yml").write_text(
+        (root / ".github" / "workflows" / "01-quality-gates.yml").write_text(
             good.replace("a" * 40, "v4"), encoding="utf-8")
         if not any("mutable reference" in e for e in validate(root, "public").errors):
             failures.append("failed to catch an unpinned action")
 
         # missing permissions
-        (root / ".github" / "workflows" / "ci.yml").write_text(
+        (root / ".github" / "workflows" / "01-quality-gates.yml").write_text(
             good.replace("permissions:\n  contents: read\n", ""), encoding="utf-8")
         if not any("permissions" in e for e in validate(root, "public").errors):
             failures.append("failed to catch a workflow without permissions")
@@ -893,11 +917,11 @@ def self_test() -> int:
         # pull_request_target + head checkout
         danger = good + ("  b:\n    steps:\n      - uses: actions/checkout@" + "b" * 40 +
                          "\n        with:\n          ref: ${{ github.event.pull_request.head.sha }}\n")
-        (root / ".github" / "workflows" / "ci.yml").write_text(
+        (root / ".github" / "workflows" / "01-quality-gates.yml").write_text(
             danger.replace("pull_request:", "pull_request_target:"), encoding="utf-8")
         if not any("pull_request_target" in e for e in validate(root, "public").errors):
             failures.append("failed to catch pull_request_target with a head checkout")
-        (root / ".github" / "workflows" / "ci.yml").write_text(good, encoding="utf-8")
+        (root / ".github" / "workflows" / "01-quality-gates.yml").write_text(good, encoding="utf-8")
 
         # env negation missing
         (root / ".gitignore").write_text(".env\n.env.*\n", encoding="utf-8")
