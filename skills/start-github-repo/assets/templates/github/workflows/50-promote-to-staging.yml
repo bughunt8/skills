@@ -1,0 +1,89 @@
+name: Promote to Staging
+
+# Promotion into the staging environment. The verify job is the gate, and the
+# deploy job runs inside this file, so the commit that reaches staging is the
+# commit the suite tested. Nothing here reads a moving branch tip.
+on:
+  push:
+    branches: [{{DEFAULT_BRANCH}}]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: promote-staging-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      # A manual dispatch can name any ref, and a ref that is not the default
+      # branch never passed the repository ruleset. The comparison is on the
+      # whole ref, because a tag named after the default branch carries the same
+      # short name.
+      - name: Refuse a promotion that did not start on the default branch
+        env:
+          REF: ${{ github.ref }}
+          DEFAULT_REF: "refs/heads/{{DEFAULT_BRANCH}}"
+        run: |
+          if [ "$REF" != "$DEFAULT_REF" ]; then
+            echo "The staging promotion starts from the default branch."
+            exit 1
+          fi
+
+  verify:
+    needs: [guard]
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4 # SCAFFOLD-PIN-SHA
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: "{{PACKAGE_MANAGER}} install --frozen-lockfile"
+      - name: Lint
+        run: "{{LINT_COMMAND}}"
+      - name: Typecheck
+        run: "{{PACKAGE_MANAGER}} exec tsc --noEmit"
+      - name: Test
+        run: "{{TEST_COMMAND}}"
+      - name: Record the verified commit
+        id: commit
+        run: echo "sha=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: [verify]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # move the staging branch to the verified commit
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+        with:
+          ref: ${{ needs.verify.outputs.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4 # SCAFFOLD-PIN-SHA
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: "{{PACKAGE_MANAGER}} install --frozen-lockfile"
+      # The staging branch records what is live in staging. A push that is not a
+      # fast-forward is refused by the server, which is the point: a staging
+      # branch that diverged is reconciled by hand, not overwritten here. The
+      # first promotion creates the branch.
+      - name: Move the staging branch to the verified commit
+        run: git push origin "${{ needs.verify.outputs.sha }}:staging"
+      - name: Promote the verified commit to the staging environment
+        # SCAFFOLD-PLACEHOLDER: promote-to-staging
+        # Replace this step with the promotion command for this repository. The
+        # command must select the staging environment itself, and the secrets it
+        # needs must be declared. The commit is already checked out, so the
+        # command deploys the verified one.
+        run: |
+          echo "No staging promotion command is configured for this repository yet."

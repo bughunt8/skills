@@ -101,12 +101,16 @@
     { "template": "github/dependabot.yml",                     "dest": ".github/dependabot.yml",                     "group": "github" },
     { "template": "github/AGENTS.md.tmpl",                     "dest": ".github/AGENTS.md",                          "group": "github" },
 
-    { "template": "github/workflows/ci.yml",           "dest": ".github/workflows/ci.yml",           "group": "workflows" },
-    { "template": "github/workflows/docs-check.yml",   "dest": ".github/workflows/docs-check.yml",   "group": "workflows" },
-    { "template": "github/workflows/security.yml",     "dest": ".github/workflows/security.yml",     "group": "workflows" },
-    { "template": "github/workflows/release.yml",      "dest": ".github/workflows/release.yml",      "group": "workflows", "when": "release_tooling == changesets" },
-    { "template": "github/workflows/scorecard.yml",    "dest": ".github/workflows/scorecard.yml",    "group": "workflows", "when": "visibility == public" },
-    { "template": "github/workflows/e2e.yml",          "dest": ".github/workflows/e2e.yml",          "group": "workflows", "when": "profile.ui" },
+    { "template": "github/workflows/01-quality-gates.yml",        "dest": ".github/workflows/01-quality-gates.yml",        "group": "workflows" },
+    { "template": "github/workflows/02-docs-review.yml",          "dest": ".github/workflows/02-docs-review.yml",          "group": "workflows" },
+    { "template": "github/workflows/03-e2e.yml",                  "dest": ".github/workflows/03-e2e.yml",                  "group": "workflows", "when": "profile.ui" },
+    { "template": "github/workflows/04-security.yml",             "dest": ".github/workflows/04-security.yml",             "group": "workflows" },
+    { "template": "github/workflows/05-release.yml",              "dest": ".github/workflows/05-release.yml",              "group": "workflows", "when": "release_tooling == changesets" },
+    { "template": "github/workflows/06-scorecard.yml",            "dest": ".github/workflows/06-scorecard.yml",            "group": "workflows", "when": "visibility == public" },
+    { "template": "github/workflows/50-promote-to-staging.yml",   "dest": ".github/workflows/50-promote-to-staging.yml",   "group": "workflows" },
+    { "template": "github/workflows/60-staging-checks.yml",    "dest": ".github/workflows/60-staging-checks.yml",    "group": "workflows" },
+    { "template": "github/workflows/80-promote-to-production.yml","dest": ".github/workflows/80-promote-to-production.yml","group": "workflows" },
+    { "template": "github/workflows/90-deploy-production.yml",    "dest": ".github/workflows/90-deploy-production.yml",    "group": "workflows" },
 
     { "template": "scripts/bootstrap",   "dest": "scripts/bootstrap",   "group": "scripts", "mode": "0755" },
     { "template": "scripts/setup",       "dest": "scripts/setup",       "group": "scripts", "mode": "0755" },
@@ -149,7 +153,7 @@
   ],
 
   "manual_settings": [
-    "Create a repository ruleset on the default branch: require a PR, require status checks, require linear history, block force pushes.",
+    "Create a repository ruleset on the default branch: require a PR, require the check status check published by 01-quality-gates.yml, require linear history, block force pushes.",
     "Enable Dependabot alerts and security updates.",
     "Enable secret scanning and push protection (repository-level push protection is OFF by default).",
     "Enable private vulnerability reporting (public repositories only).",

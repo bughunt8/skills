@@ -1,8 +1,8 @@
 # start-github-repo
 
 Renders a repository skeleton with a document spine, community files and workflows for TypeScript/Node and Cloudflare Workers projects, plus agent runtime contracts for the `agent-service` profile.
-It bundles 73 templates. A default `worker-service` scaffold plans 52 files, and
-`agent-service` plans 67 files.
+It bundles 77 templates. A default `worker-service` scaffold plans 56 files, and
+`agent-service` plans 71 files.
 
 Templates are **bundled**. There is no network fetch at scaffold time and no dependency on an
 external template catalog.
@@ -15,15 +15,54 @@ external template catalog.
 | Root | `README.md`, `AGENTS.md`, `CLAUDE.md`, `CHANGELOG.md`, `.gitignore`, `.gitattributes`, `.editorconfig`, `.nvmrc`, `.env.example`, `.dev.vars.example` |
 | Community health | `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`, `LICENSE`, `NOTICE` |
 | GitHub | three YAML issue forms + `config.yml`, PR template, `CODEOWNERS`, `dependabot.yml`, scoped `.github/AGENTS.md` |
-| Workflows | `ci`, `docs-check`, `security`, `release`, `scorecard`, `e2e`, with least-privilege permissions, concurrency and SHA-pin markers |
+| Workflows | `01-quality-gates`, `02-docs-review`, `03-e2e`, `04-security`, `05-release`, `06-scorecard`, `50-promote-to-staging`, `60-staging-checks`, `80-promote-to-production`, `90-deploy-production`, with least-privilege permissions, concurrency, SHA-pin markers and placeholder steps for the promotion and deployment commands |
 | Scripts | `bootstrap`, `setup`, `update`, `server`, `test`, `cibuild`, `console`, `check-docs` |
 | Toolchain | `vitest.config.ts`, `playwright.config.ts`, `wrangler.jsonc`, `.changeset/config.json` |
 | Agent runtime and human-in-the-loop (`agentic-stack`) | `config/persona.json`, `config/hitl_triggers.json`, `config/system_prompt.md`, `config/vector_store.yaml`, `config/tools.json`, `db/migrations/0001_create_agent_sessions.sql`, `db/migrations/0002_create_hitl_records.sql`, `src/agent/state.ts`, `src/agent/router.ts`, `src/agent/endpoints.ts`, `src/agent/ui_contracts.ts`, `src/agent/agentic_stack.test.ts`, `src/safety/filters.ts`, `tests/eval_dataset.json`, `docs/architecture/hitl-protocol.md` |
 
+## The numbered pipeline
+
+The ten workflow templates carry a two-digit number. Sorted by name, they read in the order work
+moves from a pull request to production. Three of the ten are conditional, so a default scaffold
+emits nine. Five bands group the numbers:
+
+| Band | Numbers | Files |
+|---|---|---|
+| Checks | `01`-`49` | `01-quality-gates.yml`, `02-docs-review.yml`, `03-e2e.yml`, `04-security.yml`, `05-release.yml`, `06-scorecard.yml`; `07`-`49` stays free for more checks |
+| Staging promotion | `50`-`59` | `50-promote-to-staging.yml`; `51`-`59` stays free |
+| Staging actions | `60`-`79` | `60-staging-checks.yml`; `61`-`79` stays free for the other work a staging environment needs |
+| Production promotion | `80`-`89` | `80-promote-to-production.yml`; `81`-`89` stays free |
+| Production deployment | `90`-`99` | `90-deploy-production.yml`; `91`-`99` stays free |
+
+Inside one workflow, `needs:` gates one job on another. Across workflows, `workflow_run` gates the
+staging checks and the production deployment on the promotion that precedes them, and the
+repository ruleset gates a pull request: it must require the `check` job from
+`01-quality-gates.yml` before a merge. `80-promote-to-production.yml` is the workflow a person
+starts for a production deployment. It runs on `workflow_dispatch` alone and refuses anything but
+the exact string `PROMOTE`, and `03-e2e.yml`, `05-release.yml` and `50-promote-to-staging.yml`
+also accept a manual dispatch. The production deployment sits behind the `production` environment,
+so its reviewers approve it, and `05-release.yml` declares the same environment.
+
+The commit that ships is the commit that was verified. `50` checks out the pushed SHA and deploys
+that SHA, `60` checks out the SHA the promotion ran on, `80` promotes the staging commit it tested
+rather than merging it, and `90` deploys the head commit of the promotion run. The production
+promotion is dispatched from the branch that holds the commit to promote and refuses to run when
+that branch is not the current staging head, so the promoted commit is fixed at dispatch time. It
+waits for a successful staging deployment of that commit and for the staging checks to publish a
+passing result on it before it moves the default branch. The staging promotion itself refuses a
+dispatch that did not start on the default branch.
+
+`50-promote-to-staging.yml`, `60-staging-checks.yml` and `90-deploy-production.yml` ship with a
+`SCAFFOLD-PLACEHOLDER` step. The validator warns once per file instead of failing, because a fresh
+scaffold cannot know the deploy command. The skill's Assess step fills each placeholder from the
+target's own environment-specific script or from its wrangler config, and a command that cannot
+name its environment stays a placeholder. `references/workflow_pipeline.md` holds the assessment
+rules and the procedure for adding a workflow to a reserved band.
+
 ## Usage
 
 ```
-/start-github-repo              # interview, plan, confirm, scaffold, validate
+/start-github-repo              # interview, plan, confirm, scaffold, assess, validate
 /start-github-repo plan         # dry run, writes nothing
 /start-github-repo docs         # add only the document spine to an existing repo
 /start-github-repo audit        # report missing or stale artifacts
@@ -34,7 +73,7 @@ The `agent-service` profile scaffolds contracts and helper code for an agent app
 Cloudflare Worker with a human-in-the-loop gate. The application must implement agent execution,
 HTTP serving and session management.
 
-## Three design decisions worth knowing
+## Three design decisions
 
 **1. Versions live in a data file.** Every pinned spec and package version lives in
 `assets/versions.json` with a `checked_at` field. `SKILL.md` and `references/` never hardcode one.
@@ -127,7 +166,8 @@ skills/start-github-repo/
 │   ├── github_platform.md
 │   ├── release_and_versioning.md
 │   ├── repo_hygiene_and_scripts.md
-│   └── traceability_scheme.md
+│   ├── traceability_scheme.md
+│   └── workflow_pipeline.md
 └── scripts/
     ├── scaffold.py
     ├── traceability.py

@@ -94,7 +94,7 @@ Sources: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) 
 | No `[NEEDS CLARIFICATION: …]` markers remain | An unresolved spec is being shipped |
 | No unfilled `TODO`/`<!-- TODO -->` placeholders in generated docs | Scaffold output was never completed |
 
-Wire it into `docs-check.yml` so a PR that breaks the chain fails before review.
+Wire it into `02-docs-review.yml` so a PR that breaks the chain fails before review.
 
 `scripts/traceability.py` is the complementary direction: it scans PRD IDs, `describe()` names in
 tests, and commit scopes, then reports **orphans both ways** — requirements with no test, and tests

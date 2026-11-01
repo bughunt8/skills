@@ -401,6 +401,126 @@ def self_test() -> int:
     if dupes:
         failures.append(f"two templates target the same destination: {sorted(dupes)}")
 
+    # A workflow_run dependency names a workflow by its display name, not by its
+    # file path. Every dependency must name a workflow that ships.
+    workflow_dir = TEMPLATES / "github" / "workflows"
+    workflow_names = {}
+    for path in sorted(workflow_dir.glob("*.yml")):
+        found = re.search(r"^name:\s*(.+)$", path.read_text(encoding="utf-8"), re.M)
+        if found:
+            workflow_names[found.group(1).strip().strip("\"'")] = path.name
+    workflow_run_dependencies = 0
+    for path in sorted(workflow_dir.glob("*.yml")):
+        text = path.read_text(encoding="utf-8")
+        for found in re.finditer(r"workflows:\s*\[([^\]]*)\]", text):
+            for entry in found.group(1).split(","):
+                dependency = entry.strip().strip("\"'")
+                if not dependency:
+                    continue
+                workflow_run_dependencies += 1
+                if dependency not in workflow_names:
+                    failures.append(
+                        f"{path.name}: workflow_run depends on {dependency!r}, which no workflow "
+                        "declares as its name")
+    if workflow_run_dependencies == 0:
+        failures.append(
+            "no workflow_run dependency was found, so the dependency name check proved nothing")
+
+    # The pipeline has to carry the commit that was verified. A branch can move
+    # under a running job, so each template has to contain the literal that
+    # binds it to one commit.
+    expected_literals = {
+        "50-promote-to-staging.yml": (
+            "sha: ${{ steps.commit.outputs.sha }}",
+            "ref: ${{ github.sha }}",
+            "ref: ${{ needs.verify.outputs.sha }}",
+            'git push origin "${{ needs.verify.outputs.sha }}:staging"',
+            "REF: ${{ github.ref }}",
+            'DEFAULT_REF: "refs/heads/{{DEFAULT_BRANCH}}"',
+            "needs: [guard]",
+        ),
+        "60-staging-checks.yml": (
+            "ref: ${{ github.event.workflow_run.head_sha }}",
+            "statuses: write",
+            "GH_REPO: ${{ github.repository }}",
+            "CONTEXT: staging-checks-${{ github.event.workflow_run.id }}-${{ github.event.workflow_run.run_attempt }}-${{ github.run_id }}-${{ github.run_attempt }}",
+            "run-name: >-",
+            "Staging checks promotion-${{ github.event.workflow_run.id }}-${{ github.event.workflow_run.run_attempt }}",
+            "state=pending",
+            '-f state="$state"',
+            "configured=false",
+            "if: always()",
+        ),
+        "80-promote-to-production.yml": (
+            "sha: ${{ steps.candidate.outputs.sha }}",
+            "DISPATCH_SHA: ${{ github.sha }}",
+            "git rev-parse refs/remotes/origin/staging",
+            "ref: ${{ needs.candidate.outputs.sha }}",
+            "staging-gate",
+            'git push origin "$CANDIDATE:{{DEFAULT_BRANCH}}"',
+            "GH_REPO: ${{ github.repository }}",
+            "--workflow 50-promote-to-staging.yml",
+            'select(.context == \\"staging-checks-$promotion-$promotion_attempt-$check_run-$check_attempt\\")',
+            'contains(\\"promotion-$promotion-$promotion_attempt\\")',
+            '--field commit="$CANDIDATE"',
+            '--field correlation="$nonce"',
+            'select(.displayTitle == \\"Release $nonce\\")',
+            "summary=$(gh api",
+            "current_attempt=${summary%% *}",
+            "conclusion=${summary##* }",
+            "The staging checks were rerun while the promotion waited.",
+        ),
+        "90-deploy-production.yml": (
+            "ref: ${{ github.event.workflow_run.head_sha }}",
+            "environment: production",
+        ),
+        "05-release.yml": (
+            "ref: ${{ inputs.commit || github.sha }}",
+            "run-name:",
+            "correlation:",
+        ),
+    }
+    for name, literals in expected_literals.items():
+        path = workflow_dir / name
+        if not path.exists():
+            failures.append(f"{name}: the pipeline depends on this template and it is missing")
+            continue
+        text = path.read_text(encoding="utf-8")
+        for literal in literals:
+            start = 0
+            found = False
+            while True:
+                index = text.find(literal, start)
+                if index < 0:
+                    break
+                after = text[index + len(literal): index + len(literal) + 1]
+                if not after or after in " \t\n\r\"'),]}":
+                    found = True
+                    break
+                start = index + 1
+            if not found:
+                failures.append(
+                    f"{name}: expected {literal!r} as a whole value so the pipeline carries "
+                    "one immutable commit")
+
+    exact_lines = {
+        "50-promote-to-staging.yml": ("needs: [guard]",),
+        "80-promote-to-production.yml": ("needs: [guard, candidate, staging-gate, verify]",),
+    }
+    for name, lines in exact_lines.items():
+        path = workflow_dir / name
+        if not path.exists():
+            continue
+        present = {line.strip() for line in path.read_text(encoding="utf-8").splitlines()}
+        for line in lines:
+            if line not in present:
+                failures.append(f"{name}: expected the line {line!r}")
+
+    for path in sorted(workflow_dir.glob("*.yml")):
+        if "git merge" in path.read_text(encoding="utf-8"):
+            failures.append(
+                f"{path.name}: merges a branch, which creates a commit that was never verified")
+
     tmp = pathlib.Path(tempfile.mkdtemp())
     try:
         written, refused = write_all(entries, state, tmp, force=False)

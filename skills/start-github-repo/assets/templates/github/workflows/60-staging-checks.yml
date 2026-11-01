@@ -1,0 +1,87 @@
+name: Staging checks
+
+# The other testing that happens at staging, after the code is live there. It
+# runs only when the promotion succeeded, and it checks out the commit that
+# promotion deployed.
+on:
+  workflow_run:
+    workflows: ["Promote to Staging"]
+    types: [completed]
+
+# The name carries the promotion this run belongs to, so the promotion into
+# production can find the checks of the attempt it is waiting for.
+run-name: >-
+  Staging checks promotion-${{ github.event.workflow_run.id }}-${{ github.event.workflow_run.run_attempt }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-checks-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  checks:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      statuses: write         # publish the result on the deployed commit
+    env:
+      CONTEXT: staging-checks-${{ github.event.workflow_run.id }}-${{ github.event.workflow_run.run_attempt }}-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      # The result is published on the commit that was deployed, under a context
+      # that names the promotion and the attempt of the check. A workflow_run
+      # consumer carries the default branch commit in its own SHA, not the
+      # commit it checked out, so the run list cannot tell the two apart. The
+      # commit status carries the deployed commit instead, and the attempt in
+      # the context keeps an earlier attempt from answering for a later one.
+      - name: Mark the staging checks as running
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          DEPLOYED: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          gh api "repos/$GH_REPO/statuses/$DEPLOYED" --method POST \
+            -f state=pending \
+            -f context="$CONTEXT" \
+            -f description="the staging checks are running"
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: actions/setup-node@v4 # SCAFFOLD-PIN-SHA
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: "{{PACKAGE_MANAGER}} install --frozen-lockfile"
+      - name: Run the checks that follow a staging deployment
+        id: staging-check
+        # SCAFFOLD-PLACEHOLDER: staging-checks
+        # Replace this step with the checks this repository runs against its
+        # staging environment. The command must name the staging environment
+        # itself, and the secrets it needs must be declared. The replacement
+        # replaces this whole block, so the line that marks an unconfigured
+        # check does not survive it.
+        run: |
+          echo "No staging check command is configured for this repository yet."
+          echo "configured=false" >> "$GITHUB_OUTPUT"
+      - name: Report the staging checks on the deployed commit
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          DEPLOYED: ${{ github.event.workflow_run.head_sha }}
+          OUTCOME: ${{ steps.staging-check.outcome }}
+          CONFIGURED: ${{ steps.staging-check.outputs.configured }}
+        run: |
+          if [ "$OUTCOME" != "success" ]; then
+            state=failure
+          elif [ "$CONFIGURED" = "false" ]; then
+            state=error
+          else
+            state=success
+          fi
+          gh api "repos/$GH_REPO/statuses/$DEPLOYED" --method POST \
+            -f state="$state" \
+            -f context="$CONTEXT" \
+            -f description="the staging checks reported $state"

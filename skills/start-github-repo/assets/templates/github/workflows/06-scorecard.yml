@@ -8,12 +8,14 @@ on:
   push:
     branches: [{{DEFAULT_BRANCH}}]
 
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
   analysis:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       security-events: write
       id-token: write
     steps:
