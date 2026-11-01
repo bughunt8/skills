@@ -1,0 +1,254 @@
+name: Promote Staging to Main
+
+# The one manual step in the pipeline. The operator types PROMOTE, because a
+# promotion into production is not a decision the pipeline may take on its own.
+# The workflow is dispatched from the branch that holds the commit to promote.
+# The gate below refuses to run when the commit the run started from is not the
+# current staging head, so the commit this run promotes is fixed at dispatch
+# time and cannot drift while the run is in flight.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type PROMOTE to continue"
+        required: true
+        type: string
+      run_verification:
+        description: "Run the verification suite before promoting"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: promote-production
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Validate the confirmation
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          if [ "$CONFIRM" != "PROMOTE" ]; then
+            echo "Refusing to promote. Type PROMOTE to confirm."
+            exit 1
+          fi
+
+  candidate:
+    needs: [guard]
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.candidate.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+        with:
+          fetch-depth: 0
+      - name: Record the staging candidate
+        id: candidate
+        env:
+          DISPATCH_SHA: ${{ github.sha }}
+        run: |
+          git fetch --force origin '+refs/heads/staging:refs/remotes/origin/staging'
+          candidate="$(git rev-parse refs/remotes/origin/staging)"
+          if [ "$candidate" != "$DISPATCH_SHA" ]; then
+            echo "The commit this run started from is not the current staging head."
+            echo "Dispatch this workflow from the branch that holds $candidate."
+            exit 1
+          fi
+          echo "sha=$candidate" >> "$GITHUB_OUTPUT"
+
+  staging-gate:
+    needs: [candidate]
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read          # read the runs of the staging workflows
+      statuses: read         # read the result the staging checks published
+    steps:
+      # Two facts are needed, both keyed by the candidate commit. The staging
+      # promotion of that commit is the run of 50-promote-to-staging.yml for
+      # that commit, because that workflow runs on the commit it promotes. The
+      # staging checks publish their result as a commit status whose context
+      # names the promotion, the attempt of the promotion and the attempt of
+      # the check, because a workflow_run consumer carries the default branch
+      # commit rather than the commit it checked out.
+      - name: Require a successful staging deployment and checks of the candidate
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          CANDIDATE: ${{ needs.candidate.outputs.sha }}
+        run: |
+          conclusion=""
+          for _ in $(seq 1 40); do
+            conclusion=$(gh run list --workflow 50-promote-to-staging.yml --commit "$CANDIDATE" --limit 1 --json conclusion --jq '.[0].conclusion // empty')
+            if [ "$conclusion" = "success" ]; then
+              break
+            fi
+            sleep 15
+          done
+          if [ "$conclusion" != "success" ]; then
+            echo "The staging deployment of $CANDIDATE did not succeed."
+            exit 1
+          fi
+          promotion=$(gh run list --workflow 50-promote-to-staging.yml --commit "$CANDIDATE" --limit 1 --json databaseId --jq '.[0].databaseId // 0')
+          promotion_attempt=$(gh run list --workflow 50-promote-to-staging.yml --commit "$CANDIDATE" --limit 1 --json attempt --jq '.[0].attempt // 1')
+          check_run=""
+          for _ in $(seq 1 40); do
+            check_run=$(gh run list --workflow 60-staging-checks.yml --limit 20 --json displayTitle,databaseId --jq "map(select(.displayTitle | contains(\"promotion-$promotion-$promotion_attempt\"))) | .[0].databaseId // empty")
+            if [ -n "$check_run" ]; then
+              break
+            fi
+            sleep 15
+          done
+          if [ -z "$check_run" ]; then
+            echo "The staging checks for $CANDIDATE did not start."
+            exit 1
+          fi
+          check_attempt=$(gh api "repos/$GH_REPO/actions/runs/$check_run" --jq '.run_attempt')
+          state=""
+          for _ in $(seq 1 40); do
+            state=$(gh api "repos/$GH_REPO/commits/$CANDIDATE/status" --jq ".statuses[] | select(.context == \"staging-checks-$promotion-$promotion_attempt-$check_run-$check_attempt\") | .state" | head -n 1)
+            if [ "$state" = "success" ] || [ "$state" = "failure" ] || [ "$state" = "error" ]; then
+              break
+            fi
+            sleep 15
+          done
+          if [ "$state" = "failure" ] || [ "$state" = "error" ]; then
+            echo "The staging checks for $CANDIDATE reported $state."
+            exit 1
+          fi
+          if [ "$state" != "success" ]; then
+            echo "No successful staging check was published for $CANDIDATE."
+            exit 1
+          fi
+          # The checks publish their result before the workflow finishes, so the
+          # run may still be going when the result appears. Wait for it to
+          # finish, and refuse when it was rerun in the meantime, because the
+          # attempt that published the result is then no longer the one that
+          # ran. The attempt and the conclusion come from one response, because
+          # two responses can straddle a rerun and pair the result of one attempt
+          # with the outcome of another.
+          conclusion=""
+          for _ in $(seq 1 40); do
+            summary=$(gh api "repos/$GH_REPO/actions/runs/$check_run" --jq '"\(.run_attempt) \(.conclusion // "none")"')
+            current_attempt=${summary%% *}
+            conclusion=${summary##* }
+            if [ "$current_attempt" != "$check_attempt" ]; then
+              echo "The staging checks were rerun while the promotion waited."
+              exit 1
+            fi
+            if [ "$conclusion" = "success" ]; then
+              break
+            fi
+            if [ "$conclusion" = "failure" ] || [ "$conclusion" = "cancelled" ] \
+               || [ "$conclusion" = "timed_out" ] || [ "$conclusion" = "skipped" ]; then
+              echo "The staging checks for $CANDIDATE concluded $conclusion."
+              exit 1
+            fi
+            sleep 15
+          done
+          if [ "$conclusion" != "success" ]; then
+            echo "The staging checks for $CANDIDATE did not succeed."
+            exit 1
+          fi
+
+  verify:
+    needs: [candidate]
+    if: ${{ inputs.run_verification }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+        with:
+          ref: ${{ needs.candidate.outputs.sha }}
+      - uses: actions/setup-node@v4 # SCAFFOLD-PIN-SHA
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: "{{PACKAGE_MANAGER}} install --frozen-lockfile"
+      - name: Lint
+        run: "{{LINT_COMMAND}}"
+      - name: Typecheck
+        run: "{{PACKAGE_MANAGER}} exec tsc --noEmit"
+      - name: Test
+        run: "{{TEST_COMMAND}}"
+
+  promote:
+    needs: [guard, candidate, staging-gate, verify]
+    if: ${{ always() && needs.guard.result == 'success' && needs.candidate.result == 'success' && needs.staging-gate.result == 'success' && (needs.verify.result == 'success' || needs.verify.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # move the default branch to the verified candidate
+      actions: write          # start the release and read its run
+    steps:
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+        with:
+          fetch-depth: 0
+      - name: Confirm the staging branch still holds the candidate
+        env:
+          CANDIDATE: ${{ needs.candidate.outputs.sha }}
+        run: |
+          git fetch --force origin '+refs/heads/staging:refs/remotes/origin/staging'
+          current="$(git rev-parse refs/remotes/origin/staging)"
+          if [ "$current" != "$CANDIDATE" ]; then
+            echo "The staging branch moved during verification. Run the promotion again."
+            exit 1
+          fi
+      # The default branch moves to the candidate, never to a merge of it. A
+      # merge would create a commit nobody tested, and a push that is not a
+      # fast-forward is refused by the server, so a diverged default branch is
+      # reconciled by hand.
+      - name: Move the default branch to the verified candidate
+        env:
+          CANDIDATE: ${{ needs.candidate.outputs.sha }}
+        run: git push origin "$CANDIDATE:{{DEFAULT_BRANCH}}"
+      # A push made with GITHUB_TOKEN starts no new workflow run, apart from
+      # workflow_dispatch. The release therefore has to be started by hand here,
+      # and the promotion waits for it, so the production deployment never runs
+      # ahead of the publication. The dispatch carries an identifier that appears
+      # in the name of the run it starts, so the promotion waits for that run and
+      # not for another release that happened to start nearby.
+      - name: Publish the release and wait for it to finish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          CANDIDATE: ${{ needs.candidate.outputs.sha }}
+        run: |
+          lookup_err="$RUNNER_TEMP/release-lookup.err"
+          if ! gh api "repos/$GH_REPO/actions/workflows/05-release.yml" >/dev/null 2>"$lookup_err"; then
+            if grep -q "HTTP 404" "$lookup_err"; then
+              echo "This repository has no release workflow, so the promotion did not publish."
+              exit 0
+            fi
+            echo "The release workflow could not be read:"
+            cat "$lookup_err"
+            exit 1
+          fi
+          nonce="promote-$(date -u +%Y%m%dT%H%M%SZ)-$RANDOM"
+          gh workflow run 05-release.yml --ref {{DEFAULT_BRANCH}} \
+            --field commit="$CANDIDATE" --field correlation="$nonce"
+          run_id=""
+          for _ in $(seq 1 40); do
+            run_id=$(gh run list --workflow 05-release.yml --limit 20 --json displayTitle,databaseId --jq "map(select(.displayTitle == \"Release $nonce\")) | .[0].databaseId // empty")
+            if [ -n "$run_id" ]; then
+              break
+            fi
+            sleep 3
+          done
+          if [ -z "$run_id" ]; then
+            echo "The release run did not start."
+            exit 1
+          fi
+          head_sha=$(gh api "repos/$GH_REPO/actions/runs/$run_id" --jq '.head_sha')
+          if [ "$head_sha" != "$CANDIDATE" ]; then
+            echo "The release run did not start from the promoted commit."
+            exit 1
+          fi
+          if ! timeout 3600 gh run watch "$run_id" --exit-status; then
+            echo "The release did not succeed, so the promotion stops here."
+            exit 1
+          fi

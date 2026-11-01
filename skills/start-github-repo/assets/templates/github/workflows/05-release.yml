@@ -1,8 +1,28 @@
 name: Release
 
+# The promotion that dispatches this workflow passes an identifier that names
+# the run it started, so the promotion waits for that run and not for another
+# release that happened to start nearby.
+run-name: >-
+  Release ${{ inputs.correlation || github.sha }}
+
 on:
   push:
     branches: [{{DEFAULT_BRANCH}}]
+  # A promotion pushes with GITHUB_TOKEN, and a push made with that token starts
+  # no workflow run. The promotion dispatches this workflow by hand so the
+  # promoted commit still publishes. The commit input names the commit to
+  # publish, because the promotion knows it and the branch head may move.
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Commit to publish. Empty means the branch head."
+        required: false
+        type: string
+      correlation:
+        description: "Identifier the promotion uses to find this run."
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -18,12 +38,22 @@ jobs:
     permissions:
       contents: write        # create the version PR, tags and releases
       pull-requests: write   # open and update the version PR
-      id-token: write        # OIDC — prefer this over a long-lived publish token
+      id-token: write        # OIDC, which is preferred over a long-lived publish token
       attestations: write    # SLSA provenance for published artifacts
     steps:
+      - name: Accept only a commit that names a commit
+        if: ${{ inputs.commit != '' }}
+        env:
+          COMMIT: ${{ inputs.commit }}
+        run: |
+          if ! printf '%s' "$COMMIT" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "The commit input must be a full commit SHA."
+            exit 1
+          fi
       - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
         with:
           fetch-depth: 0
+          ref: ${{ inputs.commit || github.sha }}
       - uses: actions/setup-node@v4 # SCAFFOLD-PIN-SHA
         with:
           node-version-file: .nvmrc

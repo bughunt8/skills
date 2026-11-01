@@ -1,4 +1,4 @@
-name: Docs check
+name: Documentation review
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: docs-${{ github.workflow }}-${{ github.ref }}
+  group: documentation-review-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

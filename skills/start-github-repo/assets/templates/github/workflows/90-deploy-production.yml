@@ -1,0 +1,43 @@
+name: Deploy Production
+
+# The production deployment. It runs only after the promotion succeeded, and the
+# production environment gates it with its reviewers. The concrete command
+# depends on the target repository, so it ships as a placeholder the skill fills
+# in.
+on:
+  workflow_run:
+    workflows: ["Promote Staging to Main"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      # The promotion ran on the commit it moved the default branch to, so the
+      # head commit of that run is the promoted commit. Checking out the commit
+      # rather than the branch keeps the deployment bound to the commit that
+      # was verified, whatever happens to the branch afterwards.
+      - uses: actions/checkout@v4 # SCAFFOLD-PIN-SHA
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: actions/setup-node@v4 # SCAFFOLD-PIN-SHA
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: {{PACKAGE_MANAGER}} install --frozen-lockfile
+      - name: Deploy the application to the production environment
+        # SCAFFOLD-PLACEHOLDER: deploy-production
+        # Replace this step with the deploy command for this repository. The
+        # command must select the production environment itself, and the secrets
+        # it needs must be declared.
+        run: |
+          echo "No deploy command is configured for this repository yet."
