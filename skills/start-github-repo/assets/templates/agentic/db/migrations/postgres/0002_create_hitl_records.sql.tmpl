@@ -1,0 +1,18 @@
+-- Generated migration.
+-- One row records one review request with the proposed call and the human's resolution.
+CREATE TABLE hitl_records (
+  hitl_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  session_id UUID NOT NULL REFERENCES agent_sessions(session_id) ON DELETE CASCADE,
+  trigger_id VARCHAR(50) NOT NULL,
+  proposed_tool_name VARCHAR(100) NOT NULL,
+  proposed_arguments JSONB NOT NULL,
+  human_corrections JSONB,
+  resolution_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+  action_required VARCHAR(32) NOT NULL DEFAULT 'APPROVE_REJECT_MODIFY',
+  requested_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  resolved_at TIMESTAMPTZ,
+  CONSTRAINT hitl_records_resolution_check
+    CHECK (resolution_status IN ('PENDING', 'APPROVED', 'MODIFIED', 'DENIED', 'TIMEOUT')),
+  CONSTRAINT hitl_records_action_check
+    CHECK (action_required IN ('APPROVE_REJECT_MODIFY', 'MFA_CHALLENGE', 'NOTIFY_ONLY'))
+);

@@ -1,0 +1,14 @@
+vector_store_configuration:
+  dimension: 1536
+  metric: cosine
+  chunking_strategy:
+    method: recursive_character
+    chunk_size: 512
+    chunk_overlap: 64
+  metadata_fields:
+    - name: document_id
+      type: string
+    - name: user_scope_id
+      type: string
+    - name: classification_level
+      type: string

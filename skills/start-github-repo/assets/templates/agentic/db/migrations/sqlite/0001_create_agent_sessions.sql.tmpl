@@ -1,0 +1,15 @@
+-- Generated migration.
+-- JSON columns store TEXT holding JSON. The application serialises before writing and parses after reading.
+-- token_ref holds a pointer to a secret manager entry. It never holds the secret itself.
+-- The schema cannot stop a secret from being written into current_context. The application must keep secrets out of it.
+CREATE TABLE agent_sessions (
+  session_id TEXT PRIMARY KEY,
+  status TEXT NOT NULL DEFAULT 'RUNNING',
+  current_context TEXT NOT NULL DEFAULT '{}',
+  scratchpad_state TEXT,
+  token_ref TEXT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT agent_sessions_status_check
+    CHECK (status IN ('RUNNING', 'PENDING_HUMAN_APPROVAL', 'RESUMING_LOOP', 'TASK_ABORTED', 'TASK_COMPLETED'))
+);

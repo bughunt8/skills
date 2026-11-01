@@ -6,7 +6,7 @@
 //   npx @cloudflare/codemods vitest:pool-workers-to-vitest-plugin
 //
 // Tests run inside the Workers runtime, so they can assert directly against KV, R2, D1 and Durable
-// Object state. `test/tsconfig.json` must list "@cloudflare/vitest-plugin" in compilerOptions.types —
+// Object state. `test/tsconfig.json` must list "@cloudflare/vitest-plugin" in compilerOptions.types,
 // that is what defines the `cloudflare:test` module.
 
 import { defineConfig } from 'vitest/config';
@@ -21,7 +21,7 @@ export default defineConfig({
     }),
   ],
   test: {
-    include: ['test/**/*.{test,spec}.ts'],
+    include: ['test/**/*.{test,spec}.ts', 'src/**/*.{test,spec}.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],

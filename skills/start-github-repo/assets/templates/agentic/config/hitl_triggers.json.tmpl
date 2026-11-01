@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "default_timeout_seconds": 3600,
+  "triggers": [
+    {
+      "trigger_id": "TR-01",
+      "category": "FINANCIAL",
+      "description": "Any single tool call whose amount argument exceeds 500.00.",
+      "match": { "kind": "argument_threshold", "field": "amount", "op": "gt", "value": 500.0 },
+      "action_required": "APPROVE_REJECT_MODIFY",
+      "frontend_component": "TransactionApprovalModal",
+      "timeout_seconds": 3600
+    },
+    {
+      "trigger_id": "TR-02",
+      "category": "DELETION",
+      "description": "Any destructive tool call: delete_record or purge_user.",
+      "match": { "kind": "tool_name_in", "tool_names": ["delete_record", "purge_user"] },
+      "action_required": "MFA_CHALLENGE",
+      "frontend_component": "SecurityChallengePanel",
+      "timeout_seconds": 900
+    }
+  ]
+}

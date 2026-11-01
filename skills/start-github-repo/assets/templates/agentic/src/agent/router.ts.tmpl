@@ -1,0 +1,107 @@
+import { MAX_EXECUTION_LOOPS } from "./state";
+import type { AgentStateGraph, AgentStatus, RoutingNode } from "./state";
+
+export interface HitlTrigger {
+  trigger_id: string;
+  category: string;
+  description: string;
+  match: {
+    kind: "argument_threshold" | "tool_name_in" | "argument_matches";
+    field?: string;
+    op?: "gt" | "gte" | "lt" | "lte" | "eq";
+    value?: number | string;
+    tool_names?: string[];
+    pattern?: string;
+  };
+  action_required: "APPROVE_REJECT_MODIFY" | "MFA_CHALLENGE" | "NOTIFY_ONLY";
+  frontend_component: string;
+  timeout_seconds: number;
+}
+
+export function evaluateTriggers(
+  triggers: HitlTrigger[],
+  request: { proposedToolName: string; proposedArguments: Record<string, unknown> },
+): HitlTrigger[] {
+  return triggers.filter(({ match }) => {
+    switch (match.kind) {
+      case "tool_name_in":
+        return Array.isArray(match.tool_names)
+          && match.tool_names.every((name) => typeof name === "string")
+          && match.tool_names.includes(request.proposedToolName);
+      case "argument_matches": {
+        if (match.field === undefined || match.pattern === undefined) return false;
+        if (!Object.prototype.hasOwnProperty.call(request.proposedArguments, match.field)) return false;
+        const value = request.proposedArguments[match.field];
+        if (value === undefined || value === null) return false;
+        try {
+          return new RegExp(match.pattern).test(String(value));
+        } catch {
+          return false;
+        }
+      }
+      case "argument_threshold": {
+        if (typeof match.field !== "string" || match.field.length === 0
+          || typeof match.value !== "number" || !Number.isFinite(match.value)) return false;
+        const argument = request.proposedArguments[match.field];
+        if (typeof argument !== "number" && typeof argument !== "string") return false;
+        if (typeof argument === "string" && argument.trim().length === 0) return false;
+        const actual = Number(argument);
+        const expected = match.value;
+        if (!Number.isFinite(actual) || !Number.isFinite(expected)) return false;
+        switch (match.op) {
+          case "gt": return actual > expected;
+          case "gte": return actual >= expected;
+          case "lt": return actual < expected;
+          case "lte": return actual <= expected;
+          case "eq": return actual === expected;
+          default: return false;
+        }
+      }
+    }
+  });
+}
+
+export function route(
+  state: AgentStateGraph,
+  request: { proposedToolName: string; proposedArguments: Record<string, unknown> },
+  triggers: HitlTrigger[],
+): { next: RoutingNode; status: AgentStatus; reason: string; matchedTriggers: string[]; notifiedTriggers: string[] } {
+  if (state.status !== "RUNNING") {
+    throw new Error(`Cannot route session in status ${state.status}`);
+  }
+  if (state.executionLoopCount > MAX_EXECUTION_LOOPS) {
+    // Return an abort decision instead of throwing so the supervisor can end the session.
+    return {
+      next: "supervisor",
+      status: "TASK_ABORTED",
+      reason: `Execution loop budget of ${MAX_EXECUTION_LOOPS} exceeded`,
+      matchedTriggers: [],
+      notifiedTriggers: [],
+    };
+  }
+  const matches = evaluateTriggers(triggers, request);
+  const matchedTriggers = matches.map((trigger) => trigger.trigger_id);
+  const notifiedTriggers = matches
+    .filter((trigger) => trigger.action_required === "NOTIFY_ONLY")
+    .map((trigger) => trigger.trigger_id);
+  const blocking = matches.some((trigger) => trigger.action_required === "APPROVE_REJECT_MODIFY"
+    || trigger.action_required === "MFA_CHALLENGE");
+  if (blocking) {
+    return {
+      next: "supervisor",
+      status: "PENDING_HUMAN_APPROVAL",
+      reason: `Matched HITL triggers: ${matchedTriggers.join(", ")}`,
+      matchedTriggers,
+      notifiedTriggers,
+    };
+  }
+  return {
+    next: "researcher",
+    status: "RUNNING",
+    reason: notifiedTriggers.length > 0
+      ? `Notified HITL triggers: ${notifiedTriggers.join(", ")}`
+      : "No trigger matched",
+    matchedTriggers,
+    notifiedTriggers,
+  };
+}

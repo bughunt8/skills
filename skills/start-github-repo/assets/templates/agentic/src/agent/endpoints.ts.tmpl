@@ -1,0 +1,131 @@
+export type AgentRoutePath =
+  | "/api/agent/sessions"
+  | "/api/agent/sessions/:sessionId/turns"
+  | "/api/agent/sessions/:sessionId/pending-approval"
+  | "/api/agent/sessions/:sessionId/approvals/:hitlId"
+  | "/api/agent/sessions/:sessionId/mfa/:hitlId"
+  | "/api/agent/sessions/:sessionId/notify/:hitlId";
+
+export interface AgentRouteDefinition {
+  method: "POST" | "GET";
+  path: AgentRoutePath;
+  purpose: string;
+  request: Record<string, unknown>;
+  response: Record<string, unknown>;
+  guards: string[];
+}
+
+export const AGENT_ROUTES: ReadonlyArray<AgentRouteDefinition> = [
+  {
+    method: "POST",
+    path: "/api/agent/sessions",
+    purpose: "Create a session in RUNNING and return its public session id.",
+    request: { body: { type: "object", properties: {} } },
+    response: {
+      body: {
+        type: "object", required: ["sessionId", "status"],
+        properties: { sessionId: { type: "string" }, status: { const: "RUNNING" } },
+      },
+    },
+    guards: ["authenticated caller"],
+  },
+  {
+    method: "POST",
+    path: "/api/agent/sessions/:sessionId/turns",
+     purpose: "Take user input, run the router and return the next node or a pending approval. Never call a tool whose trigger matched as blocking. matchedTriggers carries notices as well as blocking matches.",
+    request: {
+      body: { type: "object", required: ["input"], properties: { input: { type: "string" } } },
+    },
+    response: {
+      body: {
+        type: "object", required: ["next", "status", "reason", "matchedTriggers", "notifiedTriggers"],
+        properties: {
+          next: { type: "string" }, status: { type: "string" }, reason: { type: "string" },
+          matchedTriggers: { type: "array", items: { type: "string" } },
+          notifiedTriggers: { type: "array", items: { type: "string" } },
+          pendingApproval: { type: ["object", "null"], description: "PendingApprovalView with secrets removed" },
+        },
+      },
+    },
+     guards: ["authenticated caller", "session ownership", "tool permission check before any call"],
+  },
+  {
+    method: "GET",
+    path: "/api/agent/sessions/:sessionId/pending-approval",
+    purpose: "Return the pending request for the approval or MFA panel with secrets removed.",
+    request: { body: { type: "null", description: "No request body" } },
+    response: {
+      body: {
+        type: "object", required: ["pendingApproval"],
+        properties: {
+          pendingApproval: { type: ["object", "null"], description: "PendingApprovalView with secrets removed" },
+        },
+      },
+    },
+    guards: ["authenticated caller", "caller is authorized for the session named in the path", "session ownership", "request has not expired (check timeoutSeconds on the pending record)", "record is the session's current pending operation"],
+  },
+  {
+    method: "POST",
+    path: "/api/agent/sessions/:sessionId/approvals/:hitlId",
+    purpose: "Accept APPROVED, MODIFIED or DENIED, validate corrected arguments against the tool parameter schema, write the audit row and advance or abort the session.",
+    request: {
+      body: {
+        type: "object", required: ["resolution"],
+        properties: {
+          resolution: { enum: ["APPROVED", "MODIFIED", "DENIED"] },
+          correctedArguments: { type: "object", description: "Required for MODIFIED; validate against the tool parameter schema" },
+        },
+      },
+    },
+    response: {
+      body: {
+        type: "object", required: ["status"],
+        properties: {
+          status: { enum: ["PENDING_HUMAN_APPROVAL", "RESUMING_LOOP", "TASK_ABORTED"] },
+          pendingHitlId: { type: "string", description: "The next blocking record when the session stays parked" },
+        },
+      },
+    },
+    guards: ["authenticated caller", "caller is authorized for the session named in the path", "hitl record belongs to the session named in the path", "action_required matches the approval endpoint", "record is still pending", "request has not expired (check timeoutSeconds on the pending record)", "record is the session's current pending operation", "update from pending to resolved is atomic", "operation runs only when no blocking record for it remains pending", "action vocabulary check", "tool parameter schema check on a correction"],
+  },
+  {
+    method: "POST",
+    path: "/api/agent/sessions/:sessionId/mfa/:hitlId",
+    purpose: "Accept the server side MFA result and map it to APPROVED, DENIED or TIMEOUT.",
+    request: {
+      body: {
+        type: "object", required: ["result"],
+        properties: { result: { type: "object", description: "MFA result verified by the server" } },
+      },
+    },
+    response: {
+      body: {
+        type: "object", required: ["resolution", "status"],
+        properties: {
+          resolution: { enum: ["APPROVED", "DENIED", "TIMEOUT"] },
+          status: { enum: ["PENDING_HUMAN_APPROVAL", "RESUMING_LOOP", "TASK_ABORTED"] },
+          pendingHitlId: { type: "string", description: "The next blocking record when the session stays parked" },
+        },
+      },
+    },
+     guards: ["authenticated caller", "caller is authorized for the session named in the path", "hitl record belongs to the session named in the path", "action_required matches the MFA endpoint", "record is still pending", "request has not expired (check timeoutSeconds on the pending record)", "record is the session's current pending operation", "MFA challenge result came from the server, not the browser", "MFA challenge is bound to this caller, this sessionId, this hitlId and this proposed operation", "update from pending to resolved is atomic", "operation runs only when no blocking record for it remains pending"],
+  },
+  {
+    method: "POST",
+    path: "/api/agent/sessions/:sessionId/notify/:hitlId",
+    purpose: "Record a NOTIFY_ONLY request without parking the session.",
+    request: {
+      body: {
+        type: "object", required: ["triggerId"],
+        properties: { triggerId: { type: "string" } },
+      },
+    },
+    response: {
+      body: {
+        type: "object", required: ["hitlId", "status"],
+        properties: { hitlId: { type: "string" }, status: { const: "RUNNING" } },
+      },
+    },
+    guards: ["authenticated caller", "session ownership"],
+  },
+];

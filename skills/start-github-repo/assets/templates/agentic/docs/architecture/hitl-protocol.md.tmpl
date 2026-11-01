@@ -1,0 +1,140 @@
+# Handle a request for human approval
+
+Review the proposed tool name and arguments before you approve a parked session.
+Check the trigger description and the time left to respond. Approve only the
+operation you intend to allow. Reject an unwanted operation. If the request
+allows edits, correct its arguments before you submit it.
+
+A session is one task the agent is trying to finish. A tool call is an operation
+the agent proposes, such as deleting a record. Human-in-the-loop approval pauses
+that call until you resolve the request. The agent must not execute the call,
+retry it, or bypass the approval while it waits.
+
+## Choose the requested action
+
+`action_required` tells the interface what to ask you to do.
+`resolution_status` records the outcome of that request. A new request starts
+with resolution `PENDING`.
+
+| `action_required` | What you see and do | Final resolutions |
+| --- | --- | --- |
+| `APPROVE_REJECT_MODIFY` | An approval form shows the tool and proposed arguments. Approve them, submit corrected arguments, or reject the call. The default financial trigger names `TransactionApprovalModal`. | `APPROVED`, `MODIFIED`, `DENIED` |
+| `MFA_CHALLENGE` | A security panel asks you to complete multifactor authentication before approval. Reject the request if you do not authorize it. The default deletion trigger names `SecurityChallengePanel`. | `APPROVED`, `DENIED`, `TIMEOUT` |
+| `NOTIFY_ONLY` | An informational notice shows the matched trigger and proposed call. No approval or correction is required. | No blocking resolution. It never releases a session from `PENDING_HUMAN_APPROVAL`. |
+
+`NOTIFY_ONLY` never blocks execution. It must not create an approval wait of its
+own or release a wait caused by another trigger. A blocking match parks the
+session in `PENDING_HUMAN_APPROVAL`. A `NOTIFY_ONLY` match leaves the session
+running on `researcher`, and the application raises the notice. The scaffold
+supplies component names and routing decisions. The application must provide the
+interface and connect human responses to the session.
+
+## Correct arguments and handle timeouts
+
+For `MODIFIED`, the application re-validates your corrected arguments against
+the tool's parameter schema before it runs the corrected call. If validation
+fails, it rejects the correction and does not execute it. Fix the reported
+fields and submit a valid correction before the session can resume.
+
+Each trigger sets `timeout_seconds`. The configuration's default timeout is
+3600 seconds. The supplied financial trigger allows 3600 seconds and the
+deletion challenge allows 900 seconds.
+
+A `TIMEOUT` resolution emits `HITL_TIMEOUT` and ends the session as
+`TASK_ABORTED`. It never approves the call. `DENIED` emits `HUMAN_REJECTED` and
+also aborts the session. A notice alone requires no response and cannot time out
+an approval wait of its own.
+
+## Read the session status
+
+| State | What it means for you |
+| --- | --- |
+| `RUNNING` | The agent is working on the task. |
+| `PENDING_HUMAN_APPROVAL` | The supervisor has a matched trigger to handle. A blocking request waits for your response. |
+| `RESUMING_LOOP` | The application accepted approval or valid corrections and is preparing to continue. |
+| `TASK_ABORTED` | The task ended without completion. This is a terminal state. |
+| `TASK_COMPLETED` | The task finished. This is a terminal state. |
+
+The state machine accepts these transitions. Any other state and event pair
+raises an error. Terminal states have no outgoing transitions.
+
+| From | Event | To |
+| --- | --- | --- |
+| `RUNNING` | `HITL_TRIGGERED` | `PENDING_HUMAN_APPROVAL` |
+| `RUNNING` | `TASK_DONE` | `TASK_COMPLETED` |
+| `RUNNING` | `TASK_FAILED` | `TASK_ABORTED` |
+| `PENDING_HUMAN_APPROVAL` | `HUMAN_APPROVED` | `RESUMING_LOOP` |
+| `PENDING_HUMAN_APPROVAL` | `HUMAN_MODIFIED` | `RESUMING_LOOP` |
+| `PENDING_HUMAN_APPROVAL` | `HUMAN_REJECTED` | `TASK_ABORTED` |
+| `PENDING_HUMAN_APPROVAL` | `HITL_TIMEOUT` | `TASK_ABORTED` |
+| `RESUMING_LOOP` | `LOOP_RESUMED` | `RUNNING` |
+| `RESUMING_LOOP` | `TASK_DONE` | `TASK_COMPLETED` |
+| `RESUMING_LOOP` | `TASK_FAILED` | `TASK_ABORTED` |
+
+`APPROVED` maps to `HUMAN_APPROVED`. A valid `MODIFIED` correction maps to
+`HUMAN_MODIFIED`. A notice emits neither event to release a pending request.
+
+## Find the audit trail
+
+The database table `hitl_records` holds one row per request. Use `session_id`
+to find requests for a session and `hitl_id` to identify one request.
+Each row records `trigger_id`, `action_required`, `proposed_tool_name`,
+`proposed_arguments`, any `human_corrections`, and `resolution_status`.
+`requested_at` and `resolved_at` show when the request opened and ended.
+Compare the proposed arguments with the corrections to see what the human
+changed. A notice row has `action_required` set to `NOTIFY_ONLY` and
+`resolution_status` set to `PENDING`; it is not an outstanding approval. An
+outstanding approval has `action_required` set to `APPROVE_REJECT_MODIFY` or
+`MFA_CHALLENGE`. Read the session's current status in `agent_sessions`.
+
+## Add a trigger
+
+Edit `config/hitl_triggers.json`. Give each trigger a unique `trigger_id`, a
+category, a description, a `match`, an `action_required`, a
+`frontend_component`, and `timeout_seconds`. Connect the named component to the
+application before you use a blocking trigger.
+
+Choose the match kind that fits the operation. These worked examples show the
+`match` object to put inside a trigger and the request that matches it.
+
+| Match kind | Example `match` object | Matching request |
+| --- | --- | --- |
+| `argument_threshold` | `{"kind":"argument_threshold","field":"amount","op":"gt","value":500.0}` | Arguments `{"amount":600}` match. `{"amount":500}` does not. Use `APPROVE_REJECT_MODIFY` to review the amount. |
+| `tool_name_in` | `{"kind":"tool_name_in","tool_names":["delete_record","purge_user"]}` | A proposed tool named `delete_record` matches. Use `MFA_CHALLENGE` to require authentication. |
+| `argument_matches` | `{"kind":"argument_matches","field":"environment","pattern":"^production$"}` | Arguments `{"environment":"production"}` match. `{"environment":"staging"}` does not. Use `APPROVE_REJECT_MODIFY` to review production operations. |
+
+`argument_threshold` compares the named argument numerically. Its operators
+are `gt`, `gte`, `lt`, `lte`, and `eq`. `tool_name_in` checks the proposed tool
+name against the list. `argument_matches` applies the pattern to the string
+form of the named argument. The router returns every matching trigger, so test
+a matching request and a nonmatching request for each rule you add.
+
+## Multiple blocking matches
+
+A single operation can match more than one blocking trigger. A `delete_record`
+call with `amount: 600` matches both the default financial trigger and the
+default deletion trigger, so two blocking requirements exist.
+
+The application creates one HITL record per blocking match. The session parks
+on the first record it created. When the human resolves that record, the
+application checks the remaining records for the same operation. If any is
+still pending, the session parks on the next one. The operation runs only when
+no blocking record for it remains pending.
+
+The resolution endpoints resume the session only when no other blocking record
+for that operation is pending. The update that moves a record from pending to
+resolved is atomic. Two concurrent requests must not both consume the same
+approval.
+
+## Router precondition
+
+`route()` refuses a session that is not `RUNNING`. Before the application
+routes resumed work, it applies `LOOP_RESUMED` to move the session back to
+`RUNNING`.
+
+## Caller authorization
+
+The caller must be authorized for the session before a resolution is accepted.
+An authenticated caller with no access to the named session must be refused.
+Record and session consistency (the hitl record belonging to the session in the
+path) does not establish this. Check it separately.

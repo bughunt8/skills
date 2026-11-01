@@ -1,0 +1,15 @@
+-- Generated migration.
+-- token_ref holds a pointer to a secret manager, never the secret itself.
+-- The schema cannot stop a secret from being written into current_context,
+-- so the application must keep secrets out of it.
+CREATE TABLE agent_sessions (
+  session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  status VARCHAR(50) NOT NULL DEFAULT 'RUNNING',
+  current_context JSONB NOT NULL DEFAULT '{}'::jsonb,
+  scratchpad_state JSONB,
+  token_ref VARCHAR(255),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT agent_sessions_status_check
+    CHECK (status IN ('RUNNING', 'PENDING_HUMAN_APPROVAL', 'RESUMING_LOOP', 'TASK_ABORTED', 'TASK_COMPLETED'))
+);

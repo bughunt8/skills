@@ -1,0 +1,19 @@
+-- Generated migration.
+-- One row records one review request: the proposed call and the human's resolution.
+-- JSON columns store TEXT holding JSON in the SQLite dialect. The application serialises before writing and parses after reading.
+CREATE TABLE hitl_records (
+  hitl_id TEXT PRIMARY KEY,
+  session_id TEXT NOT NULL REFERENCES agent_sessions(session_id) ON DELETE CASCADE,
+  trigger_id TEXT NOT NULL,
+  proposed_tool_name TEXT NOT NULL,
+  proposed_arguments TEXT NOT NULL,
+  human_corrections TEXT,
+  resolution_status TEXT NOT NULL DEFAULT 'PENDING',
+  action_required TEXT NOT NULL DEFAULT 'APPROVE_REJECT_MODIFY',
+  requested_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  resolved_at TEXT,
+  CONSTRAINT hitl_records_resolution_check
+    CHECK (resolution_status IN ('PENDING', 'APPROVED', 'MODIFIED', 'DENIED', 'TIMEOUT')),
+    CONSTRAINT hitl_records_action_check
+        CHECK (action_required IN ('APPROVE_REJECT_MODIFY', 'MFA_CHALLENGE', 'NOTIFY_ONLY'))
+);
