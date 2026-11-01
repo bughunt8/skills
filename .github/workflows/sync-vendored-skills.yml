@@ -110,6 +110,21 @@ jobs:
         if: steps.due.outputs.run == 'true'
         run: python3 scripts/generate_index.py --write
 
+      # The published page is built from skills/, so a vendored refresh that adds
+      # or removes a skill changes the library the page claims to describe. The
+      # page must be rebuilt in the same pull request, or the pull request ships
+      # a page whose counts contradict the library it was built from. That is not
+      # hypothetical: a refresh that landed on main without a rebuild left the
+      # live page claiming 491 skills while the library held 497.
+      #
+      # --refresh is deliberately not used here. It re-pins the external sources
+      # in site/sources.json, which is the fortnightly site-refresh workflow's
+      # job (m1-site-refresh-sources). This workflow only moves vendored skills,
+      # so it rebuilds against the pins that are already committed.
+      - name: Rebuild the site from the refreshed library
+        if: steps.due.outputs.run == 'true'
+        run: python3 site/build.py --write
+
       # The same gates as the ci workflow. They run here because a token-created
       # pull request cannot start ci, so this is the only place the result is real.
       # A failure here stops the pull request being opened.
@@ -127,6 +142,9 @@ jobs:
           python3 skills/engineering/agent-harness/skills/agent-harness/scripts/harness_manifest_builder.py --check --repo-root .
           python3 scripts/audit_third_party.py
           python3 scripts/check_links.py
+          # The page must agree with the library it was built from. Without this
+          # the rebuild above could be dropped and nothing here would notice.
+          python3 site/build.py --check
 
       - name: Summarise for the pull request body
         if: steps.due.outputs.run == 'true'
@@ -179,6 +197,12 @@ jobs:
         with:
           token: ${{ secrets.SYNC_PAT || secrets.GITHUB_TOKEN }}
           branch: automation/sync-vendored-skills
+          # staging, not main. A refresh that opened straight against main
+          # bypassed the promotion flow entirely: it merged there on its own,
+          # with no reviewer and no site rebuild, and left the live page
+          # claiming 491 skills while the library held 497. Every change reaches
+          # main through the reviewed promotion pull request instead.
+          base: staging
           delete-branch: true
           commit-message: 'chore(vendor): refresh vendored upstream skills'
           title: 'chore(vendor): scheduled refresh of vendored upstream skills'
@@ -188,6 +212,9 @@ jobs:
             docs/
             THIRD_PARTY_NOTICES.md
             README.md
+            site/index.html
+            site/data.js
+            site/intro.html
 
       # Labels are applied here rather than by the action so that a missing label
       # is a warning instead of a failed run. `gh label create` is idempotent.

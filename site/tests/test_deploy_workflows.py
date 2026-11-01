@@ -22,9 +22,10 @@ ROOT = Path(__file__).resolve().parents[2]
 STAGING = "https://mediumvioletred-coyote-692292.hostingersite.com/"
 PRODUCTION = "https://skills.ronald.ng"
 REFRESH = "m1-site-refresh-sources"
+VENDOR_SYNC = "sync-vendored-skills"
 WORKFLOW_NAMES = (
     "a2-site-deploy-staging", "b2-site-deploy-production", "s2-site-deploy",
-    "s3-site-verify", "s1-site-validate", REFRESH,
+    "s3-site-verify", "s1-site-validate", REFRESH, VENDOR_SYNC,
 )
 CALLERS = {"staging": "a2-site-deploy-staging", "production": "b2-site-deploy-production"}
 SMOKE_COMMAND = 'node scripts/smoke.mjs "$SITE_URL" "$EXPECTED_SHA"'
@@ -32,6 +33,10 @@ TARGET_COMMAND = (
     'node site/scripts/check-deploy-target.mjs "$DEPLOY_ENVIRONMENT" "$SITE_URL"'
 )
 DELETE = object()
+
+# The vendored refresh only acts when its fortnightly due check says the interval
+# has elapsed, so every step in that job carries this condition.
+DUE_GATE = "steps.due.outputs.run == 'true'"
 
 # The scheduled site refresh. `build.py --refresh` moves the pins in
 # site/sources.json before later collection steps can fail, so the rebuild is
@@ -249,6 +254,55 @@ def check_refresh_candidate_validation(workflows):
                         "refresh candidate gate must preserve S1 shell")
 
 
+def check_vendor_sync_contract(workflow):
+    """A vendored refresh changes the library, so it must rebuild the page.
+
+    The refresh used to open its pull request against main, where it merged on
+    its own without a rebuild. The live page then claimed 491 skills while the
+    library held 497, and the next pull request to main failed the build gate
+    on a defect it had inherited rather than introduced.
+
+    Two properties close that: the pull request targets staging, so the change
+    travels the reviewed promotion path, and the page is rebuilt and checked in
+    the same job, so the page cannot disagree with the library it describes.
+    """
+    label = VENDOR_SYNC
+    job = get_job(workflow, "sync", label)
+    steps = job.get("steps", [])
+
+    rebuild = find_step(job, "site/build.py --write", label)
+    blocking(rebuild, f"{label} rebuild", allow_if=True)
+    require(rebuild.get("if", DUE_GATE) == DUE_GATE,
+            f"{label}: the rebuild may only be skipped when the due check says to run")
+    require("--refresh" not in rebuild.get("run", ""),
+            f"{label}: the rebuild must not re-pin the external sources; "
+            "that is the site refresh workflow's job")
+
+    check = find_step(job, "site/build.py --check", label)
+    blocking(check, f"{label} site build reproducibility", allow_if=True)
+    require(check.get("if", DUE_GATE) == DUE_GATE,
+            f"{label}: the page check may only be skipped when the due check says to run")
+
+    pulls = [step for step in steps if "create-pull-request" in str(step.get("uses", ""))]
+    require(len(pulls) == 1, f"{label}: expected exactly one create-pull-request step")
+    pull_index = steps.index(pulls[0])
+    require(steps.index(rebuild) < pull_index,
+            f"{label}: the page must be rebuilt before the pull request is opened")
+    require(steps.index(check) < pull_index,
+            f"{label}: the page must be verified before the pull request is opened")
+
+    with_block = pulls[0].get("with", {})
+    require(with_block.get("base") == "staging",
+            f"{label}: the pull request must target staging, not main")
+    add_paths = with_block.get("add-paths", "")
+    if isinstance(add_paths, list):
+        add_paths = "\n".join(add_paths)
+    for path in ("site/index.html", "site/data.js", "site/intro.html"):
+        require(path in add_paths.split(),
+                f"{label}: add-paths must keep {path}, or the rebuilt page is "
+                "not part of the pull request")
+
+
 def check_contract(workflows):
     for environment, url in (("staging", STAGING), ("production", PRODUCTION)):
         workflow = workflows[CALLERS[environment]]
@@ -332,6 +386,7 @@ def check_contract(workflows):
 
     check_refresh_contract(workflows[REFRESH])
     check_refresh_candidate_validation(workflows)
+    check_vendor_sync_contract(workflows[VENDOR_SYNC])
 
 
 class WorkflowContractTests(unittest.TestCase):
@@ -603,6 +658,46 @@ class WorkflowContractTests(unittest.TestCase):
                             r"add-paths must keep site/sources\.json")
         self.prove_mutation("pull request skip gate", (*path, "if"), "false",
                             "may only be skipped when nothing changed")
+
+    def test_vendor_sync_pull_request_keeps_targeting_staging(self):
+        steps = self.workflows[VENDOR_SYNC]["jobs"]["sync"]["steps"]
+        index = next(i for i, step in enumerate(steps)
+                     if "create-pull-request" in str(step.get("uses", "")))
+        path = (VENDOR_SYNC, "jobs", "sync", "steps", index)
+        self.prove_mutation("vendor pull request targets main", (*path, "with", "base"),
+                            "main", "must target staging, not main")
+        self.prove_mutation("vendor add-paths drops intro.html",
+                            (*path, "with", "add-paths"),
+                            ["site/index.html", "site/data.js"],
+                            r"add-paths must keep site/intro\.html")
+
+    def test_vendor_sync_rebuilds_and_checks_the_page(self):
+        rebuild = self.step_path(VENDOR_SYNC, "sync", "site/build.py --write")
+        self.prove_mutation("vendor sync does not rebuild the page",
+                            rebuild, DELETE, "must run site/build.py --write exactly once")
+        self.prove_mutation("vendor rebuild re-pins the external sources",
+                            (*rebuild, "run"),
+                            "python3 site/build.py --write --refresh",
+                            "must not re-pin the external sources")
+        check = self.step_path(VENDOR_SYNC, "sync", "site/build.py --check")
+        self.prove_mutation("vendor sync does not verify the page",
+                            check, DELETE, "must run site/build.py --check exactly once")
+        for key, value, message in (
+            ("continue-on-error", True, "continue-on-error is forbidden"),
+        ):
+            self.prove_mutation(f"vendor page check {key}", (*check, key), value, message)
+
+    def test_vendor_sync_rebuilds_the_page_before_the_pull_request_is_opened(self):
+        check_contract(self.workflows)  # the baseline must pass
+        changed = deepcopy(self.workflows)
+        steps = changed[VENDOR_SYNC]["jobs"]["sync"]["steps"]
+        pull = next(step for step in steps
+                    if "create-pull-request" in str(step.get("uses", "")))
+        steps.remove(pull)
+        steps.insert(0, pull)
+        with self.assertRaisesRegex(AssertionError, "before the pull request is opened"):
+            check_contract(changed)
+        print("PROVED vendor page must be rebuilt before the pull request", flush=True)
 
     def test_refresh_gates_run_before_the_pull_request_is_opened(self):
         check_contract(self.workflows)  # the baseline must pass
