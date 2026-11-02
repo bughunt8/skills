@@ -28,8 +28,13 @@ Clone to `/tmp` and record facts. Do not guess any of them.
 gh api repos/<owner>/<name> --jq '{default_branch,license:.license.spdx_id,description,pushed_at}'
 git clone https://github.com/<owner>/<name>.git /tmp/<id>
 cd /tmp/<id> && git rev-parse HEAD && git log -1 --format='%ci %s'
-head -4 LICENSE
+head -4 LICENSE 2>/dev/null || echo 'no standalone licence file'
 ```
+
+If the last command reports no licence file, record the upstream file that
+declares the licence (usually `README.md`) as `license_evidence_path` in the
+manifest. The importer copies it verbatim behind a header that labels it a
+declaration, not a licence text. Do not invent a licence file.
 
 Collect and write down:
 
@@ -45,7 +50,9 @@ Collect and write down:
 | Prose references | `grep -rhoE '(docs\|evals\|tests)/[A-Za-z0-9._/-]+' skills` |
 
 The licence needs the copyright line and the package author, not just the SPDX id. If
-they disagree, record both. `--validate-manifest` cannot prove the upstream had the right
+they disagree, record both. If there is no standalone licence file, record the
+declaring file as `license_evidence_path` and say in `limitations` that the basis
+is a declaration. `--validate-manifest` cannot prove the upstream had the right
 to license its files, and do not claim it does.
 
 ## Phase 2: choose the mapping
@@ -125,6 +132,11 @@ Do not add `expected_commit`. The importer preflights every source, and a moved
 source rather than just this one. `pinned_commit`, `ref` and `pinned_at` already record
 what was reviewed.
 
+Use `license_evidence_path` instead of `license_path` when upstream ships no
+standalone licence file. They are mutually exclusive; `--sync` and
+`--validate-manifest` reject both or neither. The generated attribution and
+notices then say "declared; no upstream licence file".
+
 Then run, in order:
 
 ```bash
@@ -182,11 +194,15 @@ raise SystemExit(0 if ok else 1)
 PY
 ```
 
-Adjust the `PROVENANCE.md` depth for a nested layout (`len(parts) == 3`). Run the
-negative case once: hardlink-copy the destination inside the repository filesystem,
-delete one imported non-generated file, point `DST` at the copy, and require
-`missing 1` and exit 1. A copy across filesystems fails with `Invalid cross-device
-link` and can fill the disk, so keep it under the repository.
+Adjust the `PROVENANCE.md` depth for a nested layout (`len(parts) == 3`). If the
+upstream is a single skill at the repository root with support directories, map
+it as a `support` tree and compare the files selected by `file_include`; `UP` is
+then the repository root, not a `skills/` directory. Run the negative cases
+against a **real byte copy** under `/tmp` (`shutil.copytree`, not a hardlink),
+because a hardlink shares the inode and an edit would mutate the vendored tree.
+Record the destination's digest before the negative cases and require it to be
+unchanged afterwards. Require `missing 1`, `extra 1` and `mismatch 1` on the
+three copies, each exiting 1.
 
 Then run every gate:
 
@@ -246,4 +262,4 @@ with the gate results, the browser comparison and what is still open.
 - `site/tests/library-size.mjs` holds exact counts on purpose. Update them from
   `data.js`, never by guessing.
 - Do not claim a licence is verified. The manifest check proves declarations, not rights.
-- Do not push, merge or deploy on your own.
+- Refuse to push, merge or deploy without an explicit instruction.

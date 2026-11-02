@@ -5,7 +5,7 @@ anything here.
 
 ## What this repository is
 
-A library of 739 skill files across 28 directories, 738 of which are linted; the difference is
+A library of 740 skill files across 28 directories, 739 of which are linted; the difference is
 one deliberate test fixture. The skill index in `README.md` is the authoritative count.
 `scripts/generate_index.py` regenerates it and CI checks it, so refresh these numbers there
 when the tree changes. The skill files are instructions to another agent. The
@@ -25,8 +25,8 @@ future session, with credentials you do not have. Write accordingly.
    Change the script or the data it reads, then run the script.
 3. **Do not import someone else's work by copying files.** Add a source to
    `skills/vendor.manifest.json` and run `scripts/sync_vendor.py --sync`. That is the only
-   path that produces correct licence, author and commit-pinned attribution, and CI rejects
-   an import that lacks them.
+   path that produces correct licence (or recorded licence evidence), author and commit-pinned
+   attribution, and CI rejects an import that lacks them.
 4. **Run the applicable checks before you claim to be finished.** Not "should pass". Run them.
 5. **Apply `skills/pstack/unslop/SKILL.md` to every sentence you write here,** including
    commit messages and pull request bodies. It is a mandatory import for exactly this reason.
@@ -212,7 +212,7 @@ docs/skill-library.html        static prototype rendering the solutions
 - **`--check` exits 1 when upstream moved.** That is a report, not a failure. Only
   `--validate-manifest` belongs in a blocking gate, because it needs no network.
 - **`--validate-manifest` checks declarations, not truth.** It proves the tree matches what the
-  manifest claims and that provenance, licence copies and ownership records exist. It cannot
+  manifest claims and that provenance, licence copies or evidence, and ownership records exist. It cannot
   prove an upstream had the right to license what it published, or that a declared author is the
   real one. Do not describe it as licence verification.
 - **Symlinks in an upstream tree are a hard error, not a warning.** Following one would let

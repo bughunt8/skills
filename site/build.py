@@ -865,8 +865,13 @@ def render_attribution() -> str:
     manifest = REPO_ROOT / "skills" / "vendor.manifest.json"
     if manifest.exists():
         for source in json.loads(manifest.read_text(encoding="utf-8")).get("sources", []):
+            licence = source.get("license")
+            tier = "refreshed"
+            if source.get("license_evidence_path"):
+                licence = f"{licence} (declared; no upstream licence file)"
+                tier = "manual pin"
             add(source.get("repo"), source.get("id"), source.get("author"),
-                source.get("license"), "refreshed", None)
+                licence, tier, None)
     inventory = REPO_ROOT / "docs" / "third-party-inventory.json"
     if inventory.exists():
         for source in json.loads(inventory.read_text(encoding="utf-8")).get("legacy", []):
@@ -885,7 +890,7 @@ def render_attribution() -> str:
             (label.lower(), '        <li>' + title
              + f'<span class="attrib__meta">{esc("; ".join(sorted(entry["authors"])) or "author not recorded")}'
              + f' · {esc(" / ".join(sorted(entry["licences"])) or "licence not recorded")}'
-             + f' · {esc("refreshed" if "refreshed" in entry["tiers"] else "hand-copied")}</span></li>')
+             + f' · {esc(" · ".join(sorted(entry["tiers"])))}</span></li>')
         )
     rows.sort(key=lambda row: row[0])
     return '<ul class="attrib">\n' + "\n".join(row[1] for row in rows) + "\n        </ul>"

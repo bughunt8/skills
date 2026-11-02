@@ -62,7 +62,8 @@ procedure: upstream inspection, name collisions, mapping for flat and nested lay
 evidence to collect and the reviews. The steps below are the contract it enforces.
 
 1. Add a source to [`skills/vendor.manifest.json`](./skills/vendor.manifest.json) with the
-   upstream repository, the author, the licence, the licence file path, the destination
+   upstream repository, the author, the licence, the licence file path (or the
+   `license_evidence_path` when upstream ships no standalone licence file), the destination
    directory, and an `exclude_reasons` entry for anything you leave out.
 
    **Check the upstream links before you assume `skills/` is self-contained.** A source
@@ -85,15 +86,20 @@ evidence to collect and the reviews. The steps below are the contract it enforce
    `docs/link-check-exemptions.json` rather than loosening the checker.
 
 2. Run `python3 scripts/sync_vendor.py --sync`. That imports the tree, writes a
-   `PROVENANCE.md` into every skill directory, copies the upstream licence verbatim to
+   `PROVENANCE.md` into every skill directory, copies the upstream licence (or the recorded
+   declaration when there is no licence file) verbatim to
    `LICENSE.upstream`, regenerates the collection's `ATTRIBUTION.md`, and rewrites
    `THIRD_PARTY_NOTICES.md`.
 3. Run `python3 scripts/generate_index.py --write`.
 4. Commit the manifest change and the generated result together.
 
-An import without a licence, a named author and a commit-pinned source link does not get merged.
+An import without a licence (or recorded licence evidence), a named author and a commit-pinned
+source link does not get merged.
 That is not a formality. This repository is public and MIT, and redistributing someone's work
 without attribution is the one mistake here that cannot be quietly fixed later.
+
+Licence evidence is not licence verification. It records what upstream published and labels it
+as a declaration; it does not prove upstream had the right to license the content.
 
 It has already happened once. Eighteen skills derived from
 [mattpocock/skills](https://github.com/mattpocock/skills) say in their own text that Matt

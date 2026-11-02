@@ -455,6 +455,8 @@ def fetch_upstream(source: dict, workdir: Path) -> "tuple[Path, str]":
 
 def _licence_summary(source: dict) -> str:
     primary = source.get("license", "see upstream")
+    if is_licence_evidence(source):
+        primary = f"{primary} (declared; no upstream licence file)"
     extra = [entry["license"] for entry in source.get("additional_licenses") or []]
     return primary if not extra else f"{primary}, plus {', '.join(sorted(set(extra)))}"
 
@@ -462,6 +464,69 @@ def _licence_summary(source: dict) -> str:
 def is_immutable_ref(source: dict) -> bool:
     """Whether the manifest asks Git for one full commit object, not a moving ref."""
     return isinstance(source.get("ref"), str) and bool(SHA_RE.fullmatch(source["ref"]))
+
+
+def is_licence_evidence(source: dict) -> bool:
+    """Whether the licence input is a declaration rather than a licence file."""
+    return bool(source.get("license_evidence_path"))
+
+
+def licence_field_problem(source: dict) -> "str | None":
+    """The manifest-level licence problem, or None when exactly one field is set."""
+    primary = source.get("license_path")
+    evidence = source.get("license_evidence_path")
+    if primary and evidence:
+        return "`license_path` and `license_evidence_path` are mutually exclusive"
+    if not (primary or evidence):
+        return "`license_path` or `license_evidence_path` is required"
+    return None
+
+
+def licence_problem(source: dict) -> "str | None":
+    """The offline validation problem for a source's licence input, or None."""
+    problem = licence_field_problem(source)
+    if problem:
+        return problem
+    field = "license_path" if source.get("license_path") else "license_evidence_path"
+    value = source.get(field)
+    if not isinstance(value, str) or not value.strip():
+        return f"`{field}` must be a non-empty string"
+    with contextlib.redirect_stderr(io.StringIO()):
+        try:
+            normalized = safe_segment(value, field, source.get("id", "<missing id>"))
+        except SystemExit:
+            return f"`{field}` must be a safe repository-relative path"
+    if not normalized:
+        return f"`{field}` must be a non-empty string"
+    return None
+
+
+def licence_reference(source: dict) -> "tuple[str, str]":
+    """Return the manifest-relative licence input and its mode.
+
+    `file` is a standalone licence file. `declaration` is the upstream file that
+    states the licence when no standalone file exists. Exactly one of
+    `license_path` and `license_evidence_path` is required.
+    """
+    sid = source.get("id", "<missing id>")
+    problem = licence_field_problem(source)
+    if problem:
+        _fail(f"[{sid}] {problem}")
+    if source.get("license_path"):
+        return source["license_path"], "file"
+    return source["license_evidence_path"], "declaration"
+
+
+def licence_input(source: dict, checkout: Path) -> "tuple[Path, str]":
+    """Resolve the licence input through the same escape and symlink guards as any path."""
+    relative, mode = licence_reference(source)
+    sid = source.get("id", "<missing id>")
+    label = "license_path" if mode == "file" else "license_evidence_path"
+    path = checked_path(checkout, relative, label, sid)
+    if not path.is_file():
+        _fail(f"[{sid}] declared {label} `{relative}` not found upstream")
+    path.read_text(encoding="utf-8")
+    return path, mode
 
 
 def provenance_text(source: dict, upstream_path: str, local_dir: Path, sha: str, kind: str) -> str:
@@ -478,7 +543,7 @@ def provenance_text(source: dict, upstream_path: str, local_dir: Path, sha: str,
         f"| Permalink | {repo}/tree/{sha}/{upstream_path} |",
         f"| Original author | {source.get('author', 'see upstream')} |",
         f"| Upstream licence | {_licence_summary(source)} |",
-        f"| Licence copy | [`{lic_link}`]({lic_link}) |",
+        f"| {'Licence evidence' if is_licence_evidence(source) else 'Licence copy'} | [`{lic_link}`]({lic_link}) |",
         f"| Full attribution | [`{att_link}`]({att_link}) |",
         f"| Content kind | {kind} |",
         (
@@ -532,8 +597,15 @@ def attribution_text(source: dict, sha: str, plan: list) -> str:
         "",
         f"- **Upstream project:** <{repo}>",
         f"- **Original author:** {source.get('author', 'see upstream')}",
-        f"- **Primary licence:** {source.get('license', 'see upstream')}, reproduced verbatim in "
-        "[`LICENSE.upstream`](./LICENSE.upstream)",
+        (
+            f"- **Primary licence:** {source.get('license', 'see upstream')}, declared in "
+            f"`{source['license_evidence_path']}`; upstream ships no standalone licence file. "
+            "The declaration is reproduced verbatim in "
+            "[`LICENSE.upstream`](./LICENSE.upstream)."
+            if is_licence_evidence(source)
+            else f"- **Primary licence:** {source.get('license', 'see upstream')}, reproduced verbatim in "
+            "[`LICENSE.upstream`](./LICENSE.upstream)"
+        ),
         f"- **Tracked by:** [`{manifest_link}`]({manifest_link})",
         (
             f"- **Update cadence:** immutable commit; no automatic refresh. Update "
@@ -551,6 +623,12 @@ def attribution_text(source: dict, sha: str, plan: list) -> str:
         "`PROVENANCE.md` per vendored directory, a `.vendor-owned.json` ownership record, and this",
         "file.",
     ]
+    if is_licence_evidence(source):
+        out += [
+            "",
+            "The licence basis is a declaration, not a verified standalone licence file. "
+            "`LICENSE.upstream` reproduces the evidence; it does not add terms.",
+        ]
 
     extra = source.get("additional_licenses") or []
     if extra:
@@ -654,9 +732,9 @@ def notices_text(manifest: dict) -> str:
         "",
         "# Third-party notices",
         "",
-        "This repository redistributes work from the projects below. Each entry keeps its original",
-        "licence, its original copyright, and a link back to the source. Nothing here changes the",
-        "licence of the original work.",
+        "This repository redistributes work from the projects below. Each entry keeps the licence",
+        "its upstream declares, its recorded author, and a link back to the source. Nothing here",
+        "changes the licence of the original work.",
         "",
         "Two tiers, because they carry different guarantees.",
         "",
@@ -914,13 +992,7 @@ def preflight_upstream(source: dict, checkout: Path, sha: str, apply: bool) -> N
         _fail(f"[{sid}] mandatory skill missing from selection: {', '.join(missing)}", 1)
     if not apply:
         return
-    lic = safe_segment(source.get("license_path", ""), "license_path", sid)
-    if not lic:
-        _fail(f"[{sid}] license_path is required")
-    licence = checked_path(checkout, lic, "license_path", sid)
-    if not licence.is_file():
-        _fail(f"[{sid}] declared license_path `{lic}` not found upstream")
-    licence.read_text(encoding="utf-8")
+    licence_input(source, checkout)
     for entry in source.get("additional_licenses") or []:
         upstream_rel = safe_segment(entry.get("upstream_license_file", ""), "upstream_license_file", sid)
         target_rel = safe_segment(entry.get("license_file", ""), "license_file", sid)
@@ -1121,16 +1193,18 @@ def process_source(source: dict, checkout: Path, sha: str, apply: bool) -> dict:
         changed.append("ATTRIBUTION.md (generated metadata)")
 
     if apply:
-        lic = source.get("license_path")
-        if not lic:
-            _fail(f"[{sid}] `license_path` is required: a redistributed licence must be copied")
-        if not (checkout / lic).exists():
-            _fail(f"[{sid}] declared license_path `{lic}` not found upstream")
+        licence_path, licence_mode = licence_input(source, checkout)
+        licence_header = (
+            "Upstream ships no standalone licence file. The licence declaration below is "
+            "reproduced verbatim as evidence. It is not a standalone licence text."
+            if licence_mode == "declaration"
+            else "Original licence text follows, unmodified."
+        )
         _write(
             dest_root / "LICENSE.upstream",
             f"Vendored from {source['repo']} at commit {sha}.\n"
-            f"Original licence text follows, unmodified.\n"
-            f"{'-' * 76}\n\n" + (checkout / lic).read_text(encoding="utf-8"),
+            f"{licence_header}\n"
+            f"{'-' * 76}\n\n" + licence_path.read_text(encoding="utf-8"),
         )
         for entry in source.get("additional_licenses") or []:
             src_file = checkout / entry["upstream_license_file"]
@@ -1161,10 +1235,10 @@ def validate_manifest(manifest: dict) -> list:
     """Offline invariants. Fast enough to gate every pull request.
 
     Deliberately limited. This proves the tree matches what the manifest claims,
-    that provenance and licence copies exist, and that nothing excluded slipped
-    back in. It does not and cannot prove that an upstream had the right to
-    license what it published, or that a declared author is the real one. Do not
-    describe it as licence verification.
+    that provenance and licence copies or evidence exist, and that nothing
+    excluded slipped back in. It does not and cannot prove that an upstream had
+    the right to license what it published, or that a declared author is the real
+    one. Do not describe it as licence verification.
     """
     problems = []
     seen_ids, seen_dests = set(), set()
@@ -1177,13 +1251,15 @@ def validate_manifest(manifest: dict) -> list:
             "repo",
             "author",
             "license",
-            "license_path",
             "dest",
             "pinned_commit",
             "paths",
         ):
             if not src.get(field):
                 problems.append(f"[{sid}] source is missing required field `{field}`")
+        problem = licence_problem(src)
+        if problem:
+            problems.append(f"[{sid}] {problem}")
         if sid in seen_ids:
             problems.append(f"[{sid}] duplicate manifest source id")
         seen_ids.add(sid)
@@ -1237,6 +1313,18 @@ def validate_manifest(manifest: dict) -> list:
             if not local.is_dir():
                 problems.append(f"[{sid}] mapped path `{dest}/{spec['to']}` missing; run --sync")
                 continue
+
+            if spec["kind"] == SUPPORT:
+                for name in spec.get("exclude") or []:
+                    normalized = safe_segment(name, "exclude", sid)
+                    # Support exclusions are literal names. file_include is the
+                    # enforcing filter; this is a check that a declared
+                    # exclusion did not slip back in.
+                    if os.path.lexists(local / normalized):
+                        problems.append(
+                            f"[{sid}] excluded support path `{name}` is present at "
+                            f"`{dest}/{spec['to']}`; `file_include` must keep it out"
+                        )
 
             if spec["kind"] == SKILL_COLLECTION:
                 for name in _child_dirs(local):

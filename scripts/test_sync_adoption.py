@@ -623,6 +623,153 @@ class AdoptionTests(unittest.TestCase):
         self.sources[0]["expected_commit"] = self.git("rev-parse", "HEAD")
         self.reject_unchanged(text="symlink component")
 
+    def add_licence_declaration(self, text="## License\n\nMIT\n"):
+        (self.upstream / "README.md").write_text(text)
+        self.git("add", "-A")
+        self.git("commit", "-qm", "licence declaration")
+        sha = self.git("rev-parse", "HEAD")
+        for source in self.sources:
+            source["expected_commit"] = sha
+        return sha
+
+    def test_license_evidence_is_copied_verbatim_and_labelled(self):
+        self.add_licence_declaration("## License\n\nMIT\n")
+        source = self.sources[0]
+        del source["license_path"]
+        source["license_evidence_path"] = "README.md"
+        self.write_manifest()
+        code, out, err = self.run_cli(self.both())
+        self.assertEqual(code, 0, err)
+        licence = (self.dest() / "LICENSE.upstream").read_text()
+        self.assertIn("no standalone licence file", licence)
+        self.assertIn("## License\n\nMIT", licence)
+        attribution = (self.dest() / "ATTRIBUTION.md").read_text()
+        self.assertIn("declared in `README.md`", attribution)
+        self.assertIn("no standalone licence file", attribution)
+        self.assertIn("declaration, not a verified standalone licence file", attribution)
+        provenance = (self.dest() / "PROVENANCE.md").read_text()
+        self.assertIn("Licence evidence", provenance)
+        self.assertIn("declared; no upstream licence file", provenance)
+        notices = vendor.NOTICES_PATH.read_text()
+        self.assertIn("declared; no upstream licence file", notices)
+        manifest = json.loads(vendor.MANIFEST_PATH.read_text())
+        self.assertEqual(vendor.validate_manifest(manifest), [])
+
+    def test_license_path_and_evidence_are_mutually_exclusive(self):
+        self.sources[1]["license_evidence_path"] = "README.md"
+        self.reject_unchanged(self.both(), "mutually exclusive")
+
+    def test_missing_license_and_evidence_is_preflight_error(self):
+        del self.sources[1]["license_path"]
+        self.reject_unchanged(self.both(), "or `license_evidence_path` is required")
+
+    def test_offline_validate_rejects_malformed_licence_paths(self):
+        self.write_manifest()
+        self.assertEqual(self.run_cli(self.both())[0], 0)
+        for value in (42, ["README.md"], "   ", "../outside", "/etc/passwd"):
+            with self.subTest(value=value):
+                manifest = json.loads(vendor.MANIFEST_PATH.read_text())
+                manifest["sources"][0].pop("license_path", None)
+                manifest["sources"][0]["license_evidence_path"] = value
+                vendor.MANIFEST_PATH.write_text(json.dumps(manifest))
+                problems = vendor.validate_manifest(manifest)
+                self.assertTrue(
+                    any("license_evidence_path" in p for p in problems), problems
+                )
+
+    def test_license_evidence_path_escape_and_symlink_are_rejected(self):
+        self.sources[1].pop("license_path")
+        self.sources[1]["license_evidence_path"] = "../outside"
+        self.reject_unchanged(self.both(), "may not contain")
+        self.sources[1]["license_evidence_path"] = "README.md"
+        (self.upstream / "README.md").symlink_to("LICENSE")
+        self.git("add", "-A")
+        self.git("commit", "-qm", "evidence link")
+        sha = self.git("rev-parse", "HEAD")
+        for source in self.sources:
+            source["expected_commit"] = sha
+        self.reject_unchanged(self.both(), "symlink component")
+
+    def test_existing_license_path_mode_is_unchanged(self):
+        self.write_manifest()
+        code, out, err = self.run_cli(self.both())
+        self.assertEqual(code, 0, err)
+        licence = (self.dest() / "LICENSE.upstream").read_text()
+        self.assertIn("Original licence text follows, unmodified.", licence)
+        attribution = (self.dest() / "ATTRIBUTION.md").read_text()
+        self.assertIn("reproduced verbatim", attribution)
+        manifest = json.loads(vendor.MANIFEST_PATH.read_text())
+        self.assertEqual(vendor.validate_manifest(manifest), [])
+
+    def test_present_support_exclusion_is_reported(self):
+        self.sources[0]["paths"][0]["exclude"] = ["data"]
+        self.sources[0]["paths"][0]["exclude_reasons"] = {"data": "runtime state"}
+        self.write_manifest()
+        self.assertEqual(self.run_cli(self.both())[0], 0)
+        (self.dest() / "data").mkdir()
+        (self.dest() / "data" / "report.json").write_text("{}")
+        manifest = json.loads(vendor.MANIFEST_PATH.read_text())
+        problems = vendor.validate_manifest(manifest)
+        self.assertTrue(
+            any("excluded support path `data`" in p for p in problems), problems
+        )
+        code, _, err = self.run_cli(["--validate-manifest"])
+        self.assertEqual(code, 1, err)
+        shutil.rmtree(self.dest() / "data")
+        self.assertEqual(
+            vendor.validate_manifest(json.loads(vendor.MANIFEST_PATH.read_text())), []
+        )
+
+    def test_support_exclusion_normalizes_before_probing(self):
+        self.write_manifest()
+        self.assertEqual(self.run_cli(self.both())[0], 0)
+        for raw, relative in ((" data ", "data"), ("data\\nested", "data/nested")):
+            with self.subTest(raw=raw):
+                manifest = json.loads(vendor.MANIFEST_PATH.read_text())
+                manifest["sources"][0]["paths"][0]["exclude"] = [raw]
+                manifest["sources"][0]["paths"][0]["exclude_reasons"] = {raw: "test"}
+                vendor.MANIFEST_PATH.write_text(json.dumps(manifest))
+                target = self.dest() / relative
+                target.mkdir(parents=True, exist_ok=True)
+                (target / "report.json").write_text("{}")
+                problems = vendor.validate_manifest(json.loads(vendor.MANIFEST_PATH.read_text()))
+                self.assertTrue(
+                    any("excluded support path" in p for p in problems), problems
+                )
+                shutil.rmtree(self.dest() / relative)
+                self.assertEqual(
+                    vendor.validate_manifest(json.loads(vendor.MANIFEST_PATH.read_text())), []
+                )
+
+    def test_support_exclusion_rejects_dangling_symlink(self):
+        self.write_manifest()
+        self.assertEqual(self.run_cli(self.both())[0], 0)
+        manifest = json.loads(vendor.MANIFEST_PATH.read_text())
+        manifest["sources"][0]["paths"][0]["exclude"] = ["data"]
+        manifest["sources"][0]["paths"][0]["exclude_reasons"] = {"data": "runtime state"}
+        vendor.MANIFEST_PATH.write_text(json.dumps(manifest))
+        link = self.dest() / "data"
+        link.symlink_to("missing-target")
+        try:
+            problems = vendor.validate_manifest(json.loads(vendor.MANIFEST_PATH.read_text()))
+            self.assertTrue(
+                any("excluded support path" in p for p in problems), problems
+            )
+        finally:
+            link.unlink()
+        self.assertEqual(
+            vendor.validate_manifest(json.loads(vendor.MANIFEST_PATH.read_text())), []
+        )
+
+    def test_support_exclusion_path_escape_is_refused(self):
+        self.sources[0]["paths"][0]["exclude"] = ["../escape"]
+        self.sources[0]["paths"][0]["exclude_reasons"] = {"../escape": "bad path"}
+        self.write_manifest()
+        manifest = json.loads(vendor.MANIFEST_PATH.read_text())
+        with contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit):
+                vendor.validate_manifest(manifest)
+
     def test_additional_license_paths_are_preflighted(self):
         for upstream, target in (("../outside", "COPYING"), ("MISSING", "COPYING"),
                                  ("LICENSE", "../outside"), ("LICENSE", vendor.OWNERSHIP_FILE)):

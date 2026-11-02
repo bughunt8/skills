@@ -1,7 +1,7 @@
 {
   "schema": "agent-harness/manifest.v2",
   "domain": "research-ops",
-  "skill_count": 5,
+  "skill_count": 6,
   "loop_defaults": {
     "max_attempts_per_task": 3,
     "max_loop_iterations": 12,
@@ -383,6 +383,41 @@
         "skills/research-ops/skills/market-research/references/market_sizing_canon.md",
         "skills/research-ops/skills/market-research/references/segmentation_and_ci.md",
         "skills/research-ops/skills/market-research/references/survey_methodology.md"
+      ]
+    },
+    {
+      "name": "mckinsey-research",
+      "path": "skills/research-ops/skills/mckinsey-research",
+      "invocation": "model_or_user",
+      "provider_binding": {
+        "schema": "agent-harness/provider.v1",
+        "name": "mckinsey-research",
+        "skill_path": "skills/research-ops/skills/mckinsey-research",
+        "invocation": "model_or_user",
+        "files": [
+          {
+            "path": "skills/research-ops/skills/mckinsey-research/SKILL.md",
+            "sha256": "6912753df5360813e3a0e26cccf647c740576164e1b259d417411b576356a752",
+            "role": "skill_body"
+          },
+          {
+            "path": "skills/research-ops/skills/mckinsey-research/references/source-analysis.md",
+            "sha256": "34d951d232d3c918d6c48d3dd6d5b2fc5b15cdd1274d3b99b693ec547b95c095",
+            "role": "owned_resource"
+          }
+        ]
+      },
+      "description": "Run a full market and strategy analysis for a business: TAM, competitive landscape, personas, trends, SWOT/Porter, pricing, go-to-market, customer journey, financials, risk, market entry, and an executive synthesis. Use when the user wants a consulting-grade research report for a market-entry, investment, or growth decision. Not for a quick opinion or a single-competitor check: answer directly. For sizing methodology alone use market-research; for a consulting engagement without the twelve analyses use management-consultant; for structured problem-solving without market research use \u2026",
+      "tools": [],
+      "agentic_signals": {
+        "goal_intake": true,
+        "refusal_gate": false,
+        "verification": false,
+        "loop_discipline": true,
+        "close_out": false
+      },
+      "references": [
+        "skills/research-ops/skills/mckinsey-research/references/source-analysis.md"
       ]
     },
     {

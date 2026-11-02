@@ -293,6 +293,46 @@ def main() -> int:
         f"{len(touching)} overlapping pairs, e.g. {touching[:2]}",
     )
 
+    # Synthetic cases for the final settle pass. The real library exercised an
+    # extent overlap, but not the two ways a community translation can break the
+    # node-spacing guarantee.
+    print("\nthe settle pass")
+
+    def settled(points, members):
+        network._settle_layout(points, members, bp.FRAME[0], bp.FRAME[1])
+        return network._layout_ok(points, members)
+
+    near = {
+        "a0": [500.0, 500.0], "a1": [520.0, 500.0],
+        "a2": [500.0, 520.0], "a3": [520.0, 520.0],
+        "b0": [505.0, 500.0], "b1": [525.0, 500.0],
+        "b2": [505.0, 520.0], "b3": [525.0, 520.0],
+    }
+    near_members = {0: ["a0", "a1", "a2", "a3"], 1: ["b0", "b1", "b2", "b3"]}
+    check(
+        "settling near communities keeps node spacing and extents",
+        settled(near, near_members),
+    )
+
+    same = {
+        "a0": [500.0, 500.0], "a1": [520.0, 500.0], "a2": [500.0, 520.0],
+        "b0": [500.0, 500.0], "b1": [520.0, 500.0], "b2": [500.0, 520.0],
+    }
+    same_members = {0: ["a0", "a1", "a2"], 1: ["b0", "b1", "b2"]}
+    check("coincident communities separate", settled(same, same_members))
+
+    cramped = {
+        "a0": [10.0, 10.0], "a1": [10.0, 25.0],
+        "b0": [10.0, 10.0], "b1": [10.0, 25.0],
+    }
+    cramped_members = {0: ["a0", "a1"], 1: ["b0", "b1"]}
+    try:
+        network._settle_layout(cramped, cramped_members, 20.0, 20.0)
+        failed_loudly = False
+    except RuntimeError:
+        failed_loudly = True
+    check("an infeasible frame fails loudly", failed_loudly)
+
     # And the reading that colour is supposed to support: measured against each community's
     # own size, the nearest community to any skill is the one it belongs to.
     wrong = [

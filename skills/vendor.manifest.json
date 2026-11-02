@@ -1604,6 +1604,46 @@
       ],
       "notes": "The upstream skill is authored for Manus; only the skill directory is imported. The vendored content is not edited in place.",
       "pinned_at": "2026-11-02"
+    },
+    {
+      "id": "abdullah-mckinsey-research",
+      "name": "McKinsey Research (Abdullah4AI)",
+      "repo": "https://github.com/Abdullah4AI/mckinsey-research",
+      "homepage": "https://github.com/Abdullah4AI/mckinsey-research#readme",
+      "author": "Abdullah AlRashoudi (@Abdullah4AI)",
+      "license": "MIT",
+      "license_evidence_path": "README.md",
+      "ref": "140ecedf57414521bf55fc485e140d151cfb44fd",
+      "pinned_commit": "140ecedf57414521bf55fc485e140d151cfb44fd",
+      "pinned_at": "2026-11-02",
+      "dest": "docs/reference-sources/abdullah-mckinsey-research",
+      "paths": [
+        {
+          "from": "",
+          "to": "source",
+          "kind": "support",
+          "file_include": [
+            "SKILL.md",
+            "README.md",
+            "references/*",
+            "templates/*"
+          ],
+          "exclude": [
+            "data"
+          ],
+          "exclude_reasons": {
+            "data": "Runtime state written by the skill (reports.jsonl, feedback.json), not instructions. Vendoring it would publish the author's state layer and create false drift on every run."
+          }
+        }
+      ],
+      "mandatory": [],
+      "limitations": [
+        "Upstream's SKILL.md description is 1,619 characters, above SK006's 1,024 limit, so the upstream skill is a read-only reference. The routable skill is authored here.",
+        "As of the pinned commit, upstream ships no standalone LICENSE file. README.md declares MIT; copyright is not stated. The declaration is preserved verbatim in LICENSE.upstream as evidence, not as a standalone licence. The manifest check records the declaration; it does not verify the right to license.",
+        "data/ is runtime state and is deliberately not vendored. file_include is the enforcing filter; the exclude entry is a literal name used by the validate_manifest check.",
+        "The prompt set is research guidance, not verified market data. Outputs still need citation checks."
+      ],
+      "notes": "Mapped as a read-only support tree under docs/reference-sources, mirroring the Addy Osmani SDD reference. The relative layout inside source/ is preserved so the upstream SKILL.md links keep resolving. file_include, not exclude, is what actually keeps data/ out. Support exclude entries are literal names, not globs."
     }
   ]
 }

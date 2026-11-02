@@ -351,6 +351,8 @@ def label_community(members: list, rows_by_key: dict, graph: dict) -> str:
 # centres are closer than that the node drawn second covers the first one's centre and the
 # first cannot be clicked at all. Four skills were unclickable for exactly this reason.
 MIN_GAP = 15.0
+GOLDEN_ANGLE = 2.399963229728653
+GOLDEN_RATIO = 0.6180339887498949
 
 # The graph's coordinate system. build.FRAME passes this in explicitly; these defaults
 # exist only so the module is usable on its own, and they match, because the layout using
@@ -568,6 +570,108 @@ def _pack_discs(radii: list, edges: list, width: float, height: float) -> list:
     return points
 
 
+def _community_extents(points: dict, communities: list) -> list:
+    """(centre x, centre y, radius) for each community on the given coordinates."""
+    out = []
+    for mem in communities:
+        cx = math.fsum(points[n][0] for n in mem) / len(mem)
+        cy = math.fsum(points[n][1] for n in mem) / len(mem)
+        out.append((cx, cy, max(math.dist(points[n], (cx, cy)) for n in mem)))
+    return out
+
+
+def _separate_community_extents(out: dict, members: dict, width: float, height: float,
+                                gap: float = 1.0, passes: int = 8) -> None:
+    """Translate whole communities apart until their measured extents do not touch.
+
+    `_pack_discs` guarantees the gap before the global fit and the final node
+    separation. Both can grow a community's measured extent afterwards, so this
+    last pass works on the coordinates that are actually written. It translates
+    every member together, which leaves the node gaps inside the community
+    untouched.
+    """
+    communities = [list(m) for m in members.values() if len(m) > 1]
+    for _ in range(passes):
+        extents = _community_extents(out, communities)
+        moved = False
+        for a in range(len(communities)):
+            ax, ay, ar = extents[a]
+            for b in range(a + 1, len(communities)):
+                bx, by, br = extents[b]
+                dx, dy = bx - ax, by - ay
+                d = math.hypot(dx, dy)
+                if d < 1e-9:
+                    # Coincident centres have no direction to separate along.
+                    # Pick a deterministic one from the pair so the pass cannot
+                    # sit still for eight iterations and write an overlap.
+                    angle = (a + 1) * GOLDEN_ANGLE + (b + 1) * GOLDEN_RATIO
+                    dx, dy = math.cos(angle), math.sin(angle)
+                    d = 1.0
+                ux, uy = dx / d, dy / d
+                want = ar + br + gap
+                if d >= want:
+                    continue
+                push = (want - d) / 2.0
+                for sign, mem in ((-1.0, communities[a]), (1.0, communities[b])):
+                    lo_x = min(out[n][0] for n in mem)
+                    hi_x = max(out[n][0] for n in mem)
+                    lo_y = min(out[n][1] for n in mem)
+                    hi_y = max(out[n][1] for n in mem)
+                    tx = max(4.0 - lo_x, min(width - 4.0 - hi_x, sign * ux * push))
+                    ty = max(4.0 - lo_y, min(height - 4.0 - hi_y, sign * uy * push))
+                    for n in mem:
+                        out[n][0] += tx
+                        out[n][1] += ty
+                moved = True
+        if not moved:
+            return
+
+
+def _layout_ok(points: dict, members: dict) -> bool:
+    """Both guarantees on the rounded coordinates that are written to the page."""
+    keys = sorted(points)
+    for i in range(len(keys)):
+        pi = points[keys[i]]
+        for j in range(i + 1, len(keys)):
+            if math.dist(pi, points[keys[j]]) < MIN_GAP:
+                return False
+    communities = [list(m) for m in members.values() if len(m) > 1]
+    extents = _community_extents(points, communities)
+    for a in range(len(extents)):
+        ax, ay, ar = extents[a]
+        for b in range(a + 1, len(extents)):
+            bx, by, br = extents[b]
+            if math.hypot(bx - ax, by - ay) < ar + br:
+                return False
+    return True
+
+
+def _settle_layout(points: dict, members: dict, width: float, height: float,
+                   rounds: int = 8) -> None:
+    """Alternate community and node separation until both guarantees hold.
+
+    Translating a community can bring two of its nodes too close to a neighbour,
+    and separating nodes can grow a community's extent back into another. The two
+    constraints have to be settled together, on the rounded coordinates that are
+    written to the page.
+    """
+    keys = sorted(points)
+    for _ in range(rounds):
+        _separate_community_extents(points, members, width, height, gap=2.0)
+        pts = [points[k] for k in keys]
+        _separate(pts, min_dist=MIN_GAP + 0.6, passes=40)
+        for k, pt in zip(keys, pts):
+            points[k] = [
+                round(min(width - 4.0, max(4.0, pt[0])), 1),
+                round(min(height - 4.0, max(4.0, pt[1])), 1),
+            ]
+        if _layout_ok(points, members):
+            return
+    raise RuntimeError(
+        "community and node separation did not converge on the rounded coordinates"
+    )
+
+
 def layout(graph: dict, comm: dict, rows_by_key: dict,
            width: float = FRAME[0], height: float = FRAME[1]) -> dict:
     """Force-directed, computed per community and then assembled.
@@ -727,11 +831,11 @@ def layout(graph: dict, comm: dict, rows_by_key: dict,
     # pair was still 14.9186 before the write, below the 15.0 guarantee. 80 passes is
     # a convergence cap, not a looser threshold; the target stays MIN_GAP + 0.6.
     _separate(pts, min_dist=MIN_GAP + 0.6, passes=80)
-    for k, pt in zip(keys, pts):
-        out[k] = (
-            round(min(width - 4.0, max(4.0, pt[0])), 1),
-            round(min(height - 4.0, max(4.0, pt[1])), 1),
-        )
+    community_members = linked
+    final = {k: [pt[0], pt[1]] for k, pt in zip(keys, pts)}
+    _settle_layout(final, community_members, width, height)
+    for k in keys:
+        out[k] = (final[k][0], final[k][1])
 
     return {
         "pos": out,
