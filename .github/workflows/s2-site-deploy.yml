@@ -108,7 +108,7 @@ jobs:
           done
           echo "environment '${{ inputs.environment }}' is configured"
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@v7.1.0
         with:
           python-version: "3.12"
 
