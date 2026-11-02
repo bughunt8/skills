@@ -35,6 +35,7 @@ Upstream subtrees are mapped so that the relative links inside them keep resolvi
 - Upstream ships no templates/ or scripts/ directories. The skill is Markdown plus three reference documents; no executable content is imported.
 - The root LICENSE and skills/mckinsey-problem-solving/LICENSE.txt both read only 'Copyright (c) 2026' with no named holder. The recorded author is the repository owner and commit author; the initial skill commit is authored by Manus <skill@manus.im>. This manifest records declarations, not proof that upstream had the right to license the content.
 - No Markdown link inside the vendored skill points outside skills/mckinsey-problem-solving, so no sibling support tree is mapped.
+- The upstream SKILL.md description says what the skill does and when to use it, but not what to use instead, which AGENTS.md asks of local skills. The vendored file is not edited; this limitation records the routing gap.
 
 ## Notes
 
