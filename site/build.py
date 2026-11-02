@@ -83,6 +83,7 @@ LABELS = {
     "commercial": "Commercial",
     "research": "Research",
     "business-operations": "Business operations",
+    "mckinsey-problem-solving": "Structured problem solving",
     "business-growth": "Business growth",
     "markdown-html": "Markdown and HTML",
     "research-ops": "Research ops",

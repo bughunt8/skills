@@ -38,7 +38,8 @@
       "categories": [
         "c-level-advisor",
         "project-management",
-        "business-operations"
+        "business-operations",
+        "mckinsey-problem-solving"
       ]
     },
     {
@@ -112,6 +113,7 @@
     "c-level-advisor": "C-level advisory",
     "project-management": "Project management",
     "business-operations": "Business operations",
+    "mckinsey-problem-solving": "Structured problem solving",
     "marketing-skill": "Marketing",
     "commercial": "Commercial",
     "business-growth": "Business growth",

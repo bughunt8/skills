@@ -55,6 +55,7 @@ commit references require a reviewed manual pin update. Provenance presence is e
 | [gtm-skills](https://github.com/LeadMagic/gtm-skills) | LeadMagic LLC | MIT | `skills/gtm-skills/` | [`2b7ec0f9e704`](https://github.com/LeadMagic/gtm-skills/commit/2b7ec0f9e7044f46e4c77b536f486303fd863e28) | [ATTRIBUTION.md](./skills/gtm-skills/ATTRIBUTION.md) |
 | [jev-skill](https://github.com/wuyoscar/jev-skill) | wuyoscar | MIT | `skills/jev-skill/` | [`86b19a2c9856`](https://github.com/wuyoscar/jev-skill/commit/86b19a2c9856cc908ad29b5cf02ff1c4e7323c09) | [ATTRIBUTION.md](./skills/jev-skill/ATTRIBUTION.md) |
 | [rederive](https://github.com/EricJujianZou/rederive) | Eric Zou | MIT | `skills/rederive/` | [`329f9c915944`](https://github.com/EricJujianZou/rederive/commit/329f9c915944272f4f63954220f5d00a5c342270) | [ATTRIBUTION.md](./skills/rederive/ATTRIBUTION.md) |
+| [McKinsey Problem Solving](https://github.com/succtorlin/mckinsey-problem-solving-skill) | Tony Zhang (succtorlin) | MIT | `skills/mckinsey-problem-solving/` | [`c87cac100072`](https://github.com/succtorlin/mckinsey-problem-solving-skill/commit/c87cac1000720bb135d87888e9d4db50bd6f0fa3) | [ATTRIBUTION.md](./skills/mckinsey-problem-solving/ATTRIBUTION.md) |
 
 ### Secondary licences inside those imports
 

@@ -1570,6 +1570,39 @@
         "The skill writes .rederive/map.md and .rederive/log.md into the target repository. That is workspace state in the user's repo, not vendored content."
       ],
       "pinned_at": "2026-10-25"
+    },
+    {
+      "id": "mckinsey-problem-solving",
+      "name": "McKinsey Problem Solving",
+      "repo": "https://github.com/succtorlin/mckinsey-problem-solving-skill",
+      "homepage": "https://github.com/succtorlin/mckinsey-problem-solving-skill",
+      "author": "Tony Zhang (succtorlin)",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "ref": "main",
+      "pinned_commit": "c87cac1000720bb135d87888e9d4db50bd6f0fa3",
+      "dest": "skills/mckinsey-problem-solving",
+      "paths": [
+        {
+          "from": "skills",
+          "to": "",
+          "kind": "skill-collection",
+          "include": [
+            "*"
+          ],
+          "exclude": [],
+          "exclude_reasons": {}
+        }
+      ],
+      "mandatory": [],
+      "limitations": [
+        "Only the upstream skills/ tree is vendored. README.md and SECURITY.md are not linked from the skill and are not imported; the README's Manus one-click install URL does not apply to this library.",
+        "Upstream ships no templates/ or scripts/ directories. The skill is Markdown plus three reference documents; no executable content is imported.",
+        "The root LICENSE and skills/mckinsey-problem-solving/LICENSE.txt both read only 'Copyright (c) 2026' with no named holder. The recorded author is the repository owner and commit author; the initial skill commit is authored by Manus <skill@manus.im>. This manifest records declarations, not proof that upstream had the right to license the content.",
+        "No Markdown link inside the vendored skill points outside skills/mckinsey-problem-solving, so no sibling support tree is mapped."
+      ],
+      "notes": "The upstream skill is authored for Manus; only the skill directory is imported. The vendored content is not edited in place.",
+      "pinned_at": "2026-11-02"
     }
   ]
 }
