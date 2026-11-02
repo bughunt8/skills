@@ -723,9 +723,9 @@ def layout(graph: dict, comm: dict, rows_by_key: dict,
             round(min(width - 4.0, max(4.0, pt[0])), 1),
             round(min(height - 4.0, max(4.0, pt[1])), 1),
         ]
-    # At 757 nodes the denser engineering cluster can leave a pair just under the
-    # guarantee after the final rounding. More passes is a convergence cap, not a
-    # looser threshold: the target stays MIN_GAP + 0.6.
+    # At 757 nodes the final separation did not converge in 20 passes: the closest
+    # pair was still 14.9186 before the write, below the 15.0 guarantee. 80 passes is
+    # a convergence cap, not a looser threshold; the target stays MIN_GAP + 0.6.
     _separate(pts, min_dist=MIN_GAP + 0.6, passes=80)
     for k, pt in zip(keys, pts):
         out[k] = (
