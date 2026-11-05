@@ -69,8 +69,9 @@ The tracker refuses a release that:
 - moves an operative evidence line whose exact text is gone or ambiguous;
 - has no safe `LICENSE`, a symlink, an unreadable frontmatter, or no release tag.
 
-Those changes need a human parser and graph review. Similar updates never
-rewrite the graph. The checker also enforces exact closure between the registry
+An evidence line that moved but keeps the same unique text is relocated
+automatically. A changed or ambiguous line needs a human parser and graph
+review. Similar updates never rewrite the graph. The checker also enforces exact closure between the registry
 providers, the reference source and the `mattpocock-*` manifest sources, so an
 extra manifest source cannot bypass the dependency audit.
 

@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 
 import track_matt_release as tracker
 
@@ -164,6 +165,18 @@ class TrackerTests(unittest.TestCase):
             check=True, capture_output=True, text=True,
         ).stdout.strip()
 
+    def worktree(self):
+        path = Path(tempfile.mkdtemp(prefix="matt-fixture-wt-"))
+        path.rmdir()
+        self.git_root("worktree", "add", "--detach", str(path), "HEAD")
+        self.addCleanup(
+            lambda: subprocess.run(
+                ["git", "-C", str(self.root), "worktree", "remove", "--force", str(path)],
+                check=False, capture_output=True,
+            )
+        )
+        return path
+
     def proposal(self):
         return tracker.build_proposal(
             self.upstream, self.pin, "v1.2.0", str(self.upstream), self.root
@@ -300,6 +313,54 @@ class TrackerTests(unittest.TestCase):
         (self.root / "scratch.txt").write_text("uncommitted\n")
         with self.assertRaisesRegex(tracker.Refusal, "working tree is not clean"):
             tracker.run_write(self.root, str(self.upstream), None, "v1.2.0")
+
+    def test_write_is_a_no_op_at_the_pinned_release(self):
+        self.registry["upstream_commit"] = self.pin
+        self.registry["release_ref"] = "v1.2.0"
+        self.registry["release"] = "9.9.9"
+        (self.root / ".agents/skill-dependencies.json").write_text(
+            json.dumps(self.registry)
+        )
+        self.git_root("add", "-A")
+        self.git_root("commit", "-qm", "pin fixture")
+        result = tracker.run_write(self.root, str(self.upstream), None, "v1.2.0")
+        self.assertEqual(result["status"], "current")
+        self.assertEqual(self.git_root("status", "--porcelain"), "")
+
+    def add_tracked_skill(self):
+        path = self.root / "skills/engineering/a/SKILL.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("original\n")
+        self.git_root("add", "-A")
+        self.git_root("commit", "-qm", "tracked fixture skill")
+
+    def test_copy_back_applies_a_worktree_change(self):
+        self.add_tracked_skill()
+        worktree = self.worktree()
+        target = worktree / "skills/engineering/a/SKILL.md"
+        target.write_text(target.read_text() + "changed\n")
+        with mock.patch.object(tracker, "_verify", lambda root: None):
+            tracker._copy_back(self.root, worktree)
+        self.assertIn(
+            "changed", (self.root / "skills/engineering/a/SKILL.md").read_text()
+        )
+
+    def test_copy_back_rolls_back_a_failed_verification(self):
+        self.add_tracked_skill()
+        worktree = self.worktree()
+        target = worktree / "skills/engineering/a/SKILL.md"
+        original = (self.root / "skills/engineering/a/SKILL.md").read_text()
+        target.write_text("broken\n")
+
+        def fail(root):
+            raise RuntimeError("gate failed")
+
+        with mock.patch.object(tracker, "_verify", fail):
+            with self.assertRaisesRegex(tracker.Refusal, "rolled back"):
+                tracker._copy_back(self.root, worktree)
+        self.assertEqual(
+            (self.root / "skills/engineering/a/SKILL.md").read_text(), original
+        )
 
     def test_missing_license_is_refused(self):
         (self.upstream / "LICENSE").unlink()
