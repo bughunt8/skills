@@ -29,6 +29,13 @@ The upstream MIT license and copyright notice are preserved in [ALIREZAREZVANI_C
 - `research/`
 - `research-ops/`
 
+## Local additions
+
+`research-ops/skills/mckinsey-research/` is authored in this repository and is
+not part of the upstream Alireza Rezvani import. It is not covered by the
+upstream commit, copyright or licence above. The exception is recorded in
+`docs/third-party-inventory.json` under `local_additions`.
+
 ## Preserved third-party notices
 
 Some imported material has more specific attribution and license requirements, which are retained in place:

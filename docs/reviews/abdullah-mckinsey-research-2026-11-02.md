@@ -39,27 +39,20 @@ mismatch. `source/data` is absent. The negative cases (missing, extra, changed
 byte) each exit 1 on a real copy under `/tmp`; the vendored tree hash is
 unchanged afterwards.
 
+The authored skill is a local addition inside the legacy `skills/research-ops`
+domain. It is recorded as an exception in
+`skills/ALIREZAREZVANI_CLAUDE_SKILLS_ATTRIBUTION.md` and
+`docs/third-party-inventory.json` under `local_additions`.
+
 ## Functional QA
 
-Stage A was executed by an independent subagent (`sisyphus-junior`, session
-`ses_956a4dde-5204-41ba-8635-22463b575232`). It read the skill and replied:
-
-> Before I plan anything, please complete this intake in one pass.
->
-> 1. Output language: Arabic or English?
-> 2. Product clarification: Your description is under 50 words. What exactly is
->    the subscription, who is it for, and what makes it different?
-> 3. Core business facts, financials, strategy, expansion and performance.
->
-> Reply with all seven. I will not start the analysis until intake is complete.
-
-It used only the language and intake section. It started no analysis and wrote
-no file. The record predates the 18-field schema; it asked for intake categories,
-not every field. The schema is verified by inspection, not by an agent run.
-
-Stages B and C were executed manually from the skill text because the `athena`
-QA subagent failed to start. They are recorded in the gitignored
+The isolated QA subagent failed to start. Stages A, B and C were executed
+manually from the authored skill text and are recorded in the gitignored
 `.omo/evidence/mckinsey-qa/transcript.md`.
+
+Stage A asked for the output language and the 18-field intake in one message. It
+started no analysis and wrote no file. The 18-field schema is verified by
+inspection, not by an agent run.
 
 - Stage B produced a scope summary and stopped at `AWAITING SCOPE CONFIRMATION`.
   It predates the full/light/skipped coverage rule and did not enumerate

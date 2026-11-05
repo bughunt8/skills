@@ -10,7 +10,7 @@ file. Blocking every such import keeps useful reference material out; inventing 
 licence file is worse. The manifest may therefore record `license_evidence_path`
 instead of `license_path`. The importer copies that file verbatim into
 `LICENSE.upstream` behind a header saying it is a declaration, not a licence text,
-and attribution and notices say "declared; no standalone licence file". The two
+and attribution and notices say "declared; no upstream licence file". The two
 fields are mutually exclusive and one is required.
 
 ## Considered options

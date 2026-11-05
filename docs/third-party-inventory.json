@@ -44,7 +44,10 @@
         "skills/research-ops",
         "skills/engineering/strict-api"
       ],
-      "notes": "Eighteen whole skill domains. This is the largest import in the repository and the only pre-manifest one with a commit recorded."
+      "local_additions": [
+        "skills/research-ops/skills/mckinsey-research"
+      ],
+      "notes": "Eighteen whole skill domains. This is the largest import in the repository and the only pre-manifest one with a commit recorded. research-ops/skills/mckinsey-research is an authored local addition, not upstream content."
     },
     {
       "id": "stitch-skills",

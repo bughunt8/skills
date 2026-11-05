@@ -21,6 +21,11 @@ adapts the workflow.
 The manifest pins `ref` to the same full SHA, so a future upstream README change
 cannot be imported without a manual pin update.
 
+The authored skill sits inside `skills/research-ops/skills/`, which is a legacy
+Alireza Rezvani import domain. It is a local addition, not upstream content; the
+exception is recorded in `skills/ALIREZAREZVANI_CLAUDE_SKILLS_ATTRIBUTION.md`
+and `docs/third-party-inventory.json` under `local_additions`.
+
 ## Why a reference and an authored skill
 
 Two upstream properties make a verbatim vendored skill impossible under this
