@@ -98,6 +98,9 @@ def audit() -> dict:
             if not (REPO_ROOT / path).exists():
                 problems.append(f"[{eid}] declared path does not exist: `{path}`")
             covered_prefixes.append(path.strip("/"))
+        for path in entry.get("local_additions", []):
+            if not (REPO_ROOT / path).exists():
+                problems.append(f"[{eid}] local addition does not exist: `{path}`")
         if entry.get("notice"):
             covered_prefixes.append(entry["notice"])
         if entry.get("license_file"):
