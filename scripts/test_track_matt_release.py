@@ -202,6 +202,16 @@ class TrackerTests(unittest.TestCase):
         with self.assertRaisesRegex(tracker.Refusal, "graph evidence changed"):
             self.proposal()
 
+    def test_graph_evidence_line_shift_is_relocated(self):
+        path = self.upstream / "skills/engineering/a/SKILL.md"
+        path.write_text(path.read_text().replace("\nbody\n", "\n\nbody\n"))
+        proposal = self.proposal()
+        evidence = proposal["registry"]["providers"][0]["operative"][0][
+            "evidence_occurrences"
+        ][0]
+        self.assertEqual(evidence["line"], 6)
+        self.assertIn("#L6", evidence["source_url"])
+
     def test_new_scope_is_refused(self):
         new = self.upstream / "skills/design/new"
         new.mkdir(parents=True)

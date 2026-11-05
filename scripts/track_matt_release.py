@@ -194,11 +194,20 @@ def build_proposal(upstream, commit, release_ref, transport, root=ROOT):
         for edge in e["operative"]:
             for evidence in edge["evidence_occurrences"]:
                 line = evidence["line"]
-                if (line < 1 or line > len(lines) or lines[line - 1] != evidence["text"]):
+                if 1 <= line <= len(lines) and lines[line - 1] == evidence["text"]:
+                    continue
+                matches = [n for n, text in enumerate(lines, 1) if text == evidence["text"]]
+                if len(matches) != 1:
                     raise Refusal(
                         "refused_semantic",
                         f"graph evidence changed: {e['name']} -> {edge['target']}",
                     )
+                # The same line moved. Relocate it; a changed or ambiguous
+                # evidence line still needs a human review.
+                evidence["line"] = matches[0]
+                evidence["source_url"] = (
+                    f"{checker.REPO}/blob/{commit}/{e['path']}#L{matches[0]}"
+                )
         e["upstream_commit"] = commit
         e["source_url"] = f"{checker.REPO}/blob/{commit}/{e['path']}"
         for f in e["files"]:
