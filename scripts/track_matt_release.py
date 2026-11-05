@@ -159,10 +159,12 @@ def build_proposal(upstream, commit, release_ref, transport, root=ROOT):
     if symlinks:
         raise Refusal("refused_invalid_upstream", f"symlink in upstream: {symlinks[0]}")
     upstream_skills = upstream / "skills"
+    if upstream_skills.is_symlink() or not upstream_skills.is_dir():
+        raise Refusal("refused_invalid_upstream", "upstream skills directory is unsafe")
     domains = {
-        "skills/" + p.relative_to(upstream_skills).parts[0]
-        for p in upstream_skills.rglob("SKILL.md")
-        if not p.is_symlink()
+        "skills/" + p.name
+        for p in upstream_skills.iterdir()
+        if p.is_dir() and not p.is_symlink()
     }
     new_scopes = sorted(domains - scopes - ignored)
     if new_scopes:
@@ -185,8 +187,8 @@ def build_proposal(upstream, commit, release_ref, transport, root=ROOT):
         )
 
     licence = upstream / "LICENSE"
-    if not licence.is_file():
-        raise Refusal("refused_invalid_upstream", "upstream has no LICENSE")
+    if licence.is_symlink() or not licence.is_file():
+        raise Refusal("refused_invalid_upstream", "upstream has no safe LICENSE")
     legal_sha = _sha(licence)
     release = _release_version(upstream, release_ref)
 
@@ -219,6 +221,19 @@ def build_proposal(upstream, commit, release_ref, transport, root=ROOT):
         implicit = meta.get("policy", {}).get("allow_implicit_invocation", True)
         if mode != e["invocation"] or implicit == disabled:
             raise Refusal("refused_semantic", f"invocation policy changed: {e['name']}")
+        actual_files = {
+            p.relative_to(upstream).as_posix()
+            for p in source.rglob("*")
+            if p.is_file() and not p.is_symlink()
+        }
+        expected_files = {f["path"] for f in e["files"]}
+        if actual_files != expected_files:
+            raise Refusal(
+                "refused_semantic",
+                f"provider file set changed: {e['name']} "
+                f"missing={sorted(expected_files - actual_files)} "
+                f"added={sorted(actual_files - expected_files)}",
+            )
         lines = skill.read_text(encoding="utf-8").splitlines()
         for edge in e["operative"]:
             for evidence in edge["evidence_occurrences"]:
@@ -408,29 +423,54 @@ def apply_proposal(root, proposal, copy_back=True):
     _verify(root)
 
 
-def _copy_back(root, worktree):
-    status = _git(["status", "--porcelain", "-uall"], worktree)
-    for line in status.splitlines():
-        code, _, path = line.partition(" ")
-        path = path.strip()
-        if " -> " in path:
-            path = path.split(" -> ", 1)[1]
-        if not path:
-            continue
-        source = worktree / path
-        target = root / path
-        if code.strip() == "D" or not source.exists():
-            if target.exists():
-                target.unlink()
-            continue
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
+def _restore(root):
     try:
-        _verify(root)
-    except Exception as exc:
         _git(["restore", "--source=HEAD", "."], root)
         _git(["clean", "-fd"], root)
-        raise Refusal("rolled_back", f"post-copy verification failed: {exc}")
+    except Exception as exc:
+        raise Refusal("rolled_back", f"checkout rollback failed: {exc}")
+
+
+def _copy_back(root, worktree):
+    try:
+        status = _git(["status", "--porcelain", "-uall"], worktree)
+        for line in status.splitlines():
+            code, _, path = line.partition(" ")
+            path = path.strip()
+            if " -> " in path:
+                path = path.split(" -> ", 1)[1]
+            if not path:
+                continue
+            source = worktree / path
+            target = root / path
+            if code.strip() == "D" or not source.exists():
+                if target.exists():
+                    target.unlink()
+                continue
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, target)
+        _verify(root)
+    except Refusal:
+        raise
+    except Exception as exc:
+        try:
+            _restore(root)
+        except Refusal as rollback:
+            raise Refusal(
+                "rolled_back",
+                f"copy-back failed: {exc}; {rollback.message}",
+            ) from exc
+        raise Refusal("rolled_back", f"copy-back failed and was rolled back: {exc}") from exc
+
+
+def _drop_worktree(root, worktree):
+    try:
+        _git(["worktree", "remove", "--force", str(worktree)], root)
+    except Exception as exc:
+        print(
+            f"warning: could not remove temporary worktree {worktree}: {exc}",
+            file=sys.stderr,
+        )
 
 
 def run_check(root, upstream_dir, upstream_url, ref):
@@ -448,7 +488,7 @@ def run_check(root, upstream_dir, upstream_url, ref):
         try:
             apply_proposal(worktree, proposal)
         finally:
-            _git(["worktree", "remove", "--force", str(worktree)], root)
+            _drop_worktree(root, worktree)
         return {"status": "update_available", "changed": True, "target": commit}
     finally:
         cleanup()
@@ -472,7 +512,7 @@ def run_write(root, upstream_dir, upstream_url, ref):
             apply_proposal(worktree, proposal)
             _copy_back(root, worktree)
         finally:
-            _git(["worktree", "remove", "--force", str(worktree)], root)
+            _drop_worktree(root, worktree)
         return {"status": "updated", "changed": True, "target": commit}
     finally:
         cleanup()
