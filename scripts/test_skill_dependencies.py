@@ -378,12 +378,34 @@ class Dependencies(unittest.TestCase):
                         pinned_commit=self.r['upstream_commit'], expected_commit=self.r['upstream_commit'], ref=self.r["release_ref"],
                         dest=e["source_path"], paths=[{"from": e["source_path"], "to": "", "kind": "skill"}])
                    for e in self.r["providers"]]
+        sources += [dict(id=reference["id"], repo=checker.REPO,
+                         pinned_commit=self.r['upstream_commit'], expected_commit=self.r['upstream_commit'],
+                         ref=self.r["release_ref"], dest=reference["dest"], paths=[])
+                    for reference in self.r["reference_sources"]]
         path = self.root / "skills/vendor.manifest.json"
         path.write_text(json.dumps({"sources": sources}))
         self.assertEqual(checker.check(self.root, self.r), [])
         sources[0]["paths"][0]["from"] = "skills/engineering/research"
         path.write_text(json.dumps({"sources": sources}))
         self.assert_errors("import manifest source path/pin mismatch")
+
+    def test_import_manifest_extra_matt_source_refused(self):
+        self.add_provenance()
+        sources = [dict(id="mattpocock-" + e["name"], repo=checker.REPO,
+                        pinned_commit=self.r['upstream_commit'], expected_commit=self.r['upstream_commit'],
+                        ref=self.r["release_ref"], dest=e["source_path"],
+                        paths=[{"from": e["source_path"], "to": "", "kind": "skill"}])
+                   for e in self.r["providers"]]
+        sources += [dict(id=reference["id"], dest=reference["dest"], paths=[])
+                    for reference in self.r["reference_sources"]]
+        sources.append(dict(id="mattpocock-extra", dest="skills/engineering/extra", paths=[]))
+        (self.root / "skills/vendor.manifest.json").write_text(json.dumps({"sources": sources}))
+        self.assert_errors("import manifest Matt source closure mismatch")
+
+    def test_untracked_scope_must_be_a_top_level_domain(self):
+        self.r["untracked_scopes"] = ["skills/engineering/nested"]
+        with self.assertRaisesRegex(checker.Invalid, "untracked scope"):
+            checker.validate_registry(self.r)
 
     def test_cli_root_and_exact_path(self):
         result = subprocess.run([sys.executable, str(BASE / "scripts/check_skill_dependencies.py"),

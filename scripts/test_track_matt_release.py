@@ -68,7 +68,8 @@ class TrackerTests(unittest.TestCase):
             "provider_count": 2,
             "file_count": 4,
             "operative_count": 1,
-            "untracked_scopes": ["skills/misc"],
+            "untracked_scopes": ["skills/deprecated", "skills/misc"],
+            "reference_sources": [],
             "legal_resource": {
                 "source_path": "LICENSE",
                 "sha256": "0" * 64,
@@ -199,6 +200,13 @@ class TrackerTests(unittest.TestCase):
         with self.assertRaisesRegex(tracker.Refusal, "provider set changed"):
             self.proposal()
 
+    def test_untracked_tree_without_a_skill_is_ignored(self):
+        new = self.upstream / "skills/deprecated"
+        new.mkdir(parents=True)
+        (new / "README.md").write_text("no skill here\n")
+        proposal = self.proposal()
+        self.assertEqual(proposal["registry"]["provider_count"], 2)
+
     def test_untracked_scope_is_ignored(self):
         new = self.upstream / "skills/misc/experimental"
         new.mkdir(parents=True)
@@ -265,6 +273,20 @@ class TrackerTests(unittest.TestCase):
         with self.assertRaisesRegex(tracker.Refusal, "upstream directory is at"):
             tracker.prepare_upstream(self.upstream, self.pin, False)
 
+    def test_provider_file_set_change_is_refused(self):
+        (self.upstream / "skills/engineering/a/extra.md").write_text("new resource\n")
+        with self.assertRaisesRegex(tracker.Refusal, "provider file set changed"):
+            self.proposal()
+
+    def test_symlink_license_is_refused(self):
+        licence = self.upstream / "LICENSE"
+        real = self.upstream / "LICENSE.real"
+        real.write_text(licence.read_text())
+        licence.unlink()
+        licence.symlink_to(real)
+        with self.assertRaisesRegex(tracker.Refusal, "LICENSE"):
+            self.proposal()
+
     def test_symlink_provider_is_refused(self):
         skill = self.upstream / "skills/engineering/a/SKILL.md"
         real = self.upstream / "fixture-skill.md"
@@ -281,7 +303,7 @@ class TrackerTests(unittest.TestCase):
 
     def test_missing_license_is_refused(self):
         (self.upstream / "LICENSE").unlink()
-        with self.assertRaisesRegex(tracker.Refusal, "no LICENSE"):
+        with self.assertRaisesRegex(tracker.Refusal, "LICENSE"):
             self.proposal()
 
     def test_library_size_updates_three_literals_and_drops_communities(self):

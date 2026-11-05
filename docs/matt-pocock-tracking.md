@@ -40,7 +40,8 @@ and copies back only after they pass. A copy-back failure restores the checkout.
   `homepage` and `pinned_at`.
 - `.agents/skill-dependencies.json`: `upstream_commit`, `release`, `release_ref`,
   the legal resource, every provider and file hash, every source URL, the
-  declared counts and the regenerated `legacy_bindings`.
+  declared counts, the reference-source identity and the regenerated
+  `legacy_bindings`.
 - Generated attribution: `LICENSE.upstream`, `ATTRIBUTION.md`, `PROVENANCE.md`
   and `THIRD_PARTY_NOTICES.md` through `sync_vendor.py`.
 - `README.md`, `AGENTS.md`, `.agents/invocation.md` and
@@ -51,24 +52,31 @@ and copies back only after they pass. A copy-back failure restores the checkout.
 Historical documents keep their original pins: `docs/matt-pocock-v1.3.1.md`, the
 setup migration references and `MATTPOCOCK_SKILLS_ATTRIBUTION.md`.
 
-The registry's `untracked_scopes` lists the experimental trees that the stable
-import does not vendor, currently `skills/in-progress` and `skills/misc`. A new
-provider under either tree does not change the vendored set. A new top-level
-tree under `skills/` is refused until a human decides whether it belongs in the
-stable import.
+The registry's `untracked_scopes` lists the non-stable trees that the import
+does not vendor, currently `skills/deprecated`, `skills/in-progress` and
+`skills/misc`. A new provider under one of those trees does not change the
+vendored set. A new top-level tree under `skills/` is refused until a human
+decides whether it belongs in the stable import.
 
 ## Fail-closed points
 
 The tracker refuses a release that:
 
 - adds, removes or renames a provider inside a tracked scope;
+- adds or removes a file inside a tracked provider;
 - adds an unrecognised top-level tree under `skills/`;
 - changes a provider path or invocation policy;
-- changes the body evidence for an operative dependency edge;
-- has no `LICENSE`, a symlink, an unreadable frontmatter, or no release tag.
+- moves an operative evidence line whose exact text is gone or ambiguous;
+- has no safe `LICENSE`, a symlink, an unreadable frontmatter, or no release tag.
 
-Those changes need a human parser and graph review. Hash-only updates never
-rewrite the graph.
+Those changes need a human parser and graph review. Similar updates never
+rewrite the graph. The checker also enforces exact closure between the registry
+providers, the reference source and the `mattpocock-*` manifest sources, so an
+extra manifest source cannot bypass the dependency audit.
+
+A clone starts on the default branch, so the tracker checks out the resolved
+commit before it reads or hashes anything. A caller-provided `--upstream-dir`
+must already be at that commit; the tracker will not move it.
 
 ## Staging workflow
 

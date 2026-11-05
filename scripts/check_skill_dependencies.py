@@ -186,7 +186,10 @@ def validate_registry(r):
             raise Invalid(f"duplicate or invalid native provider: {name}")
         source_path = e["source_path"]
         path = e["path"]
-        if (not isinstance(source_path, str) or not source_path.startswith("skills/")
+        source_parts = PurePosixPath(source_path).parts if isinstance(source_path, str) else ()
+        if (len(source_parts) != 3 or source_parts[0] != "skills"
+                or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", source_parts[1])
+                or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", source_parts[2])
                 or path != f"{source_path}/SKILL.md"):
             raise Invalid(f"wrong provider identity/path: {name}")
         if e["upstream_commit"] != pin or e["source_url"] != f"{REPO}/blob/{pin}/{path}":
@@ -213,12 +216,31 @@ def validate_registry(r):
     if r.get("file_count") != file_count:
         raise Invalid("declared file count mismatch")
     untracked = r.get("untracked_scopes")
-    if (not isinstance(untracked, list)
-            or not all(isinstance(s, str) and s.startswith("skills/") for s in untracked)):
-        raise Invalid("registry untracked_scopes must be a list of skills/ paths")
-    for e in entries:
-        if any(e["source_path"] == s or e["source_path"].startswith(s + "/") for s in untracked):
-            raise Invalid(f"tracked provider inside an untracked scope: {e['name']}")
+    if not isinstance(untracked, list) or len(set(untracked)) != len(untracked):
+        raise Invalid("registry untracked_scopes must be a unique list")
+    for scope in untracked:
+        parts = PurePosixPath(scope).parts if isinstance(scope, str) else ()
+        if (len(parts) != 2 or parts[0] != "skills"
+                or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", parts[1])):
+            raise Invalid(f"untracked scope must be skills/<domain>: {scope}")
+        if any(e["source_path"].startswith(scope + "/") for e in entries):
+            raise Invalid(f"untracked scope contains a tracked provider: {scope}")
+    references = r.get("reference_sources")
+    if not isinstance(references, list):
+        raise Invalid("registry reference_sources must be a list")
+    seen_references = set()
+    for reference in references:
+        if not isinstance(reference, dict):
+            raise Invalid("registry reference source must be an object")
+        source_id = reference.get("id")
+        dest = reference.get("dest")
+        if (not isinstance(source_id, str) or not source_id.startswith("mattpocock-")
+                or source_id in seen_references):
+            raise Invalid(f"invalid reference source id: {source_id}")
+        if (not isinstance(dest, str)
+                or not dest.startswith("docs/reference-sources/")):
+            raise Invalid(f"invalid reference source destination: {dest}")
+        seen_references.add(source_id)
     graph = {}
     for name, e in by_name.items():
         targets = []
@@ -365,6 +387,17 @@ def check(root, r, require_provenance=False):
                     or s.get("expected_commit") != pin or s.get("ref") != release_ref
                     or s.get("dest") != e["source_path"] or s.get("paths") != expected_mapping):
                 errors.append(f"import manifest source path/pin mismatch: {name}")
+        matt_sources = [s for s in sources
+                        if str(s.get("id", "")).startswith("mattpocock-")]
+        expected_ids = {"mattpocock-" + name for name in by_name}
+        expected_dests = {e["source_path"] for e in by_name.values()}
+        for reference in r["reference_sources"]:
+            expected_ids.add(reference["id"])
+            expected_dests.add(reference["dest"])
+        if {s.get("id") for s in matt_sources} != expected_ids:
+            errors.append("import manifest Matt source closure mismatch")
+        if {s.get("dest") for s in matt_sources} != expected_dests:
+            errors.append("import manifest Matt destination closure mismatch")
     for name, e in by_name.items():
         try:
             for f in e["files"]:

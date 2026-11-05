@@ -8,8 +8,15 @@
   "file_count": 79,
   "operative_count": 18,
   "untracked_scopes": [
+    "skills/deprecated",
     "skills/in-progress",
     "skills/misc"
+  ],
+  "reference_sources": [
+    {
+      "id": "mattpocock-invocation-reference",
+      "dest": "docs/reference-sources/mattpocock-invocation"
+    }
   ],
   "legal_resource": {
     "source_path": "LICENSE",
