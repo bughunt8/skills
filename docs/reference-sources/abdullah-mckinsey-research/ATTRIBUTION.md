@@ -3,7 +3,7 @@
 # Attribution: McKinsey Research (Abdullah4AI)
 
 Everything in this directory was copied from [McKinsey Research (Abdullah4AI)](https://github.com/Abdullah4AI/mckinsey-research) at commit
-[`140ecedf57414521bf55fc485e140d151cfb44fd`](https://github.com/Abdullah4AI/mckinsey-research/commit/140ecedf57414521bf55fc485e140d151cfb44fd), pinned on 2026-11-02.
+[`140ecedf57414521bf55fc485e140d151cfb44fd`](https://github.com/Abdullah4AI/mckinsey-research/commit/140ecedf57414521bf55fc485e140d151cfb44fd), pinned on 2026-11-05.
 
 - **Upstream project:** <https://github.com/Abdullah4AI/mckinsey-research>
 - **Original author:** Abdullah AlRashoudi (@Abdullah4AI)
