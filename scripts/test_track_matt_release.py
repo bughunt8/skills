@@ -422,12 +422,19 @@ class TrackerTests(unittest.TestCase):
             / ".github/workflows/sync-matt-release.yml"
         ).read_text()
         for required in (
+            "workflow_dispatch",
+            "schedule",
+            "cancel-in-progress: false",
             "base: staging",
+            "SYNC_PAT",
             "track_matt_release.py --check",
             "track_matt_release.py --write",
+            "-eq 0",
+            "-eq 1",
             "scripts/check_skill_dependencies.py --include-legacy",
             "site/build.py --check",
             "npx playwright test",
+            "THIRD_PARTY_NOTICES.md",
         ):
             self.assertIn(required, text)
 
