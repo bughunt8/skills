@@ -307,11 +307,17 @@ def check_vendor_sync_contract(workflow):
 def check_matt_release_contract(workflow):
     """The Matt tracker opens a staging pull request and gates it inside the job."""
     label = "sync-matt-release"
+    triggers = workflow.get("on") or {}
+    require(triggers.get("workflow_dispatch") is not None,
+            f"{label}: manual dispatch must stay available")
+    require(bool(triggers.get("schedule")), f"{label}: expected a schedule trigger")
     require(workflow.get("permissions", {}).get("contents") == "read",
             f"{label}: top-level permissions must stay read-only")
     concurrency = workflow.get("concurrency") or {}
     require(concurrency.get("group") == label,
             f"{label}: expected a stable concurrency group")
+    require(concurrency.get("cancel-in-progress") is False,
+            f"{label}: a release update must not cancel a running one")
     job = get_job(workflow, "sync", label)
     require(job.get("permissions", {}).get("contents") == "write",
             f"{label}: sync job needs contents write")
@@ -337,16 +343,30 @@ def check_matt_release_contract(workflow):
     ):
         require(command in runs, f"{label}: missing in-job gate {command}")
 
+    checks = [step for step in job.get("steps", [])
+              if "track_matt_release.py --check" in step.get("run", "")]
+    require(len(checks) == 1, f"{label}: expected exactly one check step")
+    check_run = checks[0]["run"]
+    require("-eq 0" in check_run and "-eq 1" in check_run,
+            f"{label}: the check step must accept current and update exits only")
+    require("exit" in check_run,
+            f"{label}: a refusal must fail the job instead of continuing")
+
     pulls = [step for step in job.get("steps", [])
              if "create-pull-request" in str(step.get("uses", ""))]
     require(len(pulls) == 1, f"{label}: expected exactly one create-pull-request step")
-    require(pulls[0].get("with", {}).get("base") == "staging",
+    pull_with = pulls[0].get("with", {})
+    require(pull_with.get("base") == "staging",
             f"{label}: the pull request must target staging")
-    add_paths = pulls[0].get("with", {}).get("add-paths", "")
+    token = str(pull_with.get("token", ""))
+    require("SYNC_PAT" in token and "GITHUB_TOKEN" in token,
+            f"{label}: the token must prefer SYNC_PAT and fall back to GITHUB_TOKEN")
+    add_paths = pull_with.get("add-paths", "")
     if isinstance(add_paths, list):
         add_paths = "\n".join(add_paths)
     for path in ("skills/", "docs/", ".agents/", "README.md", "AGENTS.md",
-                 "site/index.html", "site/data.js", "site/tests/library-size.mjs"):
+                 "THIRD_PARTY_NOTICES.md", "site/index.html", "site/data.js",
+                 "site/intro.html", "site/tests/library-size.mjs"):
         require(path in add_paths.split(),
                 f"{label}: add-paths must include {path}")
 
