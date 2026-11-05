@@ -48,6 +48,7 @@ No promotion was performed. Only `staging` was pushed, for maintainer review.
 - Site totals: 758 skills, 30 categories, 91 communities, 61 Solutions.
 - Repository counts: 740 skill files, 28 directories, 739 linted.
 - The graph separation cap increased from 20 to 80 passes. At 757 nodes the final separation did not converge in 20 passes; the closest pair was still 14.9186 before the write, below the 15.0 guarantee, and `site/tests/test_network.py` failed. The change does not lower `MIN_GAP`, change the `MIN_GAP + 0.6` target, or alter identity/evidence semantics. Reviewers should treat it as a behavior change included with the import.
+- `site/build.py` now derives the attribution tier from the manifest `ref`: branch-tracking sources render `refreshed`, and immutable 40-character refs render `manual pin`. The pre-existing OpenHeart reference is relabelled from `refreshed` to `manual pin` because its `ref` is a full commit SHA.
 
 ## Reviews
 

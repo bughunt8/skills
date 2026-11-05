@@ -12,7 +12,7 @@ Date: 2026-11-02. Branch `staging`, based on `c6249a7`.
 | `scripts/sync_vendor.py --validate-manifest` | 40 sources, 0 problems |
 | `scripts/sync_vendor.py --check --source abdullah-mckinsey-research` | no drift |
 | `scripts/audit_third_party.py` | 506 markers, 0 unaccounted |
-| `scripts/check_links.py` (default scope) | 2016 files, 2847 links, 0 unresolved |
+| `scripts/check_links.py` (default scope) | 2016 files, 2845 links, 0 unresolved (2026-11-05 re-run) |
 | `scripts/check_links.py --path …` (new docs included) | 2026 files, 2856 links, 0 unresolved |
 | `scripts/check_solutions.py` | 3 solutions, all steps resolve |
 | `scripts/check_skill_dependencies.py --include-legacy` | 27 providers, 79 files, OK |
@@ -28,6 +28,8 @@ Date: 2026-11-02. Branch `staging`, based on `c6249a7`.
 | `site/tests/test_deploy_workflows.py` | 38 tests, OK |
 | `npm run lint:html` | clean |
 | `npm run lint:secrets` | clean |
+
+The link count was re-run on 2026-11-05; the 2026-11-02 snapshot was 2847.
 
 ## Import completeness
 
