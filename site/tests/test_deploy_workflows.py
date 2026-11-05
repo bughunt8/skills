@@ -26,6 +26,7 @@ VENDOR_SYNC = "sync-vendored-skills"
 WORKFLOW_NAMES = (
     "a2-site-deploy-staging", "b2-site-deploy-production", "s2-site-deploy",
     "s3-site-verify", "s1-site-validate", REFRESH, VENDOR_SYNC,
+    "sync-matt-release",
 )
 CALLERS = {"staging": "a2-site-deploy-staging", "production": "b2-site-deploy-production"}
 SMOKE_COMMAND = 'node scripts/smoke.mjs "$SITE_URL" "$EXPECTED_SHA"'
@@ -303,6 +304,53 @@ def check_vendor_sync_contract(workflow):
                 "not part of the pull request")
 
 
+def check_matt_release_contract(workflow):
+    """The Matt tracker opens a staging pull request and gates it inside the job."""
+    label = "sync-matt-release"
+    require(workflow.get("permissions", {}).get("contents") == "read",
+            f"{label}: top-level permissions must stay read-only")
+    concurrency = workflow.get("concurrency") or {}
+    require(concurrency.get("group") == label,
+            f"{label}: expected a stable concurrency group")
+    job = get_job(workflow, "sync", label)
+    require(job.get("permissions", {}).get("contents") == "write",
+            f"{label}: sync job needs contents write")
+    require(job.get("permissions", {}).get("pull-requests") == "write",
+            f"{label}: sync job needs pull-requests write")
+
+    checkouts = [step for step in job.get("steps", [])
+                 if str(step.get("uses", "")).startswith("actions/checkout@")]
+    require(len(checkouts) == 1, f"{label}: expected exactly one checkout")
+    require(checkouts[0].get("with", {}).get("ref") == "staging",
+            f"{label}: must check out staging")
+    require(checkouts[0].get("with", {}).get("persist-credentials") is False,
+            f"{label}: checkout must not persist credentials")
+
+    runs = "\n".join(step.get("run", "") for step in job.get("steps", []))
+    for command in (
+        "track_matt_release.py --check",
+        "track_matt_release.py --write",
+        "check_skill_dependencies.py --include-legacy",
+        "harness_manifest_builder.py --check",
+        "site/build.py --check",
+        "npx playwright test",
+    ):
+        require(command in runs, f"{label}: missing in-job gate {command}")
+
+    pulls = [step for step in job.get("steps", [])
+             if "create-pull-request" in str(step.get("uses", ""))]
+    require(len(pulls) == 1, f"{label}: expected exactly one create-pull-request step")
+    require(pulls[0].get("with", {}).get("base") == "staging",
+            f"{label}: the pull request must target staging")
+    add_paths = pulls[0].get("with", {}).get("add-paths", "")
+    if isinstance(add_paths, list):
+        add_paths = "\n".join(add_paths)
+    for path in ("skills/", "docs/", ".agents/", "README.md", "AGENTS.md",
+                 "site/index.html", "site/data.js", "site/tests/library-size.mjs"):
+        require(path in add_paths.split(),
+                f"{label}: add-paths must include {path}")
+
+
 def check_contract(workflows):
     for environment, url in (("staging", STAGING), ("production", PRODUCTION)):
         workflow = workflows[CALLERS[environment]]
@@ -387,6 +435,7 @@ def check_contract(workflows):
     check_refresh_contract(workflows[REFRESH])
     check_refresh_candidate_validation(workflows)
     check_vendor_sync_contract(workflows[VENDOR_SYNC])
+    check_matt_release_contract(workflows["sync-matt-release"])
 
 
 class WorkflowContractTests(unittest.TestCase):
