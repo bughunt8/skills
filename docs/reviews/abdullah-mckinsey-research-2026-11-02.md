@@ -36,8 +36,10 @@ authenticity or rights. The byte comparison below establishes that the imported
 content matches the pinned source. The pinned checkout (`140ecedf5741`) and the
 imported `source/` agree on all 21 selected files: no missing, no extra, no hash
 mismatch. `source/data` is absent. The negative cases (missing, extra, changed
-byte) each exit 1 on a real copy under `/tmp`; the vendored tree hash is
-unchanged afterwards.
+byte) each exit 1 on a real copy under `.omo/evidence/staging-promotion`; the
+vendored tree hash is unchanged afterwards. The script is retained at
+`.omo/evidence/check_reference_import.py` and its output at
+`.omo/evidence/staging-promotion/abdullah-completeness.txt` (both gitignored).
 
 The authored skill is a local addition inside the legacy `skills/research-ops`
 domain. It is recorded as an exception in

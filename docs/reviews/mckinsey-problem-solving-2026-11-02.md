@@ -1,7 +1,7 @@
 # Review evidence: mckinsey-problem-solving import
 
 Date: 2026-11-05. Import committed 2026-11-02.
-Branch: `staging`. Base before the staging work: `9051b3f`. Validated HEAD: `368484b`.
+Branch: `staging`. Base before the staging work: `9051b3f`. Validated code commit: `d756ae3`. The review record, the local-addition audit check and the predicate normalization are the follow-up commit.
 
 ## Scope
 
@@ -38,7 +38,7 @@ No promotion was performed. Only `staging` was pushed, for maintainer review.
 - Imported only through `python3 scripts/sync_vendor.py --sync --source mckinsey-problem-solving`. No file was copied by hand.
 - The vendored tree contains `SKILL.md`, `LICENSE.txt`, the three references and the generated `PROVENANCE.md`.
 - Generated metadata: `ATTRIBUTION.md`, `LICENSE.upstream`, `.vendor-owned.json`, `THIRD_PARTY_NOTICES.md`, the README index row and the site attribution.
-- Completeness: 5 expected, 5 imported, 0 missing, 0 extra, 0 mismatch. The negative cases for missing, extra and mismatch each report 1 and exit 1. The destination digest is unchanged before and after.
+- Completeness: 5 expected, 5 imported, 0 missing, 0 extra, 0 mismatch. The negative cases for missing, extra and mismatch each report 1 and exit 1. The destination digest is unchanged before and after. The script and output are retained at `.omo/evidence/staging-promotion/check_mckinsey.py` and `.omo/evidence/staging-promotion/mckinsey-completeness.txt` (gitignored).
 - Manifest validation: 40 sources, 0 problems. It checks declarations and records, not licence rights.
 - Description gap: the upstream description does not name a "use instead" alternative. The vendored file is not edited; the gap is recorded in `limitations` and rendered into `ATTRIBUTION.md`.
 

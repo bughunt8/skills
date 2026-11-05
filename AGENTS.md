@@ -212,7 +212,8 @@ docs/skill-library.html        static prototype rendering the solutions
 - **`--check` exits 1 when upstream moved.** That is a report, not a failure. Only
   `--validate-manifest` belongs in a blocking gate, because it needs no network.
 - **`--validate-manifest` checks declarations, not truth.** It proves the tree matches what the
-  manifest claims and that provenance, licence copies or evidence, and ownership records exist. It cannot
+  manifest claims and that provenance, a licence copy or recorded evidence, and ownership
+  records exist. It cannot
   prove an upstream had the right to license what it published, or that a declared author is the
   real one. Do not describe it as licence verification.
 - **Symlinks in an upstream tree are a hard error, not a warning.** Following one would let
