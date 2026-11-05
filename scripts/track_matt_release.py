@@ -133,6 +133,14 @@ def build_proposal(upstream, commit, release_ref, transport, root=ROOT):
     expected = {e["source_path"] for e in providers}
     scopes = {"/".join(Path(e["source_path"]).parts[:2]) for e in providers}
     ignored = set(registry.get("untracked_scopes", []))
+    symlinks = sorted(
+        p.relative_to(upstream).as_posix()
+        for scope in scopes
+        for p in (upstream / scope).rglob("*")
+        if p.is_symlink()
+    )
+    if symlinks:
+        raise Refusal("refused_invalid_upstream", f"symlink in upstream: {symlinks[0]}")
     upstream_skills = upstream / "skills"
     domains = {
         "skills/" + p.relative_to(upstream_skills).parts[0]
@@ -178,8 +186,12 @@ def build_proposal(upstream, commit, release_ref, transport, root=ROOT):
         source = upstream / e["source_path"]
         skill = source / "SKILL.md"
         codex = source / "agents/openai.yaml"
-        if not skill.is_file() or not codex.is_file():
-            raise Refusal("refused_invalid_upstream", f"missing provider files: {e['name']}")
+        if (skill.is_symlink() or codex.is_symlink()
+                or not skill.is_file() or not codex.is_file()):
+            raise Refusal(
+                "refused_invalid_upstream",
+                f"missing or symlinked provider files: {e['name']}",
+            )
         try:
             fm = checker.frontmatter(skill)
             meta = checker.codex(codex)

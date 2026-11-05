@@ -145,10 +145,20 @@ class TrackerTests(unittest.TestCase):
         }
         (self.root / "skills/vendor.manifest.json").write_text(json.dumps(self.manifest))
         (self.root / ".agents/skill-dependencies.json").write_text(json.dumps(self.registry))
+        self.git_root("init", "-q")
+        self.git_root("add", "-A")
+        self.git_root("commit", "-qm", "fixture checkout")
 
     def git(self, *args):
         return subprocess.run(
             ["git", "-C", str(self.upstream), "-c", "user.name=Fixture",
+             "-c", "user.email=fixture@test", *args],
+            check=True, capture_output=True, text=True,
+        ).stdout.strip()
+
+    def git_root(self, *args):
+        return subprocess.run(
+            ["git", "-C", str(self.root), "-c", "user.name=Fixture",
              "-c", "user.email=fixture@test", *args],
             check=True, capture_output=True, text=True,
         ).stdout.strip()
@@ -226,6 +236,20 @@ class TrackerTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(tracker.Refusal, "invocation policy changed"):
             self.proposal()
+
+    def test_symlink_provider_is_refused(self):
+        skill = self.upstream / "skills/engineering/a/SKILL.md"
+        real = self.upstream / "fixture-skill.md"
+        real.write_text(skill.read_text())
+        skill.unlink()
+        skill.symlink_to(real)
+        with self.assertRaisesRegex(tracker.Refusal, "symlink"):
+            self.proposal()
+
+    def test_write_refuses_a_dirty_tree(self):
+        (self.root / "scratch.txt").write_text("uncommitted\n")
+        with self.assertRaisesRegex(tracker.Refusal, "working tree is not clean"):
+            tracker.run_write(self.root, str(self.upstream), None, "v1.2.0")
 
     def test_missing_license_is_refused(self):
         (self.upstream / "LICENSE").unlink()
