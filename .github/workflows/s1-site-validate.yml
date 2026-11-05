@@ -21,7 +21,7 @@ permissions:
 jobs:
   secrets:
     name: secret scan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: site
@@ -47,7 +47,7 @@ jobs:
 
   build:
     name: build is reproducible from source
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: site
@@ -96,7 +96,7 @@ jobs:
 
   lint:
     name: html validity
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: site
@@ -112,7 +112,7 @@ jobs:
 
   test:
     name: browser tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: site
@@ -174,7 +174,7 @@ jobs:
 
   solutions:
     name: solution references resolve
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
 
@@ -244,7 +244,7 @@ jobs:
 
   deployment_contract:
     name: deployment verification regression tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
@@ -269,7 +269,7 @@ jobs:
 
   gate:
     name: all gates passed
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [secrets, build, lint, test, solutions, deployment_contract]
     if: always()
     steps:
