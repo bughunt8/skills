@@ -67,7 +67,7 @@ class TrackerTests(unittest.TestCase):
             "release_ref": "v1.0.0",
             "provider_count": 2,
             "file_count": 4,
-            "operative_count": 0,
+            "operative_count": 1,
             "untracked_scopes": ["skills/misc"],
             "legal_resource": {
                 "source_path": "LICENSE",
@@ -84,7 +84,21 @@ class TrackerTests(unittest.TestCase):
                     "invocation": "model_or_user",
                     "files": files[:2],
                     "resources": [],
-                    "operative": [],
+                    "operative": [
+                        {
+                            "target": "b",
+                            "type": "operative_tool_call",
+                            "condition": "fixture step",
+                            "provider_path": "skills/productivity/b/SKILL.md",
+                            "evidence_occurrences": [
+                                {
+                                    "line": 5,
+                                    "text": "body",
+                                    "source_url": f"{REPO}/blob/{PIN}/skills/engineering/a/SKILL.md#L5",
+                                }
+                            ],
+                        }
+                    ],
                     "human_prerequisites": [],
                 },
                 {
@@ -181,6 +195,12 @@ class TrackerTests(unittest.TestCase):
         (new / "SKILL.md").write_text("---\nname: experimental\ndescription: new\n---\n")
         proposal = self.proposal()
         self.assertEqual(proposal["registry"]["provider_count"], 2)
+
+    def test_graph_evidence_change_is_refused(self):
+        path = self.upstream / "skills/engineering/a/SKILL.md"
+        path.write_text(path.read_text().replace("body", "changed body"))
+        with self.assertRaisesRegex(tracker.Refusal, "graph evidence changed"):
+            self.proposal()
 
     def test_new_scope_is_refused(self):
         new = self.upstream / "skills/design/new"

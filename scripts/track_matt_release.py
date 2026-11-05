@@ -183,13 +183,22 @@ def build_proposal(upstream, commit, release_ref, transport, root=ROOT):
         try:
             fm = checker.frontmatter(skill)
             meta = checker.codex(codex)
-        except (checker.Invalid, Exception) as exc:
+        except Exception as exc:
             raise Refusal("refused_semantic", f"invalid provider metadata: {e['name']}: {exc}")
         disabled = checker.disabled(fm)
         mode = "user_only" if disabled else "model_or_user"
         implicit = meta.get("policy", {}).get("allow_implicit_invocation", True)
         if mode != e["invocation"] or implicit == disabled:
             raise Refusal("refused_semantic", f"invocation policy changed: {e['name']}")
+        lines = skill.read_text(encoding="utf-8").splitlines()
+        for edge in e["operative"]:
+            for evidence in edge["evidence_occurrences"]:
+                line = evidence["line"]
+                if (line < 1 or line > len(lines) or lines[line - 1] != evidence["text"]):
+                    raise Refusal(
+                        "refused_semantic",
+                        f"graph evidence changed: {e['name']} -> {edge['target']}",
+                    )
         e["upstream_commit"] = commit
         e["source_url"] = f"{checker.REPO}/blob/{commit}/{e['path']}"
         for f in e["files"]:
