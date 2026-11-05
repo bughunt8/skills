@@ -1,5 +1,8 @@
 # Matt Pocock v1.3.1 dependency integration
 
+> This page records the v1.3.1 migration and keeps its original pins. Current
+> release tracking is documented in [matt-pocock-tracking.md](matt-pocock-tracking.md).
+
 ## Installed scope
 
 The upgrade imports the complete stable release through `scripts/sync_vendor.py`

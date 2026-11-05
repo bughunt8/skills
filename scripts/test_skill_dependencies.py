@@ -46,6 +46,17 @@ class Dependencies(unittest.TestCase):
     def entry(self, name):
         return next(e for e in self.r["providers"] if e["name"] == name)
 
+    def path(self, name):
+        for e in self.r["providers"] + self.r["auxiliary_providers"]:
+            if e["name"] == name:
+                return e["path"]
+        raise KeyError(name)
+
+    def sync_counts(self):
+        self.r["provider_count"] = len(self.r["providers"])
+        self.r["file_count"] = sum(len(e["files"]) for e in self.r["providers"])
+        self.r["operative_count"] = sum(len(e["operative"]) for e in self.r["providers"])
+
     def rehash(self, relative):
         # Trusted registry updates deliberately let tests reach deeper structural checks.
         f = next(f for e in self.r["providers"] for f in e["files"] if f["path"] == relative)
@@ -68,9 +79,18 @@ class Dependencies(unittest.TestCase):
 
     def test_pristine_release(self):
         self.assertEqual(checker.check(self.root, self.r), [])
-        self.assertEqual(len(self.r["providers"]), 27)
-        self.assertEqual(sum(len(e["files"]) for e in self.r["providers"]), 79)
-        self.assertEqual(sum(len(e["operative"]) for e in self.r["providers"]), 18)
+        self.assertEqual(len(self.r["providers"]), self.r["provider_count"])
+        self.assertEqual(
+            sum(len(e["files"]) for e in self.r["providers"]), self.r["file_count"]
+        )
+        self.assertEqual(
+            sum(len(e["operative"]) for e in self.r["providers"]), self.r["operative_count"]
+        )
+
+    def test_registry_requires_canonical_upstream_repository(self):
+        self.r["upstream_repository"] = "file:///tmp/other"
+        with self.assertRaisesRegex(checker.Invalid, "upstream repository"):
+            checker.validate_registry(self.r)
 
     def test_exact_model_target(self):
         result = checker.resolve(self.root, self.r, "grilling", "model", "grill-me")
@@ -86,7 +106,7 @@ class Dependencies(unittest.TestCase):
         self.refuse("ambiguous retro intent", "retro", invoker="user")
         self.assertEqual(
             checker.resolve(self.root, self.r, "retro", "user", namespace="matt"),
-            self.root / checker.NATIVE["retro"])
+            self.root / self.path("retro"))
 
     def test_pm_retro_is_not_matt_skill_alias(self):
         with self.assertRaisesRegex(checker.Invalid, "PM retrospective is"):
@@ -118,7 +138,7 @@ class Dependencies(unittest.TestCase):
         path.parent.mkdir(parents=True)
         path.write_text("---\nname: grill-with-docs\ndescription: alternate provider\n---\n")
         self.assertEqual(checker.resolve(self.root, self.r, "grill-me-with-docs", "user"),
-                         self.root / checker.NATIVE["grill-with-docs"])
+                         self.root / self.path("grill-with-docs"))
         self.refuse("ambiguous provider identity", "grill-with-docs", invoker="user")
         self.refuse("user-only", "grill-with-docs", invoker="model")
 
@@ -213,16 +233,19 @@ class Dependencies(unittest.TestCase):
 
     def test_graph_mismatch_missing_edge(self):
         self.entry("grill-me")["operative"] = []
+        self.sync_counts()
         self.assert_errors("graph/body mismatch")
 
     def test_graph_mismatch_added_edge(self):
         self.entry("research")["operative"] = copy.deepcopy(self.entry("grill-me")["operative"])
+        self.sync_counts()
         self.assert_errors("graph/body mismatch")
 
     def test_graph_cycle_refused(self):
         edge = copy.deepcopy(self.entry("tdd")["operative"][0])
-        edge["target"], edge["provider_path"] = "tdd", checker.NATIVE["tdd"]
+        edge["target"], edge["provider_path"] = "tdd", self.path("tdd")
         self.entry("tdd")["operative"].append(edge)
+        self.sync_counts()
         with self.assertRaisesRegex(checker.Invalid, "operative graph cycle"):
             checker.validate_registry(self.r)
 
@@ -234,7 +257,7 @@ class Dependencies(unittest.TestCase):
 
     def test_graph_user_only_target_refused(self):
         edge = self.entry("grill-me")["operative"][0]
-        edge["target"], edge["provider_path"] = "grill-with-docs", checker.NATIVE["grill-with-docs"]
+        edge["target"], edge["provider_path"] = "grill-with-docs", self.path("grill-with-docs")
         with self.assertRaisesRegex(checker.Invalid, "model edge to user-only"):
             checker.validate_registry(self.r)
 
@@ -249,7 +272,7 @@ class Dependencies(unittest.TestCase):
             checker.validate_registry(self.r)
 
     def test_alias_wrong_provider_refused(self):
-        self.r["aliases"]["grill-me-with-docs"]["provider_path"] = checker.NATIVE["grill-me"]
+        self.r["aliases"]["grill-me-with-docs"]["provider_path"] = self.path("grill-me")
         with self.assertRaisesRegex(checker.Invalid, "alias identity/path"):
             checker.validate_registry(self.r)
 
@@ -265,11 +288,11 @@ class Dependencies(unittest.TestCase):
 
     def test_setup_model_pr_scope(self):
         self.assertEqual(checker.resolve(self.root, self.r, "pr", "model", "github-repository-setup"),
-                         self.root / checker.NATIVE["pr"])
+                         self.root / self.path("pr"))
 
     def test_dynamic_notes_can_only_resolve_model_targets(self):
         self.assertEqual(checker.resolve(self.root, self.r, "pr", "model", "wayfinder"),
-                         self.root / checker.NATIVE["pr"])
+                         self.root / self.path("pr"))
         self.refuse("user-only", "retro", caller="wayfinder")
         self.refuse("user-only", "wayfinder", caller="wayfinder")
 
@@ -308,18 +331,18 @@ class Dependencies(unittest.TestCase):
             base = self.root / e["source_path"]
             (base / "PROVENANCE.md").write_text(
                 f"| Upstream path | `{e['source_path']}` |\n"
-                f"| Pinned commit | [{checker.PIN}]({checker.REPO}/commit/{checker.PIN}) |\n"
-                f"| Permalink | {checker.REPO}/tree/{checker.PIN}/{e['source_path']} |\n")
+                f"| Pinned commit | [{self.r['upstream_commit']}]({checker.REPO}/commit/{self.r['upstream_commit']}) |\n"
+                f"| Permalink | {checker.REPO}/tree/{self.r['upstream_commit']}/{e['source_path']} |\n")
             license_path = SOURCE / "skills/engineering/research/LICENSE.upstream"
             license_bytes = (license_path if license_path.exists() else SOURCE / "LICENSE").read_bytes()
-            prefix = (f"Vendored from {checker.REPO} at commit {checker.PIN}.\n"
+            prefix = (f"Vendored from {checker.REPO} at commit {self.r['upstream_commit']}.\n"
                       f"Original licence text follows, unmodified.\n{'-' * 76}\n\n").encode()
             # Fixture input may be upstream or already imported. Normalize to the
             # original notice, then exercise the preface explicitly in its test.
             if license_bytes.startswith(prefix):
                 license_bytes = license_bytes[len(prefix):]
             (base / "LICENSE.upstream").write_bytes(license_bytes)
-            (base / "ATTRIBUTION.md").write_text(f"{checker.REPO} {checker.PIN}")
+            (base / "ATTRIBUTION.md").write_text(f"{checker.REPO} {self.r['upstream_commit']}")
             (base / ".vendor-owned.json").write_text(json.dumps({"source": "mattpocock-" + e["name"], "paths": [""]}))
 
     def test_importer_source_paths_validated(self):
@@ -338,7 +361,7 @@ class Dependencies(unittest.TestCase):
     def test_importer_license_preface_supported(self):
         self.add_provenance()
         p = self.root / "skills/engineering/research/LICENSE.upstream"
-        prefix = (f"Vendored from {checker.REPO} at commit {checker.PIN}.\n"
+        prefix = (f"Vendored from {checker.REPO} at commit {self.r['upstream_commit']}.\n"
                   f"Original licence text follows, unmodified.\n{'-' * 76}\n\n")
         p.write_text(prefix + p.read_text())
         self.assertEqual(checker.check(self.root, self.r), [])
@@ -352,7 +375,7 @@ class Dependencies(unittest.TestCase):
     def test_import_manifest_mapping_validated(self):
         self.add_provenance()
         sources = [dict(id="mattpocock-" + e["name"], repo=checker.REPO,
-                        pinned_commit=checker.PIN, expected_commit=checker.PIN, ref="v1.3.1",
+                        pinned_commit=self.r['upstream_commit'], expected_commit=self.r['upstream_commit'], ref=self.r["release_ref"],
                         dest=e["source_path"], paths=[{"from": e["source_path"], "to": "", "kind": "skill"}])
                    for e in self.r["providers"]]
         path = self.root / "skills/vendor.manifest.json"
@@ -367,7 +390,7 @@ class Dependencies(unittest.TestCase):
                                  "--root", str(self.root), "--resolve", "research",
                                  "--invoker", "model", "--caller", "wayfinder"], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout.strip(), str(self.root / checker.NATIVE["research"]))
+        self.assertEqual(result.stdout.strip(), str(self.root / self.path("research")))
 
     def test_cli_refusal_nonzero(self):
         result = subprocess.run([sys.executable, str(BASE / "scripts/check_skill_dependencies.py"),

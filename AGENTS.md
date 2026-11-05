@@ -253,7 +253,7 @@ The five canonical roles, each label string equal to its name: `needs-triage`, `
 Single-context: a lazily created `GLOSSARY.md` and existing `docs/adr/` at the root.
 See `docs/agents/domain.md`. Do not invent domain content to fill a template.
 
-### Invocation and Matt v1.3.1
+### Invocation and Matt providers
 
 Read [.agents/invocation.md](.agents/invocation.md) before selecting a companion.
 The [dependency registry](.agents/skill-dependencies.json) binds the 27 stable
@@ -281,8 +281,10 @@ only in approved isolated throwaway work; production adoption needs separate
 tested implementation. `retro` recommends environment changes, not implicit
 global or local writes. Existing SDD gates and independent review remain in force.
 
-The [migration guide](docs/matt-pocock-v1.3.1.md) explains pins, archives and
-limits. Future imports and refreshes use `scripts/sync_vendor.py`; never copy
+The [v1.3.1 migration guide](docs/matt-pocock-v1.3.1.md) records that release's
+pins, archives and limits. The [tracking guide](docs/matt-pocock-tracking.md)
+records the current release. Future imports and refreshes use
+`scripts/sync_vendor.py`; never copy
 external skills or forge ownership records. The one-time `--adopt-existing`
 operation requires explicit source IDs, a verified complete-tree hash and an
 unused archive path. Do not use it on an already managed source.
@@ -305,6 +307,14 @@ Missing wrappers are blocked rather than invented. PM sprint retrospectives use
 `/cs:pm sprint retrospective action items`; Matt's environment retrospective
 requires explicit `--resolve retro --namespace matt --invoker user` in the
 repository resolver. Do not turn a PM label into a human-only Skill call.
+
+### Matt Pocock release tracking
+
+`scripts/track_matt_release.py` updates the 28 Matt sources, the dependency
+registry, generated attribution, docs, site and harness inventories as one unit.
+It refuses a provider-set, invocation or graph-evidence change for human review.
+See the [tracking guide](docs/matt-pocock-tracking.md). The staging workflow is
+`.github/workflows/sync-matt-release.yml`.
 
 ## Commit convention
 

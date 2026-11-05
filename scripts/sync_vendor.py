@@ -433,20 +433,24 @@ def write_ownership(dest_root: Path, owned: list, source_id: str) -> None:
 
 def fetch_upstream(source: dict, workdir: Path) -> "tuple[Path, str]":
     ref = source.get("ref") or "HEAD"
+    # `fetch_repo` is a test-only transport override. Generated provenance and
+    # attribution always use `repo`, so a fixture can fetch locally without
+    # changing the identity written into the vendored tree.
+    repo = source.get("fetch_repo") or source["repo"]
     dest = workdir / source["id"]
     if isinstance(ref, str) and SHA_RE.fullmatch(ref):
         # A commit object is not a branch name.  Cloning with --branch would
         # resolve only advertised refs, so initialise an empty repository and
         # request precisely the immutable object instead.
         _run(["git", "init", "--quiet", str(dest)])
-        _run(["git", "remote", "add", "origin", source["repo"]], cwd=dest)
+        _run(["git", "remote", "add", "origin", repo], cwd=dest)
         _run(["git", "fetch", "--quiet", "--depth", "1", "origin", ref], cwd=dest)
         _run(["git", "checkout", "--quiet", "--detach", "FETCH_HEAD"], cwd=dest)
         sha = _run(["git", "rev-parse", "HEAD"], cwd=dest)
         if sha != ref:
             _fail(f"[{source['id']}] immutable ref {ref} fetched commit {sha}")
         return dest, sha
-    _run(["git", "clone", "--quiet", "--depth", "1", "--branch", ref, source["repo"], str(dest)])
+    _run(["git", "clone", "--quiet", "--depth", "1", "--branch", ref, repo, str(dest)])
     return dest, _run(["git", "rev-parse", "HEAD"], cwd=dest)
 
 

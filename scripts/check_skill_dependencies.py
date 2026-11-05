@@ -13,19 +13,7 @@ import sys
 
 import yaml
 
-PIN = "24fe0ef7737efae15c87225755e9f6f5965e4888"
 REPO = "https://github.com/mattpocock/skills"
-ENGINEERING = (
-    "ask-matt diagnosing-bugs grill-with-docs triage improve-codebase-architecture "
-    "setup-matt-pocock-skills tdd to-spec to-tickets wayfinder implement implement-spec "
-    "prototype research domain-modeling codebase-design code-review pr retro wizard"
-).split()
-PRODUCTIVITY = "grill-me grilling handoff teach to-questionnaire wait-what writing-for-agents".split()
-NATIVE = {n: f"skills/{b}/{n}/SKILL.md"
-          for b, names in (("engineering", ENGINEERING), ("productivity", PRODUCTIVITY))
-          for n in names}
-MODEL = set("diagnosing-bugs tdd prototype research domain-modeling codebase-design "
-            "code-review pr wizard grilling writing-for-agents".split())
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -161,41 +149,69 @@ def read_registry(root):
     return registry
 
 
+def release_fields(r):
+    repo = r.get("upstream_repository")
+    pin = r.get("upstream_commit")
+    release = r.get("release")
+    release_ref = r.get("release_ref")
+    if repo != REPO:
+        raise Invalid("registry upstream repository mismatch")
+    if not isinstance(pin, str) or not re.fullmatch(r"[0-9a-f]{40}", pin):
+        raise Invalid("registry upstream commit must be a full sha")
+    if not isinstance(release, str) or not release:
+        raise Invalid("registry release is required")
+    if not isinstance(release_ref, str) or not release_ref:
+        raise Invalid("registry release_ref is required")
+    return pin, release, release_ref
+
+
 def validate_registry(r):
-    if r.get("schema_version") != 1 or r.get("upstream_commit") != PIN or r.get("upstream_repository") != REPO:
-        raise Invalid("registry schema or upstream pin mismatch")
+    pin, release, release_ref = release_fields(r)
+    if r.get("schema_version") != 1:
+        raise Invalid("registry schema mismatch")
     legal = r["legal_resource"]
-    if legal["source_path"] != "LICENSE" or legal["source_url"] != f"{REPO}/blob/{PIN}/LICENSE" or not re.fullmatch(r"[0-9a-f]{64}", legal["sha256"]):
+    if (legal["source_path"] != "LICENSE"
+            or legal["source_url"] != f"{REPO}/blob/{pin}/LICENSE"
+            or not re.fullmatch(r"[0-9a-f]{64}", legal["sha256"])):
         raise Invalid("license source/hash mismatch")
     entries = r.get("providers")
-    if not isinstance(entries, list) or len(entries) != 27:
-        raise Invalid("registry must contain exactly 27 native providers")
+    if not isinstance(entries, list) or not entries:
+        raise Invalid("registry must contain native providers")
     by_name = {}
+    file_count = 0
+    operative_count = 0
     for e in entries:
         name = e["name"]
-        if name in by_name or name not in NATIVE:
-            raise Invalid(f"duplicate or unexpected native provider: {name}")
-        if e["path"] != NATIVE[name] or e["source_path"] != str(PurePosixPath(NATIVE[name]).parent):
+        if not isinstance(name, str) or not name or name in by_name:
+            raise Invalid(f"duplicate or invalid native provider: {name}")
+        source_path = e["source_path"]
+        path = e["path"]
+        if (not isinstance(source_path, str) or not source_path.startswith("skills/")
+                or path != f"{source_path}/SKILL.md"):
             raise Invalid(f"wrong provider identity/path: {name}")
-        if e["upstream_commit"] != PIN or e["source_url"] != f"{REPO}/blob/{PIN}/{e['path']}":
+        if e["upstream_commit"] != pin or e["source_url"] != f"{REPO}/blob/{pin}/{path}":
             raise Invalid(f"provider pin/source mismatch: {name}")
-        expected_mode = "model_or_user" if name in MODEL else "user_only"
-        if e["invocation"] != expected_mode:
-            raise Invalid(f"invocation mode mismatch: {name}")
+        if e["invocation"] not in ("model_or_user", "user_only"):
+            raise Invalid(f"invalid invocation mode: {name}")
         files = e["files"]
         paths = [f["path"] for f in files]
-        if len(set(paths)) != len(paths) or e["path"] not in paths or e["source_path"] + "/agents/openai.yaml" not in paths:
+        if (len(set(paths)) != len(paths) or path not in paths
+                or source_path + "/agents/openai.yaml" not in paths):
             raise Invalid(f"missing/duplicate registry resources: {name}")
         for f in files:
-            if not f["path"].startswith(e["source_path"] + "/") or f["source_path"] != f["path"]:
+            if not f["path"].startswith(source_path + "/") or f["source_path"] != f["path"]:
                 raise Invalid(f"wrong resource source path: {name}")
-            if not re.fullmatch(r"[0-9a-f]{64}", f["sha256"]) or f["source_url"] != f"{REPO}/blob/{PIN}/{f['source_path']}":
+            if (not re.fullmatch(r"[0-9a-f]{64}", f["sha256"])
+                    or f["source_url"] != f"{REPO}/blob/{pin}/{f['source_path']}"):
                 raise Invalid(f"invalid resource hash/source: {name}")
-        if set(e["resources"]) != set(paths) - {e["path"], e["source_path"] + "/agents/openai.yaml"}:
+        if set(e["resources"]) != set(paths) - {path, source_path + "/agents/openai.yaml"}:
             raise Invalid(f"resource inventory mismatch: {name}")
         by_name[name] = e
-    if set(by_name) != set(NATIVE) or sum(len(e["files"]) for e in entries) != 79:
-        raise Invalid("release file/provider closure mismatch")
+        file_count += len(files)
+    if r.get("provider_count") != len(entries):
+        raise Invalid("declared provider count mismatch")
+    if r.get("file_count") != file_count:
+        raise Invalid("declared file count mismatch")
     graph = {}
     for name, e in by_name.items():
         targets = []
@@ -205,7 +221,7 @@ def validate_registry(r):
                 raise Invalid(f"graph target missing: {name} -> {target}")
             if edge["provider_path"] != by_name[target]["path"]:
                 raise Invalid(f"wrong graph provider: {name} -> {target}")
-            if target not in MODEL:
+            if by_name[target]["invocation"] != "model_or_user":
                 raise Invalid(f"model edge to user-only provider: {name} -> {target}")
             if edge["type"] not in ("operative_tool_call", "operative_slash_call"):
                 raise Invalid(f"invalid operative edge type: {name}")
@@ -217,16 +233,20 @@ def validate_registry(r):
         graph[name] = targets
         if not set(e["human_prerequisites"]) <= set(by_name):
             raise Invalid(f"human prerequisite missing: {name}")
+        operative_count += len(e["operative"])
+    if r.get("operative_count") != operative_count:
+        raise Invalid("declared operative count mismatch")
     cycles(graph, "operative graph")
+    known = dict(by_name)
+    known.update({e["name"]: e for e in r.get("auxiliary_providers", [])})
     aliases = r["aliases"]
     cycles({k: [v["target"]] for k, v in aliases.items()}, "alias")
-    expected_aliases = {"grill-me-with-docs": ("grill-with-docs", NATIVE["grill-with-docs"]),
-                        "setup-github-repository": ("github-repository-setup", "skills/engineering/github-repository-setup/SKILL.md")}
-    if set(aliases) != set(expected_aliases):
-        raise Invalid("alias identity mismatch")
-    for alias, (target, path) in expected_aliases.items():
-        if aliases[alias] != {"target": target, "provider_path": path, "invoker": "user", "expansion": "before_invocation"}:
-            raise Invalid(f"alias identity/path or expansion mismatch: {alias}")
+    for alias, spec in aliases.items():
+        target = spec["target"]
+        if target not in known or spec["provider_path"] != known[target]["path"]:
+            raise Invalid(f"alias identity/path mismatch: {alias}")
+        if spec["invoker"] != "user" or spec["expansion"] != "before_invocation":
+            raise Invalid(f"alias expansion mismatch: {alias}")
     auxiliary = r["auxiliary_providers"]
     expected_aux = {"github-repository-setup": "skills/engineering/github-repository-setup/SKILL.md",
                     "hybrid-research": "skills/research/research/skills/research/SKILL.md"}
@@ -243,27 +263,27 @@ def validate_registry(r):
             if pair["path"] != "skills/engineering/github-repository-setup/agents/openai.yaml" or not re.fullmatch(r"[0-9a-f]{64}", pair["sha256"]):
                 raise Invalid("invalid required setup Codex metadata path/hash")
     scopes = r["caller_scopes"]
-    if scopes != {"wayfinder": {"research": NATIVE["research"]},
-                  "github-repository-setup": {"grilling": NATIVE["grilling"], "domain-modeling": NATIVE["domain-modeling"],
-                                              "pr": NATIVE["pr"], "prototype": NATIVE["prototype"]}}:
-        raise Invalid("caller scope identity/path mismatch")
-    return by_name
+    for caller, scope in scopes.items():
+        for name, path in scope.items():
+            if name not in by_name or by_name[name]["path"] != path:
+                raise Invalid(f"caller scope identity/path mismatch: {caller} -> {name}")
+    return by_name, pin, release, release_ref
 
 
-def validate_provenance(root, e, required, legal_hash):
+def validate_provenance(root, e, required, legal_hash, pin, repo):
     directory = root / e["source_path"]
     if not required:
         return
     path = checked_path(root, e["source_path"] + "/PROVENANCE.md")
     text = path.read_text(encoding="utf-8")
     match = re.search(r"^\| Upstream path \| `([^`]+)` \|$", text, re.M)
-    permalink = f"{REPO}/tree/{PIN}/{e['source_path']}"
-    if not match or match[1] != e["source_path"] or permalink not in text or f"{REPO}/commit/{PIN}" not in text:
+    permalink = f"{repo}/tree/{pin}/{e['source_path']}"
+    if not match or match[1] != e["source_path"] or permalink not in text or f"{repo}/commit/{pin}" not in text:
         raise Invalid(f"provenance source path/pin mismatch: {e['name']}")
     for filename in ("LICENSE.upstream", "ATTRIBUTION.md", ".vendor-owned.json"):
         checked_path(root, e["source_path"] + "/" + filename)
     license_bytes = (directory / "LICENSE.upstream").read_bytes()
-    prefix = (f"Vendored from {REPO} at commit {PIN}.\n"
+    prefix = (f"Vendored from {repo} at commit {pin}.\n"
               f"Original licence text follows, unmodified.\n{'-' * 76}\n\n").encode("utf-8")
     # The importer adds an attribution preface; hash the unmodified notice after it.
     if license_bytes.startswith(prefix):
@@ -271,7 +291,7 @@ def validate_provenance(root, e, required, legal_hash):
     if hashlib.sha256(license_bytes).hexdigest() != legal_hash:
         raise Invalid(f"upstream MIT notice/hash mismatch: {e['name']}")
     attribution = (directory / "ATTRIBUTION.md").read_text(encoding="utf-8")
-    if REPO not in attribution or PIN not in attribution:
+    if repo not in attribution or pin not in attribution:
         raise Invalid(f"attribution pin/source mismatch: {e['name']}")
     ownership = load_json(directory / ".vendor-owned.json")
     if not isinstance(ownership, dict) or ownership.get("source") != "mattpocock-" + e["name"] or ownership.get("paths") != [""]:
@@ -286,7 +306,11 @@ def imported(root, entries):
     manifest = root / "skills/vendor.manifest.json"
     if manifest.exists():
         sources = load_json(checked_path(root, "skills/vendor.manifest.json")).get("sources", [])
-        return any(s.get("repo", "").rstrip("/") == REPO for s in sources)
+        for source in sources:
+            for e in entries:
+                if (source.get("id") == "mattpocock-" + e["name"]
+                        and source.get("dest") == e["source_path"]):
+                    return True
     return False
 
 
@@ -317,7 +341,7 @@ def catalog(root, requested):
 
 
 def check(root, r, require_provenance=False):
-    by_name = validate_registry(r)
+    by_name, pin, release, release_ref = validate_registry(r)
     errors = []
     require_provenance = require_provenance or imported(root, r["providers"])
     manifest = root / "skills/vendor.manifest.json"
@@ -330,8 +354,8 @@ def check(root, r, require_provenance=False):
                 continue
             s = matches[0]
             expected_mapping = [{"from": e["source_path"], "to": "", "kind": "skill"}]
-            if (s.get("repo", "").rstrip("/") != REPO or s.get("pinned_commit") != PIN
-                    or s.get("expected_commit") != PIN or s.get("ref") != "v1.3.1"
+            if (s.get("repo", "").rstrip("/") != REPO or s.get("pinned_commit") != pin
+                    or s.get("expected_commit") != pin or s.get("ref") != release_ref
                     or s.get("dest") != e["source_path"] or s.get("paths") != expected_mapping):
                 errors.append(f"import manifest source path/pin mismatch: {name}")
     for name, e in by_name.items():
@@ -348,7 +372,7 @@ def check(root, r, require_provenance=False):
             implicit = meta.get("policy", {}).get("allow_implicit_invocation", True)
             if is_disabled != (e["invocation"] == "user_only") or implicit == is_disabled:
                 raise Invalid(f"invocation YAML/Codex pair mismatch: {name}")
-            if name in MODEL and ("disable-model-invocation" in fm or "policy" in meta):
+            if e["invocation"] == "model_or_user" and ("disable-model-invocation" in fm or "policy" in meta):
                 raise Invalid(f"model defaults must be omitted: {name}")
             text = (root / e["path"]).read_text(encoding="utf-8")
             expected = {edge["target"] for edge in e["operative"]}
@@ -364,7 +388,7 @@ def check(root, r, require_provenance=False):
                         raise Invalid(f"graph evidence target mismatch: {name}")
                     if ev["source_url"] != e["source_url"] + f"#L{line}":
                         raise Invalid(f"graph evidence source mismatch: {name}")
-            validate_provenance(root, e, require_provenance, r["legal_resource"]["sha256"])
+            validate_provenance(root, e, require_provenance, r["legal_resource"]["sha256"], pin, REPO)
         except (Invalid, yaml.YAMLError, OSError, ValueError) as exc:
             errors.append(str(exc))
     for e in r["auxiliary_providers"]:
@@ -395,13 +419,13 @@ def check(root, r, require_provenance=False):
     plugin = root / ".claude-plugin/plugin.json"
     if plugin.exists():
         p = load_json(checked_path(root, ".claude-plugin/plugin.json"))
-        if p.get("version") != "1.3.1" or sorted(p.get("skills", [])) != sorted("./" + e["source_path"] for e in r["providers"]):
+        if p.get("version") != release or sorted(p.get("skills", [])) != sorted("./" + e["source_path"] for e in r["providers"]):
             errors.append("release manifest closure mismatch")
     return errors
 
 
 def resolve(root, r, name, invoker="user", caller=None, namespace=None):
-    by_name = validate_registry(r)
+    by_name, pin, release, release_ref = validate_registry(r)
     # Check everything before resolving: no successful routing through a broken bundle.
     errors = check(root, r)
     if errors:
@@ -532,7 +556,9 @@ def main(argv=None):
                 for error in errors:
                     print("ERROR: " + error, file=sys.stderr)
                 return 1
-            print("OK: 27 native providers, 79 pinned files, invocation pairs and operative graph validated")
+            print(f"OK: {r['provider_count']} native providers, {r['file_count']} pinned files, "
+                  f"{r['operative_count']} operative edges, "
+                  "invocation pairs and operative graph validated")
             print("Static check only; runtime loader, authorization and external capabilities are not enforced.")
         return 0
     except (Invalid, yaml.YAMLError, OSError, ValueError, KeyError, TypeError) as exc:

@@ -49,6 +49,9 @@ jobs:
       - name: Test the frontmatter parser
         run: python3 scripts/lint_skills.py --self-test
 
+      - name: Test the Matt release tracker
+        run: python3 scripts/track_matt_release.py --self-test
+
       # SK001-SK009. Pre-existing violations are recorded in
       # scripts/skill_lint_baseline.json, keyed by rule, path and a fingerprint of
       # the message, so the gate blocks new debt without requiring the whole
@@ -113,6 +116,7 @@ jobs:
             --path skills/engineering-team/skills/senior-fullstack \
             --path skills/project-management/AGENTS.md \
             --path .agents --path docs/matt-pocock-v1.3.1.md \
+            --path docs/matt-pocock-tracking.md \
             --path docs/legacy-harness-bindings.md
 
       # A Solution Skill references skills by name. A renamed or removed skill

@@ -78,8 +78,10 @@ for the source pin, format limits, tests and independent review.
 - **[togaf-advisor](./skills/engineering/togaf-advisor/SKILL.md)** — TOGAF 10-grounded enterprise architecture decision support. [Upstream source and attribution](./skills/engineering/togaf-advisor/ATTRIBUTION.md).
 - **[architecture-diagrams](./skills/engineering/architecture-diagrams/SKILL.md)** — Render architecture, workflow, data-flow, sequence and lifecycle diagrams as explorable standalone HTML with inline SVG, from a small validated JSON document. Zero dependencies, Python standard library only. [Upstream inspiration and attribution](./skills/engineering/architecture-diagrams/ATTRIBUTION.md).
 
-Matt's [v1.3.1 migration guide](docs/matt-pocock-v1.3.1.md) covers all 27 stable
-skills and their companion resources. Read [.agents/invocation.md](.agents/invocation.md)
+Matt's [v1.3.1 migration guide](docs/matt-pocock-v1.3.1.md) records that
+release's 27 stable skills and companion resources. The
+[tracking guide](docs/matt-pocock-tracking.md) records the current release.
+Read [.agents/invocation.md](.agents/invocation.md)
 for human-only commands, exact-provider resolution and native approval overrides.
 The requested `/grill-me-with-docs` is a human alias for `/grill-with-docs`;
 hosts without alias expansion must use the canonical command.
@@ -275,6 +277,10 @@ Read [CONTRIBUTING.md](./CONTRIBUTING.md) first. Three rules matter most:
 2. Never hand-edit the generated index or `THIRD_PARTY_NOTICES.md`. Run the generator.
 3. Every import from someone else's work needs a licence (or recorded licence evidence), an
    author, and a commit-pinned link before it is merged.
+
+The Matt Pocock release is tracked by
+[`scripts/track_matt_release.py`](./scripts/track_matt_release.py); see the
+[tracking guide](./docs/matt-pocock-tracking.md).
 
 Run the same checks CI runs. All offline, standard library plus PyYAML, nothing else to install:
 
