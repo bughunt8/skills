@@ -58,7 +58,11 @@ test.describe("workspace acceptance", () => {
     expect((await resultKeys(page)).length).toBe(data.nodes.length);
     const rings = await page.locator(".g-commring").evaluateAll((els) =>
       els.length && getComputedStyle(els[0]).display !== "none" ? els.length : 0);
-    expect(rings, "overview marks detected communities with rings").toBeGreaterThan(1);
+    const sizes = new Map();
+    for (const cid of data.commOf) sizes.set(cid, (sizes.get(cid) || 0) + 1);
+    const expectedRings = [...sizes.values()].filter((size) => size >= 2).length;
+    expect(rings, "overview marks every detected community of two or more skills")
+      .toBe(expectedRings);
     const layout = await assertLayout(page);
     const graph = await page.locator("#gsvg").boundingBox();
     expect(graph.width).toBeGreaterThan(layout.regions["graph-region"].width * 0.85);
