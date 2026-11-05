@@ -866,10 +866,10 @@ def render_attribution() -> str:
     if manifest.exists():
         for source in json.loads(manifest.read_text(encoding="utf-8")).get("sources", []):
             licence = source.get("license")
-            tier = "refreshed"
+            ref = str(source.get("ref", ""))
+            tier = "manual pin" if re.fullmatch(r"[0-9a-fA-F]{40}", ref) else "refreshed"
             if source.get("license_evidence_path"):
                 licence = f"{licence} (declared; no upstream licence file)"
-                tier = "manual pin"
             add(source.get("repo"), source.get("id"), source.get("author"),
                 licence, tier, None)
     inventory = REPO_ROOT / "docs" / "third-party-inventory.json"
