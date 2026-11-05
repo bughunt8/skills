@@ -68,6 +68,7 @@ class TrackerTests(unittest.TestCase):
             "provider_count": 2,
             "file_count": 4,
             "operative_count": 0,
+            "untracked_scopes": ["skills/misc"],
             "legal_resource": {
                 "source_path": "LICENSE",
                 "sha256": "0" * 64,
@@ -168,10 +169,24 @@ class TrackerTests(unittest.TestCase):
             self.assertIn(f"{REPO}/tree/{self.pin}/", source["homepage"])
 
     def test_provider_set_change_is_refused(self):
-        new = self.upstream / "skills/misc/new"
+        new = self.upstream / "skills/engineering/new"
         new.mkdir(parents=True)
         (new / "SKILL.md").write_text("---\nname: new\ndescription: new\n---\n")
         with self.assertRaisesRegex(tracker.Refusal, "provider set changed"):
+            self.proposal()
+
+    def test_untracked_scope_is_ignored(self):
+        new = self.upstream / "skills/misc/experimental"
+        new.mkdir(parents=True)
+        (new / "SKILL.md").write_text("---\nname: experimental\ndescription: new\n---\n")
+        proposal = self.proposal()
+        self.assertEqual(proposal["registry"]["provider_count"], 2)
+
+    def test_new_scope_is_refused(self):
+        new = self.upstream / "skills/design/new"
+        new.mkdir(parents=True)
+        (new / "SKILL.md").write_text("---\nname: new\ndescription: new\n---\n")
+        with self.assertRaisesRegex(tracker.Refusal, "new upstream scope"):
             self.proposal()
 
     def test_invocation_change_is_refused(self):

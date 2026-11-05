@@ -212,6 +212,13 @@ def validate_registry(r):
         raise Invalid("declared provider count mismatch")
     if r.get("file_count") != file_count:
         raise Invalid("declared file count mismatch")
+    untracked = r.get("untracked_scopes")
+    if (not isinstance(untracked, list)
+            or not all(isinstance(s, str) and s.startswith("skills/") for s in untracked)):
+        raise Invalid("registry untracked_scopes must be a list of skills/ paths")
+    for e in entries:
+        if any(e["source_path"] == s or e["source_path"].startswith(s + "/") for s in untracked):
+            raise Invalid(f"tracked provider inside an untracked scope: {e['name']}")
     graph = {}
     for name, e in by_name.items():
         targets = []

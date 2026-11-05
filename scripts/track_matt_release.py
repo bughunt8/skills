@@ -131,9 +131,24 @@ def build_proposal(upstream, commit, release_ref, transport, root=ROOT):
 
     providers = registry["providers"]
     expected = {e["source_path"] for e in providers}
+    scopes = {"/".join(Path(e["source_path"]).parts[:2]) for e in providers}
+    ignored = set(registry.get("untracked_scopes", []))
+    upstream_skills = upstream / "skills"
+    domains = {
+        "skills/" + p.relative_to(upstream_skills).parts[0]
+        for p in upstream_skills.rglob("SKILL.md")
+        if not p.is_symlink()
+    }
+    new_scopes = sorted(domains - scopes - ignored)
+    if new_scopes:
+        raise Refusal(
+            "refused_semantic",
+            f"new upstream scope requires review: {new_scopes}",
+        )
     actual = {
         p.parent.relative_to(upstream).as_posix()
-        for p in (upstream / "skills").rglob("SKILL.md")
+        for scope in scopes
+        for p in (upstream / scope).rglob("SKILL.md")
         if not p.is_symlink()
     }
     if actual != expected:

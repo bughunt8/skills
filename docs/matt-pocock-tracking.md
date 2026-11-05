@@ -51,11 +51,18 @@ and copies back only after they pass. A copy-back failure restores the checkout.
 Historical documents keep their original pins: `docs/matt-pocock-v1.3.1.md`, the
 setup migration references and `MATTPOCOCK_SKILLS_ATTRIBUTION.md`.
 
+The registry's `untracked_scopes` lists the experimental trees that the stable
+import does not vendor, currently `skills/in-progress` and `skills/misc`. A new
+provider under either tree does not change the vendored set. A new top-level
+tree under `skills/` is refused until a human decides whether it belongs in the
+stable import.
+
 ## Fail-closed points
 
 The tracker refuses a release that:
 
-- adds, removes or renames a provider;
+- adds, removes or renames a provider inside a tracked scope;
+- adds an unrecognised top-level tree under `skills/`;
 - changes a provider path or invocation policy;
 - changes the body evidence for an operative dependency edge;
 - has no `LICENSE`, a symlink, an unreadable frontmatter, or no release tag.
