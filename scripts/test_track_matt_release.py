@@ -237,6 +237,34 @@ class TrackerTests(unittest.TestCase):
         with self.assertRaisesRegex(tracker.Refusal, "invocation policy changed"):
             self.proposal()
 
+    def test_temporary_clone_checks_out_the_resolved_tag(self):
+        (self.upstream / "NEW.md").write_text("later\n")
+        self.git("add", "-A")
+        self.git("commit", "-qm", "later")
+        later = self.git("rev-parse", "HEAD")
+        self.assertNotEqual(later, self.pin)
+        upstream, _transport, cleanup, temporary = tracker.upstream_tree(
+            None, str(self.upstream)
+        )
+        try:
+            _ref, commit = tracker.resolve_target(upstream, "v1.2.0")
+            self.assertEqual(commit, self.pin)
+            tracker.prepare_upstream(upstream, commit, temporary)
+            head = subprocess.run(
+                ["git", "-C", str(upstream), "rev-parse", "HEAD"],
+                check=True, capture_output=True, text=True,
+            ).stdout.strip()
+            self.assertEqual(head, self.pin)
+        finally:
+            cleanup()
+
+    def test_caller_directory_must_match_the_resolved_commit(self):
+        (self.upstream / "NEW.md").write_text("later\n")
+        self.git("add", "-A")
+        self.git("commit", "-qm", "later")
+        with self.assertRaisesRegex(tracker.Refusal, "upstream directory is at"):
+            tracker.prepare_upstream(self.upstream, self.pin, False)
+
     def test_symlink_provider_is_refused(self):
         skill = self.upstream / "skills/engineering/a/SKILL.md"
         real = self.upstream / "fixture-skill.md"

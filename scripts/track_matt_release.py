@@ -101,16 +101,33 @@ def resolve_target(upstream, ref):
 
 
 def upstream_tree(upstream_dir, upstream_url):
-    """Return (path, transport, cleanup). transport is what sync_vendor fetches."""
+    """Return (path, transport, cleanup, temporary).
+
+    ``temporary`` means the tracker owns the checkout and may move it to the
+    resolved commit. A caller-provided directory is only read.
+    """
     if upstream_dir:
         path = Path(upstream_dir).resolve()
         if not (path / ".git").is_dir():
             raise Refusal("refused_invalid_upstream", f"not a git repository: {path}")
-        return path, str(path), lambda: None
+        return path, str(path), lambda: None, False
     url = upstream_url or checker.REPO
     temp = Path(tempfile.mkdtemp(prefix="matt-upstream-"))
     _run(["git", "clone", "--quiet", url, str(temp)])
-    return temp, str(temp), lambda: shutil.rmtree(temp, ignore_errors=True)
+    return temp, str(temp), lambda: shutil.rmtree(temp, ignore_errors=True), True
+
+
+def prepare_upstream(upstream, commit, temporary):
+    """Check out the resolved commit, or verify a caller's directory is there."""
+    if temporary:
+        _git(["checkout", "--quiet", "--detach", commit], upstream)
+        return
+    head = _git(["rev-parse", "HEAD"], upstream)
+    if head != commit:
+        raise Refusal(
+            "refused_invalid_upstream",
+            f"upstream directory is at {head}, not {commit}",
+        )
 
 
 def _release_version(upstream, ref):
@@ -417,9 +434,10 @@ def _copy_back(root, worktree):
 
 
 def run_check(root, upstream_dir, upstream_url, ref):
-    upstream, transport, cleanup = upstream_tree(upstream_dir, upstream_url)
+    upstream, transport, cleanup, temporary = upstream_tree(upstream_dir, upstream_url)
     try:
         release_ref, commit = resolve_target(upstream, ref)
+        prepare_upstream(upstream, commit, temporary)
         proposal = build_proposal(upstream, commit, release_ref, transport, root)
         current = proposal["old_pin"] == commit and proposal["old_ref"] == release_ref
         if current:
@@ -439,9 +457,10 @@ def run_check(root, upstream_dir, upstream_url, ref):
 def run_write(root, upstream_dir, upstream_url, ref):
     if not _clean(root):
         raise Refusal("refused_invalid_upstream", "working tree is not clean")
-    upstream, transport, cleanup = upstream_tree(upstream_dir, upstream_url)
+    upstream, transport, cleanup, temporary = upstream_tree(upstream_dir, upstream_url)
     try:
         release_ref, commit = resolve_target(upstream, ref)
+        prepare_upstream(upstream, commit, temporary)
         proposal = build_proposal(upstream, commit, release_ref, transport, root)
         registry = json.loads((root / REGISTRY).read_text(encoding="utf-8"))
         if registry["upstream_commit"] == commit and registry["release_ref"] == release_ref:
