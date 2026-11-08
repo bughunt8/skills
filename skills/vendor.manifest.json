@@ -1644,6 +1644,34 @@
         "The prompt set is research guidance, not verified market data. Outputs still need citation checks."
       ],
       "notes": "Mapped as a read-only support tree under docs/reference-sources, mirroring the Addy Osmani SDD reference. The relative layout inside source/ is preserved so the upstream SKILL.md links keep resolving. file_include, not exclude, is what actually keeps data/ out. Support exclude entries are literal names, not globs."
+    },
+    {
+      "id": "skill-creator",
+      "name": "Skill Creator",
+      "repo": "https://github.com/anthropics/claude-plugins-official",
+      "homepage": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/skill-creator",
+      "author": "Anthropic",
+      "license": "Apache-2.0",
+      "license_path": "LICENSE",
+      "ref": "main",
+      "pinned_commit": "0412be76f50ab4f4f8abff3753efa9269fbbca5b",
+      "dest": "skills/engineering/skill-creator",
+      "paths": [
+        {
+          "from": "plugins/skill-creator/skills/skill-creator",
+          "to": "",
+          "kind": "skill"
+        }
+      ],
+      "mandatory": [],
+      "limitations": [
+        "The upstream skill is designed for Claude Code and Claude.ai. Its evaluation scripts call the `claude` CLI, and its viewer expects a local browser; this library does not install that toolchain. The skill can be read and followed manually, but the eval loop is not runnable here without it.",
+        "The whole skill directory is vendored, including `scripts/`, `agents/`, `references/`, `assets/` and `eval-viewer/`. The scripts are content, not a runtime this repository installs.",
+        "The upstream directory carries its own Apache-2.0 `LICENSE.txt` in addition to the repository root `LICENSE`. Both are preserved.",
+        "The skill's `present_files` packaging step applies only to a host that provides that tool. Other hosts should skip it."
+      ],
+      "notes": "Vendored from the official Anthropic plugin repository. The mapping copies the single skill directory to a first-party engineering path so its internal `scripts/`, `references/`, `agents/` and `eval-viewer/` links keep resolving.",
+      "pinned_at": "2026-11-08"
     }
   ]
 }

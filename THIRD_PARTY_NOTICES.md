@@ -58,6 +58,7 @@ commit references require a reviewed manual pin update. Provenance presence is e
 | [rederive](https://github.com/EricJujianZou/rederive) | Eric Zou | MIT | `skills/rederive/` | [`329f9c915944`](https://github.com/EricJujianZou/rederive/commit/329f9c915944272f4f63954220f5d00a5c342270) | [ATTRIBUTION.md](./skills/rederive/ATTRIBUTION.md) |
 | [McKinsey Problem Solving](https://github.com/succtorlin/mckinsey-problem-solving-skill) | Tony Zhang (succtorlin) | MIT | `skills/mckinsey-problem-solving/` | [`c87cac100072`](https://github.com/succtorlin/mckinsey-problem-solving-skill/commit/c87cac1000720bb135d87888e9d4db50bd6f0fa3) | [ATTRIBUTION.md](./skills/mckinsey-problem-solving/ATTRIBUTION.md) |
 | [McKinsey Research (Abdullah4AI)](https://github.com/Abdullah4AI/mckinsey-research) | Abdullah AlRashoudi (@Abdullah4AI) | MIT (declared; no upstream licence file) | `docs/reference-sources/abdullah-mckinsey-research/` | [`140ecedf5741`](https://github.com/Abdullah4AI/mckinsey-research/commit/140ecedf57414521bf55fc485e140d151cfb44fd) | [ATTRIBUTION.md](./docs/reference-sources/abdullah-mckinsey-research/ATTRIBUTION.md) |
+| [Skill Creator](https://github.com/anthropics/claude-plugins-official) | Anthropic | Apache-2.0 | `skills/engineering/skill-creator/` | [`0412be76f50a`](https://github.com/anthropics/claude-plugins-official/commit/0412be76f50ab4f4f8abff3753efa9269fbbca5b) | [ATTRIBUTION.md](./skills/engineering/skill-creator/ATTRIBUTION.md) |
 
 ### Secondary licences inside those imports
 
